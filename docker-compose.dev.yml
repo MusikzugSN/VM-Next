@@ -1,0 +1,40 @@
+# Local development services: PostgreSQL and Pocket ID (OIDC identity server).
+# Start:  pnpm dev:up      Stop: pnpm dev:down      (see apps/api/README.md)
+name: vm-web-dev
+
+services:
+  postgres:
+    image: postgres:17-alpine
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: vmweb
+      POSTGRES_PASSWORD: vmweb
+      POSTGRES_DB: vmweb
+    ports:
+      # 5433 on the host: a local Windows PostgreSQL often occupies 5432
+      - '127.0.0.1:5433:5432'
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+    healthcheck:
+      test: ['CMD-SHELL', 'pg_isready -U vmweb -d vmweb']
+      interval: 5s
+      timeout: 3s
+      retries: 10
+
+  pocket-id:
+    image: ghcr.io/pocket-id/pocket-id:v2
+    restart: unless-stopped
+    environment:
+      # Must match the address used in the browser and in OIDC_ISSUER_URL
+      APP_URL: http://localhost:1411
+      # Development only – never reuse this key outside the local machine
+      ENCRYPTION_KEY: vm-web-local-dev-only-key-0123456789
+      TRUST_PROXY: 'false'
+    ports:
+      - '127.0.0.1:1411:1411'
+    volumes:
+      - pocket-id-data:/app/data
+
+volumes:
+  postgres-data:
+  pocket-id-data:
