@@ -1,0 +1,83 @@
+{
+  "version": 1,
+  "name": "Standard-Blasorchester",
+  "instruments": [
+    { "name": "Flöte", "voices": [{ "name": "Piccolo" }, { "name": "Flöte 1" }, { "name": "Flöte 2" }] },
+    { "name": "Oboe", "voices": [{ "name": "Oboe" }] },
+    { "name": "Fagott", "voices": [{ "name": "Fagott" }] },
+    {
+      "name": "Klarinette",
+      "voices": [
+        { "name": "Klarinette in Es" },
+        { "name": "Klarinette 1 in B" },
+        { "name": "Klarinette 2 in B" },
+        { "name": "Klarinette 3 in B" },
+        { "name": "Bassklarinette in B" }
+      ]
+    },
+    {
+      "name": "Saxophon",
+      "voices": [
+        { "name": "Altsaxophon 1 in Es" },
+        { "name": "Altsaxophon 2 in Es" },
+        { "name": "Tenorsaxophon in B" },
+        { "name": "Baritonsaxophon in Es" }
+      ]
+    },
+    { "name": "Flügelhorn", "voices": [{ "name": "Flügelhorn 1 in B" }, { "name": "Flügelhorn 2 in B" }] },
+    {
+      "name": "Trompete",
+      "voices": [{ "name": "Trompete 1 in B" }, { "name": "Trompete 2 in B" }, { "name": "Trompete 3 in B" }]
+    },
+    {
+      "name": "Horn",
+      "voices": [
+        { "name": "Horn 1 in F" },
+        { "name": "Horn 2 in F" },
+        { "name": "Horn 3 in F" },
+        { "name": "Horn 4 in F" },
+        { "name": "Horn 1 in Es", "lineup": false },
+        { "name": "Horn 2 in Es", "lineup": false },
+        { "name": "Horn 3 in Es", "lineup": false },
+        { "name": "Horn 4 in Es", "lineup": false }
+      ]
+    },
+    { "name": "Tenorhorn", "voices": [{ "name": "Tenorhorn 1 in B" }, { "name": "Tenorhorn 2 in B" }] },
+    {
+      "name": "Bariton",
+      "voices": [{ "name": "Bariton in B" }, { "name": "Bariton in C", "lineup": false }]
+    },
+    {
+      "name": "Posaune",
+      "voices": [
+        { "name": "Posaune 1 in C" },
+        { "name": "Posaune 2 in C" },
+        { "name": "Posaune 3 in C" },
+        { "name": "Posaune 1 in B", "lineup": false },
+        { "name": "Posaune 2 in B", "lineup": false },
+        { "name": "Posaune 3 in B", "lineup": false }
+      ]
+    },
+    {
+      "name": "Tuba",
+      "voices": [{ "name": "Tuba in C" }, { "name": "Tuba in B", "lineup": false }, { "name": "Tuba in Es", "lineup": false }]
+    },
+    { "name": "Kontrabass", "voices": [{ "name": "Kontrabass" }] },
+    { "name": "Pauken", "voices": [{ "name": "Pauken" }] },
+    { "name": "Schlagwerk", "voices": [{ "name": "Schlagzeug" }, { "name": "Mallets" }] }
+  ],
+  "substitutes": {
+    "Horn 1 in F": ["Horn 1 in Es"],
+    "Horn 2 in F": ["Horn 2 in Es"],
+    "Horn 3 in F": ["Horn 3 in Es"],
+    "Horn 4 in F": ["Horn 4 in Es"],
+    "Bariton in B": ["Bariton in C", "Tenorhorn 1 in B"],
+    "Posaune 1 in C": ["Posaune 1 in B"],
+    "Posaune 2 in C": ["Posaune 2 in B"],
+    "Posaune 3 in C": ["Posaune 3 in B"],
+    "Tuba in C": ["Tuba in B", "Tuba in Es"],
+    "Kontrabass": ["Tuba in C"],
+    "Flügelhorn 1 in B": ["Trompete 1 in B"],
+    "Flügelhorn 2 in B": ["Trompete 2 in B"]
+  }
+}
