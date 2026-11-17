@@ -1,4 +1,4 @@
-import { z } from 'zod';
+import * as z from 'zod';
 import { idSchema } from '../common/ids.schema';
 
 /** GET voices/instrument-suggestions?q= – autocomplete for the instrument field (N-7). Max. 20 hits, prefix matches first. */

@@ -1,4 +1,4 @@
-import { z } from 'zod';
+import * as z from 'zod';
 import { idSchema, refSchema } from '../common/ids.schema';
 
 /** GET me/folders/:folderId/overview – folder header (M-4). Query: `voiceContextQuerySchema`. */

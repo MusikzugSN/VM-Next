@@ -1,4 +1,4 @@
-import { z } from 'zod';
+import * as z from 'zod';
 import { idSchema, shortNameSchema } from '../common/ids.schema';
 
 /** Types of custom fields (N-2). */

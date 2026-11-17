@@ -1,8 +1,8 @@
-import { z } from 'zod';
+import * as z from 'zod';
 
 /** GET auth/login – starts the OIDC flow (A-1). Responds with 302 to the identity server. */
 export const loginQuerySchema = z.object({
-  /** Relative app path to return to after login; defaults to `/me` (A-3). Absolute URLs are rejected. */
+  /** Relative app path to return to after login; defaults to `DEFAULT_APP_PATH` (A-3). Absolute URLs are rejected. */
   returnTo: z
     .string()
     .regex(/^\/(?!\/)/)
@@ -11,7 +11,7 @@ export const loginQuerySchema = z.object({
 });
 export type LoginQuery = z.infer<typeof loginQuerySchema>;
 
-/** GET auth/callback – OIDC redirect target. Responds with 302 to `returnTo`, `/gesperrt` or `/login?error=…`. */
+/** GET auth/callback – OIDC redirect target. Responds with 302 to `returnTo`, `/blocked` or `/login?error=…`. */
 export const callbackQuerySchema = z.object({
   code: z.string().optional(),
   state: z.string().optional(),

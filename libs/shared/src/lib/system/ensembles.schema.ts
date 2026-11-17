@@ -1,4 +1,4 @@
-import { z } from 'zod';
+import * as z from 'zod';
 import { idSchema, isoDateTimeSchema, queryBoolean, refSchema, shortNameSchema } from '../common/ids.schema';
 import { cursorQuerySchema, pageSchema } from '../common/pagination.schema';
 import { voiceRefSchema } from '../common/voice.schema';

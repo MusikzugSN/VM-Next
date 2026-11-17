@@ -1,4 +1,4 @@
-import { z } from 'zod';
+import * as z from 'zod';
 import { idSchema } from '../common/ids.schema';
 import { cursorQuerySchema, pageSchema } from '../common/pagination.schema';
 import { memberScoreRowSchema } from '../common/sheet.schema';

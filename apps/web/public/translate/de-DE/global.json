@@ -1,0 +1,127 @@
+{
+  "app": {
+    "name": "VM-Web",
+    "skipToContent": "Zum Inhalt springen"
+  },
+  "nav": {
+    "label": "Hauptnavigation",
+    "menu": "Menü",
+    "me": {
+      "section": "Mein Bereich",
+      "start": "Start",
+      "folders": "Mappen",
+      "events": "Events",
+      "tags": "Tags",
+      "uploads": "Meine Uploads",
+      "profile": "Profil"
+    },
+    "library": {
+      "section": "Noten",
+      "scores": "Stücke",
+      "review": "Prüfung",
+      "folders": "Mappen verwalten",
+      "events": "Events verwalten",
+      "tags": "Vereins-Tags",
+      "voices": "Stimmen & Instrumente"
+    },
+    "print": {
+      "section": "Drucken",
+      "history": "Druckverlauf"
+    },
+    "system": {
+      "section": "System",
+      "users": "Benutzer",
+      "ensembles": "Ensembles",
+      "roles": "Rollen",
+      "settings": "Konfiguration"
+    }
+  },
+  "common": {
+    "save": "Speichern",
+    "cancel": "Abbrechen",
+    "close": "Schließen",
+    "back": "Zurück",
+    "delete": "Löschen",
+    "edit": "Bearbeiten",
+    "create": "Anlegen",
+    "rename": "Umbenennen",
+    "undo": "Rückgängig",
+    "retry": "Erneut versuchen",
+    "search": "Suchen",
+    "filter": "Filter",
+    "resetFilters": "Alle zurücksetzen",
+    "loadMore": "Mehr laden",
+    "loading": "Wird geladen …",
+    "download": "Herunterladen",
+    "print": "Drucken",
+    "upload": "Hochladen",
+    "logout": "Abmelden",
+    "empty": "Keine Einträge"
+  },
+  "terms": {
+    "ensemble": "Ensemble",
+    "role": "Rolle",
+    "member": "Mitglied",
+    "score": "Stück",
+    "voice": "Stimme",
+    "sheet": "Notenblatt",
+    "folder": "Mappe",
+    "event": "Event",
+    "substituteVoice": "Ersatzstimme",
+    "review": "Prüfung"
+  },
+  "status": {
+    "substitute": "Ersatz: {{ voice }}",
+    "missing": "Stimme fehlt",
+    "pending": "Ungeprüft",
+    "approved": "Freigegeben",
+    "rejected": "Abgelehnt",
+    "queued": "Wartend",
+    "printing": "Druckt",
+    "done": "Fertig",
+    "failed": "Fehler",
+    "complete": "Vollständig"
+  },
+  "errors": {
+    "validation-failed": "Einige Angaben sind nicht gültig. Bitte prüfe die markierten Felder.",
+    "unauthenticated": "Deine Sitzung ist abgelaufen. Bitte melde dich erneut an.",
+    "account-blocked": "Dein Konto ist gesperrt. Wende dich an den Verein.",
+    "csrf-invalid": "Die Sitzung ist nicht mehr gültig. Lade die Seite neu und versuche es erneut.",
+    "forbidden": "Dafür fehlt dir die Berechtigung.",
+    "not-found": "Das gesuchte Element gibt es nicht oder nicht mehr.",
+    "conflict": "Das Element wurde inzwischen geändert. Lade die Seite neu und versuche es erneut.",
+    "name-taken": "Dieser Name ist bereits vergeben.",
+    "in-use": "Das Element wird noch verwendet und kann nicht gelöscht werden.",
+    "sheet-exists": "Für dieses Stück und diese Stimme gibt es bereits ein Notenblatt.",
+    "last-admin": "Es muss mindestens eine Administrator:in geben.",
+    "not-default-role": "Nur Standardrollen lassen sich auf den Standard zurücksetzen.",
+    "upload-not-pending": "Dieser Upload wurde bereits geprüft.",
+    "root-ensemble": "Das oberste Ensemble kann nicht verändert oder archiviert werden.",
+    "invalid-hierarchy": "Ein Ensemble kann nicht unter sich selbst oder einem eigenen Unter-Ensemble stehen.",
+    "unsupported-media-type": "Dieses Dateiformat wird nicht unterstützt.",
+    "payload-too-large": "Die Datei ist zu groß.",
+    "login-failed": "Die Anmeldung ist fehlgeschlagen. Bitte versuche es erneut.",
+    "internal-error": "Auf dem Server ist ein Fehler aufgetreten. Bitte versuche es später erneut.",
+    "network-error": "VM-Web ist gerade nicht erreichbar. Prüfe deine Internetverbindung und versuche es erneut.",
+    "unknown": "Etwas ist schiefgelaufen. Bitte versuche es erneut.",
+    "login": {
+      "login-failed": "Die Anmeldung ist fehlgeschlagen. Bitte versuche es erneut.",
+      "state-mismatch": "Die Anmeldung hat zu lange gedauert oder wurde in einem anderen Tab gestartet. Bitte melde dich erneut an.",
+      "idp-error": "Der Anmeldedienst des Vereins hat die Anmeldung abgelehnt. Wende dich an den Verein, wenn das wiederholt passiert."
+    }
+  },
+  "validation": {
+    "required": "Pflichtfeld",
+    "invalid_type": "Ungültiger Wert",
+    "invalid_format": "Ungültiges Format",
+    "invalid_value": "Ungültiger Wert",
+    "too_small": "Zu kurz oder zu klein",
+    "too_big": "Zu lang oder zu groß",
+    "not_multiple_of": "Ungültiger Wert",
+    "unrecognized_keys": "Unbekannte Angabe",
+    "invalid_union": "Ungültiger Wert",
+    "invalid_key": "Ungültiger Wert",
+    "invalid_element": "Ungültiger Wert",
+    "custom": "Ungültiger Wert"
+  }
+}

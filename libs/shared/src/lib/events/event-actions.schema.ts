@@ -1,4 +1,4 @@
-import { z } from 'zod';
+import * as z from 'zod';
 import { idSchema, isoDateSchema, shortNameSchema } from '../common/ids.schema';
 
 /** POST events/events/create → 201 `{ id }` (N-15, N-16). Requires `event.create` in `ensembleId`. */

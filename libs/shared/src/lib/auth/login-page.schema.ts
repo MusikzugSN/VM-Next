@@ -1,4 +1,4 @@
-import { z } from 'zod';
+import * as z from 'zod';
 
 /** GET auth/login-page – public branding for the login page (A-2, S-4). */
 export const loginPageResponseSchema = z.object({

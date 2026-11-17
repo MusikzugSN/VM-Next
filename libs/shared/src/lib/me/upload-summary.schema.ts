@@ -1,4 +1,4 @@
-import { z } from 'zod';
+import * as z from 'zod';
 
 /** GET me/upload-summary – start page block „Status eigener Uploads“ (N-14). */
 export const uploadSummaryResponseSchema = z.object({

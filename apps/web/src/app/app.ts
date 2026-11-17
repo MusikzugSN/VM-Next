@@ -1,13 +1,14 @@
 import { Component } from '@angular/core';
-import { RouterModule } from '@angular/router';
-import { NxWelcome } from './nx-welcome';
+import { RouterOutlet } from '@angular/router';
+
+import { ZardSonnerComponent } from '@/shared/components/sonner';
 
 @Component({
-  imports: [NxWelcome, RouterModule],
   selector: 'vm-root',
-  templateUrl: './app.html',
-  styleUrl: './app.css',
+  imports: [RouterOutlet, ZardSonnerComponent],
+  template: `
+    <router-outlet />
+    <z-sonner theme="light" position="bottom-right" [closeButton]="true" />
+  `,
 })
-export class App {
-  protected title = 'web';
-}
+export class App {}

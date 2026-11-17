@@ -1,4 +1,4 @@
-import { z } from 'zod';
+import * as z from 'zod';
 import { idSchema, isoDateTimeSchema, refSchema } from '../common/ids.schema';
 
 /** GET folders/folders/:folderId/details – header of „Mappe bearbeiten“ (N-15). */

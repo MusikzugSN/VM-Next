@@ -1,4 +1,4 @@
-import { z } from 'zod';
+import * as z from 'zod';
 import { idSchema, isoDateSchema, refSchema } from '../common/ids.schema';
 
 /** GET me/events/:eventId/overview – event header (M-5). Query: `voiceContextQuerySchema`. */

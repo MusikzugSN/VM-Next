@@ -1,4 +1,4 @@
-import { z } from 'zod';
+import * as z from 'zod';
 import { cursorQuerySchema, pageSchema } from '../common/pagination.schema';
 import { myEventItemSchema } from './upcoming-events.schema';
 

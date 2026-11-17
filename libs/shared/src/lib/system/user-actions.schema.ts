@@ -1,4 +1,4 @@
-import { z } from 'zod';
+import * as z from 'zod';
 import { idSchema } from '../common/ids.schema';
 
 /** POST system/users/:userId/set-membership → 204. Creates or changes the membership in one ensemble (R-1). */

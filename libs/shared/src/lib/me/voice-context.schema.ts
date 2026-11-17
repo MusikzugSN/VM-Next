@@ -1,4 +1,4 @@
-import { z } from 'zod';
+import * as z from 'zod';
 import { voiceRefSchema } from '../common/voice.schema';
 
 /**

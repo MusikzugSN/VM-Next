@@ -1,4 +1,4 @@
-import { z } from 'zod';
+import * as z from 'zod';
 import { idSchema, queryArray, queryBoolean, refSchema } from '../common/ids.schema';
 import { voiceRefSchema } from '../common/voice.schema';
 import { substituteModeSchema } from '../me/downloads.schema';

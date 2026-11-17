@@ -1,4 +1,4 @@
-import { z } from 'zod';
+import * as z from 'zod';
 import { idSchema, queryArray } from './ids.schema';
 
 /** Voice as shown everywhere: one name like „Trompete 1 in B“ (N-6). */

@@ -1,4 +1,4 @@
-import { z } from 'zod';
+import * as z from 'zod';
 import { idSchema } from './ids.schema';
 
 /** Path parameters, named like the `:param` segments in `routes.ts`. */

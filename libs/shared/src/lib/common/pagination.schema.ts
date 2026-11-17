@@ -1,4 +1,4 @@
-import { z } from 'zod';
+import * as z from 'zod';
 
 export const PAGE_LIMIT_DEFAULT = 50;
 export const PAGE_LIMIT_MAX = 200;

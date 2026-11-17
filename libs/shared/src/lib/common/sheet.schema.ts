@@ -1,4 +1,4 @@
-import { z } from 'zod';
+import * as z from 'zod';
 import { idSchema } from './ids.schema';
 import { voiceRefSchema } from './voice.schema';
 

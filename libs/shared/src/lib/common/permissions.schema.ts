@@ -1,4 +1,4 @@
-import { z } from 'zod';
+import * as z from 'zod';
 
 /** CRUD actions per area (R-3). „Öffnen“ und „Auflisten“ sind in `view` zusammengefasst. */
 export const PERMISSION_ACTIONS = ['view', 'create', 'edit', 'delete'] as const;

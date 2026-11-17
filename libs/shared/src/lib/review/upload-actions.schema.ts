@@ -1,4 +1,4 @@
-import { z } from 'zod';
+import * as z from 'zod';
 import { idSchema } from '../common/ids.schema';
 import { pageTransformSchema } from '../common/sheet.schema';
 

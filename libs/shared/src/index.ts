@@ -1,4 +1,5 @@
 export * from './lib/routes';
+export * from './lib/app-routes';
 export * from './lib/common';
 export * from './lib/auth';
 export * from './lib/me';

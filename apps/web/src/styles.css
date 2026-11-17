@@ -1,1 +1,155 @@
-/* You can add global styles to this file, and also import other style files */
+/*
+ * VM-Web – globale Styles.
+ * Farben, Radien und Schatten aus der VM-Web Design Guideline (Token-Namen im shadcn-Schema, das Zard nutzt).
+ * Nur Lightmode; Darkmode ist laut Anforderungen „Später“.
+ */
+@layer ng-icon, theme, base, components, utilities;
+@import 'tailwindcss';
+@import '@fontsource-variable/inter';
+@import './app/shared/core/css/zard';
+@plugin "tailwindcss-animate";
+
+@custom-variant dark (&:is(.dark *));
+
+:root {
+  --radius: 10px; /* radius-lg; radius-md = 8px, radius-sm = 6px */
+
+  --background: #ffffff;
+  --foreground: #18181b;
+  --card: #ffffff;
+  --card-foreground: #18181b;
+  --popover: #ffffff;
+  --popover-foreground: #18181b;
+
+  --primary: #1f3a5f;
+  --primary-foreground: #ffffff;
+  --primary-soft: #e8eef6;
+
+  --brass: #c8963e;
+  --brass-soft: #faf3e6;
+  --brass-ink: #7a5418;
+
+  --secondary: #f4f4f5;
+  --secondary-foreground: #18181b;
+  --muted: #f4f4f5;
+  --muted-foreground: #63636b;
+  --accent: #f4f4f5;
+  --accent-foreground: #18181b;
+
+  --destructive: #dc2626;
+  --destructive-foreground: #ffffff;
+  --destructive-soft: #fef2f2;
+  --destructive-ink: #b91c1c;
+  --success-soft: #ecfdf3;
+  --success-ink: #15803d;
+  --warning-soft: #fff7e6;
+  --warning-ink: #92400e;
+
+  --border: #e4e4e7;
+  --input: #8a8a93;
+  --ring: #1f3a5f;
+
+  --sidebar: #fafafa;
+  --sidebar-foreground: #18181b;
+  --sidebar-primary: #1f3a5f;
+  --sidebar-primary-foreground: #ffffff;
+  --sidebar-accent: #e8eef6;
+  --sidebar-accent-foreground: #1f3a5f;
+  --sidebar-border: #e4e4e7;
+  --sidebar-ring: #1f3a5f;
+}
+
+@theme inline {
+  --font-sans: 'Inter Variable', ui-sans-serif, system-ui, sans-serif;
+  --font-mono: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-popover: var(--popover);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-primary-soft: var(--primary-soft);
+  --color-brass: var(--brass);
+  --color-brass-soft: var(--brass-soft);
+  --color-brass-ink: var(--brass-ink);
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-destructive: var(--destructive);
+  --color-destructive-foreground: var(--destructive-foreground);
+  --color-destructive-soft: var(--destructive-soft);
+  --color-destructive-ink: var(--destructive-ink);
+  --color-success-soft: var(--success-soft);
+  --color-success-ink: var(--success-ink);
+  --color-warning-soft: var(--warning-soft);
+  --color-warning-ink: var(--warning-ink);
+  --color-border: var(--border);
+  --color-input: var(--input);
+  --color-ring: var(--ring);
+
+  --radius-sm: calc(var(--radius) - 4px);
+  --radius-md: calc(var(--radius) - 2px);
+  --radius-lg: var(--radius);
+  --radius-xl: calc(var(--radius) + 4px);
+
+  --shadow-sm: 0 1px 2px 0 rgba(24, 24, 27, 0.06);
+  --shadow-lg: 0 10px 24px -6px rgba(24, 24, 27, 0.18);
+
+  --color-sidebar: var(--sidebar);
+  --color-sidebar-foreground: var(--sidebar-foreground);
+  --color-sidebar-primary: var(--sidebar-primary);
+  --color-sidebar-primary-foreground: var(--sidebar-primary-foreground);
+  --color-sidebar-accent: var(--sidebar-accent);
+  --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
+  --color-sidebar-border: var(--sidebar-border);
+  --color-sidebar-ring: var(--sidebar-ring);
+}
+
+/*
+ * Fokus immer sichtbar: 2 px `ring`, 2 px Abstand (WCAG 2.2, Design Guideline).
+ * Bewusst außerhalb jeder @layer: ungeschichtete Regeln haben Vorrang vor Tailwind-Utilities,
+ * so gilt der Ring auch für Zard-Komponenten mit `outline-none`. Deren halbtransparenter
+ * Ring-Schatten wird abgeschaltet, damit es nur einen Fokusring gibt.
+ */
+:focus-visible {
+  outline: 2px solid var(--ring);
+  outline-offset: 2px;
+  --tw-ring-shadow: 0 0 #0000;
+}
+
+/* Maße aus der Design Guideline (Größen-Tokens), als Tailwind-Werte nutzbar: h-touch, w-sidebar, max-w-content … */
+@theme {
+  --spacing-touch: 44px;
+  --spacing-control: 36px;
+  --spacing-header: 56px;
+  --spacing-sidebar: 256px;
+  --container-content: 1200px;
+}
+
+@layer base {
+  * {
+    @apply border-border outline-ring/50;
+  }
+  html {
+    font-size: 16px;
+  }
+  body {
+    @apply bg-background text-foreground font-sans text-sm antialiased;
+  }
+
+  input[type='number']::-webkit-inner-spin-button,
+  input[type='number']::-webkit-outer-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+  }
+  input[type='number'] {
+    -moz-appearance: textfield;
+    appearance: textfield;
+  }
+}

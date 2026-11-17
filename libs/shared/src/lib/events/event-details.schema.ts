@@ -1,4 +1,4 @@
-import { z } from 'zod';
+import * as z from 'zod';
 import { idSchema, isoDateSchema, isoDateTimeSchema, refSchema } from '../common/ids.schema';
 
 /** GET events/events/:eventId/details – header of „Event bearbeiten“ (N-15, N-16). */

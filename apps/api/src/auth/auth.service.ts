@@ -1,6 +1,10 @@
 import { Inject, Injectable, Logger } from '@nestjs/common';
 import {
   API_PREFIX,
+  APP_QUERY,
+  APP_ROUTES,
+  appPath,
+  DEFAULT_APP_PATH,
   callbackQuerySchema,
   permissionScope,
   type LoginErrorCode,
@@ -15,7 +19,6 @@ import { ClubSettingsRepository } from '../settings/club-settings.repository';
 import { OIDC_CLIENT, type IOidcClient } from './oidc.client';
 import { USERS_REPOSITORY, type IUsersRepository } from './users.repository';
 
-const DEFAULT_RETURN_TO = '/me';
 
 export type CallbackResult =
   | { kind: 'success'; redirect: string; sessionId: string; csrfToken: string }
@@ -44,17 +47,17 @@ export class AuthService {
     await this.sessions.saveLoginState(request.state, {
       codeVerifier: request.codeVerifier,
       nonce: request.nonce,
-      returnTo: returnTo ?? DEFAULT_RETURN_TO,
+      returnTo: returnTo ?? DEFAULT_APP_PATH,
     });
     return { redirect: request.url, state: request.state };
   }
 
   /**
    * Handles the identity server's redirect. Never throws: every outcome is a redirect,
-   * failures go to `/login?error=<code>`, blocked accounts to `/gesperrt` (A-5).
+   * failures go to `/login?error=<code>`, blocked accounts to `/blocked` (A-5).
    */
   async finishLogin(rawQuery: Record<string, unknown>, queryString: string, browserState: string | undefined): Promise<CallbackResult> {
-    const fail = (code: LoginErrorCode): CallbackResult => ({ kind: 'failure', redirect: this.appUrl(`/login?error=${code}`) });
+    const fail = (code: LoginErrorCode): CallbackResult => ({ kind: 'failure', redirect: this.appUrl(appPath(APP_ROUTES.login, {}, { [APP_QUERY.error]: code })) });
 
     const query = callbackQuerySchema.safeParse(rawQuery);
     if (!query.success) return fail('login-failed');
@@ -81,7 +84,7 @@ export class AuthService {
 
     const user = await this.users.upsertOnLogin(claims, new Date());
     if (user.created) this.logger.log(`Account created for ${user.id}${user.isAdmin ? ' (first person, admin)' : ''}`);
-    if (user.status === 'blocked') return { kind: 'failure', redirect: this.appUrl('/gesperrt') };
+    if (user.status === 'blocked') return { kind: 'failure', redirect: this.appUrl(APP_ROUTES.blocked) };
 
     const session = await this.sessions.create(user.id, claims.idToken);
     return {

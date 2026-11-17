@@ -1,4 +1,4 @@
-import { z } from 'zod';
+import * as z from 'zod';
 import { idSchema, shortNameSchema } from '../common/ids.schema';
 import { permissionSchema, permissionScopeSchema } from '../common/permissions.schema';
 import { pageSchema, cursorQuerySchema } from '../common/pagination.schema';

@@ -91,7 +91,7 @@ Gemeinsamer Zeilentyp `MemberScoreRow` (`common/sheet.schema.ts`):
 
 - BFF: Die API führt OIDC (Authorization Code + PKCE) serverseitig aus. Der Browser erhält nur das Cookie `vmweb_session` (`HttpOnly`, `Secure`, `SameSite=Lax`, `Path=/`). Tokens bleiben in der Sitzung auf dem Server (`ICacheService`).
 - CSRF: Synchronizer-Token pro Sitzung, ausgeliefert im lesbaren Cookie `XSRF-TOKEN`, zurückgeschickt im Header `X-XSRF-TOKEN` (Angular-Standard). Pflicht für **alle** POST außer `auth/callback` (ist GET). Fehlt oder passt er nicht: `403 csrf-invalid`.
-- Gesperrte Konten (A-5): Login endet auf `/gesperrt`; bestehende Sitzungen werden beim nächsten Aufruf beendet → `403 account-blocked`.
+- Gesperrte Konten (A-5): Login endet auf `/blocked`; bestehende Sitzungen werden beim nächsten Aufruf beendet → `403 account-blocked`.
 
 ### Downloads
 
@@ -229,7 +229,7 @@ Redirect-Ziel des Identity-Servers; legt Konto an bzw. aktualisiert es und start
 - **Recht:** Öffentlich
 - **Query:** `code`, `state` bzw. `error`, `error_description`
 - **Ablauf:** Token-Tausch → ID-Token prüfen → Benutzer über `sub` suchen (A-4). Neu: Konto anlegen und Mitglied im Standard-Ensemble mit Standardrolle (A-3); ab Werk sind das Wurzel-Ensemble und `admin` (F-3, H-3). Erste Person überhaupt: zusätzlich Admin-Kennzeichen (S-5, H-2). `name`, `email`, `picture` bei jedem Login übernehmen, `lastLoginAt` setzen. Sitzungs-ID rotieren, Cookies `vmweb_session` und `XSRF-TOKEN` setzen.
-- **Response:** `302 Found` nach `returnTo` (Standard `/me`); gesperrt → `302 /gesperrt` ohne Sitzung (A-5); Fehler → `302 /login?error=login-failed|state-mismatch|idp-error`
+- **Response:** `302 Found` nach `returnTo` (Standard `DEFAULT_APP_PATH` = `/me`; alle Frontend-Pfade stehen als `APP_ROUTES` in `libs/shared/src/lib/app-routes.ts`); gesperrt → `302 /blocked` ohne Sitzung (A-5); Fehler → `302 /login?error=login-failed|state-mismatch|idp-error`
 - **Fehler:** keine JSON-Fehler, alles über Redirect
 
 ### `POST /internal/v1/auth/logout`

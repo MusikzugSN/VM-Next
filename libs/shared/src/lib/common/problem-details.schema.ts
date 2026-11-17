@@ -1,4 +1,4 @@
-import { z } from 'zod';
+import * as z from 'zod';
 
 export const PROBLEM_CONTENT_TYPE = 'application/problem+json';
 export const PROBLEM_TYPE_PREFIX = 'urn:vm-web:problem:';

@@ -1,4 +1,4 @@
-import { z } from 'zod';
+import * as z from 'zod';
 import { idSchema, shortNameSchema } from '../common/ids.schema';
 import { folderNumberSchema } from './folder-entries.schema';
 

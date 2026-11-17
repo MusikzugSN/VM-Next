@@ -1,4 +1,4 @@
-import { z } from 'zod';
+import * as z from 'zod';
 import { idSchema, isoDateSchema } from '../common/ids.schema';
 
 /** Fixed fields of a score (N-1). */

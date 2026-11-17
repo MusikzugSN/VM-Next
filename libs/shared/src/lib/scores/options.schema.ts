@@ -1,4 +1,4 @@
-import { z } from 'zod';
+import * as z from 'zod';
 import { refSchema } from '../common/ids.schema';
 
 /** GET scores/ensemble-options – ensembles with a lineup for the completeness selector (N-4). Not paginated. */

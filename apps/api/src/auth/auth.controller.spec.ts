@@ -130,9 +130,9 @@ describe('AuthController (BFF login)', () => {
     expect((await loginFlow('musician')).headers.get('location')).toBe('http://localhost:4200/me');
   });
 
-  it('sends blocked accounts to /gesperrt without session (A-5)', async () => {
+  it('sends blocked accounts to /blocked without session (A-5)', async () => {
     const res = await loginFlow('blocked');
-    expect(res.headers.get('location')).toBe('http://localhost:4200/gesperrt');
+    expect(res.headers.get('location')).toBe('http://localhost:4200/blocked');
     expect(cookiesOf(res)[SESSION_COOKIE]).toBeFalsy();
   });
 
