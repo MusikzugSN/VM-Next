@@ -1,0 +1,25 @@
+{
+  "version": 1,
+  "roles": [
+    {
+      "key": "admin",
+      "name": "Administrator:in",
+      "permissions": ["*"]
+    },
+    {
+      "key": "musician",
+      "name": "Musiker:in",
+      "permissions": ["sheet.upload"]
+    },
+    {
+      "key": "librarian",
+      "name": "Notenwart:in",
+      "permissions": ["score.*", "voice.*", "folder.*", "event.*", "tag.*", "sheet.upload", "sheet.approve", "member.view"]
+    },
+    {
+      "key": "board",
+      "name": "Vorstand",
+      "permissions": ["member.view", "event.*"]
+    }
+  ]
+}
