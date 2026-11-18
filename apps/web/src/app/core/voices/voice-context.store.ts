@@ -56,6 +56,11 @@ export class VoiceContextStore {
   reload(): void {
     this.contextResource.reload();
   }
+
+  /** After instruments or voices were created (e.g. lineup template, N-8). */
+  reloadOptions(): void {
+    this.optionsResource.reload();
+  }
 }
 
 function readOverride(): string[] {

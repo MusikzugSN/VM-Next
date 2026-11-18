@@ -21,15 +21,6 @@
     "voices": "Stimmen",
     "noLineup": "Keine Besetzung hinterlegt"
   },
-  "fieldTypes": {
-    "text": "Text",
-    "number": "Zahl",
-    "date": "Datum",
-    "select": "Auswahl",
-    "multiselect": "Mehrfachauswahl",
-    "link": "Link",
-    "boolean": "Ja/Nein"
-  },
   "fields": {
     "title": "Titel",
     "composer": "Komponist",

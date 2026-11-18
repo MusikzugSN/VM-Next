@@ -1,0 +1,121 @@
+<a [routerLink]="listPath" class="inline-flex min-h-11 items-center gap-1 self-start font-medium no-underline">
+  <ng-icon name="lucideChevronLeft" aria-hidden="true" />{{ 'system.roles.all' | transloco }}
+</a>
+
+@if (details.error() || catalog.error()) {
+  <vm-page-problem [error]="details.error() ?? catalog.error()" />
+} @else if (role(); as r) {
+  @if (renaming()) {
+    <vm-name-form labelKey="system.common.name" submitKey="common.save" [initial]="r.name" (saved)="rename($event)" (cancelled)="renaming.set(false)" />
+  } @else {
+    <div class="flex flex-col gap-3 md:flex-row md:items-start md:justify-between">
+      <div>
+        <h1 class="text-2xl font-semibold">{{ r.name }}</h1>
+        <p class="mt-1 text-muted-foreground">
+          {{ (r.defaultKey ? 'system.roles.default' : 'system.role.own') | transloco }}
+          @if (r.modifiedFromDefault) {
+            · {{ 'system.roles.modified' | transloco }}
+          }
+          · {{ 'system.roles.assignmentCount' | tPlural: r.assignmentCount }}
+        </p>
+      </div>
+      @if (canEdit()) {
+        <button z-button zType="outline" type="button" (click)="renaming.set(true)">{{ 'common.rename' | transloco }}</button>
+      }
+    </div>
+  }
+
+  <p class="text-muted-foreground">{{ 'system.role.intro' | transloco }}</p>
+
+  @if (grantsClub()) {
+    <div role="status" class="flex items-start gap-2 rounded-lg bg-destructive-soft p-3 text-destructive-ink">
+      <ng-icon name="lucideTriangleAlert" class="mt-0.5 shrink-0" aria-hidden="true" />
+      <span>{{ 'system.role.clubWarning' | transloco }}</span>
+    </div>
+  }
+
+  @if (catalog.hasValue()) {
+    <form class="flex flex-col gap-6" (submit)="$event.preventDefault(); save()">
+      <section aria-labelledby="h-matrix" class="flex flex-col gap-3">
+        <h2 id="h-matrix" class="text-lg font-semibold">{{ 'system.role.matrix' | transloco }}</h2>
+        <div class="overflow-x-auto rounded-lg border bg-card shadow-sm">
+          <table class="w-full">
+            <thead class="bg-muted text-xs font-medium text-muted-foreground">
+              <tr>
+                <th scope="col" class="px-3 py-2 text-start">{{ 'system.role.area' | transloco }}</th>
+                @for (action of catalog.value().actions; track action) {
+                  <th scope="col" class="px-2 py-2 text-center">{{ 'system.permissions.actions.' + action | transloco }}</th>
+                }
+              </tr>
+            </thead>
+            <tbody>
+              @for (row of catalog.value().areas; track row.area) {
+                <tr class="border-t">
+                  <th scope="row" class="px-3 py-1 text-start font-medium">
+                    {{ 'system.permissions.areas.' + row.area | transloco }}
+                    <span class="block text-xs font-normal text-muted-foreground">{{ 'system.permissions.scopes.' + row.scope | transloco }}</span>
+                  </th>
+                  @for (action of catalog.value().actions; track action) {
+                    <td class="px-2 py-1 text-center">
+                      @if (cell(row.permissions, action); as p) {
+                        <label class="inline-flex size-11 items-center justify-center xl:size-8">
+                          <input
+                            type="checkbox"
+                            class="size-4 accent-primary"
+                            [checked]="has(p)"
+                            [disabled]="!canEdit()"
+                            (change)="toggle(p, $any($event.target).checked)"
+                            [attr.aria-label]="
+                              'system.permissions.cell'
+                                | transloco: { area: 'system.permissions.areas.' + row.area | transloco, action: 'system.permissions.actions.' + action | transloco }
+                            "
+                          />
+                        </label>
+                      }
+                    </td>
+                  }
+                </tr>
+              }
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <fieldset class="flex flex-col gap-1 rounded-lg border bg-card p-4 shadow-sm">
+        <legend class="px-1 text-lg font-semibold">{{ 'system.role.singles' | transloco }}</legend>
+        @for (single of catalog.value().singles; track single.permission) {
+          <label class="flex min-h-11 items-center gap-3 xl:min-h-8">
+            <input type="checkbox" class="size-4 accent-primary" [checked]="has(single.permission)" [disabled]="!canEdit()" (change)="toggle(single.permission, $any($event.target).checked)" />
+            <span class="flex flex-col">
+              <span>{{ key(single.permission) | transloco }}</span>
+              <span class="text-xs text-muted-foreground">{{ 'system.permissions.scopes.' + single.scope | transloco }}</span>
+            </span>
+          </label>
+        }
+      </fieldset>
+
+      @if (canEdit() || canDelete()) {
+        <div class="flex flex-col-reverse gap-2 md:flex-row md:justify-between">
+          <div class="flex flex-col gap-2 md:flex-row">
+            @if (canDelete()) {
+              <button z-button zType="destructive" type="button" [zDisabled]="r.assignmentCount > 0" (click)="remove()">
+                <ng-icon name="lucideTrash2" aria-hidden="true" />{{ 'system.role.delete' | transloco }}
+              </button>
+            }
+            @if (canEdit() && r.defaultKey) {
+              <button z-button zType="outline" type="button" [zDisabled]="!r.modifiedFromDefault" (click)="reset()">
+                <ng-icon name="lucideRotateCcw" aria-hidden="true" />{{ 'system.role.reset' | transloco }}
+              </button>
+            }
+          </div>
+          @if (canEdit()) {
+            <button z-button type="submit" [zLoading]="saving()" [zDisabled]="!dirty() || saving()">{{ 'common.save' | transloco }}</button>
+          }
+        </div>
+        @if (canDelete() && r.assignmentCount > 0) {
+          <p class="text-[13px] text-muted-foreground">{{ 'system.role.inUseHint' | transloco }}</p>
+        }
+      }
+    </form>
+  }
+}

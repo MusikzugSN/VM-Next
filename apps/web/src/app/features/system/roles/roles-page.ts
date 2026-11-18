@@ -1,0 +1,111 @@
+import { ChangeDetectionStrategy, Component, computed, inject, signal } from '@angular/core';
+import { Router, RouterLink } from '@angular/router';
+import { TranslocoPipe } from '@jsverse/transloco';
+import { NgIcon, provideIcons } from '@ng-icons/core';
+import { lucidePlus, lucideRotateCcw, lucideTriangleAlert } from '@ng-icons/lucide';
+import { APP_ROUTES, apiUrl, appPath, createdResponseSchema, resetDefaultsResponseSchema, roleListResponseSchema, type RoleListItem } from '@vm-web/shared';
+import { firstValueFrom } from 'rxjs';
+
+import { ZardButtonComponent } from '@/shared/components/button';
+
+import { ActionRunner, ConfirmService } from '../../../core/actions/action-runner';
+import { ApiClient } from '../../../core/api/api-client';
+import { cursorList } from '../../../core/api/cursor-list';
+import { SessionStore } from '../../../core/auth/session.store';
+import { PluralPipe } from '../../../core/i18n/plural.pipe';
+import { ListState } from '../../../shared/ui/list-state';
+import { NameForm } from '../../../shared/ui/name-form';
+
+/** Rollen (S-3, R-5): list with badges, create, reset all default roles. */
+@Component({
+  selector: 'vm-system-roles-page',
+  imports: [RouterLink, NgIcon, TranslocoPipe, PluralPipe, ZardButtonComponent, ListState, NameForm],
+  viewProviders: [provideIcons({ lucidePlus, lucideRotateCcw, lucideTriangleAlert })],
+  changeDetection: ChangeDetectionStrategy.OnPush,
+  template: `
+    <div class="flex flex-col gap-3 md:flex-row md:items-start md:justify-between">
+      <div>
+        <h1 class="text-2xl font-semibold">{{ 'nav.system.roles' | transloco }}</h1>
+        <p class="mt-1 text-muted-foreground">{{ 'system.roles.intro' | transloco }}</p>
+      </div>
+      <div class="flex flex-col gap-2 md:flex-row">
+        @if (canEdit()) {
+          <button z-button zType="outline" type="button" (click)="resetAll()">
+            <ng-icon name="lucideRotateCcw" aria-hidden="true" />{{ 'system.roles.resetAll' | transloco }}
+          </button>
+        }
+        @if (canCreate() && !creating()) {
+          <button z-button type="button" (click)="creating.set(true)">
+            <ng-icon name="lucidePlus" aria-hidden="true" />{{ 'system.roles.create' | transloco }}
+          </button>
+        }
+      </div>
+    </div>
+
+    @if (creating()) {
+      <vm-name-form labelKey="system.roles.newRole" (saved)="create($event)" (cancelled)="creating.set(false)" />
+    }
+
+    <ul class="overflow-hidden rounded-lg border bg-card shadow-sm" [class.hidden]="list.items().length === 0">
+      @for (role of list.items(); track role.id; let first = $first) {
+        <li class="flex flex-col gap-1 px-3 py-2 md:flex-row md:items-center md:gap-3" [class.border-t]="!first">
+          <a [routerLink]="link(role)" class="font-medium">{{ role.name }}</a>
+          <span class="flex flex-1 flex-wrap items-center gap-1.5 text-[13px] text-muted-foreground">
+            @if (role.defaultKey) {
+              <span class="rounded-sm bg-muted px-1.5 py-0.5 text-xs">{{ 'system.roles.default' | transloco }}</span>
+            }
+            @if (role.modifiedFromDefault) {
+              <span class="rounded-sm bg-warning-soft px-1.5 py-0.5 text-xs text-warning-ink">{{ 'system.roles.modified' | transloco }}</span>
+            }
+            @if (role.hasClubPermissions) {
+              <span class="inline-flex items-center gap-1 rounded-sm bg-destructive-soft px-1.5 py-0.5 text-xs text-destructive-ink">
+                <ng-icon name="lucideTriangleAlert" size="12" aria-hidden="true" />{{ 'system.roles.clubPermissions' | transloco }}
+              </span>
+            }
+            <span>{{ 'system.roles.assignmentCount' | tPlural: role.assignmentCount }}</span>
+          </span>
+        </li>
+      }
+    </ul>
+    <vm-list-state [list]="list" emptyKey="system.roles.empty" />
+  `,
+})
+export class RolesPage {
+  private readonly api = inject(ApiClient);
+  private readonly actions = inject(ActionRunner);
+  private readonly confirm = inject(ConfirmService);
+  private readonly session = inject(SessionStore);
+  private readonly router = inject(Router);
+
+  protected readonly canCreate = computed(() => this.session.can('role.create'));
+  protected readonly canEdit = computed(() => this.session.can('role.edit'));
+  protected readonly creating = signal(false);
+
+  protected readonly list = cursorList({
+    params: () => null,
+    fetch: (_, cursor) => this.api.get(apiUrl('system', 'roleList'), roleListResponseSchema, { cursor }),
+  });
+
+  protected link(role: RoleListItem): string {
+    return appPath(APP_ROUTES.system.role, { roleId: role.id });
+  }
+
+  protected async create(name: string): Promise<void> {
+    const done = await this.actions.run(
+      () => firstValueFrom(this.api.post(apiUrl('system', 'createRole'), { name, permissions: [] }, createdResponseSchema)),
+      { success: { key: 'system.roles.created', params: { name } } },
+    );
+    if (!done) return;
+    // Straight to the matrix: a new role without permissions is of little use.
+    void this.router.navigateByUrl(appPath(APP_ROUTES.system.role, { roleId: done.value.id }));
+  }
+
+  protected async resetAll(): Promise<void> {
+    if (!(await this.confirm.confirm('system.roles.resetAllTitle', 'system.roles.resetAllText', {}, 'system.roles.resetOk'))) return;
+    const done = await this.actions.run(() => firstValueFrom(this.api.post(apiUrl('system', 'resetAllRoles'), {}, resetDefaultsResponseSchema)));
+    if (!done) return;
+    this.actions.notify('system.roles.resetAllDone', { ...done.value });
+    this.list.reload();
+    void this.session.reload();
+  }
+}

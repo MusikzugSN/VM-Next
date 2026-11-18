@@ -1,0 +1,145 @@
+<a [routerLink]="listPath" class="inline-flex min-h-11 items-center gap-1 self-start font-medium no-underline">
+  <ng-icon name="lucideChevronLeft" aria-hidden="true" />{{ 'system.ensembles.all' | transloco }}
+</a>
+
+@if (details.error()) {
+  <vm-page-problem [error]="details.error()" />
+} @else if (ensemble(); as e) {
+  <div>
+    <h1 class="text-2xl font-semibold">{{ e.name }}</h1>
+    <p class="mt-1 text-muted-foreground">
+      {{ 'system.ensembles.memberCount' | tPlural: e.memberCount }} · {{ 'system.ensembles.lineupSize' | tPlural: e.lineupSize }}
+      @if (e.archived) {
+        · {{ 'system.ensembles.archived' | transloco }}
+      }
+    </p>
+  </div>
+
+  <nav [attr.aria-label]="'system.ensemble.sections' | transloco" class="flex gap-1 overflow-x-auto overflow-y-hidden border-b">
+    @for (t of tabs; track t.id) {
+      <a
+        [routerLink]="selfPath()"
+        [queryParams]="{ tab: t.id === 'details' ? null : t.id }"
+        [attr.aria-current]="current() === t.id ? 'page' : null"
+        class="-mb-px inline-flex min-h-11 items-center border-b-2 px-3 font-medium whitespace-nowrap no-underline"
+        [class]="current() === t.id ? 'border-primary text-primary' : 'border-transparent text-muted-foreground hover:text-foreground'"
+        >{{ t.labelKey | transloco }}</a
+      >
+    }
+  </nav>
+
+  @switch (current()) {
+    @case ('details') {
+      <section class="flex flex-col gap-4 rounded-lg border bg-card p-4 shadow-sm md:p-6">
+        @if (renaming()) {
+          <vm-name-form labelKey="system.common.name" submitKey="common.save" [initial]="e.name" (saved)="rename($event)" (cancelled)="renaming.set(false)" />
+        } @else {
+          <div class="flex items-end justify-between gap-2">
+            <div class="flex flex-col gap-1">
+              <span class="text-muted-foreground">{{ 'system.common.name' | transloco }}</span>
+              <span class="font-medium">{{ e.name }}</span>
+            </div>
+            @if (canEdit()) {
+              <button z-button zType="outline" type="button" (click)="renaming.set(true)">{{ 'common.rename' | transloco }}</button>
+            }
+          </div>
+        }
+        <div class="border-t pt-4">
+          @if (e.isRoot) {
+            <span class="text-muted-foreground">{{ 'system.ensemble.parent' | transloco }}</span>
+            <p>{{ 'system.ensemble.rootHint' | transloco }}</p>
+          } @else if (canEdit()) {
+            <label class="flex flex-col gap-1.5 md:w-80">
+              <span class="font-medium">{{ 'system.ensemble.parent' | transloco }}</span>
+              <select z-native-select [value]="e.parentId" (change)="setParent($any($event.target).value)">
+                @for (p of parents(); track p.id) {
+                  <option [value]="p.id" [selected]="p.id === e.parentId">{{ p.name }}</option>
+                }
+              </select>
+            </label>
+            <p class="mt-1 text-[13px] text-muted-foreground">{{ 'system.ensemble.parentHint' | transloco }}</p>
+          } @else {
+            <span class="text-muted-foreground">{{ 'system.ensemble.parent' | transloco }}</span>
+            <p>{{ parentName() }}</p>
+          }
+        </div>
+        <dl class="grid grid-cols-[auto_1fr] gap-x-4 gap-y-1 border-t pt-4">
+          <dt class="text-muted-foreground">{{ 'system.user.created' | transloco }}</dt>
+          <dd>{{ e.createdAt | date: 'dd.MM.yyyy' }}</dd>
+          @if (e.archivedAt) {
+            <dt class="text-muted-foreground">{{ 'system.ensembles.archived' | transloco }}</dt>
+            <dd>{{ e.archivedAt | date: 'dd.MM.yyyy' }}</dd>
+          }
+        </dl>
+      </section>
+    }
+    @case ('lineup') {
+      <section aria-labelledby="h-lineup" class="flex flex-col gap-4 rounded-lg border bg-card p-4 shadow-sm md:p-6">
+        <div class="flex flex-col gap-2 md:flex-row md:items-start md:justify-between">
+          <div>
+            <h2 id="h-lineup" class="text-lg font-semibold">{{ 'system.ensemble.tabLineup' | transloco }}</h2>
+            <p class="text-muted-foreground">{{ 'system.ensemble.lineupHint' | transloco }}</p>
+          </div>
+          @if (canEdit()) {
+            <div class="flex flex-col gap-2 md:flex-row">
+              <button z-button zType="outline" type="button" (click)="applyTemplate()">
+                <ng-icon name="lucideWandSparkles" aria-hidden="true" />{{ 'system.ensemble.template' | transloco }}
+              </button>
+              <button z-button type="button" [zDisabled]="!lineupDirty()" (click)="saveLineup()">{{ 'common.save' | transloco }}</button>
+            </div>
+          }
+        </div>
+        @if (lineup.error()) {
+          <vm-page-problem [error]="lineup.error()" />
+        } @else {
+          <p class="text-muted-foreground" aria-live="polite">{{ 'system.ensembles.lineupSize' | tPlural: selected().size }}</p>
+          <div class="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
+            @for (group of voices.options(); track group.instrument.id) {
+              <fieldset class="flex flex-col gap-1 rounded-md border p-3">
+                <legend class="px-1 font-semibold">{{ group.instrument.name }}</legend>
+                @if (canEdit() && group.voices.length > 1) {
+                  <button type="button" class="self-start text-[13px] font-medium text-primary" (click)="toggleInstrument(group.voices)">
+                    {{ (allOn(group.voices) ? 'system.ensemble.noneOf' : 'system.ensemble.allOf') | transloco: { name: group.instrument.name } }}
+                  </button>
+                }
+                @for (voice of group.voices; track voice.id) {
+                  <label class="flex min-h-11 items-center gap-2 xl:min-h-8">
+                    <input type="checkbox" class="size-4 accent-primary" [disabled]="!canEdit()" [checked]="selected().has(voice.id)" (change)="toggleVoice(voice.id)" />
+                    {{ voice.name }}
+                  </label>
+                }
+              </fieldset>
+            }
+          </div>
+        }
+      </section>
+    }
+    @case ('members') {
+      <vm-search-field [(value)]="memberSearch" labelKey="system.ensemble.searchMembers" />
+      <ul class="overflow-hidden rounded-lg border bg-card shadow-sm" [class.hidden]="members.items().length === 0">
+        @for (m of members.items(); track m.userId; let first = $first) {
+          <li class="flex items-center gap-3 px-3 py-2" [class.border-t]="!first">
+            <span aria-hidden="true" class="flex size-8 shrink-0 items-center justify-center rounded-full bg-primary-soft text-xs font-semibold text-primary">{{
+              initialsOf(m.name)
+            }}</span>
+            <span class="flex min-w-0 flex-1 flex-col">
+              @if (canSeeUsers()) {
+                <a [routerLink]="userLink(m.userId)" class="font-medium">{{ m.name }}</a>
+              } @else {
+                <span class="font-medium">{{ m.name }}</span>
+              }
+              <span class="truncate text-[13px] text-muted-foreground">
+                {{ m.role.name }}
+                @for (v of m.voices; track v.id; let firstVoice = $first) {
+                  {{ firstVoice ? ' · ' : ', ' }}{{ v.name }}
+                }
+              </span>
+            </span>
+          </li>
+        }
+      </ul>
+      <vm-list-state [list]="members" emptyKey="system.ensemble.noMembers" />
+      <p class="text-[13px] text-muted-foreground">{{ 'system.ensemble.membersHint' | transloco }}</p>
+    }
+  }
+}

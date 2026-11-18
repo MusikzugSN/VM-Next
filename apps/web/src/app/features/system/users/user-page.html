@@ -1,0 +1,162 @@
+<a [routerLink]="usersPath" class="inline-flex min-h-11 items-center gap-1 self-start font-medium no-underline">
+  <ng-icon name="lucideChevronLeft" aria-hidden="true" />{{ 'system.users.all' | transloco }}
+</a>
+
+@if (details.error()) {
+  <vm-page-problem [error]="details.error()" />
+} @else if (user(); as u) {
+  <div class="flex items-start gap-4">
+    @if (u.pictureUrl) {
+      <img [src]="u.pictureUrl" alt="" class="size-14 rounded-full object-cover" />
+    } @else {
+      <span aria-hidden="true" class="flex size-14 shrink-0 items-center justify-center rounded-full bg-primary-soft text-lg font-semibold text-primary">{{
+        initialsOf(u.name)
+      }}</span>
+    }
+    <div class="flex min-w-0 flex-col gap-1">
+      <div class="flex flex-wrap items-center gap-2">
+        <h1 class="text-2xl font-semibold">{{ u.name }}</h1>
+        <vm-user-status-badge [status]="u.status" />
+      </div>
+      <p class="text-muted-foreground">{{ u.email ?? '–' }} · {{ 'system.user.readOnlyHint' | transloco }}</p>
+    </div>
+  </div>
+
+  <section aria-labelledby="h-memberships" class="flex flex-col gap-4 rounded-lg border bg-card p-4 shadow-sm md:p-6">
+    <div>
+      <h2 id="h-memberships" class="text-lg font-semibold">{{ 'system.users.memberships' | transloco }}</h2>
+      <p class="text-muted-foreground">{{ 'system.user.membershipsHint' | transloco }}</p>
+    </div>
+    <ul class="flex flex-col">
+      @for (m of u.memberships; track m.ensemble.id; let first = $first) {
+        <li class="flex flex-col gap-2 py-2 md:flex-row md:items-center" [class.border-t]="!first">
+          <span class="flex-1 font-medium">{{ m.ensemble.name }}</span>
+          <label class="flex items-center gap-2">
+            <span class="sr-only">{{ 'system.user.roleIn' | transloco: { ensemble: m.ensemble.name } }}</span>
+            <select z-native-select class="md:w-56" [disabled]="!canEdit()" [value]="m.role.id" (change)="setRole(m.ensemble.id, $any($event.target).value)">
+              @if (options.hasValue()) {
+                @for (r of options.value().roles; track r.id) {
+                  <option [value]="r.id" [selected]="r.id === m.role.id">{{ r.name }}</option>
+                }
+              }
+            </select>
+          </label>
+          @if (canEdit()) {
+            <button z-button zType="ghost" zSize="icon" type="button" (click)="removeMembership(m.ensemble.id, m.ensemble.name)" [attr.aria-label]="'system.user.removeFrom' | transloco: { ensemble: m.ensemble.name }">
+              <ng-icon name="lucideX" aria-hidden="true" />
+            </button>
+          }
+        </li>
+      } @empty {
+        <li class="text-muted-foreground">{{ 'system.user.noMemberships' | transloco }}</li>
+      }
+    </ul>
+    @if (canEdit() && freeEnsembles().length && options.hasValue()) {
+      <div class="flex flex-col gap-2 rounded-md border border-dashed p-3 md:flex-row md:items-end">
+        <label class="flex flex-1 flex-col gap-1.5">
+          <span class="font-medium">{{ 'terms.ensemble' | transloco }}</span>
+          <select z-native-select [value]="newEnsembleId()" (change)="newEnsembleId.set($any($event.target).value)">
+            <option value="">{{ 'system.common.choose' | transloco }}</option>
+            @for (e of freeEnsembles(); track e.id) {
+              <option [value]="e.id">{{ e.name }}</option>
+            }
+          </select>
+        </label>
+        <label class="flex flex-1 flex-col gap-1.5">
+          <span class="font-medium">{{ 'terms.role' | transloco }}</span>
+          <select z-native-select [value]="newRoleId()" (change)="newRoleId.set($any($event.target).value)">
+            <option value="">{{ 'system.common.choose' | transloco }}</option>
+            @for (r of options.value().roles; track r.id) {
+              <option [value]="r.id">{{ r.name }}</option>
+            }
+          </select>
+        </label>
+        <button z-button zType="outline" type="button" [zDisabled]="!newEnsembleId() || !newRoleId()" (click)="addMembership()">
+          <ng-icon name="lucidePlus" aria-hidden="true" />{{ 'system.user.addMembership' | transloco }}
+        </button>
+      </div>
+    }
+    <div class="flex items-center justify-between gap-4 border-t pt-4">
+      <div>
+        <span class="font-medium">{{ 'system.user.admin' | transloco }}</span>
+        <p class="text-muted-foreground">{{ (u.canBeDemoted ? 'system.user.adminHint' : 'system.user.lastAdmin') | transloco }}</p>
+      </div>
+      <vm-toggle-switch
+        [checked]="u.isAdmin"
+        [label]="'system.user.admin' | transloco"
+        [disabled]="!canEdit() || (u.isAdmin && !u.canBeDemoted)"
+        (toggled)="setAdmin($event)"
+      />
+    </div>
+  </section>
+
+  <section aria-labelledby="h-voices" class="flex flex-col gap-4 rounded-lg border bg-card p-4 shadow-sm md:p-6">
+    <div class="flex flex-col gap-2 md:flex-row md:items-start md:justify-between">
+      <div>
+        <h2 id="h-voices" class="text-lg font-semibold">{{ 'system.user.voices' | transloco }}</h2>
+        <p class="text-muted-foreground">{{ 'system.user.voicesHint' | transloco: { name: u.name } }}</p>
+      </div>
+      @if (canEdit()) {
+        <button z-button type="button" [zDisabled]="!voicesDirty()" (click)="saveVoices()">{{ 'common.save' | transloco }}</button>
+      }
+    </div>
+    <div class="flex max-h-96 flex-col gap-3 overflow-y-auto">
+      @for (group of voices.options(); track group.instrument.id) {
+        <div role="group" [attr.aria-labelledby]="'uv-' + group.instrument.id" class="flex flex-col gap-1.5">
+          <span [id]="'uv-' + group.instrument.id" class="text-xs font-medium text-muted-foreground">{{ group.instrument.name }}</span>
+          <div class="flex flex-wrap gap-2">
+            @for (voice of group.voices; track voice.id) {
+              <button
+                type="button"
+                [disabled]="!canEdit()"
+                [attr.aria-pressed]="selectedVoices().has(voice.id)"
+                (click)="toggleVoice(voice.id)"
+                class="inline-flex h-11 items-center gap-1.5 rounded-md border px-3 font-medium xl:h-9"
+                [class]="selectedVoices().has(voice.id) ? 'border-primary bg-primary-soft text-primary' : 'border-input bg-background'"
+              >
+                @if (selectedVoices().has(voice.id)) {
+                  <ng-icon name="lucideCheck" aria-hidden="true" />
+                }
+                {{ voice.name }}
+              </button>
+            }
+          </div>
+        </div>
+      }
+    </div>
+  </section>
+
+  <section aria-labelledby="h-account" class="flex flex-col gap-3 rounded-lg border bg-card p-4 shadow-sm md:p-6">
+    <h2 id="h-account" class="text-lg font-semibold">{{ 'system.user.account' | transloco }}</h2>
+    <dl class="grid grid-cols-[auto_1fr] gap-x-4 gap-y-1">
+      <dt class="text-muted-foreground">{{ 'system.user.created' | transloco }}</dt>
+      <dd>{{ u.createdAt | date: 'dd.MM.yyyy' }}</dd>
+      <dt class="text-muted-foreground">{{ 'system.users.lastLogin' | transloco }}</dt>
+      <dd>{{ u.lastLoginAt ? (u.lastLoginAt | date: 'dd.MM.yyyy, HH:mm') : '–' }}</dd>
+    </dl>
+  </section>
+
+  @if ((canEdit() || canDelete()) && !isSelf()) {
+    <section aria-labelledby="h-danger" class="flex flex-col gap-3 rounded-lg border border-destructive/40 p-4 md:p-6">
+      <h2 id="h-danger" class="text-lg font-semibold">{{ 'system.user.danger' | transloco }}</h2>
+      @if (canEdit()) {
+        <p class="text-muted-foreground">{{ 'system.user.blockHint' | transloco: { name: u.name } }}</p>
+        @if (u.status === 'active') {
+          <button z-button zType="outline" type="button" class="self-start" [zDisabled]="u.isAdmin && !u.canBeDemoted" (click)="setBlocked(true)">
+            <ng-icon name="lucideLock" aria-hidden="true" />{{ 'system.user.block' | transloco }}
+          </button>
+        } @else {
+          <button z-button zType="outline" type="button" class="self-start" (click)="setBlocked(false)">
+            <ng-icon name="lucideLockOpen" aria-hidden="true" />{{ 'system.user.unblock' | transloco }}
+          </button>
+        }
+      }
+      @if (canDelete()) {
+        <p class="text-muted-foreground">{{ 'system.user.deleteHint' | transloco }}</p>
+        <button z-button zType="destructive" type="button" class="self-start" [zDisabled]="u.isAdmin && !u.canBeDemoted" (click)="remove()">
+          <ng-icon name="lucideTrash2" aria-hidden="true" />{{ 'system.user.delete' | transloco }}
+        </button>
+      }
+    </section>
+  }
+}

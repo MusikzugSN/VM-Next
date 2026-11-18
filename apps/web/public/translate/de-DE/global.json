@@ -72,7 +72,16 @@
     "event": "Event",
     "substituteVoice": "Ersatzstimme",
     "review": "Prüfung",
-    "tag": "Tag"
+    "tag": "Tag",
+    "fieldTypes": {
+      "text": "Text",
+      "number": "Zahl",
+      "date": "Datum",
+      "select": "Auswahl",
+      "multiselect": "Mehrfachauswahl",
+      "link": "Link",
+      "boolean": "Ja/Nein"
+    }
   },
   "status": {
     "substitute": "Ersatz: {{ voice }}",

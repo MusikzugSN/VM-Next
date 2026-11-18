@@ -19,6 +19,11 @@ export class BrandingStore {
   readonly logoUrl = computed(() => this.branding()?.logoUrl ?? null);
   /** Two letters for the logo placeholder, e.g. „Musikzug Musterstadt“ → „MM“. */
   readonly initials = computed(() => initials(this.clubName() ?? 'VM-Web'));
+
+  /** After the club settings or the logo changed (S-4). */
+  reload(): void {
+    this.resource.reload();
+  }
 }
 
 export function initials(name: string): string {

@@ -149,7 +149,7 @@
             <span class="font-medium">{{ 'library.form.fieldType' | transloco }}</span>
             <select z-native-select [value]="newField().type" (change)="patchNewField({ type: $any($event.target).value })">
               @for (type of fieldTypes; track type) {
-                <option [value]="type" [selected]="type === newField().type">{{ 'library.fieldTypes.' + type | transloco }}</option>
+                <option [value]="type" [selected]="type === newField().type">{{ 'terms.fieldTypes.' + type | transloco }}</option>
               }
             </select>
           </label>

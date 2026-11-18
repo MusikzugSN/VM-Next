@@ -22,6 +22,11 @@ export class ActionRunner {
   private readonly sonner = inject(ZardSonnerService);
   private readonly transloco = inject(TranslocoService);
 
+  /** Success toast for results that are only known after the action (e.g. counts). */
+  notify(key: string, params: Record<string, unknown> = {}): void {
+    this.sonner.success(this.transloco.translate(key, params));
+  }
+
   async run<T>(action: () => Promise<T>, options: RunOptions = {}): Promise<{ value: T } | undefined> {
     try {
       const value = await action();
@@ -43,12 +48,17 @@ export class ConfirmService {
 
   /** Resolves `true` when the person confirms. */
   confirmDelete(titleKey: string, textKey: string, params: Record<string, unknown> = {}): Promise<boolean> {
+    return this.confirm(titleKey, textKey, params, 'common.delete');
+  }
+
+  /** Like `confirmDelete`, with an own button text (e.g. „Zurücksetzen“, „Übernehmen“). */
+  confirm(titleKey: string, textKey: string, params: Record<string, unknown>, okKey: string): Promise<boolean> {
     return new Promise((resolve) => {
       // Escape and a click on the mask go through the cancel path of the overlay as well.
       this.alerts.confirm({
         zTitle: this.transloco.translate(titleKey, params),
         zDescription: this.transloco.translate(textKey, params),
-        zOkText: this.transloco.translate('common.delete'),
+        zOkText: this.transloco.translate(okKey),
         zCancelText: this.transloco.translate('common.cancel'),
         zOkDestructive: true,
         zOnOk: () => resolve(true),

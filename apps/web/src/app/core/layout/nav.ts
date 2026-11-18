@@ -65,7 +65,7 @@ export const NAV_SECTIONS: readonly NavSection[] = [
         path: APP_ROUTES.system.settings,
         icon: 'lucideSettings',
         // Tab „Eigene Felder“ is also for librarians (requirements: Konfiguration).
-        access: anyOf('config.view', 'score.edit'),
+        access: anyOf('config.view', 'config.edit', 'score.edit'),
       },
     ],
   },

@@ -272,3 +272,10 @@ Diese Stufe ist die größte. Bei Bedarf teile ich sie in **3a** (Stücke, Stimm
   - Seiten lassen sich beim Annehmen weglassen („Seite übernehmen“), z. B. leere Rückseiten.
   - Die Pfeiltasten wechseln zwischen Uploads (N-13); Seiten blättert man mit den Buttons der Werkzeugleiste.
 - **Toasts** sitzen in der Seitenhülle, nicht in der Root-Komponente; dadurch bleiben ngx-sonner und tailwind-merge aus dem Start-Bundle (589 statt 691 kB).
+- **Systemverwaltung (Stufe 5):**
+  - Kein Tab „Druck“ (Druckregeln je Ensemble) im Ensemble-Detail; D-6 hat keinen API-Endpunkt im MVP.
+  - Mitglieder kommen über die Benutzer-Seite ins Ensemble; der Tab „Mitglieder“ im Ensemble zeigt sie nur an.
+  - Die Besetzung wird mit Checkboxen je Instrument gewählt; ihre Reihenfolge folgt der Reihenfolge der Instrumente und Stimmen.
+  - Rechte-Matrix: „Anlegen“, „Bearbeiten“ und „Löschen“ setzen „Sehen“ im selben Bereich mit; wer „Sehen“ abwählt, nimmt dem Bereich alle Rechte.
+  - Den Tab „Eigene Felder“ sehen auch Notenwart:innen (`score.edit`) und alle mit `config.edit`, so wie die API die Feld-Endpunkte freigibt.
+  - Die Bezeichnungen der Feldtypen liegen jetzt global unter `terms.fieldTypes` (gebraucht von Notenverwaltung und Konfiguration).
