@@ -252,3 +252,11 @@ Diese Stufe ist die größte. Bei Bedarf teile ich sie in **3a** (Stücke, Stimm
 - **Änderungsprotokoll (S-6):** vorerst weggelassen.
 - **Reihenfolge:** wie oben. Getestet wird ohnehin am Ende im Zusammenspiel.
 - **Ensemble-Umschalter (R-1):** gibt es nicht. Die Listen in Mein Bereich umfassen immer alle eigenen Ensembles, wie in der API.
+- **Mein Bereich (Stufe 2), Lücken zur API:** Die Mockups zeigen einiges, das die API nicht liefert. Weggelassen sind:
+  - Ersatz- und Fehlt-Zähler in der Mappenliste; die Mappe selbst zeigt „fehlt“ über `missingCount`.
+  - Suche in Mappen- und Eventlisten sowie Zähler an den Tabs „Kommende/Archiv“.
+  - Mappen mit Nummer, eigene Felder und Hörprobe auf der Stückseite; Tags-Spalte in der Tag-Liste.
+  - Hinweis „Mehr als 10 Seiten druckt der Druckservice“ (Seitengrenze ist nur in `system` lesbar), kommt mit Stufe 6.
+  - Abschnitt „Druckservice auf diesem Computer“ im Profil, kommt mit Stufe 6.
+- **Hochladen und Drucken vor Stufe 4/6:** Die Buttons sind schon da und rufen `UploadLauncher` bzw. `PrintLauncher` auf; bis die Dialoge gebaut sind, erklärt ein Toast, wann die Funktion kommt.
+- **Pluralformen:** eigene Pipe `tPlural` (`<key>.one` / `<key>.other`) statt eines Transloco-Plugins.

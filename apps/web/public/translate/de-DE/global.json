@@ -109,7 +109,8 @@
       "login-failed": "Die Anmeldung ist fehlgeschlagen. Bitte versuche es erneut.",
       "state-mismatch": "Die Anmeldung hat zu lange gedauert oder wurde in einem anderen Tab gestartet. Bitte melde dich erneut an.",
       "idp-error": "Der Anmeldedienst des Vereins hat die Anmeldung abgelehnt. Wende dich an den Verein, wenn das wiederholt passiert."
-    }
+    },
+    "title": "Etwas ist schiefgelaufen"
   },
   "validation": {
     "required": "Pflichtfeld",
@@ -157,5 +158,18 @@
       "text": "Diese Adresse gibt es nicht oder nicht mehr. Vielleicht wurde die Mappe oder das Event umbenannt oder archiviert.",
       "requested": "Aufgerufen:"
     }
+  },
+  "pending": {
+    "upload": "Hochladen folgt in Stufe 4 des Frontends.",
+    "print": "Drucken folgt in Stufe 6 des Frontends."
+  },
+  "pdf": {
+    "label": "PDF-Vorschau, Seite {{ page }} von {{ count }}. Mit den Pfeiltasten blättern.",
+    "pages": "Seiten",
+    "previous": "Vorherige Seite",
+    "next": "Nächste Seite",
+    "page": "Seite {{ page }}",
+    "status": "Seite {{ page }} von {{ count }}",
+    "error": "Die Vorschau konnte nicht geladen werden. Lade das Notenblatt herunter oder versuche es später erneut."
   }
 }

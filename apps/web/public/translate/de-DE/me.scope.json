@@ -1,0 +1,126 @@
+{
+  "common": {
+    "scores": "Stücke",
+    "scoreCount": { "one": "1 Stück", "other": "{{ count }} Stücke" },
+    "zip": "Als ZIP herunterladen",
+    "missingHint": {
+      "one": "Für 1 Stück fehlt deine Stimme und es gibt keine Ersatzstimme.",
+      "other": "Für {{ count }} Stücke fehlt deine Stimme und es gibt keine Ersatzstimme."
+    }
+  },
+  "list": {
+    "number": "Nr.",
+    "numberLabel": "Nummer {{ number }}",
+    "composer": "Komponist",
+    "pagesHeader": "Seiten",
+    "pages": { "one": "1 Seite", "other": "{{ count }} Seiten" },
+    "actions": "Aktionen",
+    "download": "{{ title }} herunterladen"
+  },
+  "start": {
+    "hello": "Hallo {{ name }}",
+    "intro": "Deine Noten für {{ voices }}.",
+    "uploadVoice": "Stimme hochladen",
+    "events": "Kommende Events",
+    "allEvents": "Alle Events",
+    "noEvents": "Gerade stehen keine Events an.",
+    "folders": "Deine Mappen",
+    "allFolders": "Alle Mappen",
+    "noFolders": "Für deine Ensembles sind noch keine Mappen freigegeben.",
+    "uploads": "Deine Uploads",
+    "allUploads": "Alle Uploads",
+    "noUploads": "Du hast noch nichts hochgeladen."
+  },
+  "voices": {
+    "title": "Welche Stimmen spielst du?",
+    "text": "Mappen und Events zeigen dir danach direkt deine Noten. Du kannst deine Auswahl jederzeit im Profil ändern.",
+    "search": "Stimme suchen",
+    "searchPlaceholder": "z. B. Klarinette oder Horn",
+    "noMatch": "Keine Stimme gefunden.",
+    "count": { "one": "1 Stimme ausgewählt", "other": "{{ count }} Stimmen ausgewählt" },
+    "later": "Später",
+    "saved": "Deine Stimmen sind gespeichert."
+  },
+  "folders": {
+    "intro": "Alle Mappen, in denen du spielst – mit deiner Stimme {{ voices }}.",
+    "zipLabel": "{{ name }} als ZIP herunterladen",
+    "empty": "Für deine Ensembles sind noch keine Mappen freigegeben."
+  },
+  "folder": {
+    "search": "In dieser Mappe suchen",
+    "searchPlaceholder": "Stücke durchsuchen",
+    "empty": "Keine Stücke gefunden."
+  },
+  "filter": {
+    "none": "Kein Filter",
+    "active": "1 Filter aktiv",
+    "remove": "Filter {{ name }} entfernen"
+  },
+  "events": {
+    "intro": "Termine deiner Ensembles mit Setlist für deine Stimme.",
+    "view": "Events-Ansicht",
+    "upcoming": "Kommende",
+    "archive": "Archiv",
+    "empty": "Gerade stehen keine Events an.",
+    "emptyArchive": "Noch keine vergangenen Events."
+  },
+  "event": {
+    "setlist": "Setlist",
+    "order": "In Spielreihenfolge",
+    "setlistCount": { "one": "Setlist mit 1 Stück", "other": "Setlist mit {{ count }} Stücken" },
+    "empty": "Die Setlist ist noch leer."
+  },
+  "tags": {
+    "intro": "Filtere Stücke nach Vereins-Tags und deinen eigenen Tags. Eigene Tags siehst nur du.",
+    "create": "Eigenen Tag anlegen",
+    "name": "Name des Tags",
+    "club": "Vereins-Tags",
+    "personal": "Meine Tags",
+    "noClubTags": "Der Verein hat noch keine Tags angelegt.",
+    "noPersonalTags": "Du hast noch keine eigenen Tags.",
+    "scoresWith": "Stücke mit Tag „{{ name }}“",
+    "reset": "Filter zurücksetzen",
+    "empty": "Keine Stücke mit diesem Tag.",
+    "deleteTitle": "Tag „{{ name }}“ löschen?",
+    "deleteText": "Der Tag wird von allen Stücken entfernt. Das lässt sich nicht rückgängig machen.",
+    "deleted": "Tag „{{ name }}“ gelöscht."
+  },
+  "score": {
+    "back": "Zurück: {{ target }}",
+    "voice": "Stimme {{ voice }}",
+    "chooseSheet": "Notenblatt wählen",
+    "substitute": "Ersatz",
+    "noSheet": "Für deine Stimmen gibt es zu diesem Stück noch kein Notenblatt.",
+    "details": "Details & Aktionen",
+    "detailsTitle": "Details",
+    "arranger": "Bearbeitung",
+    "uploadMissing": "{{ voice }} hochladen",
+    "uploadOther": "Andere Stimme fehlt? Hochladen",
+    "addTag": "Tag hinzufügen",
+    "removeTag": "Tag {{ name }} entfernen"
+  },
+  "uploads": {
+    "intro": "Notenblätter, die du hochgeladen hast. Notenwart:innen prüfen sie, bevor sie für alle sichtbar sind.",
+    "statusFilter": "Nach Status filtern",
+    "all": "Alle",
+    "date": "Datum",
+    "status": "Status",
+    "reason": "Grund: {{ reason }}",
+    "uploadedAt": "Hochgeladen am {{ date }}",
+    "empty": "Keine Uploads gefunden."
+  },
+  "profile": {
+    "account": "Konto",
+    "accountHint": "Name, E-Mail und Bild kommen vom Vereinskonto und sind hier nur lesbar.",
+    "picture": "Profilbild {{ name }}",
+    "name": "Name",
+    "email": "E-Mail",
+    "voices": "Meine Stimmen",
+    "editVoices": "Stimmen bearbeiten",
+    "noVoices": "Du hast noch keine Stimmen gewählt.",
+    "substituteHint": "Fehlt deine Stimme in einem Stück, zeigen wir dir eine passende Ersatzstimme.",
+    "ensembles": "Ensembles & Rollen",
+    "role": "Deine Rolle",
+    "admin": "Du bist Administrator:in und darfst alles."
+  }
+}

@@ -32,6 +32,8 @@ function has(tree: Json, key: string): boolean {
     if (typeof node !== 'object' || node === null) return false;
     node = node[part];
   }
+  // Plural keys (`tPlural`) are objects with `one` and `other`.
+  if (typeof node === 'object' && node !== null) return typeof node['one'] === 'string' && typeof node['other'] === 'string';
   return typeof node === 'string';
 }
 
@@ -44,24 +46,16 @@ function sourceFiles(dir: string): string[] {
 }
 
 /**
- * Keys used in the app: `'a.b' | transloco`, `t('a.b')`, `translate('a.b')`, `selectTranslate('a.b')`
- * and `messageKey`-style constants written as `i18nKey('a.b')`. Dynamic keys (`errors.<code>`)
- * are covered by the code-based tests below.
+ * Keys used in the app: every quoted string that starts with a known namespace (a top-level key of
+ * global.json or a scope name), e.g. `'me.folder.search'` or `emptyKey="me.folder.empty"`.
+ * Dynamic keys (`errors.<code>`, `status.<kind>`) are covered by the code-based tests below.
  */
-function usedKeys(): { key: string; file: string }[] {
-  const patterns = [
-    /'([a-zA-Z][\w-]*(?:\.[\w-]+)+)'\s*\|\s*transloco/g,
-    /\b(?:t|translate|selectTranslate|i18nKey|page)\(\s*'([a-zA-Z][\w-]*(?:\.[\w-]+)+)'/g,
-    // Navigation entries and route titles.
-    /\b(?:labelKey|titleKey|key):\s*'([a-zA-Z][\w-]*(?:\.[\w-]+)+)'/g,
-    /\bcomingSoon\([^,]+,[^,]+,\s*'([a-zA-Z][\w-]*(?:\.[\w-]+)+)'/g,
-  ];
+function usedKeys(namespaces: readonly string[]): { key: string; file: string }[] {
+  const pattern = new RegExp(`['"]((?:${namespaces.join('|')})(?:\\.[\\w-]+)+)['"]`, 'g');
   const result: { key: string; file: string }[] = [];
   for (const file of sourceFiles(APP_ROOT)) {
     const text = readFileSync(file, 'utf8');
-    for (const pattern of patterns) {
-      for (const match of text.matchAll(pattern)) result.push({ key: match[1], file: relative(WEB_ROOT, file) });
-    }
+    for (const match of text.matchAll(pattern)) result.push({ key: match[1], file: relative(WEB_ROOT, file) });
   }
   return result;
 }
@@ -95,7 +89,7 @@ describe.each(AVAILABLE_LANGS)('translations %s', (lang) => {
   });
 
   it('has every key used in templates and code', () => {
-    const missing = usedKeys().filter(({ key }) => {
+    const missing = usedKeys([...Object.keys(global), ...scopes.keys()]).filter(({ key }) => {
       const [first, ...rest] = key.split('.');
       const scope = scopes.get(first);
       return scope ? !has(scope, rest.join('.')) : !has(global, key);

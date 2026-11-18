@@ -1,22 +1,34 @@
-import type { Routes } from '@angular/router';
-import { APP_ROUTES } from '@vm-web/shared';
+import type { Route, Routes } from '@angular/router';
+import { provideTranslocoScope } from '@jsverse/transloco';
+import { APP_ROUTES, childSegment, type AppPath } from '@vm-web/shared';
 
-import { comingSoon } from '../placeholder/coming-soon.routes';
+import { page } from '../../core/layout/page';
 
 const r = APP_ROUTES.me;
 const section = { key: 'nav.me.section', path: r.root };
 
-/** Mein Bereich (Stufe 2). */
+function mePage(path: AppPath, titleKey: string, loadComponent: Route['loadComponent'], data: Record<string, unknown> = {}): Route {
+  const meta = page(titleKey, section);
+  return { path: childSegment(path, r.root), title: meta.title, data: { ...meta.data, ...data }, loadComponent };
+}
+
+/** Mein Bereich (Stufe 2); texts in the `me` scope. */
 export const ME_ROUTES: Routes = [
-  comingSoon(r.root, r.root, 'nav.me.start', 2, section),
-  comingSoon(r.folders, r.root, 'nav.me.folders', 2, section),
-  comingSoon(r.folder, r.root, 'terms.folder', 2, section),
-  comingSoon(r.events, r.root, 'nav.me.events', 2, section),
-  comingSoon(r.event, r.root, 'terms.event', 2, section),
-  comingSoon(r.tags, r.root, 'nav.me.tags', 2, section),
-  comingSoon(r.clubTag, r.root, 'terms.tag', 2, section),
-  comingSoon(r.personalTag, r.root, 'terms.tag', 2, section),
-  comingSoon(r.score, r.root, 'terms.score', 2, section),
-  comingSoon(r.uploads, r.root, 'nav.me.uploads', 2, section),
-  comingSoon(r.profile, r.root, 'nav.me.profile', 2, section),
+  {
+    path: '',
+    providers: [provideTranslocoScope('me')],
+    children: [
+      mePage(r.root, 'nav.me.start', () => import('./start-page').then((m) => m.StartPage)),
+      mePage(r.folders, 'nav.me.folders', () => import('./folders-page').then((m) => m.FoldersPage)),
+      mePage(r.folder, 'terms.folder', () => import('./folder-page').then((m) => m.FolderPage)),
+      mePage(r.events, 'nav.me.events', () => import('./events-page').then((m) => m.EventsPage)),
+      mePage(r.event, 'terms.event', () => import('./event-page').then((m) => m.EventPage)),
+      mePage(r.tags, 'nav.me.tags', () => import('./tags-page').then((m) => m.TagsPage)),
+      mePage(r.clubTag, 'nav.me.tags', () => import('./tags-page').then((m) => m.TagsPage), { kind: 'club' }),
+      mePage(r.personalTag, 'nav.me.tags', () => import('./tags-page').then((m) => m.TagsPage), { kind: 'personal' }),
+      mePage(r.score, 'terms.score', () => import('./score-page').then((m) => m.ScorePage)),
+      mePage(r.uploads, 'nav.me.uploads', () => import('./uploads-page').then((m) => m.UploadsPage)),
+      mePage(r.profile, 'nav.me.profile', () => import('./profile-page').then((m) => m.ProfilePage)),
+    ],
+  },
 ];

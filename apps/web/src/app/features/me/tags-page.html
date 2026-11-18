@@ -1,0 +1,105 @@
+<div class="flex flex-col gap-3 md:flex-row md:items-start md:justify-between">
+  <div>
+    <h1 class="text-2xl font-semibold">{{ 'nav.me.tags' | transloco }}</h1>
+    <p class="mt-1 text-muted-foreground">{{ 'me.tags.intro' | transloco }}</p>
+  </div>
+  @if (!creating()) {
+    <button z-button zType="outline" type="button" class="w-full md:w-auto" (click)="creating.set(true)">
+      <ng-icon name="lucidePlus" aria-hidden="true" />{{ 'me.tags.create' | transloco }}
+    </button>
+  }
+</div>
+
+@if (creating()) {
+  <vm-tag-name-form (saved)="create($event)" (cancelled)="creating.set(false)" />
+}
+
+@if (tags.hasValue()) {
+  @let all = tags.value();
+  <section aria-labelledby="h-club" class="flex flex-col gap-2">
+    <h2 id="h-club" class="text-base font-semibold">{{ 'me.tags.club' | transloco }}</h2>
+    @if (all.clubTags.length) {
+      <ul class="flex flex-wrap gap-2">
+        @for (tag of all.clubTags; track tag.id) {
+          <li>
+            <a
+              [routerLink]="link('club', tag)"
+              [attr.aria-current]="selected()?.tag?.id === tag.id ? 'true' : null"
+              class="inline-flex min-h-11 items-center gap-2 rounded-md border px-3 font-medium no-underline xl:min-h-9"
+              [class]="selected()?.tag?.id === tag.id ? 'border-primary bg-primary-soft text-primary' : 'border-input text-foreground'"
+            >
+              {{ tag.name }}<span class="text-xs text-muted-foreground tabular-nums">{{ tag.scoreCount }}</span>
+            </a>
+          </li>
+        }
+      </ul>
+    } @else {
+      <p class="text-muted-foreground">{{ 'me.tags.noClubTags' | transloco }}</p>
+    }
+  </section>
+
+  <section aria-labelledby="h-personal" class="flex flex-col gap-2">
+    <h2 id="h-personal" class="text-base font-semibold">{{ 'me.tags.personal' | transloco }}</h2>
+    @if (all.personalTags.length) {
+      <ul class="flex flex-wrap gap-2">
+        @for (tag of all.personalTags; track tag.id) {
+          <li>
+            <a
+              [routerLink]="link('personal', tag)"
+              [attr.aria-current]="selected()?.tag?.id === tag.id ? 'true' : null"
+              class="inline-flex min-h-11 items-center gap-2 rounded-md border px-3 font-medium no-underline xl:min-h-9"
+              [class]="selected()?.tag?.id === tag.id ? 'border-primary bg-primary-soft text-primary' : 'border-input text-foreground'"
+            >
+              {{ tag.name }}<span class="text-xs text-muted-foreground tabular-nums">{{ tag.scoreCount }}</span>
+            </a>
+          </li>
+        }
+      </ul>
+    } @else {
+      <p class="text-muted-foreground">{{ 'me.tags.noPersonalTags' | transloco }}</p>
+    }
+  </section>
+}
+
+@if (selected(); as current) {
+  <section aria-labelledby="h-list" class="flex flex-col gap-3">
+    <div class="flex flex-wrap items-center justify-between gap-2">
+      <h2 id="h-list" class="text-lg font-semibold">{{ 'me.tags.scoresWith' | transloco: { name: current.tag.name } }}</h2>
+      <div class="flex flex-wrap gap-2">
+        @if (current.kind === 'personal') {
+          <button z-button zType="ghost" type="button" (click)="renaming.set(true)">
+            <ng-icon name="lucidePencil" aria-hidden="true" />{{ 'common.rename' | transloco }}
+          </button>
+          <button z-button zType="ghost" type="button" (click)="remove(current.tag)">
+            <ng-icon name="lucideTrash2" aria-hidden="true" />{{ 'common.delete' | transloco }}
+          </button>
+        }
+        <a z-button zType="ghost" [routerLink]="tagsPath">{{ 'me.tags.reset' | transloco }}</a>
+      </div>
+    </div>
+
+    @if (renaming()) {
+      <vm-tag-name-form [initial]="current.tag.name" submitKey="common.save" (saved)="rename($event)" (cancelled)="renaming.set(false)" />
+    }
+
+    <label class="flex flex-col gap-1.5">
+      <span class="sr-only">{{ 'me.folder.searchPlaceholder' | transloco }}</span>
+      <span class="relative">
+        <ng-icon name="lucideSearch" class="absolute top-1/2 left-3 -translate-y-1/2 text-muted-foreground" aria-hidden="true" />
+        <input
+          z-input
+          type="search"
+          class="ps-9"
+          [placeholder]="'me.folder.searchPlaceholder' | transloco"
+          [value]="search()"
+          (input)="search.set($any($event.target).value)"
+        />
+      </span>
+    </label>
+
+    <vm-member-score-list [rows]="list.items()" numbering="none" />
+    <vm-list-state [list]="list" emptyKey="me.tags.empty" />
+  </section>
+} @else if (tagId() && tags.hasValue()) {
+  <p role="alert" class="rounded-md bg-destructive-soft p-4 text-destructive-ink">{{ 'errors.not-found' | transloco }}</p>
+}

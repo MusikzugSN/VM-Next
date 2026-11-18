@@ -1,0 +1,124 @@
+@if (viewport.isMobile()) {
+  <ul class="flex flex-col gap-2">
+    @for (item of items(); track item.row.scoreId) {
+      <li class="flex items-center gap-3 rounded-lg border bg-card py-3 ps-3 pe-2 shadow-sm">
+        @if (numbering() !== 'none') {
+          <span
+            class="flex size-11 shrink-0 self-start items-center justify-center rounded-md bg-primary-soft text-base font-semibold text-primary tabular-nums"
+            [attr.aria-label]="'me.list.numberLabel' | transloco: { number: item.number }"
+            >{{ item.number }}</span
+          >
+        }
+        <div class="flex min-w-0 flex-1 flex-col gap-0.5">
+          @if (item.missing) {
+            <span class="text-base font-medium">{{ item.row.title }}</span>
+          } @else {
+            <a [routerLink]="item.link" [queryParams]="item.query" class="text-base font-medium text-foreground no-underline hover:underline">{{
+              item.row.title
+            }}</a>
+          }
+          <span class="text-muted-foreground">
+            {{ item.row.composer ?? '' }}
+            @if (!item.missing) {
+              @if (item.row.composer) {
+                ·
+              }
+              {{ 'me.list.pages' | tPlural: item.pages }}
+            }
+          </span>
+          @if (item.substitute) {
+            <vm-status-badge kind="substitute" [params]="{ voice: item.substitute }" class="mt-1" />
+          }
+          @if (item.missing) {
+            <vm-status-badge kind="missing" class="mt-1" />
+          }
+        </div>
+        @if (item.missing) {
+          @if (canUpload()) {
+            <button z-button zType="ghost" type="button" (click)="upload(item.row)">
+              <ng-icon name="lucideUpload" aria-hidden="true" />{{ 'common.upload' | transloco }}
+            </button>
+          }
+        } @else if (item.download) {
+          <a
+            z-button
+            zType="ghost"
+            zSize="icon"
+            [href]="item.download"
+            download
+            [attr.aria-label]="'me.list.download' | transloco: { title: item.row.title }"
+          >
+            <ng-icon name="lucideDownload" size="20" aria-hidden="true" />
+          </a>
+        }
+      </li>
+    }
+  </ul>
+} @else {
+  <div class="overflow-x-auto rounded-lg border bg-card shadow-sm">
+    <table class="w-full text-start">
+      <thead class="bg-muted text-xs font-medium text-muted-foreground">
+        <tr>
+          @if (numbering() !== 'none') {
+            <th scope="col" class="w-16 px-3 py-2 text-start">{{ 'me.list.number' | transloco }}</th>
+          }
+          <th scope="col" class="px-3 py-2 text-start">{{ 'terms.score' | transloco }}</th>
+          <th scope="col" class="px-3 py-2 text-start">{{ 'me.list.composer' | transloco }}</th>
+          <th scope="col" class="w-20 px-3 py-2 text-end">{{ 'me.list.pagesHeader' | transloco }}</th>
+          <th scope="col" class="w-28 px-3 py-2 text-end">{{ 'me.list.actions' | transloco }}</th>
+        </tr>
+      </thead>
+      <tbody>
+        @for (item of items(); track item.row.scoreId) {
+          <tr class="border-t">
+            @if (numbering() !== 'none') {
+              <td class="px-3 py-2">
+                <span
+                  class="flex size-10 items-center justify-center rounded-md bg-primary-soft text-base font-semibold text-primary tabular-nums"
+                  [attr.aria-label]="'me.list.numberLabel' | transloco: { number: item.number }"
+                  >{{ item.number }}</span
+                >
+              </td>
+            }
+            <td class="px-3 py-2">
+              <div class="flex flex-wrap items-center gap-2">
+                @if (item.missing) {
+                  <span class="font-medium">{{ item.row.title }}</span>
+                  <vm-status-badge kind="missing" />
+                  @if (canUpload()) {
+                    <button type="button" class="font-medium text-primary underline-offset-4 hover:underline" (click)="upload(item.row)">
+                      {{ 'common.upload' | transloco }}
+                    </button>
+                  }
+                } @else {
+                  <a [routerLink]="item.link" [queryParams]="item.query" class="font-medium text-foreground no-underline hover:underline">{{
+                    item.row.title
+                  }}</a>
+                  @if (item.substitute) {
+                    <vm-status-badge kind="substitute" [params]="{ voice: item.substitute }" />
+                  }
+                }
+              </div>
+            </td>
+            <td class="px-3 py-2 text-muted-foreground">{{ item.row.composer ?? '' }}</td>
+            <td class="px-3 py-2 text-end text-muted-foreground tabular-nums">{{ item.missing ? '–' : item.pages }}</td>
+            <td class="px-3 py-2 text-end">
+              @if (item.download) {
+                <a
+                  z-button
+                  zType="ghost"
+                  zSize="icon"
+                  [href]="item.download"
+                  download
+                  [attr.aria-label]="'me.list.download' | transloco: { title: item.row.title }"
+                >
+                  <ng-icon name="lucideDownload" aria-hidden="true" />
+                </a>
+              }
+            </td>
+          </tr>
+        }
+      </tbody>
+    </table>
+  </div>
+}

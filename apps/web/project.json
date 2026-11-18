@@ -20,6 +20,29 @@
           {
             "glob": "**/*",
             "input": "apps/web/public"
+          },
+          {
+            "glob": "pdf.worker.min.mjs",
+            "input": "node_modules/pdfjs-dist/build",
+            "output": "pdfjs"
+          },
+          {
+            "glob": "*.{wasm,js}",
+            "input": "node_modules/pdfjs-dist/wasm",
+            "output": "pdfjs/wasm",
+            "ignore": [
+              "quickjs-eval.*"
+            ]
+          },
+          {
+            "glob": "*",
+            "input": "node_modules/pdfjs-dist/standard_fonts",
+            "output": "pdfjs/standard_fonts"
+          },
+          {
+            "glob": "*",
+            "input": "node_modules/pdfjs-dist/cmaps",
+            "output": "pdfjs/cmaps"
           }
         ],
         "styles": [

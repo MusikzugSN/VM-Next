@@ -1,0 +1,107 @@
+<div class="flex flex-col gap-3 md:flex-row md:items-start md:justify-between md:gap-4">
+  <div>
+    <h1 class="text-2xl font-semibold">{{ 'me.start.hello' | transloco: { name: firstName() } }}</h1>
+    @if (voiceNames()) {
+      <p class="mt-1 text-muted-foreground">{{ 'me.start.intro' | transloco: { voices: voiceNames() } }}</p>
+    }
+  </div>
+  @if (canUpload()) {
+    <button z-button type="button" class="hidden md:inline-flex" (click)="upload()">
+      <ng-icon name="lucideUpload" aria-hidden="true" />{{ 'me.start.uploadVoice' | transloco }}
+    </button>
+  }
+</div>
+
+<section aria-labelledby="h-events" class="flex flex-col gap-3">
+  <div class="flex items-center justify-between">
+    <h2 id="h-events" class="text-base font-semibold">{{ 'me.start.events' | transloco }}</h2>
+    <a [routerLink]="routes.events" class="py-3 font-medium md:py-0">{{ 'me.start.allEvents' | transloco }}</a>
+  </div>
+  @if (events.hasValue() && events.value().items.length > 0) {
+    <ul class="grid gap-3 md:grid-cols-3">
+      @for (event of events.value().items; track event.id) {
+        <li>
+          <a
+            [routerLink]="eventLink(event.id)"
+            class="flex items-center gap-3 rounded-lg border bg-card p-3 text-foreground no-underline shadow-sm hover:bg-accent md:flex-col md:items-start md:p-4"
+          >
+            <vm-event-date [date]="event.date" />
+            <span class="flex min-w-0 flex-col">
+              <span class="text-base font-medium md:font-semibold">{{ event.name }}</span>
+              <span class="text-muted-foreground">{{ event.date | date: 'EE dd.MM.yyyy' }}</span>
+              <span class="text-muted-foreground">{{ 'me.common.scoreCount' | tPlural: event.scoreCount }}</span>
+            </span>
+          </a>
+        </li>
+      }
+    </ul>
+  } @else if (events.hasValue()) {
+    <p class="rounded-lg border border-dashed p-6 text-center text-muted-foreground">{{ 'me.start.noEvents' | transloco }}</p>
+  }
+</section>
+
+<section aria-labelledby="h-folders" class="flex flex-col gap-3">
+  <div class="flex items-center justify-between">
+    <h2 id="h-folders" class="text-base font-semibold">{{ 'me.start.folders' | transloco }}</h2>
+    <a [routerLink]="routes.folders" class="py-3 font-medium md:py-0">{{ 'me.start.allFolders' | transloco }}</a>
+  </div>
+  @if (folders.hasValue() && folders.value().items.length > 0) {
+    <ul class="overflow-hidden rounded-lg border bg-card shadow-sm">
+      @for (folder of folders.value().items; track folder.id; let last = $last) {
+        <li [class.border-b]="!last">
+          <a [routerLink]="folderLink(folder.id)" class="flex min-h-14 items-center gap-3 px-4 py-2 text-foreground no-underline hover:bg-accent">
+            <ng-icon name="lucideFolderOpen" size="18" class="shrink-0 text-muted-foreground" aria-hidden="true" />
+            <span class="flex min-w-0 flex-1 flex-col md:flex-row md:items-center md:gap-3">
+              <span class="flex-1 font-medium">{{ folder.name }}</span>
+              <span class="text-muted-foreground tabular-nums">
+                {{ 'me.common.scoreCount' | tPlural: folder.scoreCount }} · {{ folder.ensemble.name }}
+              </span>
+            </span>
+            <ng-icon name="lucideChevronRight" class="shrink-0 text-muted-foreground" aria-hidden="true" />
+          </a>
+        </li>
+      }
+    </ul>
+  } @else if (folders.hasValue()) {
+    <p class="rounded-lg border border-dashed p-6 text-center text-muted-foreground">{{ 'me.start.noFolders' | transloco }}</p>
+  }
+</section>
+
+<section aria-labelledby="h-uploads" class="flex flex-col gap-3">
+  <div class="flex items-center justify-between">
+    <h2 id="h-uploads" class="text-base font-semibold">{{ 'me.start.uploads' | transloco }}</h2>
+    <a [routerLink]="routes.uploads" class="py-3 font-medium md:py-0">{{ 'me.start.allUploads' | transloco }}</a>
+  </div>
+  @if (myUploads.hasValue() && myUploads.value().items.length > 0) {
+    <ul class="overflow-hidden rounded-lg border bg-card shadow-sm">
+      @for (upload of myUploads.value().items; track upload.id; let last = $last) {
+        <li class="flex flex-col gap-1.5 px-4 py-3 md:flex-row md:items-center md:gap-3" [class.border-b]="!last">
+          <span class="flex min-w-0 flex-1 flex-col">
+            <span class="font-medium">
+              {{ upload.score?.name ?? upload.fileName }}
+              @if (upload.voice) {
+                – {{ upload.voice.name }}
+              }
+            </span>
+            @if (upload.status === 'rejected' && upload.rejectionReason) {
+              <span class="text-destructive-ink">{{ 'me.uploads.reason' | transloco: { reason: upload.rejectionReason } }}</span>
+            } @else {
+              <span class="text-muted-foreground">{{ 'me.uploads.uploadedAt' | transloco: { date: (upload.uploadedAt | date: 'dd.MM.yyyy') } }}</span>
+            }
+          </span>
+          <vm-upload-status-badge [status]="upload.status" />
+        </li>
+      }
+    </ul>
+  } @else if (myUploads.hasValue()) {
+    <p class="rounded-lg border border-dashed p-6 text-center text-muted-foreground">{{ 'me.start.noUploads' | transloco }}</p>
+  }
+</section>
+
+@if (canUpload()) {
+  <button z-button type="button" class="w-full md:hidden" (click)="upload()">
+    <ng-icon name="lucideUpload" aria-hidden="true" />{{ 'me.start.uploadVoice' | transloco }}
+  </button>
+}
+
+<vm-voice-selection-dialog [(open)]="selectVoices" (postponed)="postpone()" />
