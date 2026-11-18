@@ -20,6 +20,7 @@ import { ListState } from '../../shared/ui/list-state';
 import { MemberScoreList } from './ui/member-score-list';
 import { PageProblem } from '../../shared/ui/page-problem';
 import { TagFilter, type TagFilterValue } from './ui/tag-filter';
+import { usePageName } from '../../core/layout/page';
 
 /** Mappe (M-3, M-4, M-6, M-7): scores with number, search, tag filter, ZIP and print. */
 @Component({
@@ -103,6 +104,8 @@ import { TagFilter, type TagFilterValue } from './ui/tag-filter';
   `,
 })
 export class FolderPage {
+  /** Breadcrumb and document title show the loaded element's name. */
+  private readonly pageName = usePageName(() => this.overview.hasValue() ? this.overview.value().name : null);
   private readonly api = inject(ApiClient);
   private readonly voices = inject(VoiceContextStore);
   private readonly printer = inject(PrintLauncher);

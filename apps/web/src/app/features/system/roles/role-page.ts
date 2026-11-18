@@ -16,6 +16,7 @@ import { PluralPipe } from '../../../core/i18n/plural.pipe';
 import { NameDialog } from '../../../shared/ui/name-dialog';
 import { PageProblem } from '../../../shared/ui/page-problem';
 import { permissionKey, withDependencies } from './permission-labels';
+import { usePageName } from '../../../core/layout/page';
 
 /** Rolle (S-3, R-3, R-7): permission matrix (areas × actions) plus single permissions. */
 @Component({
@@ -26,6 +27,8 @@ import { permissionKey, withDependencies } from './permission-labels';
   templateUrl: './role-page.html',
 })
 export class RolePage {
+  /** Breadcrumb and document title show the loaded element's name. */
+  private readonly pageName = usePageName(() => this.role()?.name);
   private readonly api = inject(ApiClient);
   private readonly actions = inject(ActionRunner);
   private readonly confirm = inject(ConfirmService);

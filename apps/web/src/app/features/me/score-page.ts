@@ -33,6 +33,7 @@ import { PdfViewer } from '../../shared/ui/pdf-viewer';
 import { StatusBadge } from '../../shared/ui/status-badge';
 import { PageProblem } from '../../shared/ui/page-problem';
 import { NameDialog } from '../../shared/ui/name-dialog';
+import { usePageName } from '../../core/layout/page';
 
 /** Stück in Mein Bereich (M-3, M-6, M-8, M-9): PDF preview of the own voice, download, print, personal tags. */
 @Component({
@@ -55,6 +56,8 @@ import { NameDialog } from '../../shared/ui/name-dialog';
   templateUrl: './score-page.html',
 })
 export class ScorePage {
+  /** Breadcrumb and document title show the loaded element's name. */
+  private readonly pageName = usePageName(() => this.score()?.title);
   private readonly api = inject(ApiClient);
   private readonly voices = inject(VoiceContextStore);
   private readonly session = inject(SessionStore);

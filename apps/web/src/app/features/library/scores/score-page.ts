@@ -39,6 +39,7 @@ import { ScoreForm } from './score-form';
 import { buildScoreBody, scoreFormFromDetails, type ScoreFormErrors, type ScoreFormInput } from './score-form-model';
 import { formatDuration } from './score-query';
 import { TreeLabelPipe } from '../../../shared/ui/tree-label.pipe';
+import { usePageName } from '../../../core/layout/page';
 
 export type ScoreTab = 'details' | 'voices' | 'folders';
 
@@ -83,6 +84,8 @@ export function groupCompleteness(
   templateUrl: './score-page.html',
 })
 export class LibraryScorePage {
+  /** Breadcrumb and document title show the loaded element's name. */
+  private readonly pageName = usePageName(() => this.details.hasValue() ? this.details.value().title : null);
   private readonly api = inject(ApiClient);
   private readonly actions = inject(ActionRunner);
   private readonly confirm = inject(ConfirmService);

@@ -33,6 +33,7 @@ import { NameDialog } from '../../../shared/ui/name-dialog';
 import { PageProblem } from '../../../shared/ui/page-problem';
 import { SearchField } from '../../../shared/ui/search-field';
 import { TreeLabelPipe } from '../../../shared/ui/tree-label.pipe';
+import { usePageName } from '../../../core/layout/page';
 
 type EnsembleTab = 'details' | 'lineup' | 'members';
 
@@ -45,6 +46,8 @@ type EnsembleTab = 'details' | 'lineup' | 'members';
   templateUrl: './ensemble-page.html',
 })
 export class EnsemblePage {
+  /** Breadcrumb and document title show the loaded element's name. */
+  private readonly pageName = usePageName(() => this.ensemble()?.name);
   private readonly api = inject(ApiClient);
   private readonly actions = inject(ActionRunner);
   private readonly confirm = inject(ConfirmService);

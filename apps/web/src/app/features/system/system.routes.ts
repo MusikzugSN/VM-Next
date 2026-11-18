@@ -3,13 +3,19 @@ import { provideTranslocoScope } from '@jsverse/transloco';
 import { APP_ROUTES, childSegment, type AppPath } from '@vm-web/shared';
 
 import { requirePermission } from '../../core/auth/guards';
-import { page } from '../../core/layout/page';
+import { page, type Crumb } from '../../core/layout/page';
 
 const r = APP_ROUTES.system;
 const section = { key: 'nav.system.section', path: r.users };
+/** List page of each detail page, for the breadcrumbs. */
+const parents: Partial<Record<AppPath, Crumb>> = {
+  [r.user]: { key: 'nav.system.users', path: r.users },
+  [r.ensemble]: { key: 'nav.system.ensembles', path: r.ensembles },
+  [r.role]: { key: 'nav.system.roles', path: r.roles },
+};
 
 function systemPage(path: AppPath, titleKey: string, guard: CanActivateFn, loadComponent: Route['loadComponent']): Route {
-  const meta = page(titleKey, section);
+  const meta = page(titleKey, section, parents[path]);
   return { path: childSegment(path, r.root), canActivate: [guard], title: meta.title, data: meta.data, loadComponent };
 }
 

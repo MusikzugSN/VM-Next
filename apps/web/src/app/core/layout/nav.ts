@@ -10,6 +10,8 @@ export interface NavItem {
   readonly access: NavAccess;
   /** Active only on exactly this path (Start), not on sub-pages. */
   readonly exact?: boolean;
+  /** Further path prefixes that mark this entry as active, e.g. a score opened from Start. */
+  readonly activeFor?: readonly string[];
   /** Counter next to the label. */
   readonly badge?: 'review';
 }
@@ -27,10 +29,13 @@ export const NAV_SECTIONS: readonly NavSection[] = [
   {
     labelKey: 'nav.me.section',
     items: [
-      { labelKey: 'nav.me.start', path: APP_ROUTES.me.root, icon: 'lucideHouse', access: member, exact: true },
+      // Scores in Mein Bereich have no list of their own; they are opened from Start, folders and events.
+      { labelKey: 'nav.me.start', path: APP_ROUTES.me.root, icon: 'lucideHouse', access: member, exact: true, activeFor: ['/me/scores/'] },
       { labelKey: 'nav.me.folders', path: APP_ROUTES.me.folders, icon: 'lucideFolderOpen', access: member },
       { labelKey: 'nav.me.events', path: APP_ROUTES.me.events, icon: 'lucideCalendar', access: member },
       { labelKey: 'nav.me.tags', path: APP_ROUTES.me.tags, icon: 'lucideTag', access: member },
+      { labelKey: 'nav.me.uploads', path: APP_ROUTES.me.uploads, icon: 'lucideUpload', access: member },
+      { labelKey: 'nav.me.profile', path: APP_ROUTES.me.profile, icon: 'lucideUser', access: member },
     ],
   },
   {
@@ -76,8 +81,15 @@ export const MOBILE_NAV: readonly NavItem[] = [
   NAV_SECTIONS[0].items[0],
   NAV_SECTIONS[0].items[1],
   NAV_SECTIONS[0].items[2],
-  { labelKey: 'nav.me.profile', path: APP_ROUTES.me.profile, icon: 'lucideUser', access: member },
+  NAV_SECTIONS[0].items[5],
 ];
+
+/** Whether an entry is active for the current URL (path without query and fragment). */
+export function isActive(item: NavItem, url: string): boolean {
+  const path = url.split(/[?#]/)[0];
+  if (item.activeFor?.some((prefix) => path.startsWith(prefix))) return true;
+  return item.exact ? path === item.path : path === item.path || path.startsWith(`${item.path}/`);
+}
 
 export function canSee(access: NavAccess, check: { isMember: boolean; can: (permission: Permission) => boolean }): boolean {
   return 'member' in access ? check.isMember : access.anyOf.some((permission) => check.can(permission));

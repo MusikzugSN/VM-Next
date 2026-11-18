@@ -27,6 +27,7 @@ import { ToggleSwitch } from '../../../shared/ui/toggle-switch';
 import { FormDialog } from '../../../shared/ui/form-dialog';
 import { ScorePicker, type CandidatePage, type PickedScore } from '../ui/score-picker';
 import { moveItem } from '../voices/voice-dialog';
+import { usePageName } from '../../../core/layout/page';
 
 /** API limit of `set-setlist`. */
 export const MAX_SETLIST = 200;
@@ -55,6 +56,8 @@ type Item = Pick<SetlistEntry, 'scoreId' | 'title' | 'composer'>;
   templateUrl: './edit-event-page.html',
 })
 export class EditEventPage {
+  /** Breadcrumb and document title show the loaded element's name. */
+  private readonly pageName = usePageName(() => this.details.hasValue() ? this.details.value().name : null);
   private readonly api = inject(ApiClient);
   private readonly actions = inject(ActionRunner);
   private readonly confirm = inject(ConfirmService);

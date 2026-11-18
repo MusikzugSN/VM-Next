@@ -28,6 +28,7 @@ import { VoiceContextStore } from '../../core/voices/voice-context.store';
 import { ListState } from '../../shared/ui/list-state';
 import { MemberScoreList } from './ui/member-score-list';
 import { NameDialog } from '../../shared/ui/name-dialog';
+import { usePageName } from '../../core/layout/page';
 
 export type TagKind = 'club' | 'personal';
 
@@ -40,6 +41,8 @@ export type TagKind = 'club' | 'personal';
   templateUrl: './tags-page.html',
 })
 export class TagsPage {
+  /** Breadcrumb and document title show the loaded element's name. */
+  private readonly pageName = usePageName(() => this.selected()?.tag.name);
   private readonly api = inject(ApiClient);
   private readonly voices = inject(VoiceContextStore);
   private readonly router = inject(Router);

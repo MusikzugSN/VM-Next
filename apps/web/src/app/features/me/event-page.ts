@@ -18,6 +18,7 @@ import { VoiceContextStore } from '../../core/voices/voice-context.store';
 import { ListState } from '../../shared/ui/list-state';
 import { MemberScoreList } from './ui/member-score-list';
 import { PageProblem } from '../../shared/ui/page-problem';
+import { usePageName } from '../../core/layout/page';
 
 /** Event (M-5, M-6, M-7): setlist in playing order, ZIP and print. */
 @Component({
@@ -67,6 +68,8 @@ import { PageProblem } from '../../shared/ui/page-problem';
   `,
 })
 export class EventPage {
+  /** Breadcrumb and document title show the loaded element's name. */
+  private readonly pageName = usePageName(() => this.overview.hasValue() ? this.overview.value().name : null);
   private readonly api = inject(ApiClient);
   private readonly voices = inject(VoiceContextStore);
   private readonly printer = inject(PrintLauncher);

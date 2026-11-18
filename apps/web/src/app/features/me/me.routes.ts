@@ -2,13 +2,20 @@ import type { Route, Routes } from '@angular/router';
 import { provideTranslocoScope } from '@jsverse/transloco';
 import { APP_ROUTES, childSegment, type AppPath } from '@vm-web/shared';
 
-import { page } from '../../core/layout/page';
+import { page, type Crumb } from '../../core/layout/page';
 
 const r = APP_ROUTES.me;
 const section = { key: 'nav.me.section', path: r.root };
+/** List page of each detail page, for the breadcrumbs. */
+const parents: Partial<Record<AppPath, Crumb>> = {
+  [r.folder]: { key: 'nav.me.folders', path: r.folders },
+  [r.event]: { key: 'nav.me.events', path: r.events },
+  [r.clubTag]: { key: 'nav.me.tags', path: r.tags },
+  [r.personalTag]: { key: 'nav.me.tags', path: r.tags },
+};
 
 function mePage(path: AppPath, titleKey: string, loadComponent: Route['loadComponent'], data: Record<string, unknown> = {}): Route {
-  const meta = page(titleKey, section);
+  const meta = page(titleKey, section, parents[path]);
   return { path: childSegment(path, r.root), title: meta.title, data: { ...meta.data, ...data }, loadComponent };
 }
 

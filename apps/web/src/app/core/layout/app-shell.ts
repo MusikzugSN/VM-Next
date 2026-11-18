@@ -1,7 +1,7 @@
 import { DOCUMENT } from '@angular/common';
 import { afterNextRender, ChangeDetectionStrategy, Component, computed, DestroyRef, inject, Injector, signal } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
-import { NavigationEnd, Router, RouterLink, RouterLinkActive, RouterOutlet } from '@angular/router';
+import { NavigationEnd, Router, RouterLink, RouterOutlet } from '@angular/router';
 import { TranslocoPipe } from '@jsverse/transloco';
 import { NgIcon, provideIcons } from '@ng-icons/core';
 import { lucideCalendar, lucideFolderOpen, lucideHouse, lucideMenu, lucideUser } from '@ng-icons/lucide';
@@ -15,7 +15,7 @@ import { UploadDialog } from '../../features/uploads/upload-dialog';
 import { BrandingStore } from '../branding/branding.store';
 import { ClubLogo } from '../branding/club-logo';
 import { ViewportService } from './viewport';
-import { MOBILE_NAV } from './nav';
+import { isActive, MOBILE_NAV } from './nav';
 import { NavList } from './nav-list';
 import { CurrentPage } from './page';
 import { UserMenu } from './user-menu';
@@ -32,7 +32,6 @@ import { VoiceSwitcher } from './voice-switcher';
   imports: [
     RouterOutlet,
     RouterLink,
-    RouterLinkActive,
     NgIcon,
     TranslocoPipe,
     ZardSheetImports,
@@ -54,12 +53,15 @@ export class AppShell {
 
   protected readonly viewport = inject(ViewportService);
   protected readonly branding = inject(BrandingStore);
-  protected readonly page = inject(CurrentPage).data;
+  private readonly currentPage = inject(CurrentPage);
+  protected readonly page = this.currentPage.data;
+  protected readonly pageName = this.currentPage.name;
   protected readonly mobileNav = MOBILE_NAV;
   protected readonly navOpen = signal(false);
 
   /** On phones the active voice sits above the content of Mein Bereich (mockup „Start · Mobil“). */
-  private readonly url = signal(this.router.url);
+  protected readonly url = signal(this.router.url);
+  protected readonly isActive = isActive;
   protected readonly showMobileVoice = computed(
     () => this.viewport.isMobile() && (this.url() === APP_ROUTES.me.root || this.url().startsWith(`${APP_ROUTES.me.root}/`)),
   );

@@ -30,6 +30,7 @@ import { SearchField } from '../../../shared/ui/search-field';
 import { ToggleSwitch } from '../../../shared/ui/toggle-switch';
 import { FormDialog } from '../../../shared/ui/form-dialog';
 import { ScorePicker, type CandidatePage, type PickedScore } from '../ui/score-picker';
+import { usePageName } from '../../../core/layout/page';
 
 /** Mappe bearbeiten (N-5, N-15): name, visibility, scores with their own number in this folder. */
 @Component({
@@ -53,6 +54,8 @@ import { ScorePicker, type CandidatePage, type PickedScore } from '../ui/score-p
   templateUrl: './edit-folder-page.html',
 })
 export class EditFolderPage {
+  /** Breadcrumb and document title show the loaded element's name. */
+  private readonly pageName = usePageName(() => this.details.hasValue() ? this.details.value().name : null);
   private readonly api = inject(ApiClient);
   private readonly actions = inject(ActionRunner);
   private readonly confirm = inject(ConfirmService);

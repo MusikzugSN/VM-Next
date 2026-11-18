@@ -21,6 +21,7 @@ import { PageProblem } from '../../../shared/ui/page-problem';
 import { ToggleSwitch } from '../../../shared/ui/toggle-switch';
 import { UserStatusBadge } from '../ui/user-status-badge';
 import { TreeLabelPipe } from '../../../shared/ui/tree-label.pipe';
+import { usePageName } from '../../../core/layout/page';
 
 /** Benutzer-Detail (S-1, A-5, R-1, R-6): roles per ensemble, voices, admin flag, block and delete. */
 @Component({
@@ -31,6 +32,8 @@ import { TreeLabelPipe } from '../../../shared/ui/tree-label.pipe';
   templateUrl: './user-page.html',
 })
 export class UserPage {
+  /** Breadcrumb and document title show the loaded element's name. */
+  private readonly pageName = usePageName(() => this.user()?.name);
   private readonly api = inject(ApiClient);
   private readonly actions = inject(ActionRunner);
   private readonly confirm = inject(ConfirmService);

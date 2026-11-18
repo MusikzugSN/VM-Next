@@ -38,7 +38,13 @@
                 </li>
                 <li aria-hidden="true">/</li>
               }
-              <li aria-current="page" class="truncate text-foreground">{{ page.titleKey | transloco }}</li>
+              @if (page.parentKey && page.parentPath) {
+                <li>
+                  <a [routerLink]="page.parentPath" class="whitespace-nowrap text-muted-foreground no-underline hover:text-foreground">{{ page.parentKey | transloco }}</a>
+                </li>
+                <li aria-hidden="true">/</li>
+              }
+              <li aria-current="page" class="truncate text-foreground">{{ pageName() ?? (page.titleKey | transloco) }}</li>
             </ol>
           }
         </nav>
@@ -57,7 +63,7 @@
         }
         <span class="min-w-0 flex-1 truncate text-base font-semibold">
           @if (page(); as page) {
-            {{ page.titleKey | transloco }}
+            {{ pageName() ?? (page.titleKey | transloco) }}
           }
         </span>
       }
@@ -85,9 +91,9 @@
         @for (item of mobileNav; track item.path) {
           <a
             [routerLink]="item.path"
-            routerLinkActive="text-primary font-medium"
-            [routerLinkActiveOptions]="{ exact: item.exact ?? false }"
-            ariaCurrentWhenActive="page"
+            [attr.aria-current]="isActive(item, url()) ? 'page' : null"
+            [class.text-primary]="isActive(item, url())"
+            [class.font-medium]="isActive(item, url())"
             class="flex flex-col items-center justify-center gap-1 text-xs text-muted-foreground no-underline"
           >
             <ng-icon [name]="item.icon" size="20" aria-hidden="true" />

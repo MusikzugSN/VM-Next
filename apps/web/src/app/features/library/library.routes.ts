@@ -3,14 +3,22 @@ import { provideTranslocoScope } from '@jsverse/transloco';
 import { APP_ROUTES, childSegment, type AppPath } from '@vm-web/shared';
 
 import { requirePermission } from '../../core/auth/guards';
-import { page } from '../../core/layout/page';
+import { page, type Crumb } from '../../core/layout/page';
 import { LibraryOptions } from './library-options';
 
 const r = APP_ROUTES.library;
 const section = { key: 'nav.library.section', path: r.scores };
+/** List page of each detail page, for the breadcrumbs. */
+const parents: Partial<Record<AppPath, Crumb>> = {
+  [r.newScore]: { key: 'nav.library.scores', path: r.scores },
+  [r.score]: { key: 'nav.library.scores', path: r.scores },
+  [r.reviewUpload]: { key: 'nav.library.review', path: r.review },
+  [r.folder]: { key: 'nav.library.folders', path: r.folders },
+  [r.event]: { key: 'nav.library.events', path: r.events },
+};
 
 function libraryPage(path: AppPath, titleKey: string, guard: CanActivateFn, loadComponent: Route['loadComponent']): Route {
-  const meta = page(titleKey, section);
+  const meta = page(titleKey, section, parents[path]);
   return { path: childSegment(path, r.root), canActivate: [guard], title: meta.title, data: meta.data, loadComponent };
 }
 
