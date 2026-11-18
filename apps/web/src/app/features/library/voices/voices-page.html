@@ -1,7 +1,7 @@
 <div class="flex flex-col gap-3 md:flex-row md:items-start md:justify-between">
   <div>
     <h1 class="text-2xl font-semibold">{{ 'nav.library.voices' | transloco }}</h1>
-    <p class="mt-1 text-muted-foreground">
+    <p class="mt-2 text-muted-foreground">
       {{ 'library.voices.instruments' | tPlural: groups().length }} · {{ 'library.voices.voices' | tPlural: voiceCount() }}.
       {{ 'library.voices.intro' | transloco }}
     </p>
@@ -23,13 +23,13 @@
   @for (group of shown(); track group.instrument.id) {
     @let gi = groupIndex(group);
     <section [attr.aria-labelledby]="'inst-' + group.instrument.id" class="overflow-hidden rounded-lg border bg-card shadow-sm">
-      <div class="flex flex-wrap items-center gap-2 bg-muted px-3 py-2">
+      <div class="flex flex-wrap items-center gap-2 bg-muted px-4 py-3">
         <h2 [id]="'inst-' + group.instrument.id" class="flex-1 font-semibold">
           {{ group.instrument.name }}
           <span class="text-xs font-medium text-muted-foreground">· {{ 'library.voices.voices' | tPlural: group.voices.length }}</span>
         </h2>
         @if (canEdit()) {
-          <button z-button zType="ghost" zSize="icon" type="button" (click)="renaming.set(group.instrument.id)" [attr.aria-label]="'library.voices.renameInstrument' | transloco: { name: group.instrument.name }">
+          <button z-button zType="ghost" zSize="icon" type="button" (click)="startRename(group)" [attr.aria-label]="'library.voices.renameInstrument' | transloco: { name: group.instrument.name }">
             <ng-icon name="lucidePencil" aria-hidden="true" />
           </button>
         }
@@ -50,20 +50,9 @@
           </button>
         }
       </div>
-      @if (renaming() === group.instrument.id) {
-        <div class="border-t p-3">
-          <vm-name-form
-            labelKey="library.voices.instrumentName"
-            submitKey="common.save"
-            [initial]="group.instrument.name"
-            (saved)="renameInstrument(group, $event)"
-            (cancelled)="renaming.set(null)"
-          />
-        </div>
-      }
       <ul>
         @for (voice of group.voices; track voice.id; let i = $index, first = $first, last = $last) {
-          <li class="flex flex-col gap-2 border-t px-3 py-2 md:flex-row md:items-center">
+          <li class="flex flex-col gap-2 border-t px-4 py-3 md:flex-row md:items-center">
             <div class="flex min-w-0 flex-1 flex-col gap-1">
               <span class="font-medium">{{ voice.name }}</span>
               <span class="flex flex-wrap items-center gap-1 text-muted-foreground">
@@ -112,3 +101,12 @@
 </div>
 
 <vm-voice-dialog [(open)]="dialogOpen" [target]="dialogTarget()" [groups]="groups()" (saved)="list.reload()" />
+<vm-name-dialog
+  [(open)]="renameOpen"
+  titleKey="library.voices.renameInstrument"
+  [titleParams]="{ name: renaming()?.instrument?.name }"
+  labelKey="library.voices.instrumentName"
+  submitKey="common.save"
+  [initial]="renaming()?.instrument?.name ?? ''"
+  [save]="renameInstrument"
+/>

@@ -1,9 +1,9 @@
 <div>
   <h1 class="text-2xl font-semibold">{{ 'nav.system.users' | transloco }}</h1>
-  <p class="mt-1 text-muted-foreground">{{ 'system.users.intro' | transloco }}</p>
+  <p class="mt-2 text-muted-foreground">{{ 'system.users.intro' | transloco }}</p>
 </div>
 
-<p class="flex items-start gap-2 rounded-lg border p-3 text-[13px] text-muted-foreground">
+<p class="flex items-start gap-2 rounded-lg border p-4 text-[13px] text-muted-foreground">
   <ng-icon name="lucideInfo" class="mt-0.5 shrink-0" aria-hidden="true" />{{ 'system.users.accountsHint' | transloco }}
 </p>
 
@@ -23,7 +23,7 @@
       <select z-native-select [value]="ensembleId()" (change)="ensembleId.set($any($event.target).value)">
         <option value="">{{ 'system.common.allEnsembles' | transloco }}</option>
         @for (e of options.value().ensembles; track e.id) {
-          <option [value]="e.id">{{ e.name }}</option>
+          <option [value]="e.id">{{ e | treeLabel }}</option>
         }
       </select>
     </label>
@@ -54,18 +54,18 @@
     <table class="w-full">
       <thead class="bg-muted text-xs font-medium text-muted-foreground">
         <tr>
-          <th scope="col" class="px-3 py-2 text-start">{{ 'system.common.name' | transloco }}</th>
-          <th scope="col" class="px-3 py-2 text-start">{{ 'system.users.email' | transloco }}</th>
-          <th scope="col" class="px-3 py-2 text-start">{{ 'system.users.memberships' | transloco }}</th>
-          <th scope="col" class="px-3 py-2 text-start">{{ 'system.users.voices' | transloco }}</th>
-          <th scope="col" class="px-3 py-2 text-start">{{ 'system.users.status' | transloco }}</th>
-          <th scope="col" class="px-3 py-2 text-start">{{ 'system.users.lastLogin' | transloco }}</th>
+          <th scope="col" class="px-4 py-3 text-start">{{ 'system.common.name' | transloco }}</th>
+          <th scope="col" class="px-4 py-3 text-start">{{ 'system.users.email' | transloco }}</th>
+          <th scope="col" class="px-4 py-3 text-start">{{ 'system.users.memberships' | transloco }}</th>
+          <th scope="col" class="px-4 py-3 text-start">{{ 'system.users.voices' | transloco }}</th>
+          <th scope="col" class="px-4 py-3 text-start">{{ 'system.users.status' | transloco }}</th>
+          <th scope="col" class="px-4 py-3 text-start">{{ 'system.users.lastLogin' | transloco }}</th>
         </tr>
       </thead>
       <tbody>
         @for (user of list.items(); track user.id) {
           <tr class="border-t align-top">
-            <td class="px-3 py-2">
+            <td class="px-4 py-3">
               <a [routerLink]="link(user)" class="inline-flex items-center gap-2 font-medium">
                 <span aria-hidden="true" class="flex size-7 items-center justify-center rounded-full bg-primary-soft text-[11px] font-semibold text-primary no-underline">{{
                   initialsOf(user.name)
@@ -76,23 +76,23 @@
                 <span class="ms-1 rounded-sm bg-muted px-1.5 py-0.5 text-xs">{{ 'system.users.admin' | transloco }}</span>
               }
             </td>
-            <td class="px-3 py-2 text-muted-foreground">{{ user.email ?? '–' }}</td>
-            <td class="px-3 py-2">
+            <td class="px-4 py-3 text-muted-foreground">{{ user.email ?? '–' }}</td>
+            <td class="px-4 py-3">
               @for (m of user.memberships; track m.ensemble.id) {
                 <div>{{ m.ensemble.name }} · {{ m.role.name }}</div>
               } @empty {
                 <span class="text-muted-foreground">{{ 'system.users.none' | transloco }}</span>
               }
             </td>
-            <td class="px-3 py-2">
+            <td class="px-4 py-3">
               @for (v of user.voices; track v.id) {
                 <div>{{ v.name }}</div>
               } @empty {
                 <span class="text-muted-foreground">{{ 'system.users.none' | transloco }}</span>
               }
             </td>
-            <td class="px-3 py-2"><vm-user-status-badge [status]="user.status" /></td>
-            <td class="px-3 py-2 text-muted-foreground tabular-nums">{{ user.lastLoginAt ? (user.lastLoginAt | date: 'dd.MM.yyyy, HH:mm') : '–' }}</td>
+            <td class="px-4 py-3"><vm-user-status-badge [status]="user.status" /></td>
+            <td class="px-4 py-3 whitespace-nowrap text-muted-foreground tabular-nums">{{ user.lastLoginAt ? (user.lastLoginAt | date: 'dd.MM.yyyy, HH:mm') : '–' }}</td>
           </tr>
         }
       </tbody>

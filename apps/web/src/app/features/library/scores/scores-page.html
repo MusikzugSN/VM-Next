@@ -2,7 +2,7 @@
   <div>
     <h1 class="text-2xl font-semibold">{{ 'nav.library.scores' | transloco }}</h1>
     @if (meta(); as m) {
-      <p class="mt-1 text-muted-foreground">
+      <p class="mt-2 text-muted-foreground">
         {{ 'library.scores.count' | tPlural: m.total }}
         @if (m.ensemble) {
           · {{ 'library.scores.completenessFor' | transloco: { ensemble: m.ensemble } }}
@@ -101,7 +101,7 @@
       <thead class="bg-muted text-xs font-medium text-muted-foreground">
         <tr>
           @for (column of columns(); track column.id) {
-            <th scope="col" class="px-3 py-1 text-start whitespace-nowrap" [attr.aria-sort]="ariaSort(column)">
+            <th scope="col" class="px-3 py-2.5 text-start whitespace-nowrap" [attr.aria-sort]="ariaSort(column)">
               <button type="button" class="inline-flex min-h-9 items-center gap-1 hover:text-foreground" (click)="sortBy(column)">
                 {{ column.label ?? (column.labelKey! | transloco) }}
                 @switch (ariaSort(column)) {
@@ -119,7 +119,7 @@
             </th>
           }
           @if (canDelete()) {
-            <th scope="col" class="w-14 px-3 py-2 text-end"><span class="sr-only">{{ 'library.common.actions' | transloco }}</span></th>
+            <th scope="col" class="w-14 px-2 py-2.5 text-end"><span class="sr-only">{{ 'library.common.actions' | transloco }}</span></th>
           }
         </tr>
       </thead>
@@ -127,7 +127,7 @@
         @for (row of list.items(); track row.id) {
           <tr class="border-t">
             @for (column of columns(); track column.id) {
-              <td class="px-3 py-2 align-top">
+              <td class="px-3 py-3 align-top">
                 @switch (column.id) {
                   @case ('title') {
                     <div class="flex flex-wrap items-center gap-1.5">
@@ -164,7 +164,7 @@
               </td>
             }
             @if (canDelete()) {
-              <td class="px-3 py-1 text-end">
+              <td class="px-2 py-2 text-end">
                 <button
                   z-button
                   zType="ghost"

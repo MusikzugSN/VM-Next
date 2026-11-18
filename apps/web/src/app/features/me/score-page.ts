@@ -32,7 +32,7 @@ import { VoiceContextStore } from '../../core/voices/voice-context.store';
 import { PdfViewer } from '../../shared/ui/pdf-viewer';
 import { StatusBadge } from '../../shared/ui/status-badge';
 import { PageProblem } from '../../shared/ui/page-problem';
-import { NameForm } from '../../shared/ui/name-form';
+import { NameDialog } from '../../shared/ui/name-dialog';
 
 /** Stück in Mein Bereich (M-3, M-6, M-8, M-9): PDF preview of the own voice, download, print, personal tags. */
 @Component({
@@ -48,7 +48,7 @@ import { NameForm } from '../../shared/ui/name-form';
     PdfViewer,
     StatusBadge,
     PageProblem,
-    NameForm,
+    NameDialog,
   ],
   viewProviders: [provideIcons({ lucideChevronLeft, lucideDownload, lucidePrinter, lucideUpload, lucidePlus, lucideX })],
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -129,15 +129,16 @@ export class ScorePage {
     this.overview.reload();
   }
 
-  protected async createTag(name: string): Promise<void> {
+  /** New personal tag from the tag menu; it is added to this score right away. */
+  protected readonly createTag = async (name: string): Promise<boolean> => {
     const created = await this.run(() =>
       firstValueFrom(this.api.post(apiUrl('me', 'createPersonalTag'), { name }, createdResponseSchema)),
     );
-    if (!created) return;
-    this.creatingTag.set(false);
+    if (!created) return false;
     this.myTags.reload();
     await this.addTag(created.id);
-  }
+    return true;
+  };
 
   private async run<T>(action: () => Promise<T>): Promise<T | undefined> {
     try {

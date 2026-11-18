@@ -11,11 +11,12 @@ import { ZardNativeSelectDirective } from '@/shared/components/native-select';
 
 import { ActionRunner } from '../../../core/actions/action-runner';
 import { ApiClient } from '../../../core/api/api-client';
+import { TreeLabelPipe } from '../../../shared/ui/tree-label.pipe';
 
 /** Tab „Standardwerte“ (A-3): ensemble and role of new accounts; warning if that role has club permissions (B-1). */
 @Component({
   selector: 'vm-defaults-settings',
-  imports: [NgIcon, TranslocoPipe, ZardButtonComponent, ZardNativeSelectDirective],
+  imports: [TreeLabelPipe, NgIcon, TranslocoPipe, ZardButtonComponent, ZardNativeSelectDirective],
   viewProviders: [provideIcons({ lucideTriangleAlert })],
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
@@ -25,7 +26,7 @@ import { ApiClient } from '../../../core/api/api-client';
         <p class="text-muted-foreground">{{ 'system.settings.defaults.hint' | transloco }}</p>
       </div>
       @if (warning()) {
-        <div role="status" class="flex items-start gap-2 rounded-lg bg-destructive-soft p-3 text-destructive-ink">
+        <div role="status" class="flex items-start gap-2 rounded-lg bg-destructive-soft p-4 text-destructive-ink">
           <ng-icon name="lucideTriangleAlert" class="mt-0.5 shrink-0" aria-hidden="true" />
           <span>{{ 'system.settings.defaults.clubWarning' | transloco }}</span>
         </div>
@@ -36,7 +37,7 @@ import { ApiClient } from '../../../core/api/api-client';
           <select z-native-select [disabled]="readonly()" [value]="ensembleId()" (change)="ensembleId.set($any($event.target).value)">
             <option value="">{{ 'system.settings.defaults.none' | transloco }}</option>
             @for (e of options.hasValue() ? options.value().ensembles : []; track e.id) {
-              <option [value]="e.id" [selected]="e.id === ensembleId()">{{ e.name }}</option>
+              <option [value]="e.id" [selected]="e.id === ensembleId()">{{ e | treeLabel }}</option>
             }
           </select>
         </label>

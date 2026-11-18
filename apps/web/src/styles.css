@@ -153,3 +153,23 @@
     appearance: textfield;
   }
 }
+
+/*
+ * VM-Web: Seitenrhythmus. Jede geroutete Seite ist ein senkrechter Stapel mit festem Abstand
+ * zwischen ihren Abschnitten (Kopf, Filter, Listen, Karten). Ohne diese Regel wäre das Element
+ * der Seitenkomponente `display: block`, und der Abstand von <main> griffe nur zwischen Seite
+ * und Stimmen-Wechsler. In @layer components, damit Klassen an der Seite selbst gewinnen.
+ */
+@layer components {
+  #main > router-outlet + * {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+    min-width: 0;
+  }
+  @media (width >= 48rem) {
+    #main > router-outlet + * {
+      gap: 2rem;
+    }
+  }
+}

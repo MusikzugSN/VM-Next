@@ -1,6 +1,7 @@
 import { Inject, Injectable } from '@nestjs/common';
-import type { CustomFieldType, ScoreFixedFields, VoiceRef } from '@vm-web/shared';
-import { and, asc, eq, inArray, isNull, sql, type SQL } from 'drizzle-orm';
+import type { CustomFieldType, EnsembleOption, ScoreFixedFields, VoiceRef } from '@vm-web/shared';
+import { and, asc, eq, inArray, sql, type SQL } from 'drizzle-orm';
+import { activeEnsembleOptions } from '../common/ensemble-tree';
 import { DATABASE, type Database } from '../db/database';
 import {
   clubTags,
@@ -194,12 +195,13 @@ export class ScoresRepository {
   }
 
   /** Non-archived ensembles that have a lineup. */
-  async ensemblesWithLineup(): Promise<{ id: string; name: string }[]> {
-    return this.db
-      .select({ id: ensembles.id, name: ensembles.name })
+  /** Active ensembles with a lineup, in tree order (F-3). */
+  async ensemblesWithLineup(): Promise<EnsembleOption[]> {
+    const rows = await this.db
+      .select({ id: ensembles.id })
       .from(ensembles)
-      .where(and(isNull(ensembles.archivedAt), sql`exists (select 1 from ensemble_lineup_voices lv where lv.ensemble_id = ${ensembles.id})`))
-      .orderBy(sql`lower(${ensembles.name})`);
+      .where(sql`exists (select 1 from ensemble_lineup_voices lv where lv.ensemble_id = ${ensembles.id})`);
+    return activeEnsembleOptions(this.db, rows.map((r) => r.id));
   }
 
   async allClubTags(): Promise<{ id: string; name: string }[]> {

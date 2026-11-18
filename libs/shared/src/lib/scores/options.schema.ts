@@ -1,9 +1,10 @@
 import * as z from 'zod';
+import { ensembleOptionSchema } from '../common/ensemble-options.schema';
 import { refSchema } from '../common/ids.schema';
 
 /** GET scores/ensemble-options – ensembles with a lineup for the completeness selector (N-4). Not paginated. */
 export const scoreEnsembleOptionsResponseSchema = z.object({
-  items: z.array(refSchema),
+  items: z.array(ensembleOptionSchema),
   defaultEnsembleId: z.string().nullable(),
 });
 export type ScoreEnsembleOptionsResponse = z.infer<typeof scoreEnsembleOptionsResponseSchema>;

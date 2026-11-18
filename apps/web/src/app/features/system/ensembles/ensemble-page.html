@@ -7,7 +7,7 @@
 } @else if (ensemble(); as e) {
   <div>
     <h1 class="text-2xl font-semibold">{{ e.name }}</h1>
-    <p class="mt-1 text-muted-foreground">
+    <p class="mt-2 text-muted-foreground">
       {{ 'system.ensembles.memberCount' | tPlural: e.memberCount }} · {{ 'system.ensembles.lineupSize' | tPlural: e.lineupSize }}
       @if (e.archived) {
         · {{ 'system.ensembles.archived' | transloco }}
@@ -31,19 +31,16 @@
   @switch (current()) {
     @case ('details') {
       <section class="flex flex-col gap-4 rounded-lg border bg-card p-4 shadow-sm md:p-6">
-        @if (renaming()) {
-          <vm-name-form labelKey="system.common.name" submitKey="common.save" [initial]="e.name" (saved)="rename($event)" (cancelled)="renaming.set(false)" />
-        } @else {
-          <div class="flex items-end justify-between gap-2">
-            <div class="flex flex-col gap-1">
-              <span class="text-muted-foreground">{{ 'system.common.name' | transloco }}</span>
-              <span class="font-medium">{{ e.name }}</span>
-            </div>
-            @if (canEdit()) {
-              <button z-button zType="outline" type="button" (click)="renaming.set(true)">{{ 'common.rename' | transloco }}</button>
-            }
+        <div class="flex items-end justify-between gap-2">
+          <div class="flex flex-col gap-1">
+            <span class="text-muted-foreground">{{ 'system.common.name' | transloco }}</span>
+            <span class="font-medium">{{ e.name }}</span>
           </div>
-        }
+          @if (canEdit()) {
+            <button z-button zType="outline" type="button" (click)="renaming.set(true)">{{ 'common.rename' | transloco }}</button>
+          }
+        </div>
+        <vm-name-dialog [(open)]="renaming" titleKey="common.rename" labelKey="system.common.name" submitKey="common.save" [initial]="e.name" [save]="rename" />
         <div class="border-t pt-4">
           @if (e.isRoot) {
             <span class="text-muted-foreground">{{ 'system.ensemble.parent' | transloco }}</span>
@@ -53,7 +50,7 @@
               <span class="font-medium">{{ 'system.ensemble.parent' | transloco }}</span>
               <select z-native-select [value]="e.parentId" (change)="setParent($any($event.target).value)">
                 @for (p of parents(); track p.id) {
-                  <option [value]="p.id" [selected]="p.id === e.parentId">{{ p.name }}</option>
+                  <option [value]="p.id" [selected]="p.id === e.parentId">{{ p | treeLabel }}</option>
                 }
               </select>
             </label>
@@ -95,7 +92,7 @@
           <p class="text-muted-foreground" aria-live="polite">{{ 'system.ensembles.lineupSize' | tPlural: selected().size }}</p>
           <div class="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
             @for (group of voices.options(); track group.instrument.id) {
-              <fieldset class="flex flex-col gap-1 rounded-md border p-3">
+              <fieldset class="flex flex-col gap-1 rounded-md border p-4">
                 <legend class="px-1 font-semibold">{{ group.instrument.name }}</legend>
                 @if (canEdit() && group.voices.length > 1) {
                   <button type="button" class="self-start text-[13px] font-medium text-primary" (click)="toggleInstrument(group.voices)">
@@ -118,7 +115,7 @@
       <vm-search-field [(value)]="memberSearch" labelKey="system.ensemble.searchMembers" />
       <ul class="overflow-hidden rounded-lg border bg-card shadow-sm" [class.hidden]="members.items().length === 0">
         @for (m of members.items(); track m.userId; let first = $first) {
-          <li class="flex items-center gap-3 px-3 py-2" [class.border-t]="!first">
+          <li class="flex items-center gap-3 px-4 py-3" [class.border-t]="!first">
             <span aria-hidden="true" class="flex size-8 shrink-0 items-center justify-center rounded-full bg-primary-soft text-xs font-semibold text-primary">{{
               initialsOf(m.name)
             }}</span>

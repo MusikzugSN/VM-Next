@@ -29,7 +29,7 @@ import { debounced } from '../../../core/util/debounced';
 import { ListState } from '../../../shared/ui/list-state';
 import { SearchField } from '../../../shared/ui/search-field';
 import { ToggleSwitch } from '../../../shared/ui/toggle-switch';
-import { CreateInEnsembleForm, type CreateInEnsemble } from '../ui/create-in-ensemble-form';
+import { CreateInEnsembleDialog, type CreateInEnsemble } from '../ui/create-in-ensemble-dialog';
 
 /** Events verwalten (N-15): upcoming and past events per ensemble, visibility, create and delete. */
 @Component({
@@ -45,7 +45,7 @@ import { CreateInEnsembleForm, type CreateInEnsemble } from '../ui/create-in-ens
     ListState,
     SearchField,
     ToggleSwitch,
-    CreateInEnsembleForm,
+    CreateInEnsembleDialog,
   ],
   viewProviders: [provideIcons({ lucidePlus, lucidePencil, lucideTrash2 })],
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -99,7 +99,7 @@ export class ManageEventsPage {
     return this.transloco.translate('library.folders.showLabel', { name: event.name });
   }
 
-  protected async create(input: CreateInEnsemble): Promise<void> {
+  protected readonly create = async (input: CreateInEnsemble): Promise<boolean> => {
     const done = await this.actions.run(
       () =>
         firstValueFrom(
@@ -112,7 +112,8 @@ export class ManageEventsPage {
       { success: { key: 'library.events.created', params: { name: input.name } } },
     );
     if (done) void this.router.navigateByUrl(appPath(APP_ROUTES.library.event, { eventId: done.value.id }));
-  }
+    return !!done;
+  };
 
   protected async setVisibility(event: EventListItem, show: boolean): Promise<void> {
     const done = await this.actions.run(

@@ -33,10 +33,10 @@ export interface PickedScore {
   imports: [NgIcon, TranslocoPipe, ZardButtonComponent, ZardInputComponent, SearchField],
   viewProviders: [provideIcons({ lucidePlus })],
   changeDetection: ChangeDetectionStrategy.OnPush,
-  host: { class: 'flex flex-col gap-3 rounded-lg border border-dashed p-4' },
+  host: { class: 'flex flex-col gap-3' },
   template: `
     <div class="flex flex-col gap-3 md:flex-row md:items-end">
-      <vm-search-field [(value)]="search" labelKey="library.picker.search" [hideLabel]="false" />
+      <vm-search-field [(value)]="search" labelKey="library.picker.search" [hideLabel]="false" [focusInDialog]="true" />
       @if (numbered()) {
         <label class="flex flex-col gap-1.5 md:w-32">
           <span class="font-medium">{{ 'library.picker.number' | transloco }}</span>

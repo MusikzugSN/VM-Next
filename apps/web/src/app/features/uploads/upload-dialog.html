@@ -4,7 +4,7 @@
     <p z-dialog-description>{{ 'upload.intro' | transloco }}</p>
   </z-dialog-header>
 
-  <div class="flex max-h-[38dvh] flex-col gap-4 overflow-y-auto px-1 md:max-h-[55dvh]">
+  <div class="flex min-h-0 flex-1 flex-col gap-5 overflow-y-auto md:max-h-[55dvh] md:flex-none">
     <div
       class="flex flex-col items-center gap-2 rounded-lg border-2 border-dashed p-6 text-center"
       [class]="dragging() ? 'border-primary bg-primary-soft' : 'border-input'"
@@ -30,7 +30,7 @@
       </div>
       <ul class="flex flex-col gap-3">
         @for (item of items(); track item.key; let i = $index) {
-          <li class="flex flex-col gap-3 rounded-lg border p-3">
+          <li class="flex flex-col gap-3 rounded-lg border p-4">
             <div class="flex items-center gap-2">
               <ng-icon name="lucideFileText" class="shrink-0 text-muted-foreground" aria-hidden="true" />
               <span class="min-w-0 flex-1 truncate font-mono text-[13px]">{{ item.file.name }}</span>

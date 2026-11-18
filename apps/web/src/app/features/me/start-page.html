@@ -2,7 +2,7 @@
   <div>
     <h1 class="text-2xl font-semibold">{{ 'me.start.hello' | transloco: { name: firstName() } }}</h1>
     @if (voiceNames()) {
-      <p class="mt-1 text-muted-foreground">{{ 'me.start.intro' | transloco: { voices: voiceNames() } }}</p>
+      <p class="mt-2 text-muted-foreground">{{ 'me.start.intro' | transloco: { voices: voiceNames() } }}</p>
     }
   </div>
   @if (canUpload()) {
@@ -12,7 +12,7 @@
   }
 </div>
 
-<section aria-labelledby="h-events" class="flex flex-col gap-3">
+<section aria-labelledby="h-events" class="flex flex-col gap-4">
   <div class="flex items-center justify-between">
     <h2 id="h-events" class="text-base font-semibold">{{ 'me.start.events' | transloco }}</h2>
     <a [routerLink]="routes.events" class="py-3 font-medium md:py-0">{{ 'me.start.allEvents' | transloco }}</a>
@@ -23,7 +23,7 @@
         <li>
           <a
             [routerLink]="eventLink(event.id)"
-            class="flex items-center gap-3 rounded-lg border bg-card p-3 text-foreground no-underline shadow-sm hover:bg-accent md:flex-col md:items-start md:p-4"
+            class="flex items-center gap-3 rounded-lg border bg-card p-4 text-foreground no-underline shadow-sm hover:bg-accent md:flex-col md:items-start md:p-4"
           >
             <vm-event-date [date]="event.date" />
             <span class="flex min-w-0 flex-col">
@@ -40,7 +40,7 @@
   }
 </section>
 
-<section aria-labelledby="h-folders" class="flex flex-col gap-3">
+<section aria-labelledby="h-folders" class="flex flex-col gap-4">
   <div class="flex items-center justify-between">
     <h2 id="h-folders" class="text-base font-semibold">{{ 'me.start.folders' | transloco }}</h2>
     <a [routerLink]="routes.folders" class="py-3 font-medium md:py-0">{{ 'me.start.allFolders' | transloco }}</a>
@@ -67,7 +67,7 @@
   }
 </section>
 
-<section aria-labelledby="h-uploads" class="flex flex-col gap-3">
+<section aria-labelledby="h-uploads" class="flex flex-col gap-4">
   <div class="flex items-center justify-between">
     <h2 id="h-uploads" class="text-base font-semibold">{{ 'me.start.uploads' | transloco }}</h2>
     <a [routerLink]="routes.uploads" class="py-3 font-medium md:py-0">{{ 'me.start.allUploads' | transloco }}</a>

@@ -25,7 +25,7 @@ import { ListState } from '../../shared/ui/list-state';
     <div>
       <h1 class="text-2xl font-semibold">{{ 'nav.me.folders' | transloco }}</h1>
       @if (voiceNames()) {
-        <p class="mt-1 text-muted-foreground">{{ 'me.folders.intro' | transloco: { voices: voiceNames() } }}</p>
+        <p class="mt-2 text-muted-foreground">{{ 'me.folders.intro' | transloco: { voices: voiceNames() } }}</p>
       }
     </div>
 
@@ -50,19 +50,19 @@ import { ListState } from '../../shared/ui/list-state';
         <table class="w-full">
           <thead class="bg-muted text-xs font-medium text-muted-foreground">
             <tr>
-              <th scope="col" class="px-3 py-2 text-start">{{ 'terms.folder' | transloco }}</th>
-              <th scope="col" class="px-3 py-2 text-start">{{ 'terms.ensemble' | transloco }}</th>
-              <th scope="col" class="w-24 px-3 py-2 text-end">{{ 'me.common.scores' | transloco }}</th>
-              <th scope="col" class="w-28 px-3 py-2 text-end">{{ 'me.list.actions' | transloco }}</th>
+              <th scope="col" class="px-4 py-3 text-start">{{ 'terms.folder' | transloco }}</th>
+              <th scope="col" class="px-4 py-3 text-start">{{ 'terms.ensemble' | transloco }}</th>
+              <th scope="col" class="w-24 px-4 py-3 text-end">{{ 'me.common.scores' | transloco }}</th>
+              <th scope="col" class="w-28 px-4 py-3 text-end">{{ 'me.list.actions' | transloco }}</th>
             </tr>
           </thead>
           <tbody>
             @for (folder of list.items(); track folder.id) {
               <tr class="border-t">
-                <td class="px-3 py-2"><a [routerLink]="link(folder)" class="font-medium">{{ folder.name }}</a></td>
-                <td class="px-3 py-2 text-muted-foreground">{{ folder.ensemble.name }}</td>
-                <td class="px-3 py-2 text-end tabular-nums">{{ folder.scoreCount }}</td>
-                <td class="px-3 py-2 text-end">
+                <td class="px-4 py-3"><a [routerLink]="link(folder)" class="font-medium">{{ folder.name }}</a></td>
+                <td class="px-4 py-3 text-muted-foreground">{{ folder.ensemble.name }}</td>
+                <td class="px-4 py-3 text-end tabular-nums">{{ folder.scoreCount }}</td>
+                <td class="px-4 py-3 text-end">
                   <a
                     z-button
                     zType="ghost"

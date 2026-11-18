@@ -1,18 +1,18 @@
-import { ChangeDetectionStrategy, Component, computed, inject, input, model, signal } from '@angular/core';
+import { ChangeDetectionStrategy, Component, inject, input, model, signal } from '@angular/core';
 import { TranslocoPipe } from '@jsverse/transloco';
 import { NgIcon, provideIcons } from '@ng-icons/core';
 import { lucidePlus } from '@ng-icons/lucide';
-import { apiUrl, createdResponseSchema, customFieldTypeSchema, type CustomFieldType, type FieldDefinition } from '@vm-web/shared';
+import { apiUrl, createdResponseSchema, type FieldDefinition } from '@vm-web/shared';
 import { firstValueFrom } from 'rxjs';
 
 import { ZardButtonComponent } from '@/shared/components/button';
 import { ZardInputComponent } from '@/shared/components/input';
 import { ZardNativeSelectDirective } from '@/shared/components/native-select';
-import { ZardTextareaComponent } from '@/shared/components/textarea';
 
 import { ActionRunner } from '../../../core/actions/action-runner';
 import { ApiClient } from '../../../core/api/api-client';
 import { LibraryOptions } from '../library-options';
+import { FieldDialog, type FieldDialogValue } from '../ui/field-dialog';
 import type { ScoreFormErrors, ScoreFormInput } from './score-form-model';
 
 /**
@@ -21,7 +21,7 @@ import type { ScoreFormErrors, ScoreFormInput } from './score-form-model';
  */
 @Component({
   selector: 'vm-score-form',
-  imports: [NgIcon, TranslocoPipe, ZardButtonComponent, ZardInputComponent, ZardNativeSelectDirective, ZardTextareaComponent],
+  imports: [NgIcon, TranslocoPipe, ZardButtonComponent, ZardInputComponent, ZardNativeSelectDirective, FieldDialog],
   viewProviders: [provideIcons({ lucidePlus })],
   changeDetection: ChangeDetectionStrategy.OnPush,
   templateUrl: './score-form.html',
@@ -41,11 +41,8 @@ export class ScoreForm {
     { key: 'publisher', labelKey: 'library.fields.publisher' },
     { key: 'publisherNumber', labelKey: 'library.fields.publisherNumber' },
   ] as const;
-  protected readonly fieldTypes = customFieldTypeSchema.options;
 
   protected readonly addingField = signal(false);
-  protected readonly newField = signal<{ name: string; type: CustomFieldType; required: boolean; options: string }>(emptyNewField());
-  protected readonly newFieldNeedsOptions = computed(() => ['select', 'multiselect'].includes(this.newField().type));
 
   protected set<K extends keyof ScoreFormInput>(key: K, value: ScoreFormInput[K]): void {
     this.value.update((current) => ({ ...current, [key]: value }));
@@ -79,38 +76,12 @@ export class ScoreForm {
     return this.errors()[key] ?? null;
   }
 
-  protected patchNewField(patch: Partial<ReturnType<typeof emptyNewField>>): void {
-    this.newField.update((current) => ({ ...current, ...patch }));
-  }
-
   /** „Feld hinzufügen“ (N-2): creates the custom field for all scores right from the form. */
-  protected async createField(): Promise<void> {
-    const draft = this.newField();
-    const options = this.newFieldNeedsOptions()
-      ? draft.options
-          .split('\n')
-          .map((label) => label.trim())
-          .filter(Boolean)
-          .map((label) => ({ label }))
-      : [];
-    const done = await this.actions.run(
-      () =>
-        firstValueFrom(
-          this.api.post(
-            apiUrl('scores', 'createField'),
-            { name: draft.name.trim(), type: draft.type, required: draft.required, options },
-            createdResponseSchema,
-          ),
-        ),
-      { success: { key: 'library.form.fieldCreated', params: { name: draft.name.trim() } } },
-    );
-    if (!done) return;
-    this.addingField.set(false);
-    this.newField.set(emptyNewField());
-    this.options.reloadFields();
-  }
-}
-
-function emptyNewField() {
-  return { name: '', type: 'text' as CustomFieldType, required: false, options: '' };
+  protected readonly createField = async (value: FieldDialogValue): Promise<boolean> => {
+    const done = await this.actions.run(() => firstValueFrom(this.api.post(apiUrl('scores', 'createField'), value, createdResponseSchema)), {
+      success: { key: 'library.form.fieldCreated', params: { name: value.name } },
+    });
+    if (done) this.options.reloadFields();
+    return !!done;
+  };
 }

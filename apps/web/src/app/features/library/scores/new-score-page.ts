@@ -23,11 +23,11 @@ import { buildScoreBody, emptyScoreForm, type ScoreFormErrors, type ScoreFormInp
     <form class="flex flex-col gap-6" novalidate (submit)="$event.preventDefault(); save()">
       <div>
         <h1 class="text-2xl font-semibold">{{ 'pages.newScore' | transloco }}</h1>
-        <p class="mt-1 text-muted-foreground">{{ 'library.form.requiredHint' | transloco }}</p>
+        <p class="mt-2 text-muted-foreground">{{ 'library.form.requiredHint' | transloco }}</p>
       </div>
 
       @if (hasErrors()) {
-        <p role="alert" class="rounded-md bg-destructive-soft p-3 text-destructive-ink">{{ 'errors.validation-failed' | transloco }}</p>
+        <p role="alert" class="rounded-md bg-destructive-soft p-4 text-destructive-ink">{{ 'errors.validation-failed' | transloco }}</p>
       }
 
       <vm-score-form [(value)]="form" [errors]="errors()" />

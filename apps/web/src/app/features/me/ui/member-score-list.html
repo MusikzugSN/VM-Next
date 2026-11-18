@@ -60,19 +60,19 @@
       <thead class="bg-muted text-xs font-medium text-muted-foreground">
         <tr>
           @if (numbering() !== 'none') {
-            <th scope="col" class="w-16 px-3 py-2 text-start">{{ 'me.list.number' | transloco }}</th>
+            <th scope="col" class="w-16 px-4 py-3 text-start">{{ 'me.list.number' | transloco }}</th>
           }
-          <th scope="col" class="px-3 py-2 text-start">{{ 'terms.score' | transloco }}</th>
-          <th scope="col" class="px-3 py-2 text-start">{{ 'me.list.composer' | transloco }}</th>
-          <th scope="col" class="w-20 px-3 py-2 text-end">{{ 'me.list.pagesHeader' | transloco }}</th>
-          <th scope="col" class="w-28 px-3 py-2 text-end">{{ 'me.list.actions' | transloco }}</th>
+          <th scope="col" class="px-4 py-3 text-start">{{ 'terms.score' | transloco }}</th>
+          <th scope="col" class="px-4 py-3 text-start">{{ 'me.list.composer' | transloco }}</th>
+          <th scope="col" class="w-20 px-4 py-3 text-end">{{ 'me.list.pagesHeader' | transloco }}</th>
+          <th scope="col" class="w-28 px-4 py-3 text-end">{{ 'me.list.actions' | transloco }}</th>
         </tr>
       </thead>
       <tbody>
         @for (item of items(); track item.row.scoreId) {
           <tr class="border-t">
             @if (numbering() !== 'none') {
-              <td class="px-3 py-2">
+              <td class="px-4 py-3">
                 <span
                   class="flex size-10 items-center justify-center rounded-md bg-primary-soft text-base font-semibold text-primary tabular-nums"
                   [attr.aria-label]="'me.list.numberLabel' | transloco: { number: item.number }"
@@ -80,7 +80,7 @@
                 >
               </td>
             }
-            <td class="px-3 py-2">
+            <td class="px-4 py-3">
               <div class="flex flex-wrap items-center gap-2">
                 @if (item.missing) {
                   <span class="font-medium">{{ item.row.title }}</span>
@@ -100,9 +100,9 @@
                 }
               </div>
             </td>
-            <td class="px-3 py-2 text-muted-foreground">{{ item.row.composer ?? '' }}</td>
-            <td class="px-3 py-2 text-end text-muted-foreground tabular-nums">{{ item.missing ? '–' : item.pages }}</td>
-            <td class="px-3 py-2 text-end">
+            <td class="px-4 py-3 text-muted-foreground">{{ item.row.composer ?? '' }}</td>
+            <td class="px-4 py-3 text-end text-muted-foreground tabular-nums">{{ item.missing ? '–' : item.pages }}</td>
+            <td class="px-4 py-3 text-end">
               @if (item.download) {
                 <a
                   z-button

@@ -75,7 +75,7 @@ export function loginErrorKey(code: string | undefined): string | null {
             }
 
             @if (errorKey(); as key) {
-              <p role="alert" class="flex items-start gap-2 rounded-md bg-destructive-soft p-3 text-start text-destructive-ink">
+              <p role="alert" class="flex items-start gap-2 rounded-md bg-destructive-soft p-4 text-start text-destructive-ink">
                 <ng-icon name="lucideCircleAlert" class="mt-0.5 shrink-0" aria-hidden="true" />{{ key | transloco }}
               </p>
             }

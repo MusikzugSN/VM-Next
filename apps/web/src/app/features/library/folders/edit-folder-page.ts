@@ -28,12 +28,14 @@ import { ListState } from '../../../shared/ui/list-state';
 import { PageProblem } from '../../../shared/ui/page-problem';
 import { SearchField } from '../../../shared/ui/search-field';
 import { ToggleSwitch } from '../../../shared/ui/toggle-switch';
+import { FormDialog } from '../../../shared/ui/form-dialog';
 import { ScorePicker, type CandidatePage, type PickedScore } from '../ui/score-picker';
 
 /** Mappe bearbeiten (N-5, N-15): name, visibility, scores with their own number in this folder. */
 @Component({
   selector: 'vm-library-edit-folder-page',
   imports: [
+    FormDialog,
     RouterLink,
     NgIcon,
     TranslocoPipe,

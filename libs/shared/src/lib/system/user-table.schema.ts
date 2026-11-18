@@ -1,4 +1,5 @@
 import * as z from 'zod';
+import { ensembleOptionSchema } from '../common/ensemble-options.schema';
 import { idSchema, isoDateTimeSchema, refSchema } from '../common/ids.schema';
 import { cursorQuerySchema, pageSchema } from '../common/pagination.schema';
 import { voiceRefSchema } from '../common/voice.schema';
@@ -39,7 +40,7 @@ export type UserDetailsResponse = z.infer<typeof userDetailsResponseSchema>;
 
 /** GET system/user-assignment-options – choices for the user page. Not paginated. */
 export const userAssignmentOptionsResponseSchema = z.object({
-  ensembles: z.array(refSchema),
+  ensembles: z.array(ensembleOptionSchema),
   roles: z.array(refSchema),
 });
 export type UserAssignmentOptionsResponse = z.infer<typeof userAssignmentOptionsResponseSchema>;

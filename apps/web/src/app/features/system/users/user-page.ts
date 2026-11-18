@@ -16,14 +16,16 @@ import { ApiClient } from '../../../core/api/api-client';
 import { SessionStore } from '../../../core/auth/session.store';
 import { initials } from '../../../core/branding/branding.store';
 import { VoiceContextStore } from '../../../core/voices/voice-context.store';
+import { FormDialog, runDialogSave } from '../../../shared/ui/form-dialog';
 import { PageProblem } from '../../../shared/ui/page-problem';
 import { ToggleSwitch } from '../../../shared/ui/toggle-switch';
 import { UserStatusBadge } from '../ui/user-status-badge';
+import { TreeLabelPipe } from '../../../shared/ui/tree-label.pipe';
 
 /** Benutzer-Detail (S-1, A-5, R-1, R-6): roles per ensemble, voices, admin flag, block and delete. */
 @Component({
   selector: 'vm-system-user-page',
-  imports: [DatePipe, RouterLink, NgIcon, TranslocoPipe, ZardButtonComponent, ZardNativeSelectDirective, PageProblem, ToggleSwitch, UserStatusBadge],
+  imports: [TreeLabelPipe, DatePipe, RouterLink, NgIcon, TranslocoPipe, ZardButtonComponent, ZardNativeSelectDirective, PageProblem, ToggleSwitch, UserStatusBadge, FormDialog],
   viewProviders: [provideIcons({ lucideChevronLeft, lucidePlus, lucideX, lucideCheck, lucideLock, lucideLockOpen, lucideTrash2 })],
   changeDetection: ChangeDetectionStrategy.OnPush,
   templateUrl: './user-page.html',
@@ -60,6 +62,8 @@ export class UserPage {
 
   protected readonly newEnsembleId = signal('');
   protected readonly newRoleId = signal('');
+  protected readonly adding = signal(false);
+  protected readonly busy = signal(false);
   protected readonly selectedVoices = signal<ReadonlySet<string>>(new Set());
   protected readonly voicesDirty = computed(() => {
     const current = new Set(this.user()?.voices.map((v) => v.id) ?? []);
@@ -78,20 +82,25 @@ export class UserPage {
     return initials(name);
   }
 
-  protected async setRole(ensembleId: string, roleId: string): Promise<void> {
-    if (!roleId) return;
+  protected async setRole(ensembleId: string, roleId: string): Promise<boolean> {
+    if (!roleId) return false;
     const done = await this.actions.run(
       () => firstValueFrom(this.api.postVoid(apiUrl('system', 'setMembership', { userId: this.userId() }), { ensembleId, roleId })),
       { success: { key: 'system.user.roleSaved' } },
     );
     if (done) this.changed();
+    return !!done;
   }
 
-  protected async addMembership(): Promise<void> {
-    if (!this.newEnsembleId() || !this.newRoleId()) return;
-    await this.setRole(this.newEnsembleId(), this.newRoleId());
+  protected startAdd(): void {
     this.newEnsembleId.set('');
     this.newRoleId.set('');
+    this.adding.set(true);
+  }
+
+  protected addMembership(): void {
+    if (!this.newEnsembleId() || !this.newRoleId() || this.busy()) return;
+    void runDialogSave({ busy: this.busy, open: this.adding }, () => this.setRole(this.newEnsembleId(), this.newRoleId()));
   }
 
   protected async removeMembership(ensembleId: string, name: string): Promise<void> {

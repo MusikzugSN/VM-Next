@@ -36,6 +36,8 @@ import { addFiles, formatSize, sendable, uploadMeta, type UploadItem } from './u
   imports: [NgIcon, TranslocoPipe, PluralPipe, ZardButtonComponent, ZardDialogImports, ScoreSearchSelect, VoiceSelect],
   viewProviders: [provideIcons({ lucideUpload, lucideFileText, lucideX, lucideInfo, lucideCircleAlert })],
   changeDetection: ChangeDetectionStrategy.OnPush,
+  // The dialog renders in an overlay; its host must not take up space (or a gap) in the page.
+  host: { style: 'display: contents' },
   templateUrl: './upload-dialog.html',
 })
 export class UploadDialog {

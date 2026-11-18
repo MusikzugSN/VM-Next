@@ -26,7 +26,7 @@ import { UploadStatusBadge } from './ui/upload-status-badge';
     <div class="flex flex-col gap-3 md:flex-row md:items-start md:justify-between">
       <div>
         <h1 class="text-2xl font-semibold">{{ 'nav.me.uploads' | transloco }}</h1>
-        <p class="mt-1 text-muted-foreground">{{ 'me.uploads.intro' | transloco }}</p>
+        <p class="mt-2 text-muted-foreground">{{ 'me.uploads.intro' | transloco }}</p>
       </div>
       @if (canUpload()) {
         <button z-button type="button" class="w-full md:w-auto" (click)="upload()">
@@ -69,21 +69,21 @@ import { UploadStatusBadge } from './ui/upload-status-badge';
         <table class="w-full">
           <thead class="bg-muted text-xs font-medium text-muted-foreground">
             <tr>
-              <th scope="col" class="w-28 px-3 py-2 text-start">{{ 'me.uploads.date' | transloco }}</th>
-              <th scope="col" class="px-3 py-2 text-start">{{ 'terms.score' | transloco }}</th>
-              <th scope="col" class="px-3 py-2 text-start">{{ 'terms.voice' | transloco }}</th>
-              <th scope="col" class="px-3 py-2 text-start">{{ 'terms.sheet' | transloco }}</th>
-              <th scope="col" class="px-3 py-2 text-start">{{ 'me.uploads.status' | transloco }}</th>
+              <th scope="col" class="w-28 px-4 py-3 text-start">{{ 'me.uploads.date' | transloco }}</th>
+              <th scope="col" class="px-4 py-3 text-start">{{ 'terms.score' | transloco }}</th>
+              <th scope="col" class="px-4 py-3 text-start">{{ 'terms.voice' | transloco }}</th>
+              <th scope="col" class="px-4 py-3 text-start">{{ 'terms.sheet' | transloco }}</th>
+              <th scope="col" class="px-4 py-3 text-start">{{ 'me.uploads.status' | transloco }}</th>
             </tr>
           </thead>
           <tbody>
             @for (entry of list.items(); track entry.id) {
               <tr class="border-t align-top">
-                <td class="px-3 py-2 tabular-nums">{{ entry.uploadedAt | date: 'dd.MM.yyyy' }}</td>
-                <td class="px-3 py-2">{{ entry.score?.name ?? '–' }}</td>
-                <td class="px-3 py-2">{{ entry.voice?.name ?? '–' }}</td>
-                <td class="px-3 py-2 font-mono text-[13px] text-muted-foreground">{{ entry.fileName }}</td>
-                <td class="px-3 py-2">
+                <td class="px-4 py-3 tabular-nums">{{ entry.uploadedAt | date: 'dd.MM.yyyy' }}</td>
+                <td class="px-4 py-3">{{ entry.score?.name ?? '–' }}</td>
+                <td class="px-4 py-3">{{ entry.voice?.name ?? '–' }}</td>
+                <td class="px-4 py-3 font-mono text-[13px] text-muted-foreground">{{ entry.fileName }}</td>
+                <td class="px-4 py-3">
                   <div class="flex flex-col items-start gap-1">
                     <vm-upload-status-badge [status]="entry.status" />
                     @if (entry.rejectionReason) {

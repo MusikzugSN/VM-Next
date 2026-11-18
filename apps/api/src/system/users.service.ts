@@ -7,7 +7,8 @@ import type {
   UserTableQuery,
   VoiceRef,
 } from '@vm-web/shared';
-import { and, asc, eq, inArray, isNull, sql } from 'drizzle-orm';
+import { and, asc, eq, inArray, sql } from 'drizzle-orm';
+import { activeEnsembleOptions } from '../common/ensemble-tree';
 import { decodeCursor, toPage } from '../common/pagination/cursor';
 import { ProblemException } from '../common/problem-details/problem.exception';
 import { httpUrlOrNull } from '../common/url';
@@ -54,7 +55,7 @@ export class UsersService {
 
   async assignmentOptions(): Promise<UserAssignmentOptionsResponse> {
     const [ensembleRows, roleRows] = await Promise.all([
-      this.db.select({ id: ensembles.id, name: ensembles.name }).from(ensembles).where(isNull(ensembles.archivedAt)).orderBy(sql`lower(${ensembles.name})`),
+      activeEnsembleOptions(this.db),
       this.db.select({ id: roles.id, name: roles.name }).from(roles).orderBy(sql`lower(${roles.name})`),
     ]);
     return { ensembles: ensembleRows, roles: roleRows };

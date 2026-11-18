@@ -24,6 +24,7 @@ import { ApiClient } from '../../../core/api/api-client';
 import { SessionStore } from '../../../core/auth/session.store';
 import { PageProblem } from '../../../shared/ui/page-problem';
 import { ToggleSwitch } from '../../../shared/ui/toggle-switch';
+import { FormDialog } from '../../../shared/ui/form-dialog';
 import { ScorePicker, type CandidatePage, type PickedScore } from '../ui/score-picker';
 import { moveItem } from '../voices/voice-dialog';
 
@@ -36,6 +37,7 @@ type Item = Pick<SetlistEntry, 'scoreId' | 'title' | 'composer'>;
 @Component({
   selector: 'vm-library-edit-event-page',
   imports: [
+    FormDialog,
     CdkDropList,
     CdkDrag,
     CdkDragHandle,

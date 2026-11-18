@@ -1,4 +1,5 @@
 import * as z from 'zod';
+import { ensembleOptionSchema } from '../common/ensemble-options.schema';
 import { idSchema, refSchema } from '../common/ids.schema';
 
 /**
@@ -33,7 +34,7 @@ export type ConfigResponse = z.infer<typeof configResponseSchema>;
 
 /** GET system/config/default-options – choices for the defaults tab. Not paginated. */
 export const configDefaultOptionsResponseSchema = z.object({
-  ensembles: z.array(refSchema),
+  ensembles: z.array(ensembleOptionSchema),
   roles: z.array(refSchema.extend({ hasClubPermissions: z.boolean() })),
 });
 export type ConfigDefaultOptionsResponse = z.infer<typeof configDefaultOptionsResponseSchema>;

@@ -19,6 +19,7 @@ import {
   type FilterInput,
   type ScoreQueryState,
 } from './score-query';
+import { TreeLabelPipe } from '../../../shared/ui/tree-label.pipe';
 
 export interface ScoreFilterResult {
   tagId: string | null;
@@ -32,8 +33,10 @@ export interface ScoreFilterResult {
  */
 @Component({
   selector: 'vm-score-filter-dialog',
-  imports: [NgTemplateOutlet, TranslocoPipe, ZardButtonComponent, ZardDialogImports, ZardInputComponent, ZardNativeSelectDirective],
+  imports: [TreeLabelPipe, NgTemplateOutlet, TranslocoPipe, ZardButtonComponent, ZardDialogImports, ZardInputComponent, ZardNativeSelectDirective],
   changeDetection: ChangeDetectionStrategy.OnPush,
+  // The dialog renders in an overlay; its host must not take up space (or a gap) in the page.
+  host: { style: 'display: contents' },
   templateUrl: './score-filter-dialog.html',
 })
 export class ScoreFilterDialog {

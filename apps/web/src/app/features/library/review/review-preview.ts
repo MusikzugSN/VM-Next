@@ -28,7 +28,7 @@ import type { CropMargins, Rotation } from './review-model';
   changeDetection: ChangeDetectionStrategy.OnPush,
   host: { class: 'flex min-h-0 flex-1' },
   template: `
-    <div #frame class="flex min-h-80 flex-1 items-start justify-center overflow-auto bg-muted p-3 md:p-4">
+    <div #frame class="flex min-h-80 flex-1 items-start justify-center overflow-auto bg-muted p-4">
       @switch (state()) {
         @case ('loading') {
           <p class="self-center text-muted-foreground">{{ 'common.loading' | transloco }}</p>

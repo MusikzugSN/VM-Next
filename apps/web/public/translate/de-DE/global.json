@@ -280,5 +280,16 @@
     "approved": "„{{ name }}“ freigegeben.",
     "rejected": "„{{ name }}“ abgelehnt.",
     "pages": "Seiten"
+  },
+  "fields": {
+    "create": "Eigenes Feld anlegen",
+    "edit": "Feld „{{ name }}“ bearbeiten",
+    "name": "Name",
+    "type": "Typ",
+    "typeHint": "Der Typ lässt sich nach dem Anlegen nicht mehr ändern.",
+    "options": "Auswahlwerte",
+    "optionsHint": "Ein Wert pro Zeile. Umbenannte Werte gelten als neu.",
+    "required": "Pflichtfeld",
+    "requiredHint": "Ein Stück lässt sich dann nur mit einem Wert in diesem Feld speichern."
   }
 }

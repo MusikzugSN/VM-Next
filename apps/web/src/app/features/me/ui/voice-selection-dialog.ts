@@ -42,6 +42,8 @@ export function filterVoiceGroups(groups: readonly Group[], search: string): Gro
   imports: [PluralPipe, NgIcon, TranslocoPipe, ZardButtonComponent, ZardDialogImports, ZardInputComponent],
   viewProviders: [provideIcons({ lucideCheck, lucideSearch })],
   changeDetection: ChangeDetectionStrategy.OnPush,
+  // The dialog renders in an overlay; its host must not take up space (or a gap) in the page.
+  host: { style: 'display: contents' },
   template: `
     <z-dialog [(zVisible)]="open" zWidth="560px">
       <z-dialog-header>
@@ -49,7 +51,7 @@ export function filterVoiceGroups(groups: readonly Group[], search: string): Gro
         <p z-dialog-description>{{ 'me.voices.text' | transloco }}</p>
       </z-dialog-header>
 
-      <div class="flex max-h-[60dvh] flex-col gap-4 overflow-y-auto px-1">
+      <div class="flex min-h-0 flex-1 flex-col gap-5 overflow-y-auto md:max-h-[60dvh] md:flex-none">
         <label class="flex flex-col gap-1.5">
           <span class="font-medium">{{ 'me.voices.search' | transloco }}</span>
           <span class="relative">

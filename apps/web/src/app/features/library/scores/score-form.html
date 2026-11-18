@@ -137,43 +137,9 @@
   </div>
 
   @if (options.canCreateField() && !readonly()) {
-    @if (addingField()) {
-      <div role="group" [attr.aria-label]="'library.form.newField' | transloco" class="flex flex-col gap-3 rounded-md border border-dashed p-4">
-        <h3 class="font-semibold">{{ 'library.form.newField' | transloco }}</h3>
-        <div class="grid gap-3 md:grid-cols-2">
-          <label class="flex flex-col gap-1.5">
-            <span class="font-medium">{{ 'library.form.fieldName' | transloco }}</span>
-            <input z-input type="text" maxlength="100" [value]="newField().name" (input)="patchNewField({ name: $any($event.target).value })" />
-          </label>
-          <label class="flex flex-col gap-1.5">
-            <span class="font-medium">{{ 'library.form.fieldType' | transloco }}</span>
-            <select z-native-select [value]="newField().type" (change)="patchNewField({ type: $any($event.target).value })">
-              @for (type of fieldTypes; track type) {
-                <option [value]="type" [selected]="type === newField().type">{{ 'terms.fieldTypes.' + type | transloco }}</option>
-              }
-            </select>
-          </label>
-        </div>
-        @if (newFieldNeedsOptions()) {
-          <label class="flex flex-col gap-1.5">
-            <span class="font-medium">{{ 'library.form.fieldOptions' | transloco }}</span>
-            <textarea z-textarea rows="4" [value]="newField().options" (input)="patchNewField({ options: $any($event.target).value })"></textarea>
-            <span class="text-xs text-muted-foreground">{{ 'library.form.fieldOptionsHint' | transloco }}</span>
-          </label>
-        }
-        <label class="inline-flex min-h-11 items-center gap-2 xl:min-h-8">
-          <input type="checkbox" class="size-4 accent-primary" [checked]="newField().required" (change)="patchNewField({ required: $any($event.target).checked })" />
-          {{ 'library.form.fieldRequired' | transloco }}
-        </label>
-        <div class="flex flex-col gap-2 md:flex-row">
-          <button z-button type="button" [zDisabled]="!newField().name.trim()" (click)="createField()">{{ 'library.form.createField' | transloco }}</button>
-          <button z-button zType="secondary" type="button" (click)="addingField.set(false)">{{ 'common.cancel' | transloco }}</button>
-        </div>
-      </div>
-    } @else {
-      <button z-button zType="outline" type="button" class="self-start" (click)="addingField.set(true)">
-        <ng-icon name="lucidePlus" aria-hidden="true" />{{ 'library.form.addField' | transloco }}
-      </button>
-    }
+    <button z-button zType="outline" type="button" class="self-start" (click)="addingField.set(true)">
+      <ng-icon name="lucidePlus" aria-hidden="true" />{{ 'library.form.addField' | transloco }}
+    </button>
+    <vm-field-dialog [(open)]="addingField" [save]="createField" />
   }
 </fieldset>

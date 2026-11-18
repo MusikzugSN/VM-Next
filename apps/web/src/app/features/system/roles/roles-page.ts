@@ -14,19 +14,19 @@ import { cursorList } from '../../../core/api/cursor-list';
 import { SessionStore } from '../../../core/auth/session.store';
 import { PluralPipe } from '../../../core/i18n/plural.pipe';
 import { ListState } from '../../../shared/ui/list-state';
-import { NameForm } from '../../../shared/ui/name-form';
+import { NameDialog } from '../../../shared/ui/name-dialog';
 
 /** Rollen (S-3, R-5): list with badges, create, reset all default roles. */
 @Component({
   selector: 'vm-system-roles-page',
-  imports: [RouterLink, NgIcon, TranslocoPipe, PluralPipe, ZardButtonComponent, ListState, NameForm],
+  imports: [RouterLink, NgIcon, TranslocoPipe, PluralPipe, ZardButtonComponent, ListState, NameDialog],
   viewProviders: [provideIcons({ lucidePlus, lucideRotateCcw, lucideTriangleAlert })],
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
     <div class="flex flex-col gap-3 md:flex-row md:items-start md:justify-between">
       <div>
         <h1 class="text-2xl font-semibold">{{ 'nav.system.roles' | transloco }}</h1>
-        <p class="mt-1 text-muted-foreground">{{ 'system.roles.intro' | transloco }}</p>
+        <p class="mt-2 text-muted-foreground">{{ 'system.roles.intro' | transloco }}</p>
       </div>
       <div class="flex flex-col gap-2 md:flex-row">
         @if (canEdit()) {
@@ -34,7 +34,7 @@ import { NameForm } from '../../../shared/ui/name-form';
             <ng-icon name="lucideRotateCcw" aria-hidden="true" />{{ 'system.roles.resetAll' | transloco }}
           </button>
         }
-        @if (canCreate() && !creating()) {
+        @if (canCreate()) {
           <button z-button type="button" (click)="creating.set(true)">
             <ng-icon name="lucidePlus" aria-hidden="true" />{{ 'system.roles.create' | transloco }}
           </button>
@@ -42,13 +42,11 @@ import { NameForm } from '../../../shared/ui/name-form';
       </div>
     </div>
 
-    @if (creating()) {
-      <vm-name-form labelKey="system.roles.newRole" (saved)="create($event)" (cancelled)="creating.set(false)" />
-    }
+    <vm-name-dialog [(open)]="creating" titleKey="system.roles.create" labelKey="system.roles.newRole" [save]="create" />
 
     <ul class="overflow-hidden rounded-lg border bg-card shadow-sm" [class.hidden]="list.items().length === 0">
       @for (role of list.items(); track role.id; let first = $first) {
-        <li class="flex flex-col gap-1 px-3 py-2 md:flex-row md:items-center md:gap-3" [class.border-t]="!first">
+        <li class="flex flex-col gap-1 px-4 py-3 md:flex-row md:items-center md:gap-3" [class.border-t]="!first">
           <a [routerLink]="link(role)" class="font-medium">{{ role.name }}</a>
           <span class="flex flex-1 flex-wrap items-center gap-1.5 text-[13px] text-muted-foreground">
             @if (role.defaultKey) {
@@ -90,15 +88,15 @@ export class RolesPage {
     return appPath(APP_ROUTES.system.role, { roleId: role.id });
   }
 
-  protected async create(name: string): Promise<void> {
+  protected readonly create = async (name: string): Promise<boolean> => {
     const done = await this.actions.run(
       () => firstValueFrom(this.api.post(apiUrl('system', 'createRole'), { name, permissions: [] }, createdResponseSchema)),
       { success: { key: 'system.roles.created', params: { name } } },
     );
-    if (!done) return;
     // Straight to the matrix: a new role without permissions is of little use.
-    void this.router.navigateByUrl(appPath(APP_ROUTES.system.role, { roleId: done.value.id }));
-  }
+    if (done) void this.router.navigateByUrl(appPath(APP_ROUTES.system.role, { roleId: done.value.id }));
+    return !!done;
+  };
 
   protected async resetAll(): Promise<void> {
     if (!(await this.confirm.confirm('system.roles.resetAllTitle', 'system.roles.resetAllText', {}, 'system.roles.resetOk'))) return;

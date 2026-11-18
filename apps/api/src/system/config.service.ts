@@ -10,8 +10,9 @@ import {
   type UpdateDefaultsBody,
   type UpdatePrintBody,
 } from '@vm-web/shared';
-import { eq, isNull, sql } from 'drizzle-orm';
+import { eq, sql } from 'drizzle-orm';
 import { readFile, rm } from 'node:fs/promises';
+import { activeEnsembleOptions } from '../common/ensemble-tree';
 import { uuidv7 } from '../common/ids/uuid-v7';
 import { ProblemException } from '../common/problem-details/problem.exception';
 import { httpUrlOrNull } from '../common/url';
@@ -68,7 +69,7 @@ export class ConfigService {
 
   async defaultOptions(): Promise<ConfigDefaultOptionsResponse> {
     const [ensembleRows, roleRows] = await Promise.all([
-      this.db.select({ id: ensembles.id, name: ensembles.name }).from(ensembles).where(isNull(ensembles.archivedAt)).orderBy(sql`lower(${ensembles.name})`),
+      activeEnsembleOptions(this.db),
       this.db.select({ id: roles.id, name: roles.name }).from(roles).orderBy(sql`lower(${roles.name})`),
     ]);
     const club = await this.hasClubPermissions(roleRows.map((r) => r.id));

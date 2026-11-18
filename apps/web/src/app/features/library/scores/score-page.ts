@@ -38,6 +38,7 @@ import { CompletenessBadge } from '../ui/completeness-badge';
 import { ScoreForm } from './score-form';
 import { buildScoreBody, scoreFormFromDetails, type ScoreFormErrors, type ScoreFormInput } from './score-form-model';
 import { formatDuration } from './score-query';
+import { TreeLabelPipe } from '../../../shared/ui/tree-label.pipe';
 
 export type ScoreTab = 'details' | 'voices' | 'folders';
 
@@ -63,7 +64,7 @@ export function groupCompleteness(
 /** Stück in der Notenverwaltung (N-1 bis N-5, N-9): tabs Stammdaten · Stimmen & Vollständigkeit · Mappen & Nummern. */
 @Component({
   selector: 'vm-library-score-page',
-  imports: [
+  imports: [TreeLabelPipe, 
     RouterLink,
     NgIcon,
     TranslocoPipe,

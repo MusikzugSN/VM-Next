@@ -17,11 +17,12 @@ import { debounced } from '../../../core/util/debounced';
 import { ListState } from '../../../shared/ui/list-state';
 import { SearchField } from '../../../shared/ui/search-field';
 import { UserStatusBadge } from '../ui/user-status-badge';
+import { TreeLabelPipe } from '../../../shared/ui/tree-label.pipe';
 
 /** Benutzer (S-1): everybody with a club account; accounts are created on first login (A-3). */
 @Component({
   selector: 'vm-system-users-page',
-  imports: [DatePipe, RouterLink, NgIcon, TranslocoPipe, ZardNativeSelectDirective, ListState, SearchField, UserStatusBadge],
+  imports: [TreeLabelPipe, DatePipe, RouterLink, NgIcon, TranslocoPipe, ZardNativeSelectDirective, ListState, SearchField, UserStatusBadge],
   viewProviders: [provideIcons({ lucideInfo })],
   changeDetection: ChangeDetectionStrategy.OnPush,
   templateUrl: './users-page.html',

@@ -62,7 +62,7 @@
                 <a
                   [routerLink]="link(item)"
                   [attr.aria-current]="item.uploadId === uploadId() ? 'true' : null"
-                  class="flex flex-col gap-0.5 border-b px-3 py-2 text-foreground no-underline hover:bg-accent"
+                  class="flex flex-col gap-0.5 border-b px-4 py-3 text-foreground no-underline hover:bg-accent"
                   [class.bg-primary-soft]="item.uploadId === uploadId()"
                 >
                   <span class="truncate font-medium">{{ item.score?.name ?? item.fileName }}</span>
@@ -107,7 +107,7 @@
       </div>
 
       @if (cropping() && current(); as p) {
-        <fieldset class="flex flex-wrap items-end gap-3 border-b bg-background px-3 py-2">
+        <fieldset class="flex flex-wrap items-end gap-3 border-b bg-background px-4 py-3">
           <legend class="sr-only">{{ 'review.cropLegend' | transloco: { page: page() } }}</legend>
           @for (side of ['left', 'top', 'right', 'bottom']; track side) {
             <label class="flex flex-col gap-1 text-xs">
@@ -173,7 +173,7 @@
         </dl>
 
         @if (needsReplace()) {
-          <div class="flex flex-col gap-2 rounded-md bg-warning-soft p-3 text-warning-ink">
+          <div class="flex flex-col gap-2 rounded-md bg-warning-soft p-4 text-warning-ink">
             <p>{{ 'review.exists' | transloco }}</p>
             @if (canReplace()) {
               <label class="inline-flex min-h-11 items-center gap-2 xl:min-h-8">

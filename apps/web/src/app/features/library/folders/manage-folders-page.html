@@ -1,21 +1,21 @@
 <div class="flex flex-col gap-3 md:flex-row md:items-start md:justify-between">
   <div>
     <h1 class="text-2xl font-semibold">{{ 'nav.library.folders' | transloco }}</h1>
-    <p class="mt-1 text-muted-foreground">{{ 'library.folders.intro' | transloco }}</p>
+    <p class="mt-2 text-muted-foreground">{{ 'library.folders.intro' | transloco }}</p>
   </div>
-  @if (canCreate() && !creating()) {
+  @if (canCreate()) {
     <button z-button type="button" class="w-full md:w-auto" (click)="creating.set(true)">
       <ng-icon name="lucidePlus" aria-hidden="true" />{{ 'library.folders.create' | transloco }}
     </button>
   }
 </div>
 
-@if (creating() && createOptions.hasValue()) {
-  <vm-create-in-ensemble-form
+@if (createOptions.hasValue()) {
+  <vm-create-in-ensemble-dialog
+    [(open)]="creating"
     titleKey="library.folders.create"
     [ensembles]="createOptions.value().items"
-    (created)="create($event)"
-    (cancelled)="creating.set(false)"
+    [save]="create"
   />
 }
 
@@ -51,26 +51,26 @@
     <table class="w-full">
       <thead class="bg-muted text-xs font-medium text-muted-foreground">
         <tr>
-          <th scope="col" class="px-3 py-2 text-start">{{ 'library.common.name' | transloco }}</th>
-          <th scope="col" class="px-3 py-2 text-start">{{ 'terms.ensemble' | transloco }}</th>
-          <th scope="col" class="w-24 px-3 py-2 text-end">{{ 'library.common.scores' | transloco }}</th>
-          <th scope="col" class="w-48 px-3 py-2 text-start">{{ 'library.common.showInMyArea' | transloco }}</th>
-          <th scope="col" class="w-16 px-3 py-2 text-end"><span class="sr-only">{{ 'library.common.actions' | transloco }}</span></th>
+          <th scope="col" class="px-4 py-3 text-start">{{ 'library.common.name' | transloco }}</th>
+          <th scope="col" class="px-4 py-3 text-start">{{ 'terms.ensemble' | transloco }}</th>
+          <th scope="col" class="w-24 px-4 py-3 text-end">{{ 'library.common.scores' | transloco }}</th>
+          <th scope="col" class="w-48 px-4 py-3 text-start">{{ 'library.common.showInMyArea' | transloco }}</th>
+          <th scope="col" class="w-16 px-4 py-3 text-end"><span class="sr-only">{{ 'library.common.actions' | transloco }}</span></th>
         </tr>
       </thead>
       <tbody>
         @for (folder of list.items(); track folder.id) {
           <tr class="border-t">
-            <td class="px-3 py-2"><a [routerLink]="link(folder)" class="font-medium">{{ folder.name }}</a></td>
-            <td class="px-3 py-2 text-muted-foreground">{{ folder.ensemble.name }}</td>
-            <td class="px-3 py-2 text-end tabular-nums">{{ folder.scoreCount }}</td>
-            <td class="px-3 py-1">
+            <td class="px-4 py-3"><a [routerLink]="link(folder)" class="font-medium">{{ folder.name }}</a></td>
+            <td class="px-4 py-3 text-muted-foreground">{{ folder.ensemble.name }}</td>
+            <td class="px-4 py-3 text-end tabular-nums">{{ folder.scoreCount }}</td>
+            <td class="px-4 py-2">
               <span class="inline-flex items-center gap-2">
                 <vm-toggle-switch [checked]="folder.showInMyArea" [label]="visibilityLabel(folder)" [disabled]="!canEdit(folder)" (toggled)="setVisibility(folder, $event)" />
                 <span class="text-muted-foreground">{{ (folder.showInMyArea ? 'library.common.visible' : 'library.common.hiddenState') | transloco }}</span>
               </span>
             </td>
-            <td class="px-3 py-1 text-end">
+            <td class="px-4 py-2 text-end">
               @if (canDelete(folder)) {
                 <button z-button zType="ghost" zSize="icon" type="button" class="text-destructive-ink" (click)="remove(folder)" [attr.aria-label]="'library.folders.deleteLabel' | transloco: { name: folder.name }">
                   <ng-icon name="lucideTrash2" aria-hidden="true" />

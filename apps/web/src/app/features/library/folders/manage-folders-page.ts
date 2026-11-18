@@ -28,7 +28,7 @@ import { debounced } from '../../../core/util/debounced';
 import { ListState } from '../../../shared/ui/list-state';
 import { SearchField } from '../../../shared/ui/search-field';
 import { ToggleSwitch } from '../../../shared/ui/toggle-switch';
-import { CreateInEnsembleForm, type CreateInEnsemble } from '../ui/create-in-ensemble-form';
+import { CreateInEnsembleDialog, type CreateInEnsemble } from '../ui/create-in-ensemble-dialog';
 
 /** Mappen verwalten (N-15): folders per ensemble, visibility in Mein Bereich, create and delete. */
 @Component({
@@ -43,7 +43,7 @@ import { CreateInEnsembleForm, type CreateInEnsemble } from '../ui/create-in-ens
     ListState,
     SearchField,
     ToggleSwitch,
-    CreateInEnsembleForm,
+    CreateInEnsembleDialog,
   ],
   viewProviders: [provideIcons({ lucidePlus, lucideTrash2 })],
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -94,7 +94,7 @@ export class ManageFoldersPage {
     return this.transloco.translate('library.folders.showLabel', { name: folder.name });
   }
 
-  protected async create(input: CreateInEnsemble): Promise<void> {
+  protected readonly create = async (input: CreateInEnsemble): Promise<boolean> => {
     const done = await this.actions.run(
       () =>
         firstValueFrom(
@@ -103,7 +103,8 @@ export class ManageFoldersPage {
       { success: { key: 'library.folders.created', params: { name: input.name } } },
     );
     if (done) void this.router.navigateByUrl(appPath(APP_ROUTES.library.folder, { folderId: done.value.id }));
-  }
+    return !!done;
+  };
 
   protected async setVisibility(folder: FolderListItem, show: boolean): Promise<void> {
     const done = await this.actions.run(

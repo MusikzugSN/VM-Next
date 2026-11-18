@@ -10,7 +10,8 @@ import type { CursorList } from '../../core/api/cursor-list';
   selector: 'vm-list-state',
   imports: [TranslocoPipe, ZardButtonComponent],
   changeDetection: ChangeDetectionStrategy.OnPush,
-  host: { class: 'flex flex-col gap-3' },
+  // empty:hidden – without state or button the host must not add a gap to the page.
+  host: { class: 'flex flex-col gap-3 empty:hidden' },
   template: `
     @if (list().error(); as error) {
       <div role="alert" class="flex flex-col items-start gap-2 rounded-md bg-destructive-soft p-4 text-destructive-ink md:flex-row md:items-center">

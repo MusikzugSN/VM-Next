@@ -1,7 +1,7 @@
 import type { Permission } from '@vm-web/shared';
 
 import { permissionKey, withDependencies } from './roles/permission-labels';
-import { optionsFromText } from './settings/field-draft';
+import { optionsFromText } from '../library/ui/field-draft';
 
 describe('permission matrix', () => {
   const set = (...p: Permission[]) => new Set<Permission>(p);

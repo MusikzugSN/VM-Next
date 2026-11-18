@@ -7,7 +7,7 @@
 } @else if (score(); as score) {
   <div>
     <h1 class="text-[22px] leading-7 font-semibold md:text-2xl md:leading-8">{{ score.title }}</h1>
-    <p class="mt-1 text-muted-foreground">
+    <p class="mt-2 text-muted-foreground">
       {{ score.composer ?? '' }}
       @if (sheet(); as current) {
         @if (score.composer) {
@@ -151,10 +151,9 @@
             <ng-icon name="lucidePlus" aria-hidden="true" />{{ 'me.tags.create' | transloco }}
           </button>
         </z-dropdown-menu-content>
-        @if (creatingTag()) {
-          <vm-name-form labelKey="me.tags.name" (saved)="createTag($event)" (cancelled)="creatingTag.set(false)" />
-        }
       </div>
     </div>
   </ng-template>
 }
+
+<vm-name-dialog [(open)]="creatingTag" titleKey="me.tags.create" labelKey="me.tags.name" [save]="createTag" />

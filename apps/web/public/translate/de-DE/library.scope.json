@@ -14,7 +14,8 @@
     "hiddenState": "Ausgeblendet",
     "autoSave": "Änderungen werden automatisch gespeichert",
     "savedName": "Name gespeichert.",
-    "addScore": "Stück hinzufügen"
+    "addScore": "Stück hinzufügen",
+    "showInMyAreaHint": "Alle Mitglieder des Ensembles sehen sie dann unter Mein Bereich."
   },
   "completeness": {
     "label": "{{ present }} von {{ total }} Stimmen vorhanden",
@@ -60,13 +61,6 @@
     "durationHint": "Minuten:Sekunden, z. B. 3:40",
     "durationInvalid": "Bitte als Minuten:Sekunden eingeben, z. B. 3:40.",
     "addField": "Feld hinzufügen",
-    "newField": "Neues Feld",
-    "fieldName": "Name",
-    "fieldType": "Typ",
-    "fieldOptions": "Auswahlwerte",
-    "fieldOptionsHint": "Ein Wert pro Zeile.",
-    "fieldRequired": "Pflichtfeld",
-    "createField": "Feld anlegen",
     "fieldCreated": "Feld „{{ name }}“ angelegt.",
     "saveScore": "Stück speichern",
     "created": "„{{ title }}“ angelegt.",
@@ -116,7 +110,8 @@
     "sheetDeleted": "Notenblatt {{ voice }} gelöscht.",
     "substituteHint": "Ersatzstimmen legst du unter Noten / Stimmen & Instrumente fest.",
     "foldersHint": "Die Nummer vergibst du in der jeweiligen Mappe.",
-    "noFolders": "Das Stück ist in keiner Mappe."
+    "noFolders": "Das Stück ist in keiner Mappe.",
+    "uploadVoice": "{{ voice }} hochladen"
   },
   "voices": {
     "instruments": {
@@ -132,11 +127,10 @@
     "edit": "Stimme bearbeiten",
     "search": "Stimmen durchsuchen",
     "instrument": "Instrument",
-    "instrumentHint": "Ein neuer Name legt das Instrument automatisch an.",
     "instrumentName": "Name des Instruments",
     "renameInstrument": "Instrument {{ name }} umbenennen",
     "name": "Stimme",
-    "namePlaceholder": "z. B. Trompete 1 in B",
+    "namePlaceholder": "z. B. Klarinette 3 in B",
     "substitutes": "Ersatzstimmen (in Reihenfolge)",
     "substitutesHint": "Fehlt diese Stimme, bekommen Musiker:innen die erste vorhandene Ersatzstimme.",
     "addSubstitute": "Ersatzstimme hinzufügen …",
@@ -157,7 +151,11 @@
     "created": "Stimme {{ name }} angelegt.",
     "saved": "Stimme {{ name }} gespeichert.",
     "deleted": "Stimme {{ name }} gelöscht.",
-    "empty": "Keine Stimmen gefunden."
+    "empty": "Keine Stimmen gefunden.",
+    "newInstrument": "neu",
+    "instrumentFromName": "ergibt sich aus dem Namen",
+    "changeInstrument": "Ändern",
+    "otherInstrument": "Oder neues Instrument"
   },
   "tags": {
     "intro": "Gemeinsame Schlagworte für Stücke. Alle Mitglieder können in Mein Bereich danach filtern.",
@@ -186,7 +184,8 @@
     "contained": "Bereits enthalten",
     "add": "Hinzufügen",
     "addLabel": "{{ title }} hinzufügen",
-    "none": "Kein Stück gefunden."
+    "none": "Kein Stück gefunden.",
+    "dialogHint": "Der Dialog bleibt offen, du kannst mehrere Stücke nacheinander hinzufügen."
   },
   "folders": {
     "intro": "Nummerierte Sammlungen von Stücken, je Ensemble.",

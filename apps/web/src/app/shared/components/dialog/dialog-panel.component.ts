@@ -13,6 +13,7 @@ import {
   ViewEncapsulation,
 } from '@angular/core';
 
+import { TranslocoPipe } from '@jsverse/transloco';
 import { NgIcon, provideIcons } from '@ng-icons/core';
 import { lucideX } from '@ng-icons/lucide';
 import type { ClassValue } from 'clsx';
@@ -34,7 +35,7 @@ export const DIALOG_DURATION = 100;
  */
 @Component({
   selector: 'z-dialog-panel',
-  imports: [ZardButtonComponent, NgIcon],
+  imports: [ZardButtonComponent, NgIcon, TranslocoPipe],
   template: `
     @if (zClosable()) {
       <button
@@ -44,11 +45,12 @@ export const DIALOG_DURATION = 100;
         z-button
         zType="ghost"
         zSize="icon-sm"
-        class="absolute end-2 top-2"
+        class="absolute end-3 top-3"
         (click)="closeRequested.emit()"
       >
         <ng-icon name="lucideX" class="size-4!" />
-        <span class="sr-only">Close</span>
+        <!-- VM-Web: German label from i18n -->
+        <span class="sr-only">{{ 'common.close' | transloco }}</span>
       </button>
     }
     <ng-content />
@@ -90,7 +92,8 @@ export const DIALOG_DURATION = 100;
     '[attr.aria-labelledby]': 'zLabelledBy()',
     '[attr.aria-describedby]': 'zDescribedBy()',
     '[class]': 'classes()',
-    '[style.width]': 'zWidth() || null',
+    // VM-Web: width as variable, used from md on only (full screen on phones).
+    '[style.--z-dialog-width]': 'zWidth() || "24rem"',
     '[style.--z-dialog-duration.ms]': 'zDuration()',
   },
   exportAs: 'zDialogPanel',

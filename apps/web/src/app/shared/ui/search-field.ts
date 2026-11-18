@@ -21,6 +21,7 @@ import { ZardInputComponent } from '@/shared/components/input';
           z-input
           type="search"
           class="ps-9"
+          [attr.cdkFocusInitial]="focusInDialog() ? '' : null"
           [placeholder]="(placeholderKey() ?? labelKey()) | transloco"
           [value]="value()"
           (input)="value.set($any($event.target).value)"
@@ -34,4 +35,6 @@ export class SearchField {
   readonly labelKey = input.required<string>();
   readonly placeholderKey = input<string | null>(null);
   readonly hideLabel = input(true);
+  /** First field of a dialog: gets the focus when the dialog opens. */
+  readonly focusInDialog = input(false);
 }

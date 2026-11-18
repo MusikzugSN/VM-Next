@@ -25,54 +25,53 @@ import { cursorList } from '../../../core/api/cursor-list';
 import { SessionStore } from '../../../core/auth/session.store';
 import { PluralPipe } from '../../../core/i18n/plural.pipe';
 import { ListState } from '../../../shared/ui/list-state';
-import { NAME_MAX } from '../../../shared/ui/name-form';
+import { FormDialog, runDialogSave } from '../../../shared/ui/form-dialog';
+import { NAME_MAX } from '../../../shared/ui/name-dialog';
 import { ToggleSwitch } from '../../../shared/ui/toggle-switch';
+import { TreeLabelPipe } from '../../../shared/ui/tree-label.pipe';
+import { ToggleField } from '../../../shared/ui/toggle-field';
 
 /** Ensembles (S-2, F-3): the tree in pre-order, create below a parent, archive and restore. */
 @Component({
   selector: 'vm-system-ensembles-page',
-  imports: [RouterLink, NgIcon, TranslocoPipe, PluralPipe, ZardButtonComponent, ZardInputComponent, ZardNativeSelectDirective, ListState, ToggleSwitch],
+  imports: [ToggleField, TreeLabelPipe, RouterLink, NgIcon, TranslocoPipe, PluralPipe, ZardButtonComponent, ZardInputComponent, ZardNativeSelectDirective, ListState, ToggleSwitch, FormDialog],
   viewProviders: [provideIcons({ lucidePlus, lucideArchive, lucideArchiveRestore })],
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
     <div class="flex flex-col gap-3 md:flex-row md:items-start md:justify-between">
       <div>
         <h1 class="text-2xl font-semibold">{{ 'nav.system.ensembles' | transloco }}</h1>
-        <p class="mt-1 text-muted-foreground">{{ 'system.ensembles.intro' | transloco }}</p>
+        <p class="mt-2 text-muted-foreground">{{ 'system.ensembles.intro' | transloco }}</p>
       </div>
-      @if (canCreate() && !creating()) {
+      @if (canCreate()) {
         <button z-button type="button" class="w-full md:w-auto" (click)="startCreate()">
           <ng-icon name="lucidePlus" aria-hidden="true" />{{ 'system.ensembles.create' | transloco }}
         </button>
       }
     </div>
 
-    @if (creating()) {
-      <form class="flex flex-col gap-3 rounded-lg border bg-card p-4 shadow-sm" (submit)="$event.preventDefault(); create()" (keydown.escape)="creating.set(false)">
-        <div class="flex flex-col gap-3 md:flex-row">
-          <label class="flex flex-1 flex-col gap-1.5">
-            <span class="font-medium">{{ 'system.common.name' | transloco }}</span>
-            <input z-input type="text" [maxLength]="nameMax" [value]="newName()" (input)="newName.set($any($event.target).value)" required />
-          </label>
-          <label class="flex flex-1 flex-col gap-1.5">
-            <span class="font-medium">{{ 'system.ensembles.parent' | transloco }}</span>
-            <select z-native-select [value]="newParentId()" (change)="newParentId.set($any($event.target).value)">
-              @for (e of parents(); track e.id) {
-                <option [value]="e.id">{{ e.name }}</option>
-              }
-            </select>
-          </label>
-        </div>
-        <label class="flex items-center gap-2">
-          <input type="checkbox" class="size-4 accent-primary" [checked]="applyTemplate()" (change)="applyTemplate.set($any($event.target).checked)" />
-          {{ 'system.ensembles.applyTemplate' | transloco }}
-        </label>
-        <div class="flex gap-2">
-          <button z-button type="submit" [zDisabled]="!newName().trim() || !newParentId()">{{ 'common.create' | transloco }}</button>
-          <button z-button zType="secondary" type="button" (click)="creating.set(false)">{{ 'common.cancel' | transloco }}</button>
-        </div>
-      </form>
-    }
+    <vm-form-dialog
+      [(open)]="creating"
+      titleKey="system.ensembles.create"
+      submitKey="common.create"
+      [canSubmit]="!!newName().trim() && !!newParentId()"
+      [busy]="busy()"
+      (submitted)="create()"
+    >
+      <label class="flex flex-col gap-1.5">
+        <span class="font-medium">{{ 'system.common.name' | transloco }} *</span>
+        <input z-input cdkFocusInitial type="text" [maxLength]="nameMax" [value]="newName()" (input)="newName.set($any($event.target).value)" required />
+      </label>
+      <label class="flex flex-col gap-1.5">
+        <span class="font-medium">{{ 'system.ensembles.parent' | transloco }} *</span>
+        <select z-native-select [value]="newParentId()" (change)="newParentId.set($any($event.target).value)">
+          @for (e of parents(); track e.id) {
+            <option [value]="e.id" [selected]="e.id === newParentId()">{{ e | treeLabel }}</option>
+          }
+        </select>
+      </label>
+      <vm-toggle-field [label]="'system.ensembles.applyTemplate' | transloco" [hint]="'system.ensembles.applyTemplateHint' | transloco" [checked]="applyTemplate()" (toggled)="applyTemplate.set($event)" />
+    </vm-form-dialog>
 
     <div class="flex items-center gap-1">
       <vm-toggle-switch [checked]="includeArchived()" [label]="'system.ensembles.showArchived' | transloco" (toggled)="includeArchived.set($event)" />
@@ -81,7 +80,7 @@ import { ToggleSwitch } from '../../../shared/ui/toggle-switch';
 
     <ul class="overflow-hidden rounded-lg border bg-card shadow-sm" [class.hidden]="list.items().length === 0">
       @for (e of list.items(); track e.id; let first = $first) {
-        <li class="flex flex-col gap-2 px-3 py-2 md:flex-row md:items-center" [class.border-t]="!first" [class.opacity-60]="e.archived">
+        <li class="flex items-start gap-2 px-4 py-3 md:items-center" [class.border-t]="!first" [class.opacity-60]="e.archived">
           <span class="flex min-w-0 flex-1 flex-col md:flex-row md:items-center md:gap-3" [style.padding-inline-start.rem]="e.depth * 1.25">
             <a [routerLink]="link(e)" class="font-medium">{{ e.name }}</a>
             <span class="flex flex-wrap gap-1.5 text-[13px] text-muted-foreground">
@@ -127,6 +126,7 @@ export class EnsemblesPage {
   protected readonly newName = signal('');
   protected readonly newParentId = signal('');
   protected readonly applyTemplate = signal(true);
+  protected readonly busy = signal(false);
 
   protected readonly list = cursorList({
     params: () => this.includeArchived(),
@@ -150,9 +150,13 @@ export class EnsemblesPage {
     this.creating.set(true);
   }
 
-  protected async create(): Promise<void> {
+  protected create(): void {
     const name = this.newName().trim();
-    if (!name || !this.newParentId()) return;
+    if (!name || !this.newParentId() || this.busy()) return;
+    void runDialogSave({ busy: this.busy, open: this.creating }, () => this.save(name));
+  }
+
+  private async save(name: string): Promise<boolean> {
     const done = await this.actions.run(
       () =>
         firstValueFrom(
@@ -160,9 +164,8 @@ export class EnsemblesPage {
         ),
       { success: { key: 'system.ensembles.created', params: { name } } },
     );
-    if (!done) return;
-    this.creating.set(false);
-    this.changed();
+    if (done) this.changed();
+    return !!done;
   }
 
   protected async setArchived(e: EnsembleListItem, archive: boolean): Promise<void> {

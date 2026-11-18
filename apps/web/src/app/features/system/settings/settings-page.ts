@@ -25,7 +25,7 @@ type SettingsTab = 'club' | 'defaults' | 'print' | 'fields';
   template: `
     <div>
       <h1 class="text-2xl font-semibold">{{ 'nav.system.settings' | transloco }}</h1>
-      <p class="mt-1 text-muted-foreground">{{ 'system.settings.intro' | transloco }}</p>
+      <p class="mt-2 text-muted-foreground">{{ 'system.settings.intro' | transloco }}</p>
     </div>
 
     @if (tabs().length > 1) {

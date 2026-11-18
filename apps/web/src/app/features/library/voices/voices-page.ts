@@ -13,7 +13,7 @@ import { ApiClient } from '../../../core/api/api-client';
 import { SessionStore } from '../../../core/auth/session.store';
 import { PluralPipe } from '../../../core/i18n/plural.pipe';
 import { ViewportService } from '../../../core/layout/viewport';
-import { NameForm } from '../../../shared/ui/name-form';
+import { NameDialog } from '../../../shared/ui/name-dialog';
 import { PageProblem } from '../../../shared/ui/page-problem';
 import { SearchField } from '../../../shared/ui/search-field';
 import { moveItem, VoiceDialog, type VoiceDialogTarget } from './voice-dialog';
@@ -34,7 +34,7 @@ export function filterVoiceList(groups: readonly Group[], search: string): Group
 /** Stimmen & Instrumente (N-6, N-7, N-9, F-16): one list grouped by instrument with substitutes. */
 @Component({
   selector: 'vm-library-voices-page',
-  imports: [NgIcon, TranslocoPipe, PluralPipe, ZardButtonComponent, NameForm, PageProblem, SearchField, VoiceDialog],
+  imports: [NgIcon, TranslocoPipe, PluralPipe, ZardButtonComponent, NameDialog, PageProblem, SearchField, VoiceDialog],
   viewProviders: [provideIcons({ lucidePlus, lucidePencil, lucideTrash2, lucideArrowUp, lucideArrowDown })],
   changeDetection: ChangeDetectionStrategy.OnPush,
   templateUrl: './voices-page.html',
@@ -60,7 +60,8 @@ export class VoicesPage {
 
   protected readonly dialogOpen = signal(false);
   protected readonly dialogTarget = signal<VoiceDialogTarget | null>(null);
-  protected readonly renaming = signal<string | null>(null);
+  protected readonly renaming = signal<Group | null>(null);
+  protected readonly renameOpen = signal(false);
 
   protected create(): void {
     this.dialogTarget.set(null);
@@ -80,14 +81,20 @@ export class VoicesPage {
     if (done) this.list.reload();
   }
 
-  protected async renameInstrument(group: Group, name: string): Promise<void> {
+  protected startRename(group: Group): void {
+    this.renaming.set(group);
+    this.renameOpen.set(true);
+  }
+
+  protected readonly renameInstrument = async (name: string): Promise<boolean> => {
+    const group = this.renaming();
+    if (!group) return false;
     const done = await this.actions.run(() =>
       firstValueFrom(this.api.postVoid(apiUrl('voices', 'renameInstrument', { instrumentId: group.instrument.id }), { name })),
     );
-    if (!done) return;
-    this.renaming.set(null);
-    this.list.reload();
-  }
+    if (done) this.list.reload();
+    return !!done;
+  };
 
   protected async moveInstrument(index: number, delta: -1 | 1): Promise<void> {
     const ids = moveItem(this.groups().map((g) => g.instrument.id), index, delta);

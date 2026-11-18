@@ -279,3 +279,16 @@ Diese Stufe ist die größte. Bei Bedarf teile ich sie in **3a** (Stücke, Stimm
   - Rechte-Matrix: „Anlegen“, „Bearbeiten“ und „Löschen“ setzen „Sehen“ im selben Bereich mit; wer „Sehen“ abwählt, nimmt dem Bereich alle Rechte.
   - Den Tab „Eigene Felder“ sehen auch Notenwart:innen (`score.edit`) und alle mit `config.edit`, so wie die API die Feld-Endpunkte freigibt.
   - Die Bezeichnungen der Feldtypen liegen jetzt global unter `terms.fieldTypes` (gebraucht von Notenverwaltung und Konfiguration).
+- **Dialoge statt Inline-Formularen (nach Stufe 5):** Anlegen, Hinzufügen, Umbenennen und Bearbeiten ohne eigene Seite laufen immer in einem Dialog, damit die Seite nicht springt.
+  - Bausteine: `vm-form-dialog` (Rahmen mit Titel, Formular und Fußzeile), `vm-name-dialog` (ein Namensfeld), `vm-create-in-ensemble-dialog` (Mappe/Event), `vm-field-dialog` (eigenes Feld, aus Stückformular und Konfiguration) und die Stückauswahl in `vm-form-dialog` ohne Absende-Button.
+  - Am Handy (unter `md`) sind alle Dialoge Vollbild, die Fußzeile sitzt unten; ab `md` ein zentriertes Fenster (Breite über `zWidth`). Bestätigungsdialoge (Löschen, Zurücksetzen) bleiben kleine Fenster.
+  - Fehler der API erscheinen als Toast, der Dialog bleibt dabei offen.
+  - Ein Test verhindert neue Inline-Formulare hinter `@if (creating()/renaming()/adding()/editing())`.
+  - Die Feld-Texte liegen global unter `fields.*`.
+- **Rückmeldungen nach den Dialogen:**
+  - Ensemble-Auswahlen zeigen den Baum: Die Auswahl-Endpunkte liefern Baum-Reihenfolge mit `depth` (`ensembleOptionSchema`, `docs/api.md` › Ensemble-Auswahl); `treeLabel` rückt die Optionen ein. Ausnahme: die Ensemble-Filter in „Mappen/Events verwalten“ kommen aus der Sitzung (nur direkte Mitgliedschaften) und bleiben flach.
+  - Dialoge haben drei getrennte, gepolsterte Bereiche (Kopf mit Linie, Inhalt, Fußzeile mit Linie).
+  - Ein/Aus-Einstellungen in Dialogen sind Schalter-Zeilen (`vm-toggle-field`) statt Checkboxen: „In Mein Bereich anzeigen“, „Besetzung aus Vorlage“, „Pflichtfeld“.
+  - Stück › Mappen & Nummern: Nummer als erste Spalte. Stück › Stimmen: „Hochladen“ als Outline-Button.
+  - Stimme anlegen: ein Feld für den vollen Namen; das Instrument ergibt sich daraus (`instrumentFromVoiceName`, längstes vorhandenes Instrument im Namen, sonst Name ohne Nummer/Stimmung) und lässt sich über Chips oder einen neuen Namen ändern. Die Datalist-Vorschläge entfallen.
+- **Abstände:** Jede geroutete Seite ist ein senkrechter Stapel mit 24 px (Handy) bzw. 32 px (ab `md`) zwischen ihren Abschnitten (`styles.css`, `#main > router-outlet + *`); vorher war das Seitenelement `display: block` und der Abstand von `<main>` griff nicht. Dialog-Elemente sind `display: contents`, eine leere Listen-Statuszeile ist ausgeblendet, damit sie keine Lücke erzeugen. Listenzeilen und Tabellenzellen haben `px-4 py-3`, Hinweisboxen `p-4`, Einleitungen `mt-2`; die Stücktabelle bleibt seitlich enger (`px-3`).

@@ -52,29 +52,38 @@
       }
     </ul>
     @if (canEdit() && freeEnsembles().length && options.hasValue()) {
-      <div class="flex flex-col gap-2 rounded-md border border-dashed p-3 md:flex-row md:items-end">
-        <label class="flex flex-1 flex-col gap-1.5">
-          <span class="font-medium">{{ 'terms.ensemble' | transloco }}</span>
-          <select z-native-select [value]="newEnsembleId()" (change)="newEnsembleId.set($any($event.target).value)">
+      <button z-button zType="outline" type="button" class="self-start" (click)="startAdd()">
+        <ng-icon name="lucidePlus" aria-hidden="true" />{{ 'system.user.addMembership' | transloco }}
+      </button>
+      <vm-form-dialog
+        [(open)]="adding"
+        titleKey="system.user.addMembershipTitle"
+        [titleParams]="{ name: u.name }"
+        submitKey="system.user.addMembership"
+        [canSubmit]="!!newEnsembleId() && !!newRoleId()"
+        [busy]="busy()"
+        (submitted)="addMembership()"
+      >
+        <label class="flex flex-col gap-1.5">
+          <span class="font-medium">{{ 'terms.ensemble' | transloco }} *</span>
+          <select z-native-select cdkFocusInitial [value]="newEnsembleId()" (change)="newEnsembleId.set($any($event.target).value)">
             <option value="">{{ 'system.common.choose' | transloco }}</option>
             @for (e of freeEnsembles(); track e.id) {
-              <option [value]="e.id">{{ e.name }}</option>
+              <option [value]="e.id" [selected]="e.id === newEnsembleId()">{{ e | treeLabel }}</option>
             }
           </select>
         </label>
-        <label class="flex flex-1 flex-col gap-1.5">
-          <span class="font-medium">{{ 'terms.role' | transloco }}</span>
+        <label class="flex flex-col gap-1.5">
+          <span class="font-medium">{{ 'terms.role' | transloco }} *</span>
           <select z-native-select [value]="newRoleId()" (change)="newRoleId.set($any($event.target).value)">
             <option value="">{{ 'system.common.choose' | transloco }}</option>
             @for (r of options.value().roles; track r.id) {
-              <option [value]="r.id">{{ r.name }}</option>
+              <option [value]="r.id" [selected]="r.id === newRoleId()">{{ r.name }}</option>
             }
           </select>
         </label>
-        <button z-button zType="outline" type="button" [zDisabled]="!newEnsembleId() || !newRoleId()" (click)="addMembership()">
-          <ng-icon name="lucidePlus" aria-hidden="true" />{{ 'system.user.addMembership' | transloco }}
-        </button>
-      </div>
+        <p class="text-[13px] text-muted-foreground">{{ 'system.user.membershipsHint' | transloco }}</p>
+      </vm-form-dialog>
     }
     <div class="flex items-center justify-between gap-4 border-t pt-4">
       <div>
@@ -126,7 +135,7 @@
     </div>
   </section>
 
-  <section aria-labelledby="h-account" class="flex flex-col gap-3 rounded-lg border bg-card p-4 shadow-sm md:p-6">
+  <section aria-labelledby="h-account" class="flex flex-col gap-4 rounded-lg border bg-card p-4 shadow-sm md:p-6">
     <h2 id="h-account" class="text-lg font-semibold">{{ 'system.user.account' | transloco }}</h2>
     <dl class="grid grid-cols-[auto_1fr] gap-x-4 gap-y-1">
       <dt class="text-muted-foreground">{{ 'system.user.created' | transloco }}</dt>
@@ -137,7 +146,7 @@
   </section>
 
   @if ((canEdit() || canDelete()) && !isSelf()) {
-    <section aria-labelledby="h-danger" class="flex flex-col gap-3 rounded-lg border border-destructive/40 p-4 md:p-6">
+    <section aria-labelledby="h-danger" class="flex flex-col gap-4 rounded-lg border border-destructive/40 p-4 md:p-6">
       <h2 id="h-danger" class="text-lg font-semibold">{{ 'system.user.danger' | transloco }}</h2>
       @if (canEdit()) {
         <p class="text-muted-foreground">{{ 'system.user.blockHint' | transloco: { name: u.name } }}</p>

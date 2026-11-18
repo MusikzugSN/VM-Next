@@ -5,13 +5,11 @@
 @if (details.error() || catalog.error()) {
   <vm-page-problem [error]="details.error() ?? catalog.error()" />
 } @else if (role(); as r) {
-  @if (renaming()) {
-    <vm-name-form labelKey="system.common.name" submitKey="common.save" [initial]="r.name" (saved)="rename($event)" (cancelled)="renaming.set(false)" />
-  } @else {
-    <div class="flex flex-col gap-3 md:flex-row md:items-start md:justify-between">
+  <vm-name-dialog [(open)]="renaming" titleKey="common.rename" labelKey="system.common.name" submitKey="common.save" [initial]="r.name" [save]="rename" />
+  <div class="flex flex-col gap-3 md:flex-row md:items-start md:justify-between">
       <div>
         <h1 class="text-2xl font-semibold">{{ r.name }}</h1>
-        <p class="mt-1 text-muted-foreground">
+        <p class="mt-2 text-muted-foreground">
           {{ (r.defaultKey ? 'system.roles.default' : 'system.role.own') | transloco }}
           @if (r.modifiedFromDefault) {
             · {{ 'system.roles.modified' | transloco }}
@@ -23,12 +21,11 @@
         <button z-button zType="outline" type="button" (click)="renaming.set(true)">{{ 'common.rename' | transloco }}</button>
       }
     </div>
-  }
 
   <p class="text-muted-foreground">{{ 'system.role.intro' | transloco }}</p>
 
   @if (grantsClub()) {
-    <div role="status" class="flex items-start gap-2 rounded-lg bg-destructive-soft p-3 text-destructive-ink">
+    <div role="status" class="flex items-start gap-2 rounded-lg bg-destructive-soft p-4 text-destructive-ink">
       <ng-icon name="lucideTriangleAlert" class="mt-0.5 shrink-0" aria-hidden="true" />
       <span>{{ 'system.role.clubWarning' | transloco }}</span>
     </div>
@@ -36,13 +33,13 @@
 
   @if (catalog.hasValue()) {
     <form class="flex flex-col gap-6" (submit)="$event.preventDefault(); save()">
-      <section aria-labelledby="h-matrix" class="flex flex-col gap-3">
+      <section aria-labelledby="h-matrix" class="flex flex-col gap-4">
         <h2 id="h-matrix" class="text-lg font-semibold">{{ 'system.role.matrix' | transloco }}</h2>
         <div class="overflow-x-auto rounded-lg border bg-card shadow-sm">
           <table class="w-full">
             <thead class="bg-muted text-xs font-medium text-muted-foreground">
               <tr>
-                <th scope="col" class="px-3 py-2 text-start">{{ 'system.role.area' | transloco }}</th>
+                <th scope="col" class="px-4 py-3 text-start">{{ 'system.role.area' | transloco }}</th>
                 @for (action of catalog.value().actions; track action) {
                   <th scope="col" class="px-2 py-2 text-center">{{ 'system.permissions.actions.' + action | transloco }}</th>
                 }
@@ -51,7 +48,7 @@
             <tbody>
               @for (row of catalog.value().areas; track row.area) {
                 <tr class="border-t">
-                  <th scope="row" class="px-3 py-1 text-start font-medium">
+                  <th scope="row" class="px-4 py-2 text-start font-medium">
                     {{ 'system.permissions.areas.' + row.area | transloco }}
                     <span class="block text-xs font-normal text-muted-foreground">{{ 'system.permissions.scopes.' + row.scope | transloco }}</span>
                   </th>

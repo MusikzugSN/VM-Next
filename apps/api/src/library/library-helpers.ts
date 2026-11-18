@@ -1,20 +1,17 @@
 import type { Permission, ScoreCandidate } from '@vm-web/shared';
-import { and, asc, eq, inArray, isNull, sql, type SQL } from 'drizzle-orm';
+import { and, asc, eq, sql, type SQL } from 'drizzle-orm';
 import type { AccessContext } from '../access/access-context';
 import { ProblemException } from '../common/problem-details/problem.exception';
+import { activeEnsembleOptions } from '../common/ensemble-tree';
 import type { Database } from '../db/database';
 import { ensembles, scores } from '../db/schema';
 import { likePattern } from '../me/me.repository';
 
-/** Non-archived ensembles in which the caller holds `permission` (incl. inherited, F-3); 403 if none. */
+/** Non-archived ensembles in which the caller holds `permission` (incl. inherited, F-3), in tree order; 403 if none. */
 export async function ensembleOptions(db: Database, access: AccessContext, permission: Permission) {
   const ids = access.ensemblesWith(permission);
   if (!ids.length) throw ProblemException.forbidden();
-  return db
-    .select({ id: ensembles.id, name: ensembles.name })
-    .from(ensembles)
-    .where(and(inArray(ensembles.id, ids), isNull(ensembles.archivedAt)))
-    .orderBy(sql`lower(${ensembles.name})`);
+  return activeEnsembleOptions(db, ids);
 }
 
 /** New folders/events only in existing, non-archived ensembles. */

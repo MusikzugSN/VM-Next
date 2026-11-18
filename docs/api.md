@@ -62,6 +62,10 @@ Dieser Katalog beschreibt alle Endpunkte von `apps/api` für die erste Version (
 - Manche Listen ergänzen Zusatzfelder neben `items` (z. B. `totalPending`). 
 - **Nicht paginiert** sind nur begrenzte Stammdaten-/Auswahllisten; sie sind im Katalog mit „nicht paginiert“ markiert und antworten mit `{ "items": [...] }` bzw. `{ "groups": [...] }`.
 
+### Ensemble-Auswahl
+
+Auswahllisten von Ensembles (`folders/ensemble-options`, `events/ensemble-options`, `scores/ensemble-options`, `system/user-assignment-options`, `system/config/default-options`) kommen in **Baum-Reihenfolge** (F-3): übergeordnetes Ensemble vor seinen Unter-Ensembles, Geschwister nach Name. Jeder Eintrag hat `depth` = Anzahl der ebenfalls enthaltenen Vorfahren (0 = oberste Ebene dieser Liste); das Frontend rückt danach ein. Schema: `ensembleOptionSchema`.
+
 ### Stimmen-Kontext (M-2, M-3)
 
 Alle Listen und Downloads unter `me` und `print` filtern serverseitig auf die **aktiven Stimmen**:
@@ -787,7 +791,7 @@ Eigene Felder in Reihenfolge – für Tabelle, Formular und Konfigurations-Tab (
 Ensembles mit Besetzung für die Auswahl der Vollständigkeits-Basis (nicht paginiert). · N-4
 
 - **Recht:** `score.view` · Ensemble (mind. eines)
-- **Response 200:** `{ "items": [{ "id": "ens-1", "name": "Hauptorchester" }], "defaultEnsembleId": "ens-1" }`
+- **Response 200:** `{ "items": [{ "id": "ens-1", "name": "Hauptorchester", "depth": 0 }], "defaultEnsembleId": "ens-1" }` (Baum-Reihenfolge, siehe [Ensemble-Auswahl](#ensemble-auswahl))
 
 ### `GET /internal/v1/scores/tag-options`
 
@@ -1041,7 +1045,7 @@ Modul `FoldersModule`, Schemas `libs/shared/src/lib/folders/`. Rechte `folder.*`
 Ensembles, in denen die Person Mappen anlegen darf (nicht paginiert). · N-15, R-4
 
 - **Recht:** `folder.create` in mind. einem Ensemble
-- **Response 200:** `{ "items": [{ "id": "ens-1", "name": "Hauptorchester" }] }`
+- **Response 200:** `{ "items": [{ "id": "ens-1", "name": "Hauptorchester", "depth": 0 }] }` (Baum-Reihenfolge, siehe [Ensemble-Auswahl](#ensemble-auswahl))
 
 ### `GET /internal/v1/folders/folder-list`
 
@@ -1126,7 +1130,7 @@ Modul `EventsModule`, Schemas `libs/shared/src/lib/events/`. Rechte `event.*` ·
 
 - **Zweck:** Ensembles, in denen die Person Events anlegen darf (nicht paginiert). · N-15
 - **Recht:** `event.create` in mind. einem Ensemble
-- **Response 200:** `{ "items": [{ "id": "ens-1", "name": "Hauptorchester" }] }`
+- **Response 200:** `{ "items": [{ "id": "ens-1", "name": "Hauptorchester", "depth": 0 }] }`
 
 ### `GET /internal/v1/events/event-list`
 
@@ -1295,7 +1299,7 @@ Benutzerliste mit Ensembles & Rollen, Stimmen, Status, letzter Anmeldung. · S-1
 
 - **Zweck:** Auswahlwerte der Benutzerseite: Ensembles (Baum-Reihenfolge) und Rollen (nicht paginiert). · S-1, R-1
 - **Recht:** `user.edit` · Verein
-- **Response 200:** `{ "ensembles": [{ "id": "ens-1", "name": "Hauptorchester" }], "roles": [{ "id": "role-mus", "name": "Musiker:in" }, { "id": "role-admin", "name": "Administrator:in" }] }`
+- **Response 200:** `{ "ensembles": [{ "id": "ens-root", "name": "Verein", "depth": 0 }, { "id": "ens-1", "name": "Hauptorchester", "depth": 1 }], "roles": [{ "id": "role-mus", "name": "Musiker:in" }, { "id": "role-admin", "name": "Administrator:in" }] }`
 
 #### `GET /internal/v1/system/users/{userId}/details`
 
@@ -1508,7 +1512,7 @@ Benutzerliste mit Ensembles & Rollen, Stimmen, Status, letzter Anmeldung. · S-1
 
 - **Zweck:** Auswahl für Standard-Ensemble und Standardrolle (nicht paginiert). · S-4, A-3
 - **Recht:** `config.edit` · Verein
-- **Response 200:** `{ "ensembles": [{ "id": "ens-1", "name": "Hauptorchester" }], "roles": [{ "id": "role-mus", "name": "Musiker:in" }] }`
+- **Response 200:** `{ "ensembles": [{ "id": "ens-1", "name": "Hauptorchester", "depth": 0 }], "roles": [{ "id": "role-mus", "name": "Musiker:in" }] }` (Ensembles in Baum-Reihenfolge)
 
 #### `POST /internal/v1/system/config/update-club`
 

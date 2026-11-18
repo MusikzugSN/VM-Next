@@ -23,7 +23,7 @@ export type EventsTab = 'upcoming' | 'archive';
   template: `
     <div>
       <h1 class="text-2xl font-semibold">{{ 'nav.me.events' | transloco }}</h1>
-      <p class="mt-1 text-muted-foreground">{{ 'me.events.intro' | transloco }}</p>
+      <p class="mt-2 text-muted-foreground">{{ 'me.events.intro' | transloco }}</p>
     </div>
 
     <nav [attr.aria-label]="'me.events.view' | transloco" class="inline-flex self-start rounded-lg bg-muted p-1">
@@ -45,7 +45,7 @@ export type EventsTab = 'upcoming' | 'archive';
         <li>
           <a
             [routerLink]="link(event.id)"
-            class="flex items-center gap-3 rounded-lg border bg-card p-3 text-foreground no-underline shadow-sm hover:bg-accent md:p-4"
+            class="flex items-center gap-3 rounded-lg border bg-card p-4 text-foreground no-underline shadow-sm hover:bg-accent md:p-4"
           >
             <vm-event-date [date]="event.date" />
             <span class="flex min-w-0 flex-1 flex-col">

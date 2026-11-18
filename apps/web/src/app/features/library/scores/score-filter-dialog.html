@@ -4,7 +4,7 @@
     <p z-dialog-description>{{ 'library.filter.intro' | transloco }}</p>
   </z-dialog-header>
 
-  <div class="flex max-h-[60dvh] flex-col gap-5 overflow-y-auto px-1">
+  <div class="flex min-h-0 flex-1 flex-col gap-5 overflow-y-auto md:max-h-[60dvh] md:flex-none">
     <label class="flex flex-col gap-1.5">
       <span class="font-medium">{{ 'library.filter.tag' | transloco }}</span>
       <select z-native-select [value]="tagId()" (change)="tagId.set($any($event.target).value)">
@@ -21,7 +21,7 @@
         <select z-native-select [value]="ensembleId()" (change)="ensembleId.set($any($event.target).value)">
           <option value="">{{ 'library.filter.defaultEnsemble' | transloco }}</option>
           @for (ensemble of options.ensembles(); track ensemble.id) {
-            <option [value]="ensemble.id" [selected]="ensemble.id === ensembleId()">{{ ensemble.name }}</option>
+            <option [value]="ensemble.id" [selected]="ensemble.id === ensembleId()">{{ ensemble | treeLabel }}</option>
           }
         </select>
         <span class="text-xs text-muted-foreground">{{ 'library.filter.ensembleHint' | transloco }}</span>

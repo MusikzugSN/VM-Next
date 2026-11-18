@@ -13,14 +13,14 @@ import { ActionRunner, ConfirmService } from '../../../core/actions/action-runne
 import { ApiClient } from '../../../core/api/api-client';
 import { SessionStore } from '../../../core/auth/session.store';
 import { PluralPipe } from '../../../core/i18n/plural.pipe';
-import { NameForm } from '../../../shared/ui/name-form';
+import { NameDialog } from '../../../shared/ui/name-dialog';
 import { PageProblem } from '../../../shared/ui/page-problem';
 import { permissionKey, withDependencies } from './permission-labels';
 
 /** Rolle (S-3, R-3, R-7): permission matrix (areas × actions) plus single permissions. */
 @Component({
   selector: 'vm-system-role-page',
-  imports: [RouterLink, NgIcon, TranslocoPipe, PluralPipe, ZardButtonComponent, NameForm, PageProblem],
+  imports: [RouterLink, NgIcon, TranslocoPipe, PluralPipe, ZardButtonComponent, NameDialog, PageProblem],
   viewProviders: [provideIcons({ lucideChevronLeft, lucideRotateCcw, lucideTrash2, lucideTriangleAlert })],
   changeDetection: ChangeDetectionStrategy.OnPush,
   templateUrl: './role-page.html',
@@ -90,14 +90,13 @@ export class RolePage {
     if (done) this.changed();
   }
 
-  protected async rename(name: string): Promise<void> {
+  protected readonly rename = async (name: string): Promise<boolean> => {
     const done = await this.actions.run(() => firstValueFrom(this.api.postVoid(apiUrl('system', 'renameRole', { roleId: this.roleId() }), { name })), {
       success: { key: 'system.role.renamed', params: { name } },
     });
-    if (!done) return;
-    this.renaming.set(false);
-    this.details.reload();
-  }
+    if (done) this.details.reload();
+    return !!done;
+  };
 
   protected async reset(): Promise<void> {
     const name = this.role()?.name ?? '';

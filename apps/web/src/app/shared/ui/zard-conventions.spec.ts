@@ -54,3 +54,14 @@ describe('Zard button in VM-Web', () => {
     expect(offenders.map((f) => relative(root, f))).toEqual([]);
   });
 });
+
+describe('Create, add and edit in VM-Web', () => {
+  // Forms that pop up inside the page push the content around; they belong into a dialog
+  // (`vm-form-dialog`, `vm-name-dialog`, …), which is full screen on phones.
+  it('never shows an inline form behind a creating/renaming/adding/editing flag', () => {
+    const root = appRoot();
+    const pattern = /@if \(\s*(creating|renaming|adding|editing|addingField|creatingTag)\w*\(\)/;
+    const offenders = templates(root).filter((file) => pattern.test(readFileSync(file, 'utf8')));
+    expect(offenders.map((f) => relative(root, f))).toEqual([]);
+  });
+});

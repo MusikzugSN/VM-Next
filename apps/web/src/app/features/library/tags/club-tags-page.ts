@@ -15,48 +15,51 @@ import { SessionStore } from '../../../core/auth/session.store';
 import { PluralPipe } from '../../../core/i18n/plural.pipe';
 import { debounced } from '../../../core/util/debounced';
 import { ListState } from '../../../shared/ui/list-state';
-import { NameForm } from '../../../shared/ui/name-form';
+import { NameDialog } from '../../../shared/ui/name-dialog';
 import { SearchField } from '../../../shared/ui/search-field';
 import { LibraryOptions } from '../library-options';
 
 /** Vereins-Tags (N-17): create, rename, delete; personal tags live in Mein Bereich. */
 @Component({
   selector: 'vm-library-club-tags-page',
-  imports: [RouterLink, NgIcon, TranslocoPipe, PluralPipe, ZardButtonComponent, ListState, NameForm, SearchField],
+  imports: [RouterLink, NgIcon, TranslocoPipe, PluralPipe, ZardButtonComponent, ListState, NameDialog, SearchField],
   viewProviders: [provideIcons({ lucidePlus, lucidePencil, lucideTrash2, lucideLock })],
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
     <div class="flex flex-col gap-3 md:flex-row md:items-start md:justify-between">
       <div>
         <h1 class="text-2xl font-semibold">{{ 'nav.library.tags' | transloco }}</h1>
-        <p class="mt-1 text-muted-foreground">{{ 'library.tags.intro' | transloco }}</p>
+        <p class="mt-2 text-muted-foreground">{{ 'library.tags.intro' | transloco }}</p>
       </div>
-      @if (canCreate() && !creating()) {
+      @if (canCreate()) {
         <button z-button type="button" class="w-full md:w-auto" (click)="creating.set(true)">
           <ng-icon name="lucidePlus" aria-hidden="true" />{{ 'library.tags.create' | transloco }}
         </button>
       }
     </div>
 
-    @if (creating()) {
-      <vm-name-form labelKey="library.tags.newTag" (saved)="create($event)" (cancelled)="creating.set(false)" />
-    }
+    <vm-name-dialog [(open)]="creating" titleKey="library.tags.create" labelKey="library.tags.newTag" [save]="create" />
+    <vm-name-dialog
+      [(open)]="renameOpen"
+      titleKey="common.rename"
+      labelKey="library.tags.name"
+      submitKey="common.save"
+      [initial]="renaming()?.name ?? ''"
+      [save]="rename"
+    />
 
     <vm-search-field [(value)]="search" labelKey="library.tags.search" />
 
     <ul class="overflow-hidden rounded-lg border bg-card shadow-sm" [class.hidden]="list.items().length === 0">
       @for (tag of list.items(); track tag.id; let first = $first) {
-        <li class="flex flex-col gap-2 px-3 py-2 md:flex-row md:items-center" [class.border-t]="!first">
-          @if (renaming() === tag.id) {
-            <vm-name-form class="flex-1" labelKey="library.tags.name" submitKey="common.save" [initial]="tag.name" (saved)="rename(tag, $event)" (cancelled)="renaming.set(null)" />
-          } @else {
+        <li class="flex flex-col gap-2 px-4 py-3 md:flex-row md:items-center" [class.border-t]="!first">
             <span class="flex min-w-0 flex-1 flex-col md:flex-row md:items-center md:gap-3">
               <span class="text-base font-medium md:text-sm">{{ tag.name }}</span>
               <span class="text-[13px] text-muted-foreground">{{ 'library.tags.scoreCount' | tPlural: tag.scoreCount }}</span>
             </span>
             <span class="flex gap-1">
               @if (canEdit()) {
-                <button z-button zType="ghost" type="button" (click)="renaming.set(tag.id)" [attr.aria-label]="'library.tags.renameLabel' | transloco: { name: tag.name }">
+                <button z-button zType="ghost" type="button" (click)="startRename(tag)" [attr.aria-label]="'library.tags.renameLabel' | transloco: { name: tag.name }">
                   <ng-icon name="lucidePencil" aria-hidden="true" /><span class="hidden md:inline">{{ 'common.rename' | transloco }}</span>
                 </button>
               }
@@ -66,13 +69,12 @@ import { LibraryOptions } from '../library-options';
                 </button>
               }
             </span>
-          }
         </li>
       }
     </ul>
     <vm-list-state [list]="list" emptyKey="library.tags.empty" />
 
-    <aside class="flex items-start gap-2 rounded-lg border p-3 text-[13px] text-muted-foreground">
+    <aside class="flex items-start gap-2 rounded-lg border p-4 text-[13px] text-muted-foreground">
       <ng-icon name="lucideLock" class="mt-0.5 shrink-0" aria-hidden="true" />
       <span>{{ 'library.tags.personalHint' | transloco }} <a [routerLink]="meTagsPath" class="font-medium">{{ 'library.tags.personalLink' | transloco }}</a></span>
     </aside>
@@ -90,7 +92,8 @@ export class ClubTagsPage {
   protected readonly canEdit = computed(() => this.session.can('tag.edit'));
   protected readonly canDelete = computed(() => this.session.can('tag.delete'));
   protected readonly creating = signal(false);
-  protected readonly renaming = signal<string | null>(null);
+  protected readonly renaming = signal<ClubTagItem | null>(null);
+  protected readonly renameOpen = signal(false);
   protected readonly search = signal('');
   private readonly query = debounced(this.search);
 
@@ -99,21 +102,26 @@ export class ClubTagsPage {
     fetch: (q, cursor) => this.api.get(apiUrl('tags', 'clubTagList'), clubTagListResponseSchema, { cursor, q }),
   });
 
-  protected async create(name: string): Promise<void> {
+  protected startRename(tag: ClubTagItem): void {
+    this.renaming.set(tag);
+    this.renameOpen.set(true);
+  }
+
+  protected readonly create = async (name: string): Promise<boolean> => {
     const done = await this.actions.run(() => firstValueFrom(this.api.post(apiUrl('tags', 'createTag'), { name }, createdResponseSchema)), {
       success: { key: 'library.tags.created', params: { name } },
     });
-    if (!done) return;
-    this.creating.set(false);
-    this.changed();
-  }
+    if (done) this.changed();
+    return !!done;
+  };
 
-  protected async rename(tag: ClubTagItem, name: string): Promise<void> {
+  protected readonly rename = async (name: string): Promise<boolean> => {
+    const tag = this.renaming();
+    if (!tag) return false;
     const done = await this.actions.run(() => firstValueFrom(this.api.postVoid(apiUrl('tags', 'renameTag', { tagId: tag.id }), { name })));
-    if (!done) return;
-    this.renaming.set(null);
-    this.changed();
-  }
+    if (done) this.changed();
+    return !!done;
+  };
 
   protected async remove(tag: ClubTagItem): Promise<void> {
     if (!(await this.confirm.confirmDelete('library.tags.deleteTitle', 'library.tags.deleteText', { name: tag.name, count: tag.scoreCount }))) return;

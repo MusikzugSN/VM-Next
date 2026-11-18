@@ -81,7 +81,8 @@
     "delete": "Konto löschen",
     "deleteTitle": "Konto von {{ name }} löschen?",
     "deleteText": "Das Konto wird endgültig gelöscht. Meldet sich die Person erneut an, entsteht ein neues, leeres Konto.",
-    "deleted": "Konto von {{ name }} gelöscht."
+    "deleted": "Konto von {{ name }} gelöscht.",
+    "addMembershipTitle": "{{ name }} einem Ensemble zuordnen"
   },
   "ensembles": {
     "intro": "Ensembles bilden einen Baum. Rollen und Mappen eines Ensembles gelten auch in seinen Unter-Ensembles.",
@@ -108,7 +109,8 @@
       "other": "{{ count }} Stimmen in der Besetzung"
     },
     "empty": "Keine Ensembles.",
-    "all": "Alle Ensembles"
+    "all": "Alle Ensembles",
+    "applyTemplateHint": "Füllt die Besetzung mit der mitgelieferten Vorlage; später änderbar."
   },
   "ensemble": {
     "sections": "Bereiche des Ensembles",
@@ -218,11 +220,6 @@
     },
     "fields": {
       "hint": "Eigene Felder ergänzen die Stammdaten aller Stücke, z. B. „Verlag“ oder „Schwierigkeit“. Der Typ lässt sich später nicht mehr ändern.",
-      "create": "Feld anlegen",
-      "type": "Typ",
-      "options": "Auswahlwerte",
-      "optionsHint": "Ein Wert pro Zeile. Umbenannte Werte gelten als neu; in Stücken gespeicherte alte Werte entfallen.",
-      "required": "Pflichtfeld",
       "created": "Feld „{{ name }}“ angelegt.",
       "editLabel": "{{ name }} bearbeiten",
       "deleteLabel": "{{ name }} löschen",

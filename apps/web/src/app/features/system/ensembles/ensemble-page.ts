@@ -29,16 +29,17 @@ import { PluralPipe } from '../../../core/i18n/plural.pipe';
 import { debounced } from '../../../core/util/debounced';
 import { VoiceContextStore } from '../../../core/voices/voice-context.store';
 import { ListState } from '../../../shared/ui/list-state';
-import { NameForm } from '../../../shared/ui/name-form';
+import { NameDialog } from '../../../shared/ui/name-dialog';
 import { PageProblem } from '../../../shared/ui/page-problem';
 import { SearchField } from '../../../shared/ui/search-field';
+import { TreeLabelPipe } from '../../../shared/ui/tree-label.pipe';
 
 type EnsembleTab = 'details' | 'lineup' | 'members';
 
 /** Ensemble (S-2, F-3, N-8): Stammdaten · Besetzung · Mitglieder (tab in `?tab=`). */
 @Component({
   selector: 'vm-system-ensemble-page',
-  imports: [DatePipe, RouterLink, NgIcon, TranslocoPipe, PluralPipe, ZardButtonComponent, ZardNativeSelectDirective, ListState, NameForm, PageProblem, SearchField],
+  imports: [TreeLabelPipe, DatePipe, RouterLink, NgIcon, TranslocoPipe, PluralPipe, ZardButtonComponent, ZardNativeSelectDirective, ListState, NameDialog, PageProblem, SearchField],
   viewProviders: [provideIcons({ lucideChevronLeft, lucideWandSparkles })],
   changeDetection: ChangeDetectionStrategy.OnPush,
   templateUrl: './ensemble-page.html',
@@ -121,14 +122,13 @@ export class EnsemblePage {
     return initials(name);
   }
 
-  protected async rename(name: string): Promise<void> {
+  protected readonly rename = async (name: string): Promise<boolean> => {
     const done = await this.actions.run(() => firstValueFrom(this.api.postVoid(apiUrl('system', 'renameEnsemble', { ensembleId: this.ensembleId() }), { name })), {
       success: { key: 'system.ensemble.renamed', params: { name } },
     });
-    if (!done) return;
-    this.renaming.set(false);
-    this.changed();
-  }
+    if (done) this.changed();
+    return !!done;
+  };
 
   protected async setParent(parentId: string): Promise<void> {
     if (!parentId || parentId === this.ensemble()?.parentId) return;

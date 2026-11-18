@@ -49,7 +49,7 @@ import { TagFilter, type TagFilterValue } from './ui/tag-filter';
       <div class="flex flex-col gap-3 md:flex-row md:items-start md:justify-between md:gap-4">
         <div>
           <h1 class="text-[22px] leading-7 font-semibold md:text-2xl md:leading-8">{{ folder.name }}</h1>
-          <p class="mt-1 text-muted-foreground">
+          <p class="mt-2 text-muted-foreground">
             {{ folder.ensemble.name }} · {{ 'me.common.scoreCount' | tPlural: folder.scoreCount }} ·
             {{ 'me.list.pages' | tPlural: folder.totalPages }}
           </p>

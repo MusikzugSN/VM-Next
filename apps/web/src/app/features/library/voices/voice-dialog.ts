@@ -1,12 +1,10 @@
 import { ChangeDetectionStrategy, Component, computed, effect, inject, input, model, output, signal, untracked } from '@angular/core';
-import { rxResource } from '@angular/core/rxjs-interop';
 import { TranslocoPipe } from '@jsverse/transloco';
 import { NgIcon, provideIcons } from '@ng-icons/core';
-import { lucideArrowDown, lucideArrowUp, lucideX } from '@ng-icons/lucide';
+import { lucideArrowDown, lucideArrowUp, lucideCheck, lucideX } from '@ng-icons/lucide';
 import {
   apiUrl,
   createVoiceResponseSchema,
-  instrumentSuggestionsResponseSchema,
   type VoiceListResponse,
 } from '@vm-web/shared';
 import { firstValueFrom } from 'rxjs';
@@ -20,7 +18,7 @@ import { ActionRunner } from '../../../core/actions/action-runner';
 import { focusFirstInvalid } from '../../../core/util/focus-invalid';
 import { ApiClient } from '../../../core/api/api-client';
 import { isApiProblem } from '../../../core/api/api-problem';
-import { debounced } from '../../../core/util/debounced';
+import { instrumentFromVoiceName } from './voice-name';
 
 type Voice = VoiceListResponse['groups'][number]['voices'][number];
 
@@ -43,14 +41,17 @@ export function moveItem<T>(items: readonly T[], index: number, delta: -1 | 1): 
 }
 
 /**
- * Stimme anlegen/bearbeiten (N-6, N-7, N-9): instrument with autocomplete (a new name creates the
- * instrument), full voice name, ordered substitutes with up/down instead of drag & drop.
+ * Stimme anlegen/bearbeiten (N-6, N-7, N-9): one field for the full voice name; the instrument follows
+ * from it (`instrumentFromVoiceName`) and can be changed via chips or a new name, which creates the
+ * instrument. Ordered substitutes with up/down instead of drag & drop.
  */
 @Component({
   selector: 'vm-voice-dialog',
   imports: [NgIcon, TranslocoPipe, ZardButtonComponent, ZardDialogImports, ZardInputComponent, ZardNativeSelectDirective],
-  viewProviders: [provideIcons({ lucideArrowUp, lucideArrowDown, lucideX })],
+  viewProviders: [provideIcons({ lucideArrowUp, lucideArrowDown, lucideX, lucideCheck })],
   changeDetection: ChangeDetectionStrategy.OnPush,
+  // The dialog renders in an overlay; its host must not take up space (or a gap) in the page.
+  host: { style: 'display: contents' },
   templateUrl: './voice-dialog.html',
 })
 export class VoiceDialog {
@@ -63,18 +64,22 @@ export class VoiceDialog {
   readonly groups = input.required<VoiceListResponse['groups']>();
   readonly saved = output<void>();
 
-  protected readonly instrument = signal('');
   protected readonly name = signal('');
+  /** Instrument chosen by hand; `null` = derived from the voice name. */
+  protected readonly override = signal<string | null>(null);
+  protected readonly choosing = signal(false);
   protected readonly substitutes = signal<{ id: string; name: string }[]>([]);
   protected readonly errors = signal<Record<string, string>>({});
   private readonly focusInvalid = focusFirstInvalid();
   protected readonly saving = signal(false);
   protected readonly max = MAX_SUBSTITUTES;
 
-  private readonly instrumentQuery = debounced(this.instrument, 200);
-  protected readonly suggestions = rxResource({
-    params: () => (this.open() ? this.instrumentQuery().trim() : undefined),
-    stream: ({ params }) => this.api.get(apiUrl('voices', 'instrumentSuggestions'), instrumentSuggestionsResponseSchema, { q: params }),
+  /** Existing instruments in display order. */
+  protected readonly instrumentNames = computed(() => this.groups().map((g) => g.instrument.name));
+  protected readonly instrument = computed(() => (this.override() ?? instrumentFromVoiceName(this.name(), this.instrumentNames())).trim());
+  protected readonly isNewInstrument = computed(() => {
+    const current = this.instrument().toLocaleLowerCase('de');
+    return !!current && !this.instrumentNames().some((n) => n.toLocaleLowerCase('de') === current);
   });
 
   /** Voices that can still be added as substitute (not itself, not twice). */
@@ -88,12 +93,19 @@ export class VoiceDialog {
       if (!this.open()) return;
       untracked(() => {
         const target = this.target();
-        this.instrument.set(target?.instrumentName ?? '');
+        // Editing keeps the current instrument; a new voice derives it from the name.
+        this.override.set(target?.instrumentName ?? null);
+        this.choosing.set(false);
         this.name.set(target?.voice.name ?? '');
         this.substitutes.set(target?.voice.substitutes.map((s) => ({ id: s.id, name: s.name })) ?? []);
         this.errors.set({});
       });
     });
+  }
+
+  protected chooseInstrument(name: string): void {
+    this.override.set(name);
+    this.choosing.set(false);
   }
 
   protected addSubstitute(id: string): void {

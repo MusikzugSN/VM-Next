@@ -27,14 +27,14 @@ import { debounced } from '../../core/util/debounced';
 import { VoiceContextStore } from '../../core/voices/voice-context.store';
 import { ListState } from '../../shared/ui/list-state';
 import { MemberScoreList } from './ui/member-score-list';
-import { NameForm } from '../../shared/ui/name-form';
+import { NameDialog } from '../../shared/ui/name-dialog';
 
 export type TagKind = 'club' | 'personal';
 
 /** Tags (M-8): club tags and own personal tags as filters; selecting one lists its scores. */
 @Component({
   selector: 'vm-me-tags-page',
-  imports: [RouterLink, NgIcon, TranslocoPipe, ZardButtonComponent, ZardInputComponent, ListState, MemberScoreList, NameForm],
+  imports: [RouterLink, NgIcon, TranslocoPipe, ZardButtonComponent, ZardInputComponent, ListState, MemberScoreList, NameDialog],
   viewProviders: [provideIcons({ lucidePlus, lucideSearch, lucidePencil, lucideTrash2 })],
   changeDetection: ChangeDetectionStrategy.OnPush,
   templateUrl: './tags-page.html',
@@ -82,22 +82,22 @@ export class TagsPage {
     return appPath(kind === 'club' ? APP_ROUTES.me.clubTag : APP_ROUTES.me.personalTag, { tagId: tag.id });
   }
 
-  protected async create(name: string): Promise<void> {
+  protected readonly create = async (name: string): Promise<boolean> => {
     const created = await this.run(() => firstValueFrom(this.api.post(apiUrl('me', 'createPersonalTag'), { name }, createdResponseSchema)));
-    if (!created) return;
-    this.creating.set(false);
+    if (!created) return false;
     this.tags.reload();
     void this.router.navigateByUrl(appPath(APP_ROUTES.me.personalTag, { tagId: created.id }));
-  }
+    return true;
+  };
 
-  protected async rename(name: string): Promise<void> {
+  protected readonly rename = async (name: string): Promise<boolean> => {
     const id = this.tagId();
-    if (!id) return;
+    if (!id) return false;
     const ok = await this.run(() => firstValueFrom(this.api.postVoid(apiUrl('me', 'renamePersonalTag', { tagId: id }), { name })));
-    if (ok === undefined) return;
-    this.renaming.set(false);
+    if (ok === undefined) return false;
     this.tags.reload();
-  }
+    return true;
+  };
 
   protected remove(tag: MyTagItem): void {
     this.alerts.confirm({

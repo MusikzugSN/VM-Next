@@ -3,47 +3,87 @@
     <h2 z-dialog-title>{{ (target() ? 'library.voices.edit' : 'library.voices.create') | transloco }}</h2>
   </z-dialog-header>
 
-  <form id="voice-form" class="flex max-h-[65dvh] flex-col gap-4 overflow-y-auto px-1" novalidate (submit)="$event.preventDefault(); save()">
-    <label class="flex flex-col gap-1.5">
-      <span class="font-medium">{{ 'library.voices.instrument' | transloco }} *</span>
-      <input
-        z-input
-        type="text"
-        maxlength="100"
-        list="instrument-suggestions"
-        autocomplete="off"
-        [value]="instrument()"
-        (input)="instrument.set($any($event.target).value)"
-        [attr.aria-invalid]="errors()['instrumentName'] ? 'true' : null"
-        aria-describedby="hint-instrument"
-      />
-      <datalist id="instrument-suggestions">
-        @if (suggestions.hasValue()) {
-          @for (s of suggestions.value().items; track s.id) {
-            <option [value]="s.name"></option>
-          }
+  <form id="voice-form" class="flex min-h-0 flex-1 flex-col gap-5 overflow-y-auto md:max-h-[65dvh] md:flex-none" novalidate (submit)="$event.preventDefault(); save()">
+    <div class="flex flex-col gap-2">
+      <label class="flex flex-col gap-1.5">
+        <span class="font-medium">{{ 'library.voices.name' | transloco }} *</span>
+        <input
+          z-input
+          cdkFocusInitial
+          type="text"
+          maxlength="100"
+          autocomplete="off"
+          [placeholder]="'library.voices.namePlaceholder' | transloco"
+          [value]="name()"
+          (input)="name.set($any($event.target).value)"
+          [attr.aria-invalid]="errors()['name'] ? 'true' : null"
+          aria-describedby="voice-instrument"
+        />
+        @if (errors()['name']; as code) {
+          <span class="text-xs text-destructive-ink">{{ 'validation.' + code | transloco }}</span>
         }
-      </datalist>
-      <span id="hint-instrument" class="text-xs" [class]="errors()['instrumentName'] ? 'text-destructive-ink' : 'text-muted-foreground'">
-        {{ (errors()['instrumentName'] ? 'validation.' + errors()['instrumentName'] : 'library.voices.instrumentHint') | transloco }}
-      </span>
-    </label>
+      </label>
 
-    <label class="flex flex-col gap-1.5">
-      <span class="font-medium">{{ 'library.voices.name' | transloco }} *</span>
-      <input
-        z-input
-        type="text"
-        maxlength="100"
-        [placeholder]="'library.voices.namePlaceholder' | transloco"
-        [value]="name()"
-        (input)="name.set($any($event.target).value)"
-        [attr.aria-invalid]="errors()['name'] ? 'true' : null"
-      />
-      @if (errors()['name']; as code) {
-        <span class="text-xs text-destructive-ink">{{ 'validation.' + code | transloco }}</span>
+      <!-- Instrument follows from the voice name (N-6); „Ändern“ opens the instrument chips. -->
+      <div id="voice-instrument" class="flex min-h-11 flex-wrap items-center gap-2 rounded-md bg-muted px-4 py-3 xl:min-h-9" aria-live="polite">
+        <span class="text-muted-foreground">{{ 'library.voices.instrument' | transloco }}:</span>
+        @if (instrument()) {
+          <span class="font-medium">{{ instrument() }}</span>
+          @if (isNewInstrument()) {
+            <span class="rounded-sm bg-brass-soft px-1.5 py-0.5 text-xs font-medium text-brass-ink">{{ 'library.voices.newInstrument' | transloco }}</span>
+          }
+        } @else {
+          <span class="text-muted-foreground">{{ 'library.voices.instrumentFromName' | transloco }}</span>
+        }
+        <button
+          z-button
+          zType="ghost"
+          type="button"
+          class="ms-auto"
+          [attr.aria-expanded]="choosing()"
+          aria-controls="voice-instrument-choice"
+          (click)="choosing.set(!choosing())"
+        >
+          {{ (choosing() ? 'common.close' : 'library.voices.changeInstrument') | transloco }}
+        </button>
+      </div>
+      @if (errors()['instrumentName']; as code) {
+        <span class="text-xs text-destructive-ink">{{ 'library.voices.instrument' | transloco }}: {{ 'validation.' + code | transloco }}</span>
       }
-    </label>
+
+      @if (choosing()) {
+        <div id="voice-instrument-choice" class="flex flex-col gap-3 rounded-md border p-4">
+          <div role="radiogroup" [attr.aria-label]="'library.voices.instrument' | transloco" class="flex flex-wrap gap-2">
+            @for (option of instrumentNames(); track option) {
+              <button
+                type="button"
+                role="radio"
+                [attr.aria-checked]="instrument() === option"
+                (click)="chooseInstrument(option)"
+                class="inline-flex h-11 items-center gap-1.5 rounded-md border px-3 font-medium xl:h-9"
+                [class]="instrument() === option ? 'border-primary bg-primary-soft text-primary' : 'border-input bg-background'"
+              >
+                @if (instrument() === option) {
+                  <ng-icon name="lucideCheck" aria-hidden="true" />
+                }
+                {{ option }}
+              </button>
+            }
+          </div>
+          <label class="flex flex-col gap-1.5">
+            <span class="font-medium">{{ 'library.voices.otherInstrument' | transloco }}</span>
+            <input
+              z-input
+              type="text"
+              maxlength="100"
+              autocomplete="off"
+              [value]="override() !== null && isNewInstrument() ? override() : ''"
+              (input)="override.set($any($event.target).value || null)"
+            />
+          </label>
+        </div>
+      }
+    </div>
 
     <fieldset class="flex flex-col gap-2">
       <legend class="mb-1 font-medium">{{ 'library.voices.substitutes' | transloco }}</legend>
@@ -51,7 +91,7 @@
       @if (substitutes().length) {
         <ol class="flex flex-col gap-1">
           @for (s of substitutes(); track s.id; let i = $index, first = $first, last = $last) {
-            <li class="flex items-center gap-1 rounded-md border px-2 py-1">
+            <li class="flex items-center gap-1 rounded-md border px-3 py-2">
               <span class="w-6 text-xs text-muted-foreground tabular-nums">{{ i + 1 }}.</span>
               <span class="flex-1 font-medium">{{ s.name }}</span>
               <button z-button zType="ghost" zSize="icon" type="button" [zDisabled]="first" (click)="move(i, -1)" [attr.aria-label]="'common.moveUp' | transloco: { name: s.name }">

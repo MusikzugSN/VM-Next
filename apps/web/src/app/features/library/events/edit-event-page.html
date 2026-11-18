@@ -9,7 +9,7 @@
   <div class="flex flex-col gap-3 md:flex-row md:items-start md:justify-between">
     <div>
       <h1 class="text-2xl font-semibold">{{ 'pages.editEvent' | transloco }}</h1>
-      <p class="mt-1 text-muted-foreground">{{ event.name }} · {{ event.ensemble.name }} · {{ 'library.event.setlistCount' | transloco: { count: items().length } }}</p>
+      <p class="mt-2 text-muted-foreground">{{ event.name }} · {{ event.ensemble.name }} · {{ 'library.event.setlistCount' | transloco: { count: items().length } }}</p>
     </div>
     @if (canEdit() && !adding()) {
       <button z-button zType="outline" type="button" class="w-full md:w-auto" (click)="adding.set(true)">
@@ -41,17 +41,11 @@
     </div>
   </form>
 
-  @if (adding()) {
-    <section aria-labelledby="h-add" class="flex flex-col gap-2">
-      <div class="flex items-center justify-between">
-        <h2 id="h-add" class="text-lg font-semibold">{{ 'library.common.addScore' | transloco }}</h2>
-        <button z-button zType="ghost" type="button" (click)="adding.set(false)">{{ 'common.close' | transloco }}</button>
-      </div>
-      <vm-score-picker [fetch]="candidates()" (picked)="add($event)" />
-    </section>
-  }
+  <vm-form-dialog [(open)]="adding" titleKey="library.common.addScore" descriptionKey="library.picker.dialogHint" [submitKey]="null" width="40rem">
+    <vm-score-picker [fetch]="candidates()" (picked)="add($event)" />
+  </vm-form-dialog>
 
-  <section aria-labelledby="h-setlist" class="flex flex-col gap-3">
+  <section aria-labelledby="h-setlist" class="flex flex-col gap-4">
     <div class="flex flex-col gap-2 md:flex-row md:items-end md:justify-between">
       <div>
         <h2 id="h-setlist" class="text-lg font-semibold">{{ 'library.event.setlist' | transloco: { count: items().length } }}</h2>
@@ -67,7 +61,7 @@
       }
     </div>
     @if (setlistDirty()) {
-      <p class="rounded-md bg-warning-soft p-3 text-warning-ink">{{ 'library.event.unsaved' | transloco }}</p>
+      <p class="rounded-md bg-warning-soft p-4 text-warning-ink">{{ 'library.event.unsaved' | transloco }}</p>
     }
 
     <p class="sr-only" aria-live="polite">{{ announcement() }}</p>
@@ -75,7 +69,7 @@
     @if (items().length) {
       <ol cdkDropList [cdkDropListDisabled]="!canEdit()" (cdkDropListDropped)="drop($event)" class="overflow-hidden rounded-lg border bg-card shadow-sm">
         @for (item of items(); track item.scoreId; let i = $index, first = $first, last = $last) {
-          <li cdkDrag class="flex items-center gap-2 bg-card px-2 py-1.5" [class.border-t]="!first">
+          <li cdkDrag class="flex items-center gap-2 bg-card px-3 py-2.5" [class.border-t]="!first">
             @if (canEdit()) {
               <button
                 cdkDragHandle

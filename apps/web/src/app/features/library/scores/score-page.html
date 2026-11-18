@@ -75,7 +75,7 @@
                 <span class="text-muted-foreground">{{ 'library.filter.ensemble' | transloco }}</span>
                 <select z-native-select class="w-auto" [value]="c.ensemble?.id ?? ''" (change)="chooseEnsemble($any($event.target).value)">
                   @for (ensemble of options.ensembles(); track ensemble.id) {
-                    <option [value]="ensemble.id" [selected]="ensemble.id === c.ensemble?.id">{{ ensemble.name }}</option>
+                    <option [value]="ensemble.id" [selected]="ensemble.id === c.ensemble?.id">{{ ensemble | treeLabel }}</option>
                   }
                 </select>
               </label>
@@ -116,7 +116,7 @@
             <p class="text-muted-foreground">{{ 'library.score.noLineup' | transloco }}</p>
           }
           @if (sheets.hasValue() && sheets.value().pendingUploadCount > 0) {
-            <p class="rounded-md bg-warning-soft p-3 text-warning-ink">
+            <p class="rounded-md bg-warning-soft p-4 text-warning-ink">
               {{ 'library.score.pending' | tPlural: sheets.value().pendingUploadCount }}
               <a [routerLink]="reviewPath" class="font-medium">{{ 'nav.library.review' | transloco }}</a>
             </p>
@@ -177,8 +177,14 @@
                       }
                     }
                     @if (entry.status !== 'present' && canUpload()) {
-                      <button type="button" class="min-h-11 px-1 font-medium text-primary underline-offset-4 hover:underline" (click)="upload(entry.voice.id)">
-                        {{ 'common.upload' | transloco }}
+                      <button
+                        z-button
+                        zType="outline"
+                        type="button"
+                        (click)="upload(entry.voice.id)"
+                        [attr.aria-label]="'library.score.uploadVoice' | transloco: { voice: entry.voice.name }"
+                      >
+                        <ng-icon name="lucideUpload" aria-hidden="true" />{{ 'common.upload' | transloco }}
                       </button>
                     }
                   </li>
@@ -199,17 +205,17 @@
           <table class="w-full">
             <thead class="bg-muted text-xs font-medium text-muted-foreground">
               <tr>
-                <th scope="col" class="px-3 py-2 text-start">{{ 'terms.folder' | transloco }}</th>
-                <th scope="col" class="px-3 py-2 text-start">{{ 'terms.ensemble' | transloco }}</th>
-                <th scope="col" class="w-24 px-3 py-2 text-end">{{ 'library.common.number' | transloco }}</th>
+                <th scope="col" class="w-20 px-4 py-3 text-start">{{ 'library.common.number' | transloco }}</th>
+                <th scope="col" class="px-4 py-3 text-start">{{ 'terms.folder' | transloco }}</th>
+                <th scope="col" class="px-4 py-3 text-start">{{ 'terms.ensemble' | transloco }}</th>
               </tr>
             </thead>
             <tbody>
               @for (entry of folders.value().items; track entry.folder.id) {
                 <tr class="border-t">
-                  <td class="px-3 py-2"><a [routerLink]="folderLink(entry.folder.id)" class="font-medium">{{ entry.folder.name }}</a></td>
-                  <td class="px-3 py-2 text-muted-foreground">{{ entry.ensemble.name }}</td>
-                  <td class="px-3 py-2 text-end font-semibold text-primary tabular-nums">{{ entry.number }}</td>
+                  <td class="px-4 py-3 font-semibold text-primary tabular-nums">{{ entry.number }}</td>
+                  <td class="px-4 py-3"><a [routerLink]="folderLink(entry.folder.id)" class="font-medium">{{ entry.folder.name }}</a></td>
+                  <td class="px-4 py-3 text-muted-foreground">{{ entry.ensemble.name }}</td>
                 </tr>
               }
             </tbody>
