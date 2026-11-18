@@ -16,9 +16,9 @@ import { cursorList } from '../../core/api/cursor-list';
 import { folderZipUrl } from '../../core/api/urls';
 import { debounced } from '../../core/util/debounced';
 import { VoiceContextStore } from '../../core/voices/voice-context.store';
-import { ListState } from './ui/list-state';
+import { ListState } from '../../shared/ui/list-state';
 import { MemberScoreList } from './ui/member-score-list';
-import { PageProblem } from './ui/page-problem';
+import { PageProblem } from '../../shared/ui/page-problem';
 import { TagFilter, type TagFilterValue } from './ui/tag-filter';
 
 /** Mappe (M-3, M-4, M-6, M-7): scores with number, search, tag filter, ZIP and print. */

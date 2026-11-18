@@ -25,16 +25,16 @@ import { isApiProblem } from '../../core/api/api-problem';
 import { cursorList } from '../../core/api/cursor-list';
 import { debounced } from '../../core/util/debounced';
 import { VoiceContextStore } from '../../core/voices/voice-context.store';
-import { ListState } from './ui/list-state';
+import { ListState } from '../../shared/ui/list-state';
 import { MemberScoreList } from './ui/member-score-list';
-import { TagNameForm } from './ui/tag-name-form';
+import { NameForm } from '../../shared/ui/name-form';
 
 export type TagKind = 'club' | 'personal';
 
 /** Tags (M-8): club tags and own personal tags as filters; selecting one lists its scores. */
 @Component({
   selector: 'vm-me-tags-page',
-  imports: [RouterLink, NgIcon, TranslocoPipe, ZardButtonComponent, ZardInputComponent, ListState, MemberScoreList, TagNameForm],
+  imports: [RouterLink, NgIcon, TranslocoPipe, ZardButtonComponent, ZardInputComponent, ListState, MemberScoreList, NameForm],
   viewProviders: [provideIcons({ lucidePlus, lucideSearch, lucidePencil, lucideTrash2 })],
   changeDetection: ChangeDetectionStrategy.OnPush,
   templateUrl: './tags-page.html',

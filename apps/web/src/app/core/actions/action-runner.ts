@@ -1,0 +1,59 @@
+import { inject, Injectable } from '@angular/core';
+import { TranslocoService } from '@jsverse/transloco';
+
+import { ZardAlertDialogService } from '@/shared/components/alert-dialog';
+import { ZardSonnerService } from '@/shared/components/sonner';
+
+import { isApiProblem } from '../api/api-problem';
+
+export interface RunOptions {
+  /** Toast after success (i18n key + params). */
+  success?: { key: string; params?: Record<string, unknown> };
+  /** Called with the problem instead of the toast, e.g. to show field errors in a form. */
+  onProblem?: (problem: unknown) => boolean | void;
+}
+
+/**
+ * Runs user actions against the API: shows a success toast if wanted and turns failures into a
+ * toast with the text of the problem code (`errors.<code>`). Returns `undefined` on failure.
+ */
+@Injectable({ providedIn: 'root' })
+export class ActionRunner {
+  private readonly sonner = inject(ZardSonnerService);
+  private readonly transloco = inject(TranslocoService);
+
+  async run<T>(action: () => Promise<T>, options: RunOptions = {}): Promise<{ value: T } | undefined> {
+    try {
+      const value = await action();
+      if (options.success) this.sonner.success(this.transloco.translate(options.success.key, options.success.params ?? {}));
+      return { value };
+    } catch (error) {
+      if (options.onProblem?.(error) === true) return undefined;
+      this.sonner.error(this.transloco.translate(isApiProblem(error) ? error.messageKey : 'errors.unknown'));
+      return undefined;
+    }
+  }
+}
+
+/** Confirmation for actions that cannot be undone (Design Guideline: only those get a dialog). */
+@Injectable({ providedIn: 'root' })
+export class ConfirmService {
+  private readonly alerts = inject(ZardAlertDialogService);
+  private readonly transloco = inject(TranslocoService);
+
+  /** Resolves `true` when the person confirms. */
+  confirmDelete(titleKey: string, textKey: string, params: Record<string, unknown> = {}): Promise<boolean> {
+    return new Promise((resolve) => {
+      // Escape and a click on the mask go through the cancel path of the overlay as well.
+      this.alerts.confirm({
+        zTitle: this.transloco.translate(titleKey, params),
+        zDescription: this.transloco.translate(textKey, params),
+        zOkText: this.transloco.translate('common.delete'),
+        zCancelText: this.transloco.translate('common.cancel'),
+        zOkDestructive: true,
+        zOnOk: () => resolve(true),
+        zOnCancel: () => resolve(false),
+      });
+    });
+  }
+}

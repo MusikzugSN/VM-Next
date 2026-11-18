@@ -3,7 +3,7 @@ import { RouterLink } from '@angular/router';
 import { TranslocoPipe } from '@jsverse/transloco';
 import { APP_ROUTES } from '@vm-web/shared';
 
-import { isApiProblem } from '../../../core/api/api-problem';
+import { isApiProblem } from '../../core/api/api-problem';
 
 /**
  * Loading a page failed: „nicht gefunden“ for 404 (also for elements the person may not see, the API

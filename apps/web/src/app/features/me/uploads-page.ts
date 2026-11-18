@@ -12,7 +12,7 @@ import { ApiClient } from '../../core/api/api-client';
 import { cursorList } from '../../core/api/cursor-list';
 import { SessionStore } from '../../core/auth/session.store';
 import { ViewportService } from '../../core/layout/viewport';
-import { ListState } from './ui/list-state';
+import { ListState } from '../../shared/ui/list-state';
 import { UploadStatusBadge } from './ui/upload-status-badge';
 
 /** Meine Uploads (N-14): status of each own upload incl. the reason for a rejection. */

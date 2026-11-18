@@ -1,0 +1,193 @@
+<div class="flex flex-col gap-3 md:flex-row md:items-start md:justify-between">
+  <div>
+    <h1 class="text-2xl font-semibold">{{ 'nav.library.scores' | transloco }}</h1>
+    @if (meta(); as m) {
+      <p class="mt-1 text-muted-foreground">
+        {{ 'library.scores.count' | tPlural: m.total }}
+        @if (m.ensemble) {
+          · {{ 'library.scores.completenessFor' | transloco: { ensemble: m.ensemble } }}
+        }
+      </p>
+    }
+  </div>
+  <div class="flex flex-col gap-2 md:flex-row-reverse">
+    @if (canCreate()) {
+      <a z-button [routerLink]="newScorePath" class="w-full md:w-auto"><ng-icon name="lucidePlus" aria-hidden="true" />{{ 'library.scores.create' | transloco }}</a>
+    }
+    <a z-button zType="outline" [href]="exportUrl()" download class="w-full md:w-auto">
+      <ng-icon name="lucideDownload" aria-hidden="true" />{{ 'library.scores.export' | transloco }}
+    </a>
+  </div>
+</div>
+
+<div class="flex flex-col gap-2">
+  <div class="flex items-end gap-2">
+    <vm-search-field [(value)]="search" labelKey="library.scores.search" />
+    <button
+      type="button"
+      class="relative flex size-11 shrink-0 items-center justify-center rounded-md border border-input bg-background shadow-sm hover:bg-accent xl:size-9"
+      [attr.aria-label]="'common.filter' | transloco"
+      aria-haspopup="dialog"
+      (click)="filterOpen.set(true)"
+    >
+      <ng-icon name="lucideSlidersHorizontal" aria-hidden="true" />
+      @if (filterCount() > 0) {
+        <span class="absolute -top-1.5 -right-1.5 flex size-4 items-center justify-center rounded-full bg-primary text-[10px] font-medium text-primary-foreground">
+          {{ filterCount() }}
+        </span>
+        <span class="sr-only">{{ 'library.filter.active' | tPlural: filterCount() }}</span>
+      }
+    </button>
+    @if (!viewport.isMobile()) {
+      <button
+        type="button"
+        z-dropdown
+        [zDropdownMenu]="columnMenu"
+        class="inline-flex h-11 shrink-0 items-center gap-2 rounded-md border border-input bg-background px-3 font-medium shadow-sm hover:bg-accent xl:h-9"
+      >
+        <ng-icon name="lucideColumns3" aria-hidden="true" />{{ 'library.scores.columns' | transloco: { shown: columns().length, total: allColumns().length } }}
+      </button>
+      <z-dropdown-menu-content #columnMenu="zDropdownMenuContent" zAlign="end" class="w-60">
+        @for (column of allColumns(); track column.id) {
+          @if (column.id !== 'title') {
+            <z-dropdown-menu-checkbox-item [zChecked]="isVisible(column.id)" (zCheckedChange)="toggleColumn(column.id, $event)">
+              {{ column.label ?? (column.labelKey! | transloco) }}
+            </z-dropdown-menu-checkbox-item>
+          }
+        }
+      </z-dropdown-menu-content>
+    }
+  </div>
+
+  @if (chips().length) {
+    <div class="flex flex-wrap items-center gap-2">
+      @for (chip of chips(); track chip.key) {
+        <span class="inline-flex items-center gap-1 rounded-sm bg-primary-soft py-0.5 ps-2 text-primary">
+          {{ chip.text }}
+          <button
+            type="button"
+            class="flex size-8 items-center justify-center"
+            [attr.aria-label]="'library.filter.remove' | transloco: { name: chip.text }"
+            (click)="removeChip(chip.index)"
+          >
+            <ng-icon name="lucideX" aria-hidden="true" />
+          </button>
+        </span>
+      }
+      <button type="button" class="font-medium text-primary underline-offset-4 hover:underline" (click)="resetFilters()">
+        {{ 'common.resetFilters' | transloco }}
+      </button>
+    </div>
+  }
+</div>
+
+@if (viewport.isMobile()) {
+  <ul class="flex flex-col gap-2">
+    @for (row of list.items(); track row.id) {
+      <li>
+        <a [routerLink]="link(row)" class="flex items-center gap-3 rounded-lg border bg-card p-4 text-foreground no-underline shadow-sm">
+          <span class="flex min-w-0 flex-1 flex-col">
+            <span class="text-base font-semibold">{{ row.title }}</span>
+            <span class="text-muted-foreground">{{ row.composer ?? '' }}</span>
+          </span>
+          <vm-completeness-badge [value]="row.completeness" />
+        </a>
+      </li>
+    }
+  </ul>
+} @else if (list.items().length > 0) {
+  <div class="overflow-x-auto rounded-lg border bg-card shadow-sm">
+    <table class="w-full">
+      <thead class="bg-muted text-xs font-medium text-muted-foreground">
+        <tr>
+          @for (column of columns(); track column.id) {
+            <th scope="col" class="px-3 py-1 text-start whitespace-nowrap" [attr.aria-sort]="ariaSort(column)">
+              <button type="button" class="inline-flex min-h-9 items-center gap-1 hover:text-foreground" (click)="sortBy(column)">
+                {{ column.label ?? (column.labelKey! | transloco) }}
+                @switch (ariaSort(column)) {
+                  @case ('ascending') {
+                    <ng-icon name="lucideArrowUp" size="14" aria-hidden="true" />
+                  }
+                  @case ('descending') {
+                    <ng-icon name="lucideArrowDown" size="14" aria-hidden="true" />
+                  }
+                  @default {
+                    <ng-icon name="lucideChevronsUpDown" size="14" class="opacity-50" aria-hidden="true" />
+                  }
+                }
+              </button>
+            </th>
+          }
+          @if (canDelete()) {
+            <th scope="col" class="w-14 px-3 py-2 text-end"><span class="sr-only">{{ 'library.common.actions' | transloco }}</span></th>
+          }
+        </tr>
+      </thead>
+      <tbody>
+        @for (row of list.items(); track row.id) {
+          <tr class="border-t">
+            @for (column of columns(); track column.id) {
+              <td class="px-3 py-2 align-top">
+                @switch (column.id) {
+                  @case ('title') {
+                    <div class="flex flex-wrap items-center gap-1.5">
+                      <a [routerLink]="link(row)" class="font-medium">{{ row.title }}</a>
+                      @for (tag of row.tags; track tag.id) {
+                        <span class="rounded-sm bg-muted px-1.5 py-0.5 text-xs">{{ tag.name }}</span>
+                      }
+                    </div>
+                  }
+                  @case ('composer') {
+                    {{ row.composer ?? '–' }}
+                  }
+                  @case ('arranger') {
+                    {{ row.arranger ?? '–' }}
+                  }
+                  @case ('publisher') {
+                    {{ row.publisher ?? '–' }}
+                  }
+                  @case ('publisherNumber') {
+                    {{ row.publisherNumber ?? '–' }}
+                  }
+                  @case ('durationSeconds') {
+                    <span class="tabular-nums">{{ duration(row) || '–' }}</span>
+                  }
+                  @case ('completeness') {
+                    <vm-completeness-badge [value]="row.completeness" [withWord]="true" />
+                  }
+                  @default {
+                    @if (column.field; as field) {
+                      <vm-field-value [field]="field" [value]="row.customFields[field.id]" />
+                    }
+                  }
+                }
+              </td>
+            }
+            @if (canDelete()) {
+              <td class="px-3 py-1 text-end">
+                <button
+                  z-button
+                  zType="ghost"
+                  zSize="icon"
+                  type="button"
+                  z-dropdown
+                  [zDropdownMenu]="rowMenu"
+                  [attr.aria-label]="'library.scores.actionsFor' | transloco: { title: row.title }"
+                >
+                  <ng-icon name="lucideEllipsis" aria-hidden="true" />
+                </button>
+                <z-dropdown-menu-content #rowMenu="zDropdownMenuContent" zAlign="end" class="w-44">
+                  <a z-dropdown-menu-item [routerLink]="link(row)">{{ 'library.scores.open' | transloco }}</a>
+                  <button type="button" z-dropdown-menu-item zType="destructive" (click)="remove(row)">{{ 'common.delete' | transloco }}</button>
+                </z-dropdown-menu-content>
+              </td>
+            }
+          </tr>
+        }
+      </tbody>
+    </table>
+  </div>
+}
+
+<vm-list-state [list]="list" emptyKey="library.scores.empty" />
+<vm-score-filter-dialog [(open)]="filterOpen" [state]="state()" (applied)="applyFilter($event)" />

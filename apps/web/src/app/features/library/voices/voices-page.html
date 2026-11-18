@@ -1,0 +1,114 @@
+<div class="flex flex-col gap-3 md:flex-row md:items-start md:justify-between">
+  <div>
+    <h1 class="text-2xl font-semibold">{{ 'nav.library.voices' | transloco }}</h1>
+    <p class="mt-1 text-muted-foreground">
+      {{ 'library.voices.instruments' | tPlural: groups().length }} · {{ 'library.voices.voices' | tPlural: voiceCount() }}.
+      {{ 'library.voices.intro' | transloco }}
+    </p>
+  </div>
+  @if (canCreate()) {
+    <button z-button type="button" class="w-full md:w-auto" (click)="create()">
+      <ng-icon name="lucidePlus" aria-hidden="true" />{{ 'library.voices.create' | transloco }}
+    </button>
+  }
+</div>
+
+<vm-search-field [(value)]="search" labelKey="library.voices.search" />
+
+@if (list.error()) {
+  <vm-page-problem [error]="list.error()" />
+}
+
+<div class="flex flex-col gap-4">
+  @for (group of shown(); track group.instrument.id) {
+    @let gi = groupIndex(group);
+    <section [attr.aria-labelledby]="'inst-' + group.instrument.id" class="overflow-hidden rounded-lg border bg-card shadow-sm">
+      <div class="flex flex-wrap items-center gap-2 bg-muted px-3 py-2">
+        <h2 [id]="'inst-' + group.instrument.id" class="flex-1 font-semibold">
+          {{ group.instrument.name }}
+          <span class="text-xs font-medium text-muted-foreground">· {{ 'library.voices.voices' | tPlural: group.voices.length }}</span>
+        </h2>
+        @if (canEdit()) {
+          <button z-button zType="ghost" zSize="icon" type="button" (click)="renaming.set(group.instrument.id)" [attr.aria-label]="'library.voices.renameInstrument' | transloco: { name: group.instrument.name }">
+            <ng-icon name="lucidePencil" aria-hidden="true" />
+          </button>
+        }
+        @if (canReorder()) {
+          <button z-button zType="ghost" zSize="icon" type="button" [disabled]="gi === 0" (click)="moveInstrument(gi, -1)" [attr.aria-label]="'common.moveUp' | transloco: { name: group.instrument.name }">
+            <ng-icon name="lucideArrowUp" aria-hidden="true" />
+          </button>
+          <button
+            z-button
+            zType="ghost"
+            zSize="icon"
+            type="button"
+            [disabled]="gi === groups().length - 1"
+            (click)="moveInstrument(gi, 1)"
+            [attr.aria-label]="'common.moveDown' | transloco: { name: group.instrument.name }"
+          >
+            <ng-icon name="lucideArrowDown" aria-hidden="true" />
+          </button>
+        }
+      </div>
+      @if (renaming() === group.instrument.id) {
+        <div class="border-t p-3">
+          <vm-name-form
+            labelKey="library.voices.instrumentName"
+            submitKey="common.save"
+            [initial]="group.instrument.name"
+            (saved)="renameInstrument(group, $event)"
+            (cancelled)="renaming.set(null)"
+          />
+        </div>
+      }
+      <ul>
+        @for (voice of group.voices; track voice.id; let i = $index, first = $first, last = $last) {
+          <li class="flex flex-col gap-2 border-t px-3 py-2 md:flex-row md:items-center">
+            <div class="flex min-w-0 flex-1 flex-col gap-1">
+              <span class="font-medium">{{ voice.name }}</span>
+              <span class="flex flex-wrap items-center gap-1 text-muted-foreground">
+                @if (voice.substitutes.length) {
+                  <span class="text-xs">{{ 'library.voices.substituteChain' | transloco }}</span>
+                  @for (s of voice.substitutes; track s.id; let n = $index) {
+                    <span class="rounded-sm bg-brass-soft px-1.5 py-0.5 text-xs font-medium text-brass-ink">{{ n + 1 }}. {{ s.name }}</span>
+                  }
+                } @else {
+                  <span class="text-xs">{{ 'library.voices.noSubstitutes' | transloco }}</span>
+                }
+              </span>
+            </div>
+            <span class="text-xs text-muted-foreground tabular-nums md:w-44 md:text-end">
+              {{ 'library.voices.sheets' | tPlural: voice.sheetCount }} · {{ 'library.voices.lineups' | tPlural: voice.lineupCount }}
+            </span>
+            <div class="flex items-center gap-1">
+              @if (canReorder()) {
+                <button z-button zType="ghost" zSize="icon" type="button" [disabled]="first" (click)="moveVoice(group, i, -1)" [attr.aria-label]="'common.moveUp' | transloco: { name: voice.name }">
+                  <ng-icon name="lucideArrowUp" aria-hidden="true" />
+                </button>
+                <button z-button zType="ghost" zSize="icon" type="button" [disabled]="last" (click)="moveVoice(group, i, 1)" [attr.aria-label]="'common.moveDown' | transloco: { name: voice.name }">
+                  <ng-icon name="lucideArrowDown" aria-hidden="true" />
+                </button>
+              }
+              @if (canEdit()) {
+                <button z-button zType="ghost" zSize="icon" type="button" (click)="edit(group, voice)" [attr.aria-label]="'library.voices.editLabel' | transloco: { name: voice.name }">
+                  <ng-icon name="lucidePencil" aria-hidden="true" />
+                </button>
+              }
+              @if (canDelete()) {
+                <button z-button zType="ghost" zSize="icon" type="button" class="text-destructive-ink" (click)="remove(voice)" [attr.aria-label]="'library.voices.deleteLabel' | transloco: { name: voice.name }">
+                  <ng-icon name="lucideTrash2" aria-hidden="true" />
+                </button>
+              }
+            </div>
+          </li>
+        }
+      </ul>
+    </section>
+  } @empty {
+    @if (list.hasValue()) {
+      <p class="rounded-lg border border-dashed p-8 text-center text-muted-foreground">{{ 'library.voices.empty' | transloco }}</p>
+    }
+  }
+</div>
+
+<vm-voice-dialog [(open)]="dialogOpen" [target]="dialogTarget()" [groups]="groups()" (saved)="list.reload()" />

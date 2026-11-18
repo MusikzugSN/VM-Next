@@ -1,0 +1,233 @@
+@if (details.error()) {
+  <vm-page-problem [error]="details.error()" />
+} @else if (details.hasValue()) {
+  @let score = details.value();
+  <div class="flex flex-col gap-3 md:flex-row md:items-start md:justify-between md:gap-4">
+    <div class="flex flex-col gap-2">
+      <h1 class="text-2xl font-semibold">{{ score.title }}</h1>
+      @if (subtitle()) {
+        <p class="text-muted-foreground">{{ subtitle() }}</p>
+      }
+      @if (folders.hasValue() && folders.value().items.length) {
+        <ul [attr.aria-label]="'library.score.inFolders' | transloco" class="flex flex-wrap gap-2">
+          @for (entry of folders.value().items; track entry.folder.id) {
+            <li class="inline-flex items-center gap-1.5 rounded-md border bg-muted px-2.5 py-1 text-[13px] font-medium">
+              <ng-icon name="lucideFolderOpen" size="14" class="text-muted-foreground" aria-hidden="true" />
+              {{ entry.folder.name }} <span aria-hidden="true" class="text-muted-foreground">·</span>
+              <span class="font-semibold text-primary tabular-nums">{{ 'library.score.number' | transloco: { number: entry.number } }}</span>
+            </li>
+          }
+        </ul>
+      }
+    </div>
+    @if (canUpload()) {
+      <button z-button type="button" class="w-full md:w-auto" (click)="upload()">
+        <ng-icon name="lucideUpload" aria-hidden="true" />{{ 'library.score.uploadVoices' | transloco }}
+      </button>
+    }
+  </div>
+
+  <nav [attr.aria-label]="'library.score.sections' | transloco" class="flex gap-1 overflow-x-auto border-b">
+    @for (t of tabs; track t.id) {
+      <a
+        [routerLink]="scorePath()"
+        [queryParams]="{ tab: t.id === 'details' ? null : t.id }"
+        queryParamsHandling="merge"
+        [attr.aria-current]="current() === t.id ? 'page' : null"
+        class="-mb-px inline-flex min-h-11 items-center border-b-2 px-3 font-medium whitespace-nowrap no-underline"
+        [class]="current() === t.id ? 'border-primary text-primary' : 'border-transparent text-muted-foreground hover:text-foreground'"
+        >{{ t.labelKey | transloco }}</a
+      >
+    }
+  </nav>
+
+  @switch (current()) {
+    @case ('details') {
+      @if (form(); as value) {
+        <form class="flex flex-col gap-6" novalidate (submit)="$event.preventDefault(); save()">
+          <vm-score-form [value]="value" (valueChange)="form.set($event)" [errors]="errors()" [readonly]="!canEdit()" />
+          @if (canEdit() || canDelete()) {
+            <div class="flex flex-col-reverse gap-2 md:flex-row md:justify-between">
+              @if (canDelete()) {
+                <button z-button zType="destructive" type="button" (click)="remove()">
+                  <ng-icon name="lucideTrash2" aria-hidden="true" />{{ 'library.score.delete' | transloco }}
+                </button>
+              } @else {
+                <span></span>
+              }
+              @if (canEdit()) {
+                <button z-button type="submit" [zLoading]="saving()" [disabled]="saving()">{{ 'common.save' | transloco }}</button>
+              }
+            </div>
+          }
+        </form>
+      }
+    }
+
+    @case ('voices') {
+      @if (completeness.hasValue()) {
+        @let c = completeness.value();
+        <section [attr.aria-label]="'library.score.progress' | transloco" class="flex flex-col gap-4 rounded-lg border bg-card p-4 shadow-sm md:p-6">
+          <div class="flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
+            <h2 class="text-lg font-semibold">{{ 'library.fields.completeness' | transloco }}</h2>
+            @if (options.ensembles().length > 1) {
+              <label class="flex items-center gap-2">
+                <span class="text-muted-foreground">{{ 'library.filter.ensemble' | transloco }}</span>
+                <select z-native-select class="w-auto" [value]="c.ensemble?.id ?? ''" (change)="chooseEnsemble($any($event.target).value)">
+                  @for (ensemble of options.ensembles(); track ensemble.id) {
+                    <option [value]="ensemble.id" [selected]="ensemble.id === c.ensemble?.id">{{ ensemble.name }}</option>
+                  }
+                </select>
+              </label>
+            }
+          </div>
+          @if (c.summary.total > 0) {
+            <div class="flex items-center gap-3">
+              <vm-completeness-badge [value]="c.summary" [withWord]="true" />
+              <div
+                role="progressbar"
+                aria-valuemin="0"
+                [attr.aria-valuemax]="c.summary.total"
+                [attr.aria-valuenow]="c.summary.present"
+                [attr.aria-label]="'library.completeness.label' | transloco: { present: c.summary.present, total: c.summary.total }"
+                class="h-2 flex-1 overflow-hidden rounded-full bg-muted"
+              >
+                <div class="h-full bg-primary" [style.width.%]="(c.summary.present / c.summary.total) * 100"></div>
+              </div>
+            </div>
+            <dl class="grid grid-cols-3 gap-2 text-center">
+              <div class="rounded-md bg-muted p-2">
+                <dt class="text-xs text-muted-foreground">{{ 'library.score.present' | transloco }}</dt>
+                <dd class="text-lg font-semibold tabular-nums">{{ c.summary.present }}</dd>
+              </div>
+              <div class="rounded-md bg-muted p-2">
+                <dt class="text-xs text-muted-foreground">{{ 'library.score.substituted' | transloco }}</dt>
+                <dd class="text-lg font-semibold tabular-nums">{{ c.summary.substituted }}</dd>
+              </div>
+              <div class="rounded-md bg-muted p-2">
+                <dt class="text-xs text-muted-foreground">{{ 'library.score.missing' | transloco }}</dt>
+                <dd class="text-lg font-semibold tabular-nums">{{ c.summary.total - c.summary.present - c.summary.substituted }}</dd>
+              </div>
+            </dl>
+            @if (c.ensemble) {
+              <p class="text-muted-foreground">{{ 'library.score.lineupHint' | transloco: { ensemble: c.ensemble.name, count: c.summary.total } }}</p>
+            }
+          } @else {
+            <p class="text-muted-foreground">{{ 'library.score.noLineup' | transloco }}</p>
+          }
+          @if (sheets.hasValue() && sheets.value().pendingUploadCount > 0) {
+            <p class="rounded-md bg-warning-soft p-3 text-warning-ink">
+              {{ 'library.score.pending' | tPlural: sheets.value().pendingUploadCount }}
+              <a [routerLink]="reviewPath" class="font-medium">{{ 'nav.library.review' | transloco }}</a>
+            </p>
+          }
+        </section>
+
+        <div class="grid gap-4 md:grid-cols-2">
+          @for (group of groups(); track group.instrumentId) {
+            <section class="flex flex-col gap-2 rounded-lg border bg-card p-4 shadow-sm">
+              <h3 class="flex items-center justify-between font-semibold">
+                {{ group.name }}
+                <span class="text-xs font-medium text-muted-foreground tabular-nums">{{ group.present }}/{{ group.voices.length }}</span>
+              </h3>
+              <ul class="flex flex-col">
+                @for (entry of group.voices; track entry.voice.id) {
+                  <li class="flex min-h-11 flex-wrap items-center gap-2 border-t py-1.5 first:border-t-0">
+                    <span class="flex-1 font-medium">{{ entry.voice.name }}</span>
+                    @switch (entry.status) {
+                      @case ('present') {
+                        @if (entry.sheetId && sheetPages().get(entry.sheetId); as sheet) {
+                          <span class="text-muted-foreground">
+                            @if (sheet.uploadedBy) {
+                              {{ 'library.score.uploadedBy' | transloco: { name: sheet.uploadedBy.name } }} ·
+                            }
+                            {{ 'library.common.pages' | tPlural: sheet.pageCount }}
+                          </span>
+                        }
+                        @if (entry.sheetId) {
+                          <button
+                            z-button
+                            zType="ghost"
+                            zSize="icon"
+                            type="button"
+                            [attr.aria-label]="'library.score.preview' | transloco: { voice: entry.voice.name }"
+                            (click)="showSheet(entry.sheetId, entry.voice.name)"
+                          >
+                            <ng-icon name="lucideEye" aria-hidden="true" />
+                          </button>
+                          @if (canEdit()) {
+                            <button
+                              z-button
+                              zType="ghost"
+                              zSize="icon"
+                              type="button"
+                              [attr.aria-label]="'library.score.deleteSheet' | transloco: { voice: entry.voice.name }"
+                              (click)="deleteSheet(entry.sheetId, entry.voice.name)"
+                            >
+                              <ng-icon name="lucideTrash2" aria-hidden="true" />
+                            </button>
+                          }
+                        }
+                      }
+                      @case ('substituted') {
+                        <vm-status-badge kind="substitute" [params]="{ voice: entry.substitute?.name ?? '' }" />
+                      }
+                      @default {
+                        <vm-status-badge kind="missing" />
+                      }
+                    }
+                    @if (entry.status !== 'present' && canUpload()) {
+                      <button type="button" class="min-h-11 px-1 font-medium text-primary underline-offset-4 hover:underline" (click)="upload(entry.voice.id)">
+                        {{ 'common.upload' | transloco }}
+                      </button>
+                    }
+                  </li>
+                }
+              </ul>
+            </section>
+          }
+        </div>
+        <p class="text-muted-foreground">{{ 'library.score.substituteHint' | transloco }}</p>
+      } @else if (completeness.isLoading()) {
+        <p class="text-muted-foreground">{{ 'common.loading' | transloco }}</p>
+      }
+    }
+
+    @case ('folders') {
+      @if (folders.hasValue() && folders.value().items.length) {
+        <div class="overflow-x-auto rounded-lg border bg-card shadow-sm">
+          <table class="w-full">
+            <thead class="bg-muted text-xs font-medium text-muted-foreground">
+              <tr>
+                <th scope="col" class="px-3 py-2 text-start">{{ 'terms.folder' | transloco }}</th>
+                <th scope="col" class="px-3 py-2 text-start">{{ 'terms.ensemble' | transloco }}</th>
+                <th scope="col" class="w-24 px-3 py-2 text-end">{{ 'library.common.number' | transloco }}</th>
+              </tr>
+            </thead>
+            <tbody>
+              @for (entry of folders.value().items; track entry.folder.id) {
+                <tr class="border-t">
+                  <td class="px-3 py-2"><a [routerLink]="folderLink(entry.folder.id)" class="font-medium">{{ entry.folder.name }}</a></td>
+                  <td class="px-3 py-2 text-muted-foreground">{{ entry.ensemble.name }}</td>
+                  <td class="px-3 py-2 text-end font-semibold text-primary tabular-nums">{{ entry.number }}</td>
+                </tr>
+              }
+            </tbody>
+          </table>
+        </div>
+        <p class="text-muted-foreground">{{ 'library.score.foldersHint' | transloco }}</p>
+      } @else if (folders.hasValue()) {
+        <p class="rounded-lg border border-dashed p-8 text-center text-muted-foreground">{{ 'library.score.noFolders' | transloco }}</p>
+      }
+    }
+  }
+
+  <z-dialog [(zVisible)]="previewOpen" zWidth="760px">
+    <z-dialog-header>
+      <h2 z-dialog-title>{{ score.title }} – {{ preview()?.title }}</h2>
+    </z-dialog-header>
+    @if (previewOpen() && preview(); as p) {
+      <vm-pdf-viewer [src]="sheetUrl(p.sheetId)" />
+    }
+  </z-dialog>
+}

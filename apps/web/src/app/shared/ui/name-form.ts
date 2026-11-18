@@ -4,12 +4,12 @@ import { TranslocoPipe } from '@jsverse/transloco';
 import { ZardButtonComponent } from '@/shared/components/button';
 import { ZardInputComponent } from '@/shared/components/input';
 
-/** Max. length of a tag name (`shortNameSchema`). */
-export const TAG_NAME_MAX = 100;
+/** Max. length of a short name (`shortNameSchema`). */
+export const NAME_MAX = 100;
 
-/** Inline form for a personal tag name (create, rename); focuses the field when shown, Esc cancels. */
+/** Inline form for a name (tags, instruments: create, rename); focuses the field when shown, Esc cancels. */
 @Component({
-  selector: 'vm-tag-name-form',
+  selector: 'vm-name-form',
   imports: [TranslocoPipe, ZardButtonComponent, ZardInputComponent],
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
@@ -27,14 +27,14 @@ export const TAG_NAME_MAX = 100;
     </form>
   `,
 })
-export class TagNameForm {
-  readonly labelKey = input('me.tags.name');
+export class NameForm {
+  readonly labelKey = input.required<string>();
   readonly submitKey = input('common.create');
   readonly initial = input('');
   readonly saved = output<string>();
   readonly cancelled = output<void>();
 
-  protected readonly max = TAG_NAME_MAX;
+  protected readonly max = NAME_MAX;
   protected readonly name = signal('');
   private readonly field = viewChild.required<ElementRef<HTMLInputElement>>('field');
 

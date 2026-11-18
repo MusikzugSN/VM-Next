@@ -13,7 +13,7 @@ import { cursorList } from '../../core/api/cursor-list';
 import { folderZipUrl } from '../../core/api/urls';
 import { ViewportService } from '../../core/layout/viewport';
 import { VoiceContextStore } from '../../core/voices/voice-context.store';
-import { ListState } from './ui/list-state';
+import { ListState } from '../../shared/ui/list-state';
 
 /** Mappen (R-2, M-4): folders released for Mein Bereich in the own ensembles. */
 @Component({

@@ -15,9 +15,9 @@ import { ApiClient } from '../../core/api/api-client';
 import { cursorList } from '../../core/api/cursor-list';
 import { eventZipUrl } from '../../core/api/urls';
 import { VoiceContextStore } from '../../core/voices/voice-context.store';
-import { ListState } from './ui/list-state';
+import { ListState } from '../../shared/ui/list-state';
 import { MemberScoreList } from './ui/member-score-list';
-import { PageProblem } from './ui/page-problem';
+import { PageProblem } from '../../shared/ui/page-problem';
 
 /** Event (M-5, M-6, M-7): setlist in playing order, ZIP and print. */
 @Component({

@@ -11,7 +11,7 @@
 </div>
 
 @if (creating()) {
-  <vm-tag-name-form (saved)="create($event)" (cancelled)="creating.set(false)" />
+  <vm-name-form labelKey="me.tags.name" (saved)="create($event)" (cancelled)="creating.set(false)" />
 }
 
 @if (tags.hasValue()) {
@@ -79,7 +79,7 @@
     </div>
 
     @if (renaming()) {
-      <vm-tag-name-form [initial]="current.tag.name" submitKey="common.save" (saved)="rename($event)" (cancelled)="renaming.set(false)" />
+      <vm-name-form labelKey="me.tags.name" [initial]="current.tag.name" submitKey="common.save" (saved)="rename($event)" (cancelled)="renaming.set(false)" />
     }
 
     <label class="flex flex-col gap-1.5">

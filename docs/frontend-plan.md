@@ -260,3 +260,9 @@ Diese Stufe ist die größte. Bei Bedarf teile ich sie in **3a** (Stücke, Stimm
   - Abschnitt „Druckservice auf diesem Computer“ im Profil, kommt mit Stufe 6.
 - **Hochladen und Drucken vor Stufe 4/6:** Die Buttons sind schon da und rufen `UploadLauncher` bzw. `PrintLauncher` auf; bis die Dialoge gebaut sind, erklärt ein Toast, wann die Funktion kommt.
 - **Pluralformen:** eigene Pipe `tPlural` (`<key>.one` / `<key>.other`) statt eines Transloco-Plugins.
+- **Notenverwaltung (Stufe 3a), Lücken zur API:** weggelassen sind
+  - Filter nach Vollständigkeit (die API kann danach nur sortieren) und nach Mappe;
+  - „Fehlliste exportieren“ auf der Stückseite;
+  - „Besetzungs-Vorlage übernehmen“ auf der Stimmen-Seite (gehört zu den Ensembles, Stufe 5);
+  - Spalte „Mitglieder“ bei den Stimmen; stattdessen Anzahl Notenblätter und Besetzungen aus `voice-list`.
+- **Sortieren ohne Drag & Drop:** Instrumente, Stimmen und Ersatzstimmen werden mit „nach oben/unten“ sortiert (F-16, N-9); Drag & Drop kommt mit der Setlist in 3b.

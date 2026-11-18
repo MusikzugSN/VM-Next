@@ -31,8 +31,8 @@ import { ViewportService } from '../../core/layout/viewport';
 import { VoiceContextStore } from '../../core/voices/voice-context.store';
 import { PdfViewer } from '../../shared/ui/pdf-viewer';
 import { StatusBadge } from '../../shared/ui/status-badge';
-import { PageProblem } from './ui/page-problem';
-import { TagNameForm } from './ui/tag-name-form';
+import { PageProblem } from '../../shared/ui/page-problem';
+import { NameForm } from '../../shared/ui/name-form';
 
 /** Stück in Mein Bereich (M-3, M-6, M-8, M-9): PDF preview of the own voice, download, print, personal tags. */
 @Component({
@@ -48,7 +48,7 @@ import { TagNameForm } from './ui/tag-name-form';
     PdfViewer,
     StatusBadge,
     PageProblem,
-    TagNameForm,
+    NameForm,
   ],
   viewProviders: [provideIcons({ lucideChevronLeft, lucideDownload, lucidePrinter, lucideUpload, lucidePlus, lucideX })],
   changeDetection: ChangeDetectionStrategy.OnPush,

@@ -56,7 +56,10 @@
     "print": "Drucken",
     "upload": "Hochladen",
     "logout": "Abmelden",
-    "empty": "Keine Einträge"
+    "empty": "Keine Einträge",
+    "moveUp": "{{ name }} nach oben",
+    "moveDown": "{{ name }} nach unten",
+    "removeItem": "{{ name }} entfernen"
   },
   "terms": {
     "ensemble": "Ensemble",

@@ -10,7 +10,7 @@ import { ZardButtonComponent } from '@/shared/components/button';
 import { ApiClient } from '../../core/api/api-client';
 import { SessionStore } from '../../core/auth/session.store';
 import { initials } from '../../core/branding/branding.store';
-import { PageProblem } from './ui/page-problem';
+import { PageProblem } from '../../shared/ui/page-problem';
 import { VoiceSelectionDialog } from './ui/voice-selection-dialog';
 
 /** Profil (M-1, A-4): account from the identity server (read-only), own voices, ensembles and roles, Abmelden. */

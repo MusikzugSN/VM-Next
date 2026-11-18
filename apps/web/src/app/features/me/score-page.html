@@ -152,7 +152,7 @@
           </button>
         </z-dropdown-menu-content>
         @if (creatingTag()) {
-          <vm-tag-name-form (saved)="createTag($event)" (cancelled)="creatingTag.set(false)" />
+          <vm-name-form labelKey="me.tags.name" (saved)="createTag($event)" (cancelled)="creatingTag.set(false)" />
         }
       </div>
     </div>

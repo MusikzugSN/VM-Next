@@ -10,7 +10,7 @@ import { APP_ROUTES, apiUrl, appPath, archivedEventsResponseSchema, upcomingEven
 import { ApiClient } from '../../core/api/api-client';
 import { cursorList } from '../../core/api/cursor-list';
 import { EventDate } from './ui/event-date';
-import { ListState } from './ui/list-state';
+import { ListState } from '../../shared/ui/list-state';
 
 export type EventsTab = 'upcoming' | 'archive';
 

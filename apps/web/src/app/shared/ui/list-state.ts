@@ -3,7 +3,7 @@ import { TranslocoPipe } from '@jsverse/transloco';
 
 import { ZardButtonComponent } from '@/shared/components/button';
 
-import type { CursorList } from '../../../core/api/cursor-list';
+import type { CursorList } from '../../core/api/cursor-list';
 
 /** Loading, error, empty state and „Mehr laden“ below a cursor list. */
 @Component({
