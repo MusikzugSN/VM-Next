@@ -19,7 +19,7 @@ export const NAME_MAX = 100;
         <input #field z-input type="text" [maxLength]="max" [value]="name()" (input)="name.set($any($event.target).value)" required />
       </label>
       <div class="flex gap-2">
-        <button z-button type="submit" class="flex-1 md:flex-none" [disabled]="!name().trim()">{{ submitKey() | transloco }}</button>
+        <button z-button type="submit" class="flex-1 md:flex-none" [zDisabled]="!name().trim()">{{ submitKey() | transloco }}</button>
         <button z-button zType="secondary" type="button" class="flex-1 md:flex-none" (click)="cancelled.emit()">
           {{ 'common.cancel' | transloco }}
         </button>
@@ -36,7 +36,7 @@ export class NameForm {
 
   protected readonly max = NAME_MAX;
   protected readonly name = signal('');
-  private readonly field = viewChild.required<ElementRef<HTMLInputElement>>('field');
+  private readonly field = viewChild.required<string, ElementRef<HTMLInputElement>>('field', { read: ElementRef });
 
   constructor() {
     afterNextRender(() => {

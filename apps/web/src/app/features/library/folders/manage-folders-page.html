@@ -1,0 +1,87 @@
+<div class="flex flex-col gap-3 md:flex-row md:items-start md:justify-between">
+  <div>
+    <h1 class="text-2xl font-semibold">{{ 'nav.library.folders' | transloco }}</h1>
+    <p class="mt-1 text-muted-foreground">{{ 'library.folders.intro' | transloco }}</p>
+  </div>
+  @if (canCreate() && !creating()) {
+    <button z-button type="button" class="w-full md:w-auto" (click)="creating.set(true)">
+      <ng-icon name="lucidePlus" aria-hidden="true" />{{ 'library.folders.create' | transloco }}
+    </button>
+  }
+</div>
+
+@if (creating() && createOptions.hasValue()) {
+  <vm-create-in-ensemble-form
+    titleKey="library.folders.create"
+    [ensembles]="createOptions.value().items"
+    (created)="create($event)"
+    (cancelled)="creating.set(false)"
+  />
+}
+
+<div class="flex flex-col gap-2 md:flex-row md:items-end">
+  @if (filterOptions().length > 1) {
+    <label class="flex flex-col gap-1.5 md:w-64">
+      <span class="font-medium">{{ 'terms.ensemble' | transloco }}</span>
+      <select z-native-select [value]="ensembleId()" (change)="ensembleId.set($any($event.target).value)">
+        <option value="">{{ 'library.common.allEnsembles' | transloco }}</option>
+        @for (ensemble of filterOptions(); track ensemble.id) {
+          <option [value]="ensemble.id">{{ ensemble.name }}</option>
+        }
+      </select>
+    </label>
+  }
+  <vm-search-field [(value)]="search" labelKey="library.folders.search" />
+</div>
+
+@if (viewport.isMobile()) {
+  <ul class="flex flex-col gap-2">
+    @for (folder of list.items(); track folder.id) {
+      <li class="flex items-center gap-3 rounded-lg border bg-card p-4 shadow-sm">
+        <a [routerLink]="link(folder)" class="flex min-w-0 flex-1 flex-col text-foreground no-underline">
+          <span class="text-base font-semibold">{{ folder.name }}</span>
+          <span class="text-muted-foreground">{{ 'library.folders.scoreCount' | tPlural: folder.scoreCount }} · {{ folder.ensemble.name }}</span>
+        </a>
+        <vm-toggle-switch [checked]="folder.showInMyArea" [label]="visibilityLabel(folder)" [disabled]="!canEdit(folder)" (toggled)="setVisibility(folder, $event)" />
+      </li>
+    }
+  </ul>
+} @else if (list.items().length > 0) {
+  <div class="overflow-x-auto rounded-lg border bg-card shadow-sm">
+    <table class="w-full">
+      <thead class="bg-muted text-xs font-medium text-muted-foreground">
+        <tr>
+          <th scope="col" class="px-3 py-2 text-start">{{ 'library.common.name' | transloco }}</th>
+          <th scope="col" class="px-3 py-2 text-start">{{ 'terms.ensemble' | transloco }}</th>
+          <th scope="col" class="w-24 px-3 py-2 text-end">{{ 'library.common.scores' | transloco }}</th>
+          <th scope="col" class="w-48 px-3 py-2 text-start">{{ 'library.common.showInMyArea' | transloco }}</th>
+          <th scope="col" class="w-16 px-3 py-2 text-end"><span class="sr-only">{{ 'library.common.actions' | transloco }}</span></th>
+        </tr>
+      </thead>
+      <tbody>
+        @for (folder of list.items(); track folder.id) {
+          <tr class="border-t">
+            <td class="px-3 py-2"><a [routerLink]="link(folder)" class="font-medium">{{ folder.name }}</a></td>
+            <td class="px-3 py-2 text-muted-foreground">{{ folder.ensemble.name }}</td>
+            <td class="px-3 py-2 text-end tabular-nums">{{ folder.scoreCount }}</td>
+            <td class="px-3 py-1">
+              <span class="inline-flex items-center gap-2">
+                <vm-toggle-switch [checked]="folder.showInMyArea" [label]="visibilityLabel(folder)" [disabled]="!canEdit(folder)" (toggled)="setVisibility(folder, $event)" />
+                <span class="text-muted-foreground">{{ (folder.showInMyArea ? 'library.common.visible' : 'library.common.hiddenState') | transloco }}</span>
+              </span>
+            </td>
+            <td class="px-3 py-1 text-end">
+              @if (canDelete(folder)) {
+                <button z-button zType="ghost" zSize="icon" type="button" class="text-destructive-ink" (click)="remove(folder)" [attr.aria-label]="'library.folders.deleteLabel' | transloco: { name: folder.name }">
+                  <ng-icon name="lucideTrash2" aria-hidden="true" />
+                </button>
+              }
+            </td>
+          </tr>
+        }
+      </tbody>
+    </table>
+  </div>
+}
+<vm-list-state [list]="list" emptyKey="library.folders.empty" />
+<p class="text-muted-foreground">{{ 'library.folders.visibilityHint' | transloco }}</p>

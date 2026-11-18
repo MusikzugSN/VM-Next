@@ -81,12 +81,35 @@ export class AppShell {
       .subscribe(() => afterNextRender(() => this.focusHeading(), { injector: this.injector }));
   }
 
+  /**
+   * Focuses the page's h1. Pages that load their data first render the h1 a bit later, so wait
+   * for it (up to 3 s) before falling back to `main`. Stops when the person moved the focus.
+   */
   private focusHeading(): void {
     const main = this.document.getElementById('main');
-    const heading = main?.querySelector<HTMLElement>('h1');
-    const target = heading ?? main;
-    if (!target) return;
-    if (!target.hasAttribute('tabindex')) target.setAttribute('tabindex', '-1');
-    target.focus({ preventScroll: true });
+    if (!main) return;
+    const focus = (target: HTMLElement) => {
+      if (!target.hasAttribute('tabindex')) target.setAttribute('tabindex', '-1');
+      target.focus({ preventScroll: true });
+    };
+    const heading = main.querySelector<HTMLElement>('h1');
+    if (heading) return focus(heading);
+
+    const startedOn = this.document.activeElement;
+    const observer = new MutationObserver(() => {
+      const late = main.querySelector<HTMLElement>('h1');
+      if (!late) return;
+      stop();
+      if (this.document.activeElement === startedOn || this.document.activeElement === this.document.body) focus(late);
+    });
+    const timer = setTimeout(() => {
+      stop();
+      if (this.document.activeElement === startedOn || this.document.activeElement === this.document.body) focus(main);
+    }, 3000);
+    const stop = () => {
+      observer.disconnect();
+      clearTimeout(timer);
+    };
+    observer.observe(main, { childList: true, subtree: true });
   }
 }

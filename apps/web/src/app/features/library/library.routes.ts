@@ -39,10 +39,18 @@ export const LIBRARY_ROUTES: Routes = [
       ),
       comingSoon(r.review, r.root, 'nav.library.review', 4, section, [requirePermission('sheet.approve')]),
       comingSoon(r.reviewUpload, r.root, 'nav.library.review', 4, section, [requirePermission('sheet.approve')]),
-      comingSoon(r.folders, r.root, 'nav.library.folders', 3, section, [requirePermission('folder.view')]),
-      comingSoon(r.folder, r.root, 'pages.editFolder', 3, section, [requirePermission('folder.view')]),
-      comingSoon(r.events, r.root, 'nav.library.events', 3, section, [requirePermission('event.view')]),
-      comingSoon(r.event, r.root, 'pages.editEvent', 3, section, [requirePermission('event.view')]),
+      libraryPage(r.folders, 'nav.library.folders', requirePermission('folder.view'), () =>
+        import('./folders/manage-folders-page').then((m) => m.ManageFoldersPage),
+      ),
+      libraryPage(r.folder, 'pages.editFolder', requirePermission('folder.view'), () =>
+        import('./folders/edit-folder-page').then((m) => m.EditFolderPage),
+      ),
+      libraryPage(r.events, 'nav.library.events', requirePermission('event.view'), () =>
+        import('./events/manage-events-page').then((m) => m.ManageEventsPage),
+      ),
+      libraryPage(r.event, 'pages.editEvent', requirePermission('event.view'), () =>
+        import('./events/edit-event-page').then((m) => m.EditEventPage),
+      ),
     ],
   },
 ];

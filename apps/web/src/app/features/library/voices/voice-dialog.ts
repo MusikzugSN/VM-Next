@@ -17,6 +17,7 @@ import { ZardInputComponent } from '@/shared/components/input';
 import { ZardNativeSelectDirective } from '@/shared/components/native-select';
 
 import { ActionRunner } from '../../../core/actions/action-runner';
+import { focusFirstInvalid } from '../../../core/util/focus-invalid';
 import { ApiClient } from '../../../core/api/api-client';
 import { isApiProblem } from '../../../core/api/api-problem';
 import { debounced } from '../../../core/util/debounced';
@@ -66,6 +67,7 @@ export class VoiceDialog {
   protected readonly name = signal('');
   protected readonly substitutes = signal<{ id: string; name: string }[]>([]);
   protected readonly errors = signal<Record<string, string>>({});
+  private readonly focusInvalid = focusFirstInvalid();
   protected readonly saving = signal(false);
   protected readonly max = MAX_SUBSTITUTES;
 
@@ -114,13 +116,17 @@ export class VoiceDialog {
     if (!body.instrumentName) errors['instrumentName'] = 'required';
     if (!body.name) errors['name'] = 'required';
     this.errors.set(errors);
-    if (Object.keys(errors).length) return;
+    if (Object.keys(errors).length) {
+      this.focusInvalid();
+      return;
+    }
 
     this.saving.set(true);
     const target = this.target();
     const onProblem = (problem: unknown) => {
       if (isApiProblem(problem) && problem.code === 'validation-failed') {
         this.errors.set(problem.fieldErrors());
+        this.focusInvalid();
         return true;
       }
       return false;

@@ -166,7 +166,7 @@
           {{ 'library.form.fieldRequired' | transloco }}
         </label>
         <div class="flex flex-col gap-2 md:flex-row">
-          <button z-button type="button" [disabled]="!newField().name.trim()" (click)="createField()">{{ 'library.form.createField' | transloco }}</button>
+          <button z-button type="button" [zDisabled]="!newField().name.trim()" (click)="createField()">{{ 'library.form.createField' | transloco }}</button>
           <button z-button zType="secondary" type="button" (click)="addingField.set(false)">{{ 'common.cancel' | transloco }}</button>
         </div>
       </div>

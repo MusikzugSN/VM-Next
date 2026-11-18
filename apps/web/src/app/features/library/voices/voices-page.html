@@ -34,7 +34,7 @@
           </button>
         }
         @if (canReorder()) {
-          <button z-button zType="ghost" zSize="icon" type="button" [disabled]="gi === 0" (click)="moveInstrument(gi, -1)" [attr.aria-label]="'common.moveUp' | transloco: { name: group.instrument.name }">
+          <button z-button zType="ghost" zSize="icon" type="button" [zDisabled]="gi === 0" (click)="moveInstrument(gi, -1)" [attr.aria-label]="'common.moveUp' | transloco: { name: group.instrument.name }">
             <ng-icon name="lucideArrowUp" aria-hidden="true" />
           </button>
           <button
@@ -42,7 +42,7 @@
             zType="ghost"
             zSize="icon"
             type="button"
-            [disabled]="gi === groups().length - 1"
+            [zDisabled]="gi === groups().length - 1"
             (click)="moveInstrument(gi, 1)"
             [attr.aria-label]="'common.moveDown' | transloco: { name: group.instrument.name }"
           >
@@ -77,15 +77,15 @@
                 }
               </span>
             </div>
-            <span class="text-xs text-muted-foreground tabular-nums md:w-44 md:text-end">
+            <span class="text-xs text-muted-foreground tabular-nums md:w-56 md:text-end">
               {{ 'library.voices.sheets' | tPlural: voice.sheetCount }} · {{ 'library.voices.lineups' | tPlural: voice.lineupCount }}
             </span>
             <div class="flex items-center gap-1">
               @if (canReorder()) {
-                <button z-button zType="ghost" zSize="icon" type="button" [disabled]="first" (click)="moveVoice(group, i, -1)" [attr.aria-label]="'common.moveUp' | transloco: { name: voice.name }">
+                <button z-button zType="ghost" zSize="icon" type="button" [zDisabled]="first" (click)="moveVoice(group, i, -1)" [attr.aria-label]="'common.moveUp' | transloco: { name: voice.name }">
                   <ng-icon name="lucideArrowUp" aria-hidden="true" />
                 </button>
-                <button z-button zType="ghost" zSize="icon" type="button" [disabled]="last" (click)="moveVoice(group, i, 1)" [attr.aria-label]="'common.moveDown' | transloco: { name: voice.name }">
+                <button z-button zType="ghost" zSize="icon" type="button" [zDisabled]="last" (click)="moveVoice(group, i, 1)" [attr.aria-label]="'common.moveDown' | transloco: { name: voice.name }">
                   <ng-icon name="lucideArrowDown" aria-hidden="true" />
                 </button>
               }

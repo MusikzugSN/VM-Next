@@ -73,7 +73,7 @@ export function clampPage(page: number, count: number): number {
 
     @if (pageCount() > 1) {
       <nav [attr.aria-label]="'pdf.pages' | transloco" class="flex flex-wrap items-center justify-center gap-1">
-        <button z-button zType="ghost" zSize="icon" type="button" [disabled]="page() <= 1" (click)="go(page() - 1)" [attr.aria-label]="'pdf.previous' | transloco">
+        <button z-button zType="ghost" zSize="icon" type="button" [zDisabled]="page() <= 1" (click)="go(page() - 1)" [attr.aria-label]="'pdf.previous' | transloco">
           <ng-icon name="lucideChevronLeft" aria-hidden="true" />
         </button>
         @if (pageCount() <= maxPageButtons) {
@@ -92,7 +92,7 @@ export function clampPage(page: number, count: number): number {
             </button>
           }
         }
-        <button z-button zType="ghost" zSize="icon" type="button" [disabled]="page() >= pageCount()" (click)="go(page() + 1)" [attr.aria-label]="'pdf.next' | transloco">
+        <button z-button zType="ghost" zSize="icon" type="button" [zDisabled]="page() >= pageCount()" (click)="go(page() + 1)" [attr.aria-label]="'pdf.next' | transloco">
           <ng-icon name="lucideChevronRight" aria-hidden="true" />
         </button>
       </nav>

@@ -2,7 +2,19 @@
   "common": {
     "actions": "Aktionen",
     "number": "Nr.",
-    "pages": { "one": "1 Seite", "other": "{{ count }} Seiten" }
+    "pages": {
+      "one": "1 Seite",
+      "other": "{{ count }} Seiten"
+    },
+    "name": "Name",
+    "scores": "Stücke",
+    "allEnsembles": "Alle Ensembles",
+    "showInMyArea": "In Mein Bereich anzeigen",
+    "visible": "Sichtbar",
+    "hiddenState": "Ausgeblendet",
+    "autoSave": "Änderungen werden automatisch gespeichert",
+    "savedName": "Name gespeichert.",
+    "addScore": "Stück hinzufügen"
   },
   "completeness": {
     "label": "{{ present }} von {{ total }} Stimmen vorhanden",
@@ -43,7 +55,10 @@
     "reset": "Zurücksetzen",
     "apply": "Anzeigen",
     "remove": "Filter {{ name }} entfernen",
-    "active": { "one": "1 Filter aktiv", "other": "{{ count }} Filter aktiv" }
+    "active": {
+      "one": "1 Filter aktiv",
+      "other": "{{ count }} Filter aktiv"
+    }
   },
   "form": {
     "requiredHint": "Pflichtfelder sind mit * markiert.",
@@ -67,7 +82,10 @@
     "saved": "Änderungen gespeichert."
   },
   "scores": {
-    "count": { "one": "1 Stück", "other": "{{ count }} Stücke" },
+    "count": {
+      "one": "1 Stück",
+      "other": "{{ count }} Stücke"
+    },
     "completenessFor": "Vollständigkeit für {{ ensemble }}",
     "create": "Stück anlegen",
     "export": "Exportieren",
@@ -110,8 +128,14 @@
     "noFolders": "Das Stück ist in keiner Mappe."
   },
   "voices": {
-    "instruments": { "one": "1 Instrument", "other": "{{ count }} Instrumente" },
-    "voices": { "one": "1 Stimme", "other": "{{ count }} Stimmen" },
+    "instruments": {
+      "one": "1 Instrument",
+      "other": "{{ count }} Instrumente"
+    },
+    "voices": {
+      "one": "1 Stimme",
+      "other": "{{ count }} Stimmen"
+    },
     "intro": "Fehlt eine Stimme, zeigt Mein Bereich die erste vorhandene Ersatzstimme der Kette.",
     "create": "Stimme anlegen",
     "edit": "Stimme bearbeiten",
@@ -127,8 +151,14 @@
     "addSubstitute": "Ersatzstimme hinzufügen …",
     "substituteChain": "Ersatz:",
     "noSubstitutes": "Keine Ersatzstimmen",
-    "sheets": { "one": "1 Notenblatt", "other": "{{ count }} Notenblätter" },
-    "lineups": { "one": "in 1 Besetzung", "other": "in {{ count }} Besetzungen" },
+    "sheets": {
+      "one": "1 Notenblatt",
+      "other": "{{ count }} Notenblätter"
+    },
+    "lineups": {
+      "one": "in 1 Besetzung",
+      "other": "in {{ count }} Besetzungen"
+    },
     "editLabel": "{{ name }} bearbeiten",
     "deleteLabel": "{{ name }} löschen",
     "deleteTitle": "Stimme {{ name }} löschen?",
@@ -144,7 +174,10 @@
     "newTag": "Neuer Tag",
     "name": "Name des Tags",
     "search": "Tags durchsuchen",
-    "scoreCount": { "one": "1 Stück", "other": "{{ count }} Stücke" },
+    "scoreCount": {
+      "one": "1 Stück",
+      "other": "{{ count }} Stücke"
+    },
     "renameLabel": "{{ name }} umbenennen",
     "deleteLabel": "{{ name }} löschen",
     "deleteTitle": "Tag „{{ name }}“ löschen?",
@@ -154,5 +187,84 @@
     "empty": "Noch keine Vereins-Tags.",
     "personalHint": "Persönliche Tags (z. B. „Üben“) sind getrennt und nur für die Person selbst sichtbar. Sie liegen unter",
     "personalLink": "Mein Bereich / Tags"
+  },
+  "picker": {
+    "search": "Stück suchen",
+    "number": "Nummer",
+    "results": "Suchergebnisse",
+    "contained": "Bereits enthalten",
+    "add": "Hinzufügen",
+    "addLabel": "{{ title }} hinzufügen",
+    "none": "Kein Stück gefunden."
+  },
+  "folders": {
+    "intro": "Nummerierte Sammlungen von Stücken, je Ensemble.",
+    "create": "Mappe anlegen",
+    "search": "Mappen durchsuchen",
+    "all": "Alle Mappen",
+    "scoreCount": {
+      "one": "1 Stück",
+      "other": "{{ count }} Stücke"
+    },
+    "showLabel": "{{ name }} in Mein Bereich anzeigen",
+    "shown": "„{{ name }}“ ist jetzt in Mein Bereich sichtbar.",
+    "hidden": "„{{ name }}“ ist in Mein Bereich ausgeblendet.",
+    "created": "Mappe „{{ name }}“ angelegt.",
+    "delete": "Mappe löschen",
+    "deleteLabel": "{{ name }} löschen",
+    "deleteTitle": "Mappe „{{ name }}“ löschen?",
+    "deleteText": "Die Mappe wird gelöscht; die Stücke und ihre Notenblätter bleiben erhalten. Das lässt sich nicht rückgängig machen.",
+    "deleted": "Mappe „{{ name }}“ gelöscht.",
+    "empty": "Keine Mappen gefunden.",
+    "visibilityHint": "Ausgeblendete Mappen bleiben erhalten, Musiker:innen sehen sie aber nicht mehr unter Mein Bereich / Mappen."
+  },
+  "folder": {
+    "showHint": "Musiker:innen von {{ ensemble }} sehen die Mappe unter Mein Bereich / Mappen.",
+    "scores": "Stücke ({{ count }})",
+    "numberHint": "Die Nummer gilt nur in dieser Mappe; die Liste ist nach Nummer sortiert. Ändern mit Enter oder beim Verlassen des Feldes.",
+    "search": "In Mappe suchen",
+    "numberOf": "Nummer von {{ title }}",
+    "numberRequired": "Bitte eine Nummer eingeben.",
+    "numberTaken": "Diese Nummer ist in der Mappe schon vergeben.",
+    "numberInvalid": "Die Nummer darf höchstens 10 Zeichen lang sein.",
+    "removeLabel": "{{ title }} aus der Mappe entfernen",
+    "added": "„{{ title }}“ als Nr. {{ number }} hinzugefügt.",
+    "removed": "„{{ title }}“ aus der Mappe entfernt.",
+    "empty": "Die Mappe ist noch leer."
+  },
+  "events": {
+    "intro": "Termine mit Setlist. Sichtbare Events erscheinen bei Musiker:innen unter Mein Bereich / Events.",
+    "create": "Event anlegen",
+    "date": "Datum",
+    "period": "Zeitraum",
+    "upcoming": "Kommende",
+    "archive": "Archiv",
+    "search": "Events durchsuchen",
+    "all": "Alle Events",
+    "created": "Event „{{ name }}“ angelegt.",
+    "editLabel": "{{ name }} bearbeiten",
+    "delete": "Event löschen",
+    "deleteLabel": "{{ name }} löschen",
+    "deleteTitle": "Event „{{ name }}“ löschen?",
+    "deleteText": "Das Event und seine Setlist werden gelöscht; die Stücke bleiben erhalten. Das lässt sich nicht rückgängig machen.",
+    "deleted": "Event „{{ name }}“ gelöscht.",
+    "empty": "Keine kommenden Events.",
+    "emptyArchive": "Keine vergangenen Events.",
+    "archiveHint": "Vergangene Events wandern am Folgetag ins Archiv."
+  },
+  "event": {
+    "setlistCount": "{{ count }} Stücke in der Setlist",
+    "setlist": "Setlist ({{ count }})",
+    "orderHint": "Reihenfolge per Ziehen oder mit den Pfeil-Buttons ändern, dann speichern.",
+    "discard": "Änderungen verwerfen",
+    "saveSetlist": "Setlist speichern",
+    "setlistSaved": "Setlist gespeichert.",
+    "unsaved": "Die Setlist hat ungespeicherte Änderungen.",
+    "dragLabel": "{{ title }} ziehen",
+    "removeLabel": "{{ title }} aus der Setlist entfernen",
+    "movedAnnounce": "{{ title }} steht jetzt an Position {{ position }} von {{ count }}.",
+    "removedAnnounce": "{{ title }} aus der Setlist entfernt.",
+    "addedAnnounce": "{{ title }} an Position {{ position }} hinzugefügt.",
+    "empty": "Die Setlist ist noch leer."
   }
 }

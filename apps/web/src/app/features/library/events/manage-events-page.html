@@ -1,0 +1,115 @@
+<div class="flex flex-col gap-3 md:flex-row md:items-start md:justify-between">
+  <div>
+    <h1 class="text-2xl font-semibold">{{ 'nav.library.events' | transloco }}</h1>
+    <p class="mt-1 text-muted-foreground">{{ 'library.events.intro' | transloco }}</p>
+  </div>
+  @if (canCreate() && !creating()) {
+    <button z-button type="button" class="w-full md:w-auto" (click)="creating.set(true)">
+      <ng-icon name="lucidePlus" aria-hidden="true" />{{ 'library.events.create' | transloco }}
+    </button>
+  }
+</div>
+
+@if (creating() && createOptions.hasValue()) {
+  <vm-create-in-ensemble-form
+    titleKey="library.events.create"
+    [withDate]="true"
+    [ensembles]="createOptions.value().items"
+    (created)="create($event)"
+    (cancelled)="creating.set(false)"
+  />
+}
+
+<nav [attr.aria-label]="'library.events.period' | transloco" class="inline-flex self-start rounded-lg bg-muted p-1">
+  <a
+    [routerLink]="eventsPath"
+    [attr.aria-current]="period() === 'upcoming' ? 'page' : null"
+    class="inline-flex min-h-11 items-center rounded-md px-4 font-medium text-foreground no-underline xl:min-h-8"
+    [class.bg-background]="period() === 'upcoming'"
+    [class.shadow-sm]="period() === 'upcoming'"
+    >{{ 'library.events.upcoming' | transloco }}</a
+  >
+  <a
+    [routerLink]="eventsPath"
+    [queryParams]="{ tab: 'archive' }"
+    [attr.aria-current]="period() === 'past' ? 'page' : null"
+    class="inline-flex min-h-11 items-center rounded-md px-4 font-medium text-foreground no-underline xl:min-h-8"
+    [class.bg-background]="period() === 'past'"
+    [class.shadow-sm]="period() === 'past'"
+    >{{ 'library.events.archive' | transloco }}</a
+  >
+</nav>
+
+<div class="flex flex-col gap-2 md:flex-row md:items-end">
+  @if (filterOptions().length > 1) {
+    <label class="flex flex-col gap-1.5 md:w-64">
+      <span class="font-medium">{{ 'terms.ensemble' | transloco }}</span>
+      <select z-native-select [value]="ensembleId()" (change)="ensembleId.set($any($event.target).value)">
+        <option value="">{{ 'library.common.allEnsembles' | transloco }}</option>
+        @for (ensemble of filterOptions(); track ensemble.id) {
+          <option [value]="ensemble.id">{{ ensemble.name }}</option>
+        }
+      </select>
+    </label>
+  }
+  <vm-search-field [(value)]="search" labelKey="library.events.search" />
+</div>
+
+@if (viewport.isMobile()) {
+  <ul class="flex flex-col gap-2">
+    @for (event of list.items(); track event.id) {
+      <li class="flex items-center gap-3 rounded-lg border bg-card p-4 shadow-sm">
+        <a [routerLink]="link(event)" class="flex min-w-0 flex-1 flex-col text-foreground no-underline">
+          <span class="text-base font-semibold">{{ event.name }}</span>
+          <span class="text-muted-foreground">{{ event.date | date: 'EE dd.MM.yyyy' }} · {{ 'library.folders.scoreCount' | tPlural: event.scoreCount }}</span>
+        </a>
+        <vm-toggle-switch [checked]="event.showInMyArea" [label]="visibilityLabel(event)" [disabled]="!canEdit(event)" (toggled)="setVisibility(event, $event)" />
+      </li>
+    }
+  </ul>
+} @else if (list.items().length > 0) {
+  <div class="overflow-x-auto rounded-lg border bg-card shadow-sm">
+    <table class="w-full">
+      <thead class="bg-muted text-xs font-medium text-muted-foreground">
+        <tr>
+          <th scope="col" class="w-36 px-3 py-2 text-start">{{ 'library.events.date' | transloco }}</th>
+          <th scope="col" class="px-3 py-2 text-start">{{ 'library.common.name' | transloco }}</th>
+          <th scope="col" class="px-3 py-2 text-start">{{ 'terms.ensemble' | transloco }}</th>
+          <th scope="col" class="w-24 px-3 py-2 text-end">{{ 'library.common.scores' | transloco }}</th>
+          <th scope="col" class="w-48 px-3 py-2 text-start">{{ 'library.common.showInMyArea' | transloco }}</th>
+          <th scope="col" class="w-24 px-3 py-2 text-end"><span class="sr-only">{{ 'library.common.actions' | transloco }}</span></th>
+        </tr>
+      </thead>
+      <tbody>
+        @for (event of list.items(); track event.id) {
+          <tr class="border-t">
+            <td class="px-3 py-2 tabular-nums">{{ event.date | date: 'EE dd.MM.yyyy' }}</td>
+            <td class="px-3 py-2"><a [routerLink]="link(event)" class="font-medium">{{ event.name }}</a></td>
+            <td class="px-3 py-2 text-muted-foreground">{{ event.ensemble.name }}</td>
+            <td class="px-3 py-2 text-end tabular-nums">{{ event.scoreCount }}</td>
+            <td class="px-3 py-1">
+              <span class="inline-flex items-center gap-2">
+                <vm-toggle-switch [checked]="event.showInMyArea" [label]="visibilityLabel(event)" [disabled]="!canEdit(event)" (toggled)="setVisibility(event, $event)" />
+                <span class="text-muted-foreground">{{ (event.showInMyArea ? 'library.common.visible' : 'library.common.hiddenState') | transloco }}</span>
+              </span>
+            </td>
+            <td class="px-3 py-1 text-end">
+              @if (canEdit(event)) {
+                <a z-button zType="ghost" zSize="icon" [routerLink]="link(event)" [attr.aria-label]="'library.events.editLabel' | transloco: { name: event.name }">
+                  <ng-icon name="lucidePencil" aria-hidden="true" />
+                </a>
+              }
+              @if (canDelete(event)) {
+                <button z-button zType="ghost" zSize="icon" type="button" class="text-destructive-ink" (click)="remove(event)" [attr.aria-label]="'library.events.deleteLabel' | transloco: { name: event.name }">
+                  <ng-icon name="lucideTrash2" aria-hidden="true" />
+                </button>
+              }
+            </td>
+          </tr>
+        }
+      </tbody>
+    </table>
+  </div>
+}
+<vm-list-state [list]="list" [emptyKey]="period() === 'past' ? 'library.events.emptyArchive' : 'library.events.empty'" />
+<p class="text-muted-foreground">{{ 'library.events.archiveHint' | transloco }}</p>

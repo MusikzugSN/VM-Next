@@ -22,6 +22,7 @@ import { ZardDialogImports } from '@/shared/components/dialog/dialog.imports';
 import { ZardNativeSelectDirective } from '@/shared/components/native-select';
 
 import { ActionRunner, ConfirmService } from '../../../core/actions/action-runner';
+import { focusFirstInvalid } from '../../../core/util/focus-invalid';
 import { UploadLauncher } from '../../../core/actions/pending-features';
 import { ApiClient } from '../../../core/api/api-client';
 import { isApiProblem } from '../../../core/api/api-problem';
@@ -141,6 +142,7 @@ export class LibraryScorePage {
 
   protected readonly form = signal<ScoreFormInput | null>(null);
   protected readonly errors = signal<ScoreFormErrors>({});
+  private readonly focusInvalid = focusFirstInvalid();
   protected readonly saving = signal(false);
   protected readonly preview = signal<{ sheetId: string; title: string } | null>(null);
   protected readonly previewOpen = signal(false);
@@ -198,7 +200,10 @@ export class LibraryScorePage {
     if (!input) return;
     const { body, errors } = buildScoreBody(input, this.options.fields());
     this.errors.set(errors);
-    if (!body) return;
+    if (!body) {
+      this.focusInvalid();
+      return;
+    }
     this.saving.set(true);
     const done = await this.actions.run(
       () => firstValueFrom(this.api.postVoid(apiUrl('scores', 'updateScoreDetails', { scoreId: this.scoreId() }), body)),
@@ -207,6 +212,7 @@ export class LibraryScorePage {
         onProblem: (problem) => {
           if (isApiProblem(problem) && problem.code === 'validation-failed') {
             this.errors.set(problem.fieldErrors());
+            this.focusInvalid();
             return true;
           }
           return false;

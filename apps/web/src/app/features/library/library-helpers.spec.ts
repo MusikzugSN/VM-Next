@@ -225,3 +225,14 @@ describe('voices (N-6, F-16)', () => {
     expect(moveItem(['a', 'b'], 0, -1)).toEqual(['a', 'b']);
   });
 });
+
+describe('folder numbers (N-5)', () => {
+  it('maps API problems to field texts', async () => {
+    const { problemKey } = await import('./folders/edit-folder-page');
+    expect(problemKey({ code: 'name-taken' })).toBe('library.folder.numberTaken');
+    expect(problemKey({ code: 'conflict' })).toBe('library.folder.numberTaken');
+    expect(problemKey({ code: 'validation-failed' })).toBe('library.folder.numberInvalid');
+    expect(problemKey({ code: 'forbidden' })).toBe('errors.forbidden');
+    expect(problemKey(null)).toBe('errors.unknown');
+  });
+});

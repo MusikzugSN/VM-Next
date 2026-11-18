@@ -1,0 +1,120 @@
+<a [routerLink]="eventsPath" class="inline-flex min-h-11 items-center gap-1 self-start font-medium no-underline">
+  <ng-icon name="lucideChevronLeft" aria-hidden="true" />{{ 'library.events.all' | transloco }}
+</a>
+
+@if (details.error()) {
+  <vm-page-problem [error]="details.error()" />
+} @else if (details.hasValue()) {
+  @let event = details.value();
+  <div class="flex flex-col gap-3 md:flex-row md:items-start md:justify-between">
+    <div>
+      <h1 class="text-2xl font-semibold">{{ 'pages.editEvent' | transloco }}</h1>
+      <p class="mt-1 text-muted-foreground">{{ event.name }} · {{ event.ensemble.name }} · {{ 'library.event.setlistCount' | transloco: { count: items().length } }}</p>
+    </div>
+    @if (canEdit() && !adding()) {
+      <button z-button zType="outline" type="button" class="w-full md:w-auto" (click)="adding.set(true)">
+        <ng-icon name="lucidePlus" aria-hidden="true" />{{ 'library.common.addScore' | transloco }}
+      </button>
+    }
+  </div>
+
+  <form aria-labelledby="h-event" class="flex flex-col gap-4 rounded-lg border bg-card p-4 shadow-sm md:p-6" novalidate (submit)="$event.preventDefault(); saveDetails()">
+    <h2 id="h-event" class="text-lg font-semibold">{{ 'terms.event' | transloco }}</h2>
+    <fieldset class="grid gap-4 md:grid-cols-2" [disabled]="!canEdit()">
+      <label class="flex flex-col gap-1.5">
+        <span class="font-medium">{{ 'library.events.date' | transloco }} *</span>
+        <input z-input type="date" required [value]="date()" (input)="date.set($any($event.target).value)" />
+      </label>
+      <label class="flex flex-col gap-1.5">
+        <span class="font-medium">{{ 'library.common.name' | transloco }} *</span>
+        <input z-input type="text" maxlength="100" required [value]="name()" (input)="name.set($any($event.target).value)" />
+      </label>
+    </fieldset>
+    <div class="flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
+      <span class="inline-flex items-center gap-2">
+        <vm-toggle-switch [checked]="event.showInMyArea" [label]="visibilityLabel()" [disabled]="!canEdit()" (toggled)="setVisibility($event)" />
+        <span class="font-medium">{{ 'library.common.showInMyArea' | transloco }}</span>
+      </span>
+      @if (canEdit()) {
+        <button z-button type="submit" [zDisabled]="!detailsDirty() || !name().trim() || !date()">{{ 'common.save' | transloco }}</button>
+      }
+    </div>
+  </form>
+
+  @if (adding()) {
+    <section aria-labelledby="h-add" class="flex flex-col gap-2">
+      <div class="flex items-center justify-between">
+        <h2 id="h-add" class="text-lg font-semibold">{{ 'library.common.addScore' | transloco }}</h2>
+        <button z-button zType="ghost" type="button" (click)="adding.set(false)">{{ 'common.close' | transloco }}</button>
+      </div>
+      <vm-score-picker [fetch]="candidates()" (picked)="add($event)" />
+    </section>
+  }
+
+  <section aria-labelledby="h-setlist" class="flex flex-col gap-3">
+    <div class="flex flex-col gap-2 md:flex-row md:items-end md:justify-between">
+      <div>
+        <h2 id="h-setlist" class="text-lg font-semibold">{{ 'library.event.setlist' | transloco: { count: items().length } }}</h2>
+        @if (canEdit()) {
+          <p class="text-muted-foreground">{{ 'library.event.orderHint' | transloco }}</p>
+        }
+      </div>
+      @if (canEdit() && setlistDirty()) {
+        <div class="flex flex-col gap-2 md:flex-row">
+          <button z-button zType="secondary" type="button" (click)="resetSetlist()">{{ 'library.event.discard' | transloco }}</button>
+          <button z-button type="button" (click)="saveSetlist()">{{ 'library.event.saveSetlist' | transloco }}</button>
+        </div>
+      }
+    </div>
+    @if (setlistDirty()) {
+      <p class="rounded-md bg-warning-soft p-3 text-warning-ink">{{ 'library.event.unsaved' | transloco }}</p>
+    }
+
+    <p class="sr-only" aria-live="polite">{{ announcement() }}</p>
+
+    @if (items().length) {
+      <ol cdkDropList [cdkDropListDisabled]="!canEdit()" (cdkDropListDropped)="drop($event)" class="overflow-hidden rounded-lg border bg-card shadow-sm">
+        @for (item of items(); track item.scoreId; let i = $index, first = $first, last = $last) {
+          <li cdkDrag class="flex items-center gap-2 bg-card px-2 py-1.5" [class.border-t]="!first">
+            @if (canEdit()) {
+              <button
+                cdkDragHandle
+                type="button"
+                class="flex size-11 shrink-0 cursor-grab items-center justify-center rounded-md text-muted-foreground hover:bg-accent xl:size-9"
+                [attr.aria-label]="'library.event.dragLabel' | transloco: { title: item.title }"
+              >
+                <ng-icon name="lucideGripVertical" aria-hidden="true" />
+              </button>
+            }
+            <span class="w-8 text-center font-semibold text-primary tabular-nums">{{ i + 1 }}</span>
+            <span class="flex min-w-0 flex-1 flex-col">
+              <a [routerLink]="scoreLink(item)" class="font-medium">{{ item.title }}</a>
+              @if (item.composer) {
+                <span class="text-muted-foreground">{{ item.composer }}</span>
+              }
+            </span>
+            @if (canEdit()) {
+              <button z-button zType="ghost" zSize="icon" type="button" [zDisabled]="first" (click)="move(i, -1)" [attr.aria-label]="'common.moveUp' | transloco: { name: item.title }">
+                <ng-icon name="lucideArrowUp" aria-hidden="true" />
+              </button>
+              <button z-button zType="ghost" zSize="icon" type="button" [zDisabled]="last" (click)="move(i, 1)" [attr.aria-label]="'common.moveDown' | transloco: { name: item.title }">
+                <ng-icon name="lucideArrowDown" aria-hidden="true" />
+              </button>
+              <button z-button zType="ghost" zSize="icon" type="button" (click)="removeItem(i)" [attr.aria-label]="'library.event.removeLabel' | transloco: { title: item.title }">
+                <ng-icon name="lucideX" aria-hidden="true" />
+              </button>
+            }
+          </li>
+        }
+      </ol>
+    } @else if (setlistLoaded()) {
+      <p class="rounded-lg border border-dashed p-8 text-center text-muted-foreground">{{ 'library.event.empty' | transloco }}</p>
+    }
+  </section>
+
+  @if (canDelete()) {
+    <button z-button zType="destructive" type="button" class="w-full md:w-auto md:self-start" (click)="deleteEvent()">
+      <ng-icon name="lucideTrash2" aria-hidden="true" />{{ 'library.events.delete' | transloco }}
+    </button>
+  }
+}

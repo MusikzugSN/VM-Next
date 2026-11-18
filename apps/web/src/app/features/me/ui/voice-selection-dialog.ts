@@ -93,7 +93,7 @@ export function filterVoiceGroups(groups: readonly Group[], search: string): Gro
       <z-dialog-footer class="flex-col-reverse items-stretch gap-2 md:flex-row md:items-center">
         <span class="text-muted-foreground md:me-auto" aria-live="polite">{{ 'me.voices.count' | tPlural: selected().size }}</span>
         <button z-button zType="secondary" type="button" (click)="later()">{{ 'me.voices.later' | transloco }}</button>
-        <button z-button type="button" [zLoading]="saving()" [disabled]="selected().size === 0 || saving()" (click)="save()">
+        <button z-button type="button" [zLoading]="saving()" [zDisabled]="selected().size === 0 || saving()" (click)="save()">
           {{ 'common.save' | transloco }}
         </button>
       </z-dialog-footer>

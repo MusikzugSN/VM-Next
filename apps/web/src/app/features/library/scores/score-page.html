@@ -27,7 +27,7 @@
     }
   </div>
 
-  <nav [attr.aria-label]="'library.score.sections' | transloco" class="flex gap-1 overflow-x-auto border-b">
+  <nav [attr.aria-label]="'library.score.sections' | transloco" class="flex gap-1 overflow-x-auto overflow-y-hidden border-b">
     @for (t of tabs; track t.id) {
       <a
         [routerLink]="scorePath()"
@@ -56,7 +56,7 @@
                 <span></span>
               }
               @if (canEdit()) {
-                <button z-button type="submit" [zLoading]="saving()" [disabled]="saving()">{{ 'common.save' | transloco }}</button>
+                <button z-button type="submit" [zLoading]="saving()" [zDisabled]="saving()">{{ 'common.save' | transloco }}</button>
               }
             </div>
           }

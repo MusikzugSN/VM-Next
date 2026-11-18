@@ -1,0 +1,115 @@
+<a [routerLink]="foldersPath" class="inline-flex min-h-11 items-center gap-1 self-start font-medium no-underline">
+  <ng-icon name="lucideChevronLeft" aria-hidden="true" />{{ 'library.folders.all' | transloco }}
+</a>
+
+@if (details.error()) {
+  <vm-page-problem [error]="details.error()" />
+} @else if (details.hasValue()) {
+  @let folder = details.value();
+  <div class="flex flex-col gap-3 md:flex-row md:items-start md:justify-between">
+    <div>
+      <h1 class="text-2xl font-semibold">{{ 'pages.editFolder' | transloco }}</h1>
+      <p class="mt-1 text-muted-foreground">
+        {{ folder.name }} · {{ folder.ensemble.name }} · {{ 'library.folders.scoreCount' | tPlural: folder.scoreCount }}
+        @if (canEdit()) {
+          · {{ 'library.common.autoSave' | transloco }}
+        }
+      </p>
+    </div>
+    @if (canEdit() && !adding()) {
+      <button z-button type="button" class="w-full md:w-auto" (click)="adding.set(true)">
+        <ng-icon name="lucidePlus" aria-hidden="true" />{{ 'library.common.addScore' | transloco }}
+      </button>
+    }
+  </div>
+
+  <section aria-labelledby="h-folder" class="flex flex-col gap-4 rounded-lg border bg-card p-4 shadow-sm md:p-6">
+    <h2 id="h-folder" class="text-lg font-semibold">{{ 'terms.folder' | transloco }}</h2>
+    <div class="grid gap-4 md:grid-cols-2">
+      <label class="flex flex-col gap-1.5">
+        <span class="font-medium">{{ 'library.common.name' | transloco }}</span>
+        <input
+          z-input
+          type="text"
+          maxlength="100"
+          [readonly]="!canEdit()"
+          [value]="folder.name"
+          (blur)="rename($any($event.target).value)"
+          (keydown.enter)="$any($event.target).blur()"
+        />
+      </label>
+      <div class="flex flex-col gap-1.5">
+        <span class="font-medium">{{ 'terms.ensemble' | transloco }}</span>
+        <span class="flex min-h-11 items-center xl:min-h-9">{{ folder.ensemble.name }}</span>
+      </div>
+    </div>
+    <div class="flex items-center justify-between gap-4">
+      <div>
+        <span id="lbl-show" class="font-medium">{{ 'library.common.showInMyArea' | transloco }}</span>
+        <p class="text-muted-foreground">{{ 'library.folder.showHint' | transloco: { ensemble: folder.ensemble.name } }}</p>
+      </div>
+      <vm-toggle-switch [checked]="folder.showInMyArea" [label]="visibilityLabel()" [disabled]="!canEdit()" (toggled)="setVisibility($event)" />
+    </div>
+  </section>
+
+  @if (adding()) {
+    <section aria-labelledby="h-add" class="flex flex-col gap-2">
+      <div class="flex items-center justify-between">
+        <h2 id="h-add" class="text-lg font-semibold">{{ 'library.common.addScore' | transloco }}</h2>
+        <button z-button zType="ghost" type="button" (click)="adding.set(false)">{{ 'common.close' | transloco }}</button>
+      </div>
+      <vm-score-picker [fetch]="candidates()" [numbered]="true" (picked)="add($event)" />
+    </section>
+  }
+
+  <section aria-labelledby="h-scores" class="flex flex-col gap-3">
+    <div>
+      <h2 id="h-scores" class="text-lg font-semibold">{{ 'library.folder.scores' | transloco: { count: folder.scoreCount } }}</h2>
+      <p class="text-muted-foreground">{{ 'library.folder.numberHint' | transloco }}</p>
+    </div>
+    <vm-search-field [(value)]="search" labelKey="library.folder.search" />
+
+    <ul class="overflow-hidden rounded-lg border bg-card shadow-sm" [class.hidden]="list.items().length === 0">
+      @for (entry of list.items(); track entry.scoreId; let first = $first) {
+        <li class="flex flex-wrap items-center gap-3 px-3 py-2" [class.border-t]="!first">
+          <label class="flex flex-col gap-1">
+            <span class="sr-only">{{ 'library.folder.numberOf' | transloco: { title: entry.title } }}</span>
+            <input
+              z-input
+              type="text"
+              maxlength="10"
+              class="w-20 text-center font-semibold text-primary tabular-nums"
+              [readonly]="!canEdit()"
+              [value]="entry.number"
+              (blur)="setNumber(entry, $any($event.target).value)"
+              (keydown.enter)="$any($event.target).blur()"
+              [attr.aria-invalid]="numberErrors()[entry.scoreId] ? 'true' : null"
+              [attr.aria-describedby]="numberErrors()[entry.scoreId] ? 'num-err-' + entry.scoreId : null"
+            />
+          </label>
+          <span class="flex min-w-0 flex-1 flex-col">
+            <a [routerLink]="scoreLink(entry)" class="font-medium">{{ entry.title }}</a>
+            @if (entry.composer) {
+              <span class="text-muted-foreground">{{ entry.composer }}</span>
+            }
+          </span>
+          @if (canEdit()) {
+            <button z-button zType="ghost" zSize="icon" type="button" (click)="remove(entry)" [attr.aria-label]="'library.folder.removeLabel' | transloco: { title: entry.title }">
+              <ng-icon name="lucideX" aria-hidden="true" />
+            </button>
+          }
+          @if (numberErrors()[entry.scoreId]; as key) {
+            <span [id]="'num-err-' + entry.scoreId" role="alert" class="w-full text-destructive-ink">{{ key | transloco }}</span>
+          }
+        </li>
+      }
+    </ul>
+    <vm-list-state [list]="list" emptyKey="library.folder.empty" />
+  </section>
+
+  @if (canDelete()) {
+    <button z-button zType="destructive" type="button" class="w-full md:w-auto md:self-start" (click)="deleteFolder()">
+      <ng-icon name="lucideTrash2" aria-hidden="true" />{{ 'library.folders.delete' | transloco }}
+    </button>
+  }
+}

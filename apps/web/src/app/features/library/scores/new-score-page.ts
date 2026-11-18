@@ -7,6 +7,7 @@ import { firstValueFrom } from 'rxjs';
 import { ZardButtonComponent } from '@/shared/components/button';
 
 import { ActionRunner } from '../../../core/actions/action-runner';
+import { focusFirstInvalid } from '../../../core/util/focus-invalid';
 import { ApiClient } from '../../../core/api/api-client';
 import { isApiProblem } from '../../../core/api/api-problem';
 import { LibraryOptions } from '../library-options';
@@ -33,7 +34,7 @@ import { buildScoreBody, emptyScoreForm, type ScoreFormErrors, type ScoreFormInp
 
       <div class="flex flex-col-reverse gap-2 md:flex-row md:justify-end">
         <a z-button zType="secondary" [routerLink]="scoresPath">{{ 'common.cancel' | transloco }}</a>
-        <button z-button type="submit" [zLoading]="saving()" [disabled]="saving() || !options.fieldsLoaded()">
+        <button z-button type="submit" [zLoading]="saving()" [zDisabled]="saving() || !options.fieldsLoaded()">
           {{ 'library.form.saveScore' | transloco }}
         </button>
       </div>
@@ -49,19 +50,24 @@ export class NewScorePage {
   protected readonly scoresPath = APP_ROUTES.library.scores;
   protected readonly form = signal<ScoreFormInput>(emptyScoreForm());
   protected readonly errors = signal<ScoreFormErrors>({});
+  private readonly focusInvalid = focusFirstInvalid();
   protected readonly saving = signal(false);
   protected readonly hasErrors = () => Object.keys(this.errors()).length > 0;
 
   protected async save(): Promise<void> {
     const { body, errors } = buildScoreBody(this.form(), this.options.fields());
     this.errors.set(errors);
-    if (!body) return;
+    if (!body) {
+      this.focusInvalid();
+      return;
+    }
     this.saving.set(true);
     const done = await this.actions.run(() => firstValueFrom(this.api.post(apiUrl('scores', 'createScore'), body, createdResponseSchema)), {
       success: { key: 'library.form.created', params: { title: body.title } },
       onProblem: (problem) => {
         if (isApiProblem(problem) && problem.code === 'validation-failed') {
           this.errors.set(problem.fieldErrors());
+          this.focusInvalid();
           return true;
         }
         return false;

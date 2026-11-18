@@ -40,12 +40,14 @@ import {
   host: {
     'data-slot': 'button',
     '[class]': 'classes()',
-    '[attr.data-disabled]': 'isNotInsideOfButtonOrLink() && zDisabled() || null',
+    // VM-Web: disabled is driven only by zDisabled (also for native <button>), because this host binding
+    // would otherwise remove a [disabled] set in the template. Use [zDisabled] on z-button, never [disabled].
+    '[attr.data-disabled]': 'zDisabled() || null',
     '[attr.data-icon-only]': 'iconOnly() || null',
     '[attr.data-size]': 'zSize()',
     '[attr.data-variant]': 'zType()',
-    '[attr.aria-disabled]': 'isNotInsideOfButtonOrLink() && zDisabled() || null',
-    '[attr.disabled]': 'isNotInsideOfButtonOrLink() && zDisabled() ? "" : null',
+    '[attr.aria-disabled]': 'zDisabled() || null',
+    '[attr.disabled]': 'zDisabled() && !isLinkHost() ? "" : null',
     '[attr.role]': 'isNotInsideOfButtonOrLink() ? "button" : null',
     '[attr.tabindex]': 'isNotInsideOfButtonOrLink() ? "0" : null',
   },
@@ -122,6 +124,9 @@ export class ZardButtonComponent implements OnDestroy {
       this.class(),
     ),
   );
+
+  /** VM-Web: links have no disabled attribute; aria-disabled and pointer-events cover them. */
+  protected readonly isLinkHost = computed(() => this.elementRef.nativeElement.tagName === 'A');
 
   protected readonly isNotInsideOfButtonOrLink = computed(() => {
     // Evaluated once; assumes component parent doesn't change after mount
