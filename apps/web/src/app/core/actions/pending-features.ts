@@ -1,4 +1,4 @@
-import { inject, Injectable } from '@angular/core';
+import { inject, Injectable, signal } from '@angular/core';
 import { TranslocoService } from '@jsverse/transloco';
 
 import { ZardSonnerService } from '@/shared/components/sonner';
@@ -6,6 +6,8 @@ import { ZardSonnerService } from '@/shared/components/sonner';
 /** What an upload starts from (N-11, M-9): preselected score and voice. */
 export interface UploadContext {
   scoreId?: string;
+  /** Shown as the preselected score in the dialog. */
+  scoreTitle?: string;
   voiceId?: string;
 }
 
@@ -13,20 +15,30 @@ export interface UploadContext {
 export type PrintContext = { folderId: string } | { eventId: string } | { scoreId: string; sheetIds: string[] };
 
 /**
- * Entry points for the upload dialog (Stufe 4) and the print dialog (Stufe 6). Pages of Mein Bereich
- * already call them; until the dialogs exist they explain that the function follows.
+ * Opens the upload dialog (N-11) from anywhere; the dialog itself lives in the app shell.
+ * `completed` counts finished uploads, so lists of the current page can reload.
  */
 @Injectable({ providedIn: 'root' })
 export class UploadLauncher {
-  private readonly sonner = inject(ZardSonnerService);
-  private readonly transloco = inject(TranslocoService);
+  /** Open request; `null` = dialog closed. */
+  readonly request = signal<UploadContext | null>(null);
+  readonly completed = signal(0);
 
   open(context: UploadContext = {}): void {
-    void context;
-    this.sonner.info(this.transloco.translate('pending.upload'));
+    this.request.set({ ...context });
+  }
+
+  close(): void {
+    this.request.set(null);
+  }
+
+  /** Called by the dialog after a successful upload. */
+  notifyCompleted(): void {
+    this.completed.update((n) => n + 1);
   }
 }
 
+/** Entry point for the print dialog (Stufe 6); until then it explains that the function follows. */
 @Injectable({ providedIn: 'root' })
 export class PrintLauncher {
   private readonly sonner = inject(ZardSonnerService);

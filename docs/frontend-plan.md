@@ -266,3 +266,9 @@ Diese Stufe ist die größte. Bei Bedarf teile ich sie in **3a** (Stücke, Stimm
   - „Besetzungs-Vorlage übernehmen“ auf der Stimmen-Seite (gehört zu den Ensembles, Stufe 5);
   - Spalte „Mitglieder“ bei den Stimmen; stattdessen Anzahl Notenblätter und Besetzungen aus `voice-list`.
 - **Sortieren ohne Drag & Drop:** Instrumente, Stimmen und Ersatzstimmen werden mit „nach oben/unten“ sortiert (F-16, N-9); Drag & Drop kommt mit der Setlist in 3b.
+- **Hochladen und Prüfung (Stufe 4):**
+  - Der Upload-Dialog sitzt in der Seitenhülle und wird überall über `UploadLauncher.open({ scoreId, scoreTitle, voiceId })` geöffnet. Uploads ohne Stück oder Stimme sind erlaubt; die Zuordnung erfolgt dann in der Prüfung (die API lässt beides offen).
+  - Zuschneiden erfolgt über Ränder in Prozent mit Vorschau als abgedunkelter Bereich; Ziehen eines Rahmens mit der Maus ist nicht gebaut.
+  - Seiten lassen sich beim Annehmen weglassen („Seite übernehmen“), z. B. leere Rückseiten.
+  - Die Pfeiltasten wechseln zwischen Uploads (N-13); Seiten blättert man mit den Buttons der Werkzeugleiste.
+- **Toasts** sitzen in der Seitenhülle, nicht in der Root-Komponente; dadurch bleiben ngx-sonner und tailwind-merge aus dem Start-Bundle (589 statt 691 kB).

@@ -163,7 +163,6 @@
     }
   },
   "pending": {
-    "upload": "Hochladen folgt in Stufe 4 des Frontends.",
     "print": "Drucken folgt in Stufe 6 des Frontends."
   },
   "pdf": {
@@ -174,5 +173,103 @@
     "page": "Seite {{ page }}",
     "status": "Seite {{ page }} von {{ count }}",
     "error": "Die Vorschau konnte nicht geladen werden. Lade das Notenblatt herunter oder versuche es später erneut."
+  },
+  "upload": {
+    "title": "Noten hochladen",
+    "intro": "Mehrere PDFs auf einmal. Die Stimme schlagen wir aus dem Dateinamen vor; prüfe sie vor dem Absenden.",
+    "drop": "PDFs hierher ziehen oder",
+    "choose": "Dateien auswählen",
+    "limits": "Nur PDF, bis 50 MB je Datei, höchstens {{ max }} Dateien.",
+    "selected": "Ausgewählte Dateien · {{ count }}",
+    "removeAll": "Alle entfernen",
+    "removeFile": "{{ name }} entfernen",
+    "suggested": "Vorschlag",
+    "chooseVoice": "Stimme wählen",
+    "change": "Ändern",
+    "searchScore": "Stück suchen",
+    "noScore": "Kein Stück gefunden.",
+    "results": "Suchergebnisse",
+    "problem": {
+      "not-pdf": "Keine PDF-Datei – wird nicht hochgeladen.",
+      "too-large": "Größer als 50 MB – wird nicht hochgeladen."
+    },
+    "approverHint": "Du darfst Noten freigeben – Uploads mit Stück und Stimme sind sofort sichtbar.",
+    "unassigned": {
+      "one": "1 Datei ohne Stück oder Stimme – die Zuordnung erfolgt bei der Prüfung.",
+      "other": "{{ count }} Dateien ohne Stück oder Stimme – die Zuordnung erfolgt bei der Prüfung."
+    },
+    "skipped": {
+      "one": "1 Datei wird übersprungen.",
+      "other": "{{ count }} Dateien werden übersprungen."
+    },
+    "progress": "Fortschritt des Uploads",
+    "send": {
+      "one": "1 Datei hochladen",
+      "other": "{{ count }} Dateien hochladen"
+    },
+    "done": {
+      "one": "1 Datei hochgeladen. Sie wartet auf die Prüfung.",
+      "other": "{{ count }} Dateien hochgeladen. Sie warten auf die Prüfung."
+    },
+    "doneApproved": {
+      "one": "1 Datei hochgeladen und freigegeben.",
+      "other": "{{ count }} Dateien hochgeladen und freigegeben."
+    },
+    "donePartly": {
+      "one": "1 Datei hochgeladen.",
+      "other": "{{ count }} Dateien hochgeladen, {{ approved }} davon sofort freigegeben. Der Rest wartet auf die Prüfung."
+    }
+  },
+  "review": {
+    "waiting": {
+      "one": "1 Notenblatt wartet auf Freigabe",
+      "other": "{{ count }} Notenblätter warten auf Freigabe"
+    },
+    "shortcuts": "Tastenkürzel:",
+    "keyApprove": "annehmen",
+    "keyReject": "ablehnen",
+    "keyBrowse": "vorheriger/nächster Upload",
+    "empty": "Keine Uploads warten auf die Prüfung.",
+    "queue": "Warteschlange",
+    "queueCount": "Warteschlange · {{ count }}",
+    "collapseQueue": "Warteschlange einklappen",
+    "expandQueue": "Warteschlange öffnen",
+    "position": "{{ position }} von {{ total }}",
+    "inQueue": "in der Warteschlange",
+    "previousUpload": "Vorheriger Upload",
+    "nextUpload": "Nächster Upload",
+    "noVoice": "Stimme offen",
+    "preview": "Vorschau",
+    "tools": "Vorschau-Werkzeuge",
+    "rotate": "Drehen",
+    "rotated": "Seite {{ page }} um {{ degrees }} Grad gedreht.",
+    "crop": "Zuschneiden",
+    "cropLegend": "Zuschnitt von Seite {{ page }}",
+    "margin": {
+      "left": "Links %",
+      "top": "Oben %",
+      "right": "Rechts %",
+      "bottom": "Unten %"
+    },
+    "resetCrop": "Zuschnitt entfernen",
+    "cropHint": "Ränder in Prozent der angezeigten Seite; der dunkle Bereich wird abgeschnitten.",
+    "zoomIn": "Vergrößern",
+    "zoomOut": "Verkleinern",
+    "keepPage": "Seite {{ page }} übernehmen",
+    "keptCount": "{{ kept }} von {{ total }} Seiten",
+    "assignment": "Zuordnung",
+    "uploadedBy": "Hochgeladen von",
+    "file": "Datei",
+    "exists": "Für dieses Stück und diese Stimme gibt es schon ein Notenblatt.",
+    "replace": "Vorhandenes Notenblatt ersetzen",
+    "replaceNotAllowed": "Zum Ersetzen fehlt dir das Recht „Stücke löschen“. Ordne eine andere Stimme zu oder lehne ab.",
+    "reason": "Grund bei Ablehnung",
+    "reasonPlaceholder": "z. B. Falsches Stück zugeordnet",
+    "reasonRequired": "Bitte gib einen Grund an – er wird der hochladenden Person angezeigt.",
+    "reject": "Ablehnen",
+    "approve": "Annehmen & weiter",
+    "approved": "„{{ name }}“ freigegeben.",
+    "rejected": "„{{ name }}“ abgelehnt.",
+    "pages": "Seiten"
   }
 }

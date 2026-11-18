@@ -23,6 +23,7 @@ import { ZardNativeSelectDirective } from '@/shared/components/native-select';
 
 import { ActionRunner, ConfirmService } from '../../../core/actions/action-runner';
 import { focusFirstInvalid } from '../../../core/util/focus-invalid';
+import { onUploadCompleted } from '../../../core/actions/on-upload';
 import { UploadLauncher } from '../../../core/actions/pending-features';
 import { ApiClient } from '../../../core/api/api-client';
 import { isApiProblem } from '../../../core/api/api-problem';
@@ -148,6 +149,10 @@ export class LibraryScorePage {
   protected readonly previewOpen = signal(false);
 
   constructor() {
+    onUploadCompleted(() => {
+      this.completeness.reload();
+      this.sheets.reload();
+    });
     // Fill the form once details and custom fields are there (again after saving).
     effect(() => {
       if (!this.details.hasValue() || !this.options.fieldsLoaded()) return;
@@ -172,7 +177,7 @@ export class LibraryScorePage {
   }
 
   protected upload(voiceId?: string): void {
-    this.uploads.open({ scoreId: this.scoreId(), voiceId });
+    this.uploads.open({ scoreId: this.scoreId(), scoreTitle: this.details.hasValue() ? this.details.value().title : undefined, voiceId });
   }
 
   protected showSheet(sheetId: string, title: string): void {

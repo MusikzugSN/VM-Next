@@ -1,14 +1,10 @@
 import { Component } from '@angular/core';
 import { RouterOutlet } from '@angular/router';
 
-import { ZardSonnerComponent } from '@/shared/components/sonner';
-
+/** Root: only the router. Toasts live in the app shell (lazy), so ngx-sonner stays out of the initial bundle. */
 @Component({
   selector: 'vm-root',
-  imports: [RouterOutlet, ZardSonnerComponent],
-  template: `
-    <router-outlet />
-    <z-sonner theme="light" position="bottom-right" [closeButton]="true" />
-  `,
+  imports: [RouterOutlet],
+  template: `<router-outlet />`,
 })
 export class App {}

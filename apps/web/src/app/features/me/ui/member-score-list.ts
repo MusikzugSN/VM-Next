@@ -74,6 +74,6 @@ export class MemberScoreList {
   );
 
   protected upload(row: ScoreListRow): void {
-    this.uploads.open({ scoreId: row.scoreId });
+    this.uploads.open({ scoreId: row.scoreId, scoreTitle: row.title });
   }
 }

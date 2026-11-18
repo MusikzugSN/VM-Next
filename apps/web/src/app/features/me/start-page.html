@@ -74,22 +74,22 @@
   </div>
   @if (myUploads.hasValue() && myUploads.value().items.length > 0) {
     <ul class="overflow-hidden rounded-lg border bg-card shadow-sm">
-      @for (upload of myUploads.value().items; track upload.id; let last = $last) {
+      @for (entry of myUploads.value().items; track entry.id; let last = $last) {
         <li class="flex flex-col gap-1.5 px-4 py-3 md:flex-row md:items-center md:gap-3" [class.border-b]="!last">
           <span class="flex min-w-0 flex-1 flex-col">
             <span class="font-medium">
-              {{ upload.score?.name ?? upload.fileName }}
-              @if (upload.voice) {
-                – {{ upload.voice.name }}
+              {{ entry.score?.name ?? entry.fileName }}
+              @if (entry.voice) {
+                – {{ entry.voice.name }}
               }
             </span>
-            @if (upload.status === 'rejected' && upload.rejectionReason) {
-              <span class="text-destructive-ink">{{ 'me.uploads.reason' | transloco: { reason: upload.rejectionReason } }}</span>
+            @if (entry.status === 'rejected' && entry.rejectionReason) {
+              <span class="text-destructive-ink">{{ 'me.uploads.reason' | transloco: { reason: entry.rejectionReason } }}</span>
             } @else {
-              <span class="text-muted-foreground">{{ 'me.uploads.uploadedAt' | transloco: { date: (upload.uploadedAt | date: 'dd.MM.yyyy') } }}</span>
+              <span class="text-muted-foreground">{{ 'me.uploads.uploadedAt' | transloco: { date: (entry.uploadedAt | date: 'dd.MM.yyyy') } }}</span>
             }
           </span>
-          <vm-upload-status-badge [status]="upload.status" />
+          <vm-upload-status-badge [status]="entry.status" />
         </li>
       }
     </ul>

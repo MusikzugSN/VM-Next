@@ -9,7 +9,9 @@ import { APP_ROUTES } from '@vm-web/shared';
 import { filter, skip } from 'rxjs';
 
 import { ZardSheetImports } from '@/shared/components/sheet/sheet.imports';
+import { ZardSonnerComponent } from '@/shared/components/sonner';
 
+import { UploadDialog } from '../../features/uploads/upload-dialog';
 import { BrandingStore } from '../branding/branding.store';
 import { ClubLogo } from '../branding/club-logo';
 import { ViewportService } from './viewport';
@@ -38,6 +40,8 @@ import { VoiceSwitcher } from './voice-switcher';
     NavList,
     UserMenu,
     VoiceSwitcher,
+    UploadDialog,
+    ZardSonnerComponent,
   ],
   viewProviders: [provideIcons({ lucideMenu, lucideHouse, lucideFolderOpen, lucideCalendar, lucideUser })],
   changeDetection: ChangeDetectionStrategy.OnPush,

@@ -8,6 +8,7 @@ import { apiUrl, myUploadsResponseSchema, type MyUploadItem, type UploadStatus }
 import { ZardButtonComponent } from '@/shared/components/button';
 
 import { UploadLauncher } from '../../core/actions/pending-features';
+import { onUploadCompleted } from '../../core/actions/on-upload';
 import { ApiClient } from '../../core/api/api-client';
 import { cursorList } from '../../core/api/cursor-list';
 import { SessionStore } from '../../core/auth/session.store';
@@ -50,15 +51,15 @@ import { UploadStatusBadge } from './ui/upload-status-badge';
 
     @if (viewport.isMobile()) {
       <ul class="flex flex-col gap-2">
-        @for (upload of list.items(); track upload.id) {
+        @for (entry of list.items(); track entry.id) {
           <li class="flex flex-col gap-1.5 rounded-lg border bg-card p-4 shadow-sm">
-            <span class="text-base font-medium">{{ title(upload) }}</span>
+            <span class="text-base font-medium">{{ title(entry) }}</span>
             <span class="flex items-center gap-2">
-              <vm-upload-status-badge [status]="upload.status" />
-              <span class="text-muted-foreground">{{ upload.uploadedAt | date: 'dd.MM.yyyy' }}</span>
+              <vm-upload-status-badge [status]="entry.status" />
+              <span class="text-muted-foreground">{{ entry.uploadedAt | date: 'dd.MM.yyyy' }}</span>
             </span>
-            @if (upload.rejectionReason) {
-              <span class="text-destructive-ink">{{ 'me.uploads.reason' | transloco: { reason: upload.rejectionReason } }}</span>
+            @if (entry.rejectionReason) {
+              <span class="text-destructive-ink">{{ 'me.uploads.reason' | transloco: { reason: entry.rejectionReason } }}</span>
             }
           </li>
         }
@@ -76,17 +77,17 @@ import { UploadStatusBadge } from './ui/upload-status-badge';
             </tr>
           </thead>
           <tbody>
-            @for (upload of list.items(); track upload.id) {
+            @for (entry of list.items(); track entry.id) {
               <tr class="border-t align-top">
-                <td class="px-3 py-2 tabular-nums">{{ upload.uploadedAt | date: 'dd.MM.yyyy' }}</td>
-                <td class="px-3 py-2">{{ upload.score?.name ?? '–' }}</td>
-                <td class="px-3 py-2">{{ upload.voice?.name ?? '–' }}</td>
-                <td class="px-3 py-2 font-mono text-[13px] text-muted-foreground">{{ upload.fileName }}</td>
+                <td class="px-3 py-2 tabular-nums">{{ entry.uploadedAt | date: 'dd.MM.yyyy' }}</td>
+                <td class="px-3 py-2">{{ entry.score?.name ?? '–' }}</td>
+                <td class="px-3 py-2">{{ entry.voice?.name ?? '–' }}</td>
+                <td class="px-3 py-2 font-mono text-[13px] text-muted-foreground">{{ entry.fileName }}</td>
                 <td class="px-3 py-2">
                   <div class="flex flex-col items-start gap-1">
-                    <vm-upload-status-badge [status]="upload.status" />
-                    @if (upload.rejectionReason) {
-                      <span class="text-destructive-ink">{{ 'me.uploads.reason' | transloco: { reason: upload.rejectionReason } }}</span>
+                    <vm-upload-status-badge [status]="entry.status" />
+                    @if (entry.rejectionReason) {
+                      <span class="text-destructive-ink">{{ 'me.uploads.reason' | transloco: { reason: entry.rejectionReason } }}</span>
                     }
                   </div>
                 </td>
@@ -119,9 +120,13 @@ export class UploadsPage {
     fetch: (status, cursor) => this.api.get(apiUrl('me', 'myUploads'), myUploadsResponseSchema, { cursor, status }),
   });
 
-  protected title(upload: MyUploadItem): string {
-    const score = upload.score?.name ?? upload.fileName;
-    return upload.voice ? `${score} – ${upload.voice.name}` : score;
+  constructor() {
+    onUploadCompleted(() => this.list.reload());
+  }
+
+  protected title(entry: MyUploadItem): string {
+    const score = entry.score?.name ?? entry.fileName;
+    return entry.voice ? `${score} – ${entry.voice.name}` : score;
   }
 
   protected upload(): void {

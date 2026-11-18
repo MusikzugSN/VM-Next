@@ -17,6 +17,7 @@ import {
 
 import { ZardButtonComponent } from '@/shared/components/button';
 
+import { onUploadCompleted } from '../../core/actions/on-upload';
 import { UploadLauncher } from '../../core/actions/pending-features';
 import { ApiClient } from '../../core/api/api-client';
 import { SessionStore } from '../../core/auth/session.store';
@@ -72,6 +73,7 @@ export class StartPage {
   });
 
   constructor() {
+    onUploadCompleted(() => this.myUploads.reload());
     // M-1: on the first visit without profile voices, ask for them (unless postponed in this tab).
     effect(() => {
       if (this.voices.needsVoiceSelection() && !postponed()) this.selectVoices.set(true);

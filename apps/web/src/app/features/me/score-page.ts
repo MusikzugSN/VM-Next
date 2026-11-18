@@ -114,7 +114,7 @@ export class ScorePage {
   }
 
   protected upload(voiceId?: string): void {
-    this.uploads.open({ scoreId: this.scoreId(), voiceId });
+    this.uploads.open({ scoreId: this.scoreId(), scoreTitle: this.score()?.title, voiceId });
   }
 
   protected async addTag(tagId: string): Promise<void> {

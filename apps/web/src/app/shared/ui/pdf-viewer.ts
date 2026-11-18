@@ -19,13 +19,13 @@ import type { PDFDocumentLoadingTask, PDFDocumentProxy, RenderTask } from 'pdfjs
 import { ZardButtonComponent } from '@/shared/components/button';
 
 /** Where the pdf.js worker and its resources are served (copied by the build, see project.json). */
-const PDFJS_BASE = '/pdfjs';
+export const PDFJS_BASE = '/pdfjs';
 
 type PdfJs = typeof import('pdfjs-dist');
 let pdfjs: Promise<PdfJs> | undefined;
 
 /** pdf.js is loaded on first use only (≈ 400 kB), never in the initial bundle. */
-function loadPdfJs(): Promise<PdfJs> {
+export function loadPdfJs(): Promise<PdfJs> {
   pdfjs ??= import('pdfjs-dist').then((lib) => {
     lib.GlobalWorkerOptions.workerSrc = `${PDFJS_BASE}/pdf.worker.min.mjs`;
     return lib;

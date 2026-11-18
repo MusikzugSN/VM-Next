@@ -4,7 +4,6 @@ import { APP_ROUTES, childSegment, type AppPath } from '@vm-web/shared';
 
 import { requirePermission } from '../../core/auth/guards';
 import { page } from '../../core/layout/page';
-import { comingSoon } from '../placeholder/coming-soon.routes';
 import { LibraryOptions } from './library-options';
 
 const r = APP_ROUTES.library;
@@ -37,8 +36,12 @@ export const LIBRARY_ROUTES: Routes = [
       libraryPage(r.tags, 'nav.library.tags', requirePermission('tag.view'), () =>
         import('./tags/club-tags-page').then((m) => m.ClubTagsPage),
       ),
-      comingSoon(r.review, r.root, 'nav.library.review', 4, section, [requirePermission('sheet.approve')]),
-      comingSoon(r.reviewUpload, r.root, 'nav.library.review', 4, section, [requirePermission('sheet.approve')]),
+      libraryPage(r.review, 'nav.library.review', requirePermission('sheet.approve'), () =>
+        import('./review/review-page').then((m) => m.ReviewPage),
+      ),
+      libraryPage(r.reviewUpload, 'nav.library.review', requirePermission('sheet.approve'), () =>
+        import('./review/review-page').then((m) => m.ReviewPage),
+      ),
       libraryPage(r.folders, 'nav.library.folders', requirePermission('folder.view'), () =>
         import('./folders/manage-folders-page').then((m) => m.ManageFoldersPage),
       ),
