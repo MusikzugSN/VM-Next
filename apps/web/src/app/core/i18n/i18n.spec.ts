@@ -1,11 +1,22 @@
-import { readdirSync, readFileSync, statSync } from 'node:fs';
-import { join, relative } from 'node:path';
+import { existsSync, readdirSync, readFileSync, statSync } from 'node:fs';
+import { dirname, join, relative } from 'node:path';
 
 import { loginErrorCodeSchema, problemCodeSchema } from '@vm-web/shared';
 
 import { AVAILABLE_LANGS, translationFile } from './i18n';
 
-const WEB_ROOT = join(process.cwd(), 'apps/web');
+/** Workspace root: the first folder above the working directory with an nx.json. */
+function workspaceRoot(): string {
+  let dir = process.cwd();
+  while (!existsSync(join(dir, 'nx.json'))) {
+    const parent = dirname(dir);
+    if (parent === dir) throw new Error('nx.json not found above ' + process.cwd());
+    dir = parent;
+  }
+  return dir;
+}
+
+const WEB_ROOT = join(workspaceRoot(), 'apps/web');
 const APP_ROOT = join(WEB_ROOT, 'src/app');
 const TRANSLATE_ROOT = join(WEB_ROOT, 'public/translate');
 
@@ -40,7 +51,10 @@ function sourceFiles(dir: string): string[] {
 function usedKeys(): { key: string; file: string }[] {
   const patterns = [
     /'([a-zA-Z][\w-]*(?:\.[\w-]+)+)'\s*\|\s*transloco/g,
-    /\b(?:t|translate|selectTranslate|i18nKey)\(\s*'([a-zA-Z][\w-]*(?:\.[\w-]+)+)'/g,
+    /\b(?:t|translate|selectTranslate|i18nKey|page)\(\s*'([a-zA-Z][\w-]*(?:\.[\w-]+)+)'/g,
+    // Navigation entries and route titles.
+    /\b(?:labelKey|titleKey|key):\s*'([a-zA-Z][\w-]*(?:\.[\w-]+)+)'/g,
+    /\bcomingSoon\([^,]+,[^,]+,\s*'([a-zA-Z][\w-]*(?:\.[\w-]+)+)'/g,
   ];
   const result: { key: string; file: string }[] = [];
   for (const file of sourceFiles(APP_ROOT)) {

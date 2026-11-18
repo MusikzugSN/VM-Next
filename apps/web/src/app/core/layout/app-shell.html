@@ -1,0 +1,114 @@
+<a
+  href="#main"
+  class="sr-only z-50 rounded-md bg-primary px-4 py-2 text-primary-foreground focus:not-sr-only focus:fixed focus:top-2 focus:left-2"
+  >{{ 'app.skipToContent' | transloco }}</a
+>
+
+<div class="flex min-h-dvh">
+  @if (viewport.isDesktop()) {
+    <aside class="sticky top-0 flex h-dvh w-sidebar shrink-0 flex-col gap-2 border-r bg-sidebar p-4">
+      <div class="mb-1 flex items-center gap-2">
+        <vm-club-logo [size]="32" />
+        <span class="truncate font-semibold">{{ branding.clubName() ?? ('app.name' | transloco) }}</span>
+      </div>
+      <div class="min-h-0 flex-1 overflow-y-auto">
+        <vm-nav-list />
+      </div>
+      <div class="border-t pt-2">
+        <vm-user-menu variant="sidebar" />
+      </div>
+    </aside>
+  }
+
+  <div class="flex min-w-0 flex-1 flex-col">
+    <header class="sticky top-0 z-20 flex h-header shrink-0 items-center gap-2 border-b bg-background px-2 md:gap-3 md:px-4 xl:px-8">
+      @if (viewport.isDesktop()) {
+        <nav [attr.aria-label]="'shell.breadcrumbs' | transloco" class="min-w-0 flex-1 text-[13px] text-muted-foreground">
+          @if (page(); as page) {
+            <ol class="flex items-center gap-1.5">
+              @if (page.sectionKey) {
+                <li>
+                  @if (page.sectionPath) {
+                    <a [routerLink]="page.sectionPath" class="text-muted-foreground no-underline hover:text-foreground">{{
+                      page.sectionKey | transloco
+                    }}</a>
+                  } @else {
+                    {{ page.sectionKey | transloco }}
+                  }
+                </li>
+                <li aria-hidden="true">/</li>
+              }
+              <li aria-current="page" class="truncate text-foreground">{{ page.titleKey | transloco }}</li>
+            </ol>
+          }
+        </nav>
+      } @else {
+        <button
+          type="button"
+          class="flex size-11 shrink-0 items-center justify-center rounded-md hover:bg-accent"
+          [attr.aria-label]="'shell.openNavigation' | transloco"
+          [attr.aria-expanded]="navOpen()"
+          (click)="navOpen.set(true)"
+        >
+          <ng-icon name="lucideMenu" size="20" aria-hidden="true" />
+        </button>
+        @if (!viewport.isMobile()) {
+          <vm-club-logo [size]="28" />
+        }
+        <span class="min-w-0 flex-1 truncate text-base font-semibold">
+          @if (page(); as page) {
+            {{ page.titleKey | transloco }}
+          }
+        </span>
+      }
+
+      @if (!viewport.isMobile()) {
+        <vm-voice-switcher />
+      }
+      @if (!viewport.isDesktop()) {
+        <vm-user-menu variant="header" />
+      }
+    </header>
+
+    <main id="main" tabindex="-1" class="mx-auto flex w-full max-w-content flex-1 flex-col gap-6 p-4 outline-none md:p-6 xl:p-8" [class.pb-20]="viewport.isMobile()">
+      @if (showMobileVoice()) {
+        <vm-voice-switcher />
+      }
+      <router-outlet />
+    </main>
+
+    @if (viewport.isMobile()) {
+      <nav
+        [attr.aria-label]="'shell.mobileNavigation' | transloco"
+        class="fixed inset-x-0 bottom-0 z-20 grid h-16 grid-cols-4 border-t bg-background"
+      >
+        @for (item of mobileNav; track item.path) {
+          <a
+            [routerLink]="item.path"
+            routerLinkActive="text-primary font-medium"
+            [routerLinkActiveOptions]="{ exact: item.exact ?? false }"
+            ariaCurrentWhenActive="page"
+            class="flex flex-col items-center justify-center gap-1 text-xs text-muted-foreground no-underline"
+          >
+            <ng-icon [name]="item.icon" size="20" aria-hidden="true" />
+            {{ item.labelKey | transloco }}
+          </a>
+        }
+      </nav>
+    }
+  </div>
+</div>
+
+@if (!viewport.isDesktop()) {
+  <z-sheet [(zVisible)]="navOpen" zSide="left" zWidth="288px" class="bg-sidebar">
+    <z-sheet-header>
+      <div z-sheet-title class="flex items-center gap-2">
+        <vm-club-logo [size]="32" />
+        <span class="truncate">{{ branding.clubName() ?? ('app.name' | transloco) }}</span>
+      </div>
+    </z-sheet-header>
+    <div class="min-h-0 flex-1 overflow-y-auto px-4 pb-4">
+      <vm-nav-list (navigate)="navOpen.set(false)" />
+    </div>
+  </z-sheet>
+}

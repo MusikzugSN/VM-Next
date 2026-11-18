@@ -101,7 +101,7 @@ Tabs, die einen Teil einer Seite zeigen, sind Query-Parameter. So bleiben Links 
   - Mobil: Kopfzeile, Menü-Button und untere Leiste mit Mein Bereich, Mappen, Events und Profil.
 - Kopfzeile: Brotkrumen und Seitentitel, aktive Stimme (VoiceChip-Menü, M-2, `me/voice-context`), Benutzermenü mit Abmelden (`auth/logout`).
 - Navigation wird aus einer Konfiguration mit Recht je Eintrag erzeugt. Der Zähler „Prüfung 4“ kommt aus `review` (Anzahl) und erscheint nur mit `sheet.approve`.
-- Ensemble-Umschalter oben in der Seitenleiste, wenn die Person mehreren Ensembles angehört (R-1).
+- Kein Ensemble-Umschalter (entschieden): Mein Bereich zeigt immer alle eigenen Ensembles. Oben in der Seitenleiste stehen Vereinslogo und Vereinsname.
 
 **Prüfung:**
 
@@ -251,3 +251,4 @@ Diese Stufe ist die größte. Bei Bedarf teile ich sie in **3a** (Stücke, Stimm
 - **Druckservice:** Den Vertrag lege ich in Stufe 6 in `libs/shared` fest; der Druckservice selbst ist ein eigener Auftrag danach.
 - **Änderungsprotokoll (S-6):** vorerst weggelassen.
 - **Reihenfolge:** wie oben. Getestet wird ohnehin am Ende im Zusammenspiel.
+- **Ensemble-Umschalter (R-1):** gibt es nicht. Die Listen in Mein Bereich umfassen immer alle eigenen Ensembles, wie in der API.

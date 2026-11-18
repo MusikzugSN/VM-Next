@@ -68,7 +68,8 @@
     "folder": "Mappe",
     "event": "Event",
     "substituteVoice": "Ersatzstimme",
-    "review": "Prüfung"
+    "review": "Prüfung",
+    "tag": "Tag"
   },
   "status": {
     "substitute": "Ersatz: {{ voice }}",
@@ -123,5 +124,38 @@
     "invalid_key": "Ungültiger Wert",
     "invalid_element": "Ungültiger Wert",
     "custom": "Ungültiger Wert"
+  },
+  "shell": {
+    "breadcrumbs": "Brotkrumen",
+    "openNavigation": "Navigation öffnen",
+    "mobileNavigation": "Hauptziele",
+    "pendingUploads": "ungeprüfte Uploads",
+    "userMenu": "Benutzermenü {{ name }}",
+    "voice": {
+      "label": "Aktive Stimme: {{ voices }}. Stimme wechseln",
+      "menuTitle": "Noten anzeigen für",
+      "allOwn": "Alle meine Stimmen",
+      "override": "Aushilfe",
+      "choose": "Stimmen wählen",
+      "editProfile": "Eigene Stimmen im Profil ändern"
+    }
+  },
+  "pages": {
+    "login": "Anmeldung",
+    "toHome": "Zu Mein Bereich",
+    "comingSoon": "Diese Seite wird in Stufe {{ stage }} gebaut.",
+    "newScore": "Stück anlegen",
+    "editFolder": "Mappe bearbeiten",
+    "editEvent": "Event bearbeiten",
+    "user": "Benutzer",
+    "forbidden": {
+      "title": "Kein Zugriff",
+      "text": "Für diesen Bereich fehlt dir in deiner Rolle das nötige Recht. Wenn du es brauchst, wende dich an eine:n Administrator:in deines Vereins."
+    },
+    "notFound": {
+      "title": "Seite nicht gefunden",
+      "text": "Diese Adresse gibt es nicht oder nicht mehr. Vielleicht wurde die Mappe oder das Event umbenannt oder archiviert.",
+      "requested": "Aufgerufen:"
+    }
   }
 }

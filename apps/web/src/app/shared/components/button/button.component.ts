@@ -126,6 +126,8 @@ export class ZardButtonComponent implements OnDestroy {
   protected readonly isNotInsideOfButtonOrLink = computed(() => {
     // Evaluated once; assumes component parent doesn't change after mount
     const zardButtonElement = this.elementRef.nativeElement;
+    // VM-Web: a native <button> or <a> host keeps its own role (links must stay links for screen readers).
+    if (zardButtonElement.tagName === 'BUTTON' || zardButtonElement.tagName === 'A') return false;
     if (zardButtonElement.parentElement) {
       const { tagName } = zardButtonElement.parentElement;
       return tagName !== 'BUTTON' && tagName !== 'A';

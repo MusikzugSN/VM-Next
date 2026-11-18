@@ -1,0 +1,23 @@
+{
+  "login": {
+    "welcomeLabel": "Willkommen",
+    "welcome": "Willkommen beim {{ club }}",
+    "defaultBanner": "Deine Noten, Mappen und Events – an einem Ort, auf jedem Gerät.",
+    "tagline": "VM-Web · Notenverwaltung für Musikvereine",
+    "logoLabel": "Vereinslogo {{ club }}",
+    "intro": "Melde dich an, um zu deinen Noten zu kommen.",
+    "submit": "Mit Vereinskonto anmelden",
+    "redirectHint": "Du wirst zum Anmeldedienst deines Vereins weitergeleitet."
+  },
+  "blocked": {
+    "title": "Dein Konto ist gesperrt",
+    "text": "Dein Konto wurde im {{ club }} gesperrt. Solange die Sperre besteht, kannst du keine Noten, Mappen oder Events öffnen. Deine Daten bleiben erhalten.",
+    "contactTitle": "Kontakt zum Verein",
+    "contactText": "Wenn du glaubst, dass das ein Versehen ist, wende dich an den Vorstand deines Vereins.",
+    "otherAccount": "Mit anderem Konto anmelden"
+  },
+  "legal": {
+    "imprint": "Impressum",
+    "privacy": "Datenschutz"
+  }
+}
