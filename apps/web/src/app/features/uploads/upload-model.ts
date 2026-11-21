@@ -50,6 +50,34 @@ export function addFiles(
   return result;
 }
 
+/** Replaces a file by the parts it was split into (N-18), in place, keeping the list order. */
+export function replaceWithParts(
+  items: readonly UploadItem[],
+  key: string,
+  parts: readonly { file: File; scoreId: string | null; scoreTitle: string | null; voiceId: string | null; from: number }[],
+): UploadItem[] {
+  return items.flatMap((item) =>
+    item.key !== key
+      ? [item]
+      : parts.map((part) => ({
+          key: `${key}#${part.from}`,
+          file: part.file,
+          scoreId: part.scoreId,
+          scoreTitle: part.scoreTitle,
+          voiceId: part.voiceId,
+          suggested: false,
+          problem: fileProblem(part.file),
+        })),
+  );
+}
+
+/** Batches for `POST uploads/sheets/upload`, which takes at most 50 files per request. */
+export function batches<T>(items: readonly T[], size = UPLOAD_MAX_FILES): T[][] {
+  const result: T[][] = [];
+  for (let i = 0; i < items.length; i += size) result.push(items.slice(i, i + size));
+  return result;
+}
+
 /** Files that can be sent (valid type and size). */
 export function sendable(items: readonly UploadItem[]): UploadItem[] {
   return items.filter((item) => item.problem === null);

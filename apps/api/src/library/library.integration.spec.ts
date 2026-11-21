@@ -9,6 +9,7 @@ import { FoldersController } from '../folders/folders.controller';
 import { FoldersService } from '../folders/folders.service';
 import { MeRepository } from '../me/me.repository';
 import { FieldsService } from '../scores/fields.service';
+import { ScoreImportService } from '../scores/score-import.service';
 import { ScoresController } from '../scores/scores.controller';
 import { ScoresRepository } from '../scores/scores.repository';
 import { ScoresService } from '../scores/scores.service';
@@ -85,7 +86,7 @@ describe.skipIf(!TEST_DATABASE_URL)('Notenverwaltung (TEST_DATABASE_URL)', () =>
     t = await createTestApp(
       {
         controllers: [ScoresController, VoicesController, FoldersController, EventsController, TagsController],
-        providers: [ScoresRepository, ScoresService, FieldsService, MeRepository, VoicesService, FoldersService, EventsService, TagsService, ClubSettingsRepository],
+        providers: [ScoresRepository, ScoresService, FieldsService, ScoreImportService, MeRepository, VoicesService, FoldersService, EventsService, TagsService, ClubSettingsRepository],
       },
       { database: testDb.db, providers: [{ provide: FILE_STORAGE, useValue: storage }], config: { APP_TIMEZONE: 'Europe/Berlin' } },
     );

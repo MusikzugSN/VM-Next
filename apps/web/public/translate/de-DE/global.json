@@ -183,7 +183,8 @@
       "title": "Seite nicht gefunden",
       "text": "Diese Adresse gibt es nicht oder nicht mehr. Vielleicht wurde die Mappe oder das Event umbenannt oder archiviert.",
       "requested": "Aufgerufen:"
-    }
+    },
+    "importScores": "Stücke importieren"
   },
   "pdf": {
     "label": "PDF-Vorschau, Seite {{ page }} von {{ count }}. Mit den Pfeiltasten blättern.",
@@ -238,6 +239,36 @@
     "donePartly": {
       "one": "1 Datei hochgeladen.",
       "other": "{{ count }} Dateien hochgeladen, {{ approved }} davon sofort freigegeben. Der Rest wartet auf die Prüfung."
+    },
+    "createScore": "„{{ title }}“ als neues Stück anlegen",
+    "scoreCreated": "Stück „{{ title }}“ angelegt.",
+    "split": {
+      "button": "Aufteilen …",
+      "open": "{{ name }} aufteilen",
+      "title": "„{{ name }}“ aufteilen",
+      "intro": "Lege oben Stück und Stimme fest und scrolle weiter. Wo sich etwas ändert, setzt du mit der Schere einen neuen Abschnitt – Stück und Stimme gelten weiter, bis du sie änderst.",
+      "pages": "Seiten der PDF",
+      "page": "Seite {{ page }} von {{ count }}",
+      "newSection": "Neuer Abschnitt ab Seite {{ page }}",
+      "sectionFrom": "Abschnitt ab Seite {{ page }}",
+      "removeBoundary": "Trennung vor Seite {{ page }} entfernen",
+      "sectionPanel": "Abschnitt bearbeiten",
+      "currentSection": "Abschnitt Seite {{ from }}–{{ to }}",
+      "skip": "Diese Seiten überspringen (z. B. Deckblatt)",
+      "sections": "Abschnitte",
+      "pagesRange": "Seite {{ from }}–{{ to }}",
+      "skipped": "wird übersprungen",
+      "forScore": "{{ title }}",
+      "noScore": "Stück offen",
+      "unassigned": {
+        "one": "1 Abschnitt ohne Stück oder Stimme – die Zuordnung erfolgt bei der Prüfung.",
+        "other": "{{ count }} Abschnitte ohne Stück oder Stimme – die Zuordnung erfolgt bei der Prüfung."
+      },
+      "apply": {
+        "one": "Als 1 Datei übernehmen",
+        "other": "In {{ count }} Dateien aufteilen"
+      },
+      "failed": "Die PDF ließ sich nicht aufteilen."
     }
   },
   "review": {

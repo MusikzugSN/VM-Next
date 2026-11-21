@@ -1,0 +1,310 @@
+<div class="flex flex-col gap-6">
+  <div>
+    <h1 class="text-2xl font-semibold">{{ 'library.import.title' | transloco }}</h1>
+    <p class="mt-2 max-w-3xl text-muted-foreground">{{ 'library.import.intro' | transloco }}</p>
+  </div>
+
+  @if (!canEdit()) {
+    <p role="alert" class="rounded-md bg-destructive-soft p-4 text-destructive-ink">{{ 'library.import.needsEdit' | transloco }}</p>
+  }
+
+  <!-- 1 · Datei -->
+  <section class="flex flex-col gap-3 rounded-lg border bg-card p-4 shadow-sm md:p-6" aria-labelledby="import-file">
+    <h2 id="import-file" class="text-lg font-semibold">{{ 'library.import.step.file' | transloco }}</h2>
+    <div class="flex flex-col gap-3 md:flex-row md:items-center">
+      <input #picker type="file" class="sr-only" accept=".csv,text/csv" tabindex="-1" aria-hidden="true" (change)="onPick($event)" />
+      <button z-button zType="outline" type="button" class="w-full md:w-auto" (click)="picker.click()">
+        <ng-icon name="lucideFileSpreadsheet" aria-hidden="true" />{{ 'library.import.chooseFile' | transloco }}
+      </button>
+      @if (table(); as t) {
+        <p class="text-muted-foreground">
+          <span class="font-mono text-foreground">{{ fileName() }}</span> ·
+          {{ 'library.import.fileInfo' | transloco: { rows: t.rows.length, columns: t.headers.length, delimiter: t.delimiter === '\t' ? 'Tab' : t.delimiter, encoding: t.encoding } }}
+        </p>
+      } @else {
+        <p class="text-muted-foreground">{{ 'library.import.fileHint' | transloco }}</p>
+      }
+    </div>
+    @if (readError()) {
+      <p role="alert" class="flex items-center gap-2 text-destructive-ink">
+        <ng-icon name="lucideCircleAlert" aria-hidden="true" />{{ 'library.import.readError' | transloco: { name: fileName() } }}
+      </p>
+    }
+  </section>
+
+  @if (table(); as t) {
+    <!-- 2 · Zuordnung -->
+    <section class="flex flex-col gap-4 rounded-lg border bg-card p-4 shadow-sm md:p-6" aria-labelledby="import-mapping">
+      <div>
+        <h2 id="import-mapping" class="text-lg font-semibold">{{ 'library.import.step.mapping' | transloco }}</h2>
+        <p class="mt-1 text-muted-foreground">{{ 'library.import.mappingHint' | transloco }}</p>
+      </div>
+
+      <!-- Table on wide screens, stacked cards on phones: the target must stay reachable without side scrolling. -->
+      <div class="rounded-md border">
+        <div class="hidden grid-cols-[minmax(0,12rem)_minmax(0,1fr)_18rem] gap-3 bg-muted px-3 py-2 text-xs font-medium text-muted-foreground md:grid" aria-hidden="true">
+          <span>{{ 'library.import.column' | transloco }}</span>
+          <span>{{ 'library.import.examples' | transloco }}</span>
+          <span>{{ 'library.import.target' | transloco }}</span>
+        </div>
+        <ul>
+          @for (header of t.headers; track $index; let i = $index) {
+            @let column = columns()[i];
+            <li class="grid gap-2 border-t px-3 py-3 first:border-t-0 md:grid-cols-[minmax(0,12rem)_minmax(0,1fr)_18rem] md:gap-3 md:first:border-t" [class.bg-muted/40]="column.target === 'ignore'">
+              <span class="font-medium break-words">{{ header }}</span>
+              <span class="min-w-0 text-[13px] text-muted-foreground">
+                <span class="sr-only">{{ 'library.import.examples' | transloco }}: </span>
+                @for (example of examplesOf(i); track example) {
+                  <span class="me-1 mb-1 inline-block max-w-full truncate rounded-sm bg-muted px-1.5 py-0.5 align-top">{{ example }}</span>
+                } @empty {
+                  <span>{{ 'library.import.emptyColumn' | transloco }}</span>
+                }
+              </span>
+              <div class="flex min-w-0 flex-col gap-2">
+                <select
+                  z-native-select
+                  (change)="setTarget(i, $any($event.target).value)"
+                  [attr.aria-label]="'library.import.targetFor' | transloco: { column: header }"
+                >
+                  <option value="ignore" [selected]="column.target === 'ignore'">{{ 'library.import.ignore' | transloco }}</option>
+                  <optgroup [label]="'library.import.groupFixed' | transloco">
+                    @for (field of fixedTargets; track field) {
+                      <option [value]="'fixed:' + field" [selected]="column.target === 'fixed:' + field">{{ 'library.fields.' + field | transloco }}</option>
+                    }
+                  </optgroup>
+                  @if (options.fields().length) {
+                    <optgroup [label]="'library.import.groupCustom' | transloco">
+                      @for (field of options.fields(); track field.id) {
+                        <option [value]="'field:' + field.id" [selected]="column.target === 'field:' + field.id">{{ field.name }}</option>
+                      }
+                    </optgroup>
+                  }
+                  <option value="new" [selected]="column.target === 'new'">{{ 'library.import.newField' | transloco }}</option>
+                  @if (canUseFolders()) {
+                    <optgroup [label]="'library.import.groupFolder' | transloco">
+                      <option value="folder" [selected]="column.target === 'folder'">{{ 'library.import.folder' | transloco }}</option>
+                      <option value="folderNumber" [selected]="column.target === 'folderNumber'">{{ 'library.import.folderNumber' | transloco }}</option>
+                    </optgroup>
+                  }
+                </select>
+                @if (column.target === 'new') {
+                  <div class="grid grid-cols-2 gap-2">
+                    <input
+                      z-input
+                      [value]="column.newName"
+                      (input)="patchColumn(i, { newName: $any($event.target).value })"
+                      [attr.aria-label]="'library.import.newFieldName' | transloco: { column: header }"
+                      maxlength="100"
+                    />
+                    <select
+                      z-native-select
+                      (change)="patchColumn(i, { newType: $any($event.target).value })"
+                      [attr.aria-label]="'library.import.newFieldType' | transloco: { column: header }"
+                    >
+                      @for (type of newFieldTypes; track type) {
+                        <option [value]="type" [selected]="type === column.newType">{{ 'terms.fieldTypes.' + type | transloco }}</option>
+                      }
+                    </select>
+                  </div>
+                }
+              </div>
+            </li>
+          }
+        </ul>
+      </div>
+
+      @if (canUseFolders()) {
+        <div class="grid gap-3 md:grid-cols-2">
+          @if (!hasFolderColumn()) {
+            <label class="flex flex-col gap-1.5">
+              <span class="font-medium">{{ 'library.import.fixedFolder' | transloco }}</span>
+              <input z-input [value]="fixedFolder()" (input)="setFixedFolder($any($event.target).value)" maxlength="100" />
+              <span class="text-[13px] text-muted-foreground">{{ 'library.import.fixedFolderHint' | transloco }}</span>
+            </label>
+          }
+          @if (withFolder()) {
+            <label class="flex flex-col gap-1.5">
+              <span class="font-medium">{{ 'library.import.folderEnsemble' | transloco }}</span>
+              <select z-native-select (change)="setEnsemble($any($event.target).value)">
+                <option value="">{{ 'library.import.chooseEnsemble' | transloco }}</option>
+                @for (ensemble of ensembleItems(); track ensemble.id) {
+                  <option [value]="ensemble.id" [selected]="ensemble.id === folderEnsembleId()">{{ ensemble | treeLabel }}</option>
+                }
+              </select>
+              <span class="text-[13px] text-muted-foreground">{{ 'library.import.folderEnsembleHint' | transloco }}</span>
+            </label>
+          }
+        </div>
+        @if (withFolder() && !hasNumberColumn()) {
+          <p class="flex items-start gap-2 text-warning-ink">
+            <ng-icon name="lucideTriangleAlert" class="mt-0.5 shrink-0" aria-hidden="true" />{{ 'library.import.noNumberColumn' | transloco }}
+          </p>
+        }
+      }
+
+      @if (requiredUnmapped().length) {
+        <p class="flex items-start gap-2 text-warning-ink">
+          <ng-icon name="lucideTriangleAlert" class="mt-0.5 shrink-0" aria-hidden="true" />{{ 'library.import.requiredUnmapped' | transloco: { names: requiredUnmapped().join('“, „') } }}
+        </p>
+      }
+      @if (problems().length) {
+        <ul class="flex flex-col gap-1 text-destructive-ink" aria-live="polite">
+          @for (problem of problems(); track problem) {
+            <li class="flex items-start gap-2"><ng-icon name="lucideCircleAlert" class="mt-0.5 shrink-0" aria-hidden="true" />{{ 'library.import.problem.' + problem | transloco }}</li>
+          }
+        </ul>
+      }
+
+      <div class="flex flex-col gap-2 md:flex-row md:justify-end">
+        <button z-button type="button" [zLoading]="busy() === 'preview'" [zDisabled]="!ready() || !canEdit() || busy() !== null" (click)="runPreview()">
+          {{ (preview() ? 'library.import.refreshPreview' : 'library.import.showPreview') | transloco }}
+        </button>
+      </div>
+    </section>
+
+    <!-- 3 · Vorschau -->
+    @if (preview(); as p) {
+      <section class="flex flex-col gap-4 rounded-lg border bg-card p-4 shadow-sm md:p-6" aria-labelledby="import-preview">
+        <div>
+          <h2 id="import-preview" class="text-lg font-semibold">{{ 'library.import.step.preview' | transloco }}</h2>
+          <p class="mt-1 text-muted-foreground">{{ 'library.import.previewHint' | transloco }}</p>
+        </div>
+
+        <ul class="flex flex-wrap gap-2 text-[13px]" aria-label="{{ 'library.import.summary' | transloco }}">
+          <li class="rounded-full bg-primary-soft px-3 py-1 text-primary">{{ 'library.import.count.create' | tPlural: p.summary.create }}</li>
+          <li class="rounded-full bg-muted px-3 py-1">{{ 'library.import.count.link' | tPlural: p.summary.link }}</li>
+          @if (p.summary.overwrite) {
+            <li class="rounded-full bg-muted px-3 py-1">{{ 'library.import.count.overwrite' | tPlural: p.summary.overwrite }}</li>
+          }
+          @if (p.summary.skip) {
+            <li class="rounded-full bg-muted px-3 py-1">{{ 'library.import.count.skip' | tPlural: p.summary.skip }}</li>
+          }
+          @if (p.summary.failed) {
+            <li class="rounded-full bg-destructive-soft px-3 py-1 text-destructive-ink">{{ 'library.import.count.failed' | tPlural: p.summary.failed }}</li>
+          }
+          @if (p.summary.newFolders.length) {
+            <li class="rounded-full bg-muted px-3 py-1">{{ 'library.import.newFolders' | transloco: { names: p.summary.newFolders.join(', ') } }}</li>
+          }
+          @if (p.summary.newOptions) {
+            <li class="rounded-full bg-muted px-3 py-1">{{ 'library.import.count.options' | tPlural: p.summary.newOptions }}</li>
+          }
+        </ul>
+
+        <label class="flex flex-col gap-1.5 md:w-64">
+          <span class="font-medium">{{ 'library.import.show' | transloco }}</span>
+          <select z-native-select (change)="rowFilter.set($any($event.target).value)">
+            <option value="all" [selected]="rowFilter() === 'all'">{{ 'library.import.filter.all' | transloco }}</option>
+            <option value="issues" [selected]="rowFilter() === 'issues'">{{ 'library.import.filter.issues' | transloco }}</option>
+            <option value="matches" [selected]="rowFilter() === 'matches'">{{ 'library.import.filter.matches' | transloco }}</option>
+          </select>
+        </label>
+
+        <!-- Like the mapping: grid rows on wide screens, cards on phones (the action stays usable). -->
+        <div class="max-h-[60dvh] overflow-auto rounded-md border">
+          <div class="sticky top-0 z-10 hidden gap-3 bg-muted px-3 py-2 text-xs font-medium text-muted-foreground md:grid md:grid-cols-[3rem_minmax(0,1.4fr)_minmax(0,1fr)_minmax(0,0.8fr)_11rem]" aria-hidden="true">
+            <span class="text-end">{{ 'library.import.line' | transloco }}</span>
+            <span>{{ 'library.fields.title' | transloco }}</span>
+            <span>{{ 'library.import.match' | transloco }}</span>
+            <span>{{ 'library.import.folder' | transloco }}</span>
+            <span>{{ 'library.import.action' | transloco }}</span>
+          </div>
+          <ul>
+            @for (row of shownRows(); track row.line) {
+              <li class="grid gap-x-3 gap-y-1.5 border-t px-3 py-3 first:border-t-0 md:first:border-t md:grid-cols-[3rem_minmax(0,1.4fr)_minmax(0,1fr)_minmax(0,0.8fr)_11rem]" [class.bg-destructive-soft]="row.failed">
+                <span class="text-[13px] text-muted-foreground tabular-nums md:text-end">
+                  <span class="md:sr-only">{{ 'library.import.line' | transloco }} </span>{{ row.line }}
+                </span>
+                <div class="min-w-0">
+                  <span class="font-medium break-words">{{ row.title || '–' }}</span>
+                  @for (issue of row.issues; track $index) {
+                    <p class="mt-1 flex items-start gap-1.5 text-[13px]" [class]="issue.level === 'error' ? 'text-destructive-ink' : 'text-warning-ink'">
+                      <ng-icon [name]="issue.level === 'error' ? 'lucideCircleAlert' : 'lucideTriangleAlert'" class="mt-0.5 shrink-0" aria-hidden="true" />
+                      <span>
+                        @if (targetLabel(issue.target); as label) {
+                          {{ label }}:
+                        } @else if (issue.target !== 'folder' && issue.target !== 'title') {
+                          {{ 'library.fields.' + issue.target | transloco }}:
+                        }
+                        {{ 'library.import.issue.' + issue.code | transloco }}
+                      </span>
+                    </p>
+                  }
+                </div>
+                <div class="min-w-0 text-[13px]">
+                  <span class="text-muted-foreground md:sr-only">{{ 'library.import.match' | transloco }}: </span>
+                  @if (row.match; as m) {
+                    <span>{{ m.title }}</span>
+                    @if (m.composer) {
+                      <span class="text-muted-foreground"> · {{ m.composer }}</span>
+                    }
+                    @if (m.inFile) {
+                      <span class="ms-1 rounded-sm bg-primary-soft px-1.5 py-0.5 text-xs text-primary">{{ 'library.import.inFile' | transloco }}</span>
+                    }
+                  } @else {
+                    <span class="text-muted-foreground">{{ 'library.import.noMatch' | transloco }}</span>
+                  }
+                </div>
+                <div class="min-w-0 text-[13px]">
+                  @if (row.folder; as f) {
+                    <span class="text-muted-foreground md:sr-only">{{ 'library.import.folder' | transloco }}: </span>
+                    {{ f.name }}
+                    @if (f.number) {
+                      <span class="font-medium"> · {{ f.number }}</span>
+                    }
+                    @if (f.isNew) {
+                      <span class="ms-1 rounded-sm bg-muted px-1.5 py-0.5 text-xs">{{ 'library.import.newFolder' | transloco }}</span>
+                    }
+                  }
+                </div>
+                <div>
+                  @if (row.failed) {
+                    <span class="text-[13px] text-destructive-ink">{{ 'library.import.notImported' | transloco }}</span>
+                  } @else {
+                    <select
+                      z-native-select
+                      [disabled]="busy() !== null"
+                      (change)="setAction(row, $any($event.target).value)"
+                      [attr.aria-label]="'library.import.actionFor' | transloco: { line: row.line }"
+                    >
+                      @for (action of actionsFor(row); track action) {
+                        <option [value]="action" [selected]="action === row.action">{{ 'library.import.actions.' + action | transloco }}</option>
+                      }
+                    </select>
+                  }
+                </div>
+              </li>
+            } @empty {
+              <li class="px-3 py-6 text-center text-muted-foreground">{{ 'library.import.noRows' | transloco }}</li>
+            }
+          </ul>
+        </div>
+
+        <div class="flex flex-col-reverse gap-2 md:flex-row md:justify-end">
+          <button z-button zType="secondary" type="button" [zDisabled]="busy() !== null" (click)="reset()">{{ 'common.cancel' | transloco }}</button>
+          <button z-button type="button" [zLoading]="busy() === 'import'" [zDisabled]="!importCount() || busy() !== null" (click)="runImport()">
+            <ng-icon name="lucideUpload" aria-hidden="true" />{{ 'library.import.run' | tPlural: importCount() }}
+          </button>
+        </div>
+      </section>
+    }
+  }
+
+  @if (result(); as r) {
+    <section class="flex flex-col gap-3 rounded-lg border bg-card p-4 shadow-sm md:p-6" aria-labelledby="import-result" role="status">
+      <h2 id="import-result" class="text-lg font-semibold">{{ 'library.import.resultTitle' | transloco }}</h2>
+      <p>
+        {{ 'library.import.count.create' | tPlural: r.summary.create }} · {{ 'library.import.count.link' | tPlural: r.summary.link }}
+        @if (r.summary.overwrite) {
+          · {{ 'library.import.count.overwrite' | tPlural: r.summary.overwrite }}
+        }
+        @if (r.summary.failed) {
+          · <span class="text-destructive-ink">{{ 'library.import.count.failed' | tPlural: r.summary.failed }}</span>
+        }
+      </p>
+      <div class="flex flex-col gap-2 md:flex-row">
+        <a z-button [routerLink]="scoresPath">{{ 'library.import.toScores' | transloco }}</a>
+        <button z-button zType="outline" type="button" (click)="reset()">{{ 'library.import.again' | transloco }}</button>
+      </div>
+    </section>
+  }
+</div>

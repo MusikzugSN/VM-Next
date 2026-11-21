@@ -1,8 +1,10 @@
 import { INestApplication, type ModuleMetadata, type Provider } from '@nestjs/common';
 import { APP_FILTER, APP_GUARD, APP_INTERCEPTOR } from '@nestjs/core';
+import type { NestExpressApplication } from '@nestjs/platform-express';
 import { Test } from '@nestjs/testing';
 import { CSRF_HEADER, SESSION_COOKIE } from '@vm-web/shared';
 import { AccessRepository } from '../access/access.repository';
+import { useBodyParsers } from '../app/body-parsers';
 import { EnsembleResolvers } from '../access/ensemble-resolvers';
 import { PermissionGuard } from '../access/permission.guard';
 import { SessionGuard } from '../access/session.guard';
@@ -57,7 +59,8 @@ export async function createTestApp(metadata: ModuleMetadata, options: TestAppOp
   }).compile();
 
   // TEST_LOG=1 shows server errors while debugging tests
-  const app = moduleRef.createNestApplication({ logger: process.env['TEST_LOG'] ? ['error', 'warn'] : false });
+  const app = moduleRef.createNestApplication<NestExpressApplication>({ logger: process.env['TEST_LOG'] ? ['error', 'warn'] : false, bodyParser: false });
+  useBodyParsers(app);
   app.setGlobalPrefix('internal/v1');
   await app.listen(0, '127.0.0.1');
   const baseUrl = (await app.getUrl()).replace('[::1]', '127.0.0.1') + '/internal/v1';

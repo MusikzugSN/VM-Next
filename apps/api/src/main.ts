@@ -3,12 +3,14 @@ import { NestFactory } from '@nestjs/core';
 import type { NestExpressApplication } from '@nestjs/platform-express';
 import { API_PREFIX } from '@vm-web/shared';
 import { AppModule } from './app/app.module';
+import { useBodyParsers } from './app/body-parsers';
 import { AppConfig } from './config/app-config.service';
 
 const LOG_LEVELS: LogLevel[] = ['fatal', 'error', 'warn', 'log', 'debug', 'verbose'];
 
 async function bootstrap() {
-  const app = await NestFactory.create<NestExpressApplication>(AppModule, { bufferLogs: true });
+  const app = await NestFactory.create<NestExpressApplication>(AppModule, { bufferLogs: true, bodyParser: false });
+  useBodyParsers(app);
   const config = app.get(AppConfig);
 
   app.useLogger(LOG_LEVELS.slice(0, LOG_LEVELS.indexOf(config.get('LOG_LEVEL')) + 1));

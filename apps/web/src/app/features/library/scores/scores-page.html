@@ -14,6 +14,11 @@
     @if (canCreate()) {
       <a z-button [routerLink]="newScorePath" class="w-full md:w-auto"><ng-icon name="lucidePlus" aria-hidden="true" />{{ 'library.scores.create' | transloco }}</a>
     }
+    @if (canImport()) {
+      <a z-button zType="outline" [routerLink]="importPath" class="w-full md:w-auto">
+        <ng-icon name="lucideFileSpreadsheet" aria-hidden="true" />{{ 'library.scores.import' | transloco }}
+      </a>
+    }
     <a z-button zType="outline" [href]="exportUrl()" download class="w-full md:w-auto">
       <ng-icon name="lucideDownload" aria-hidden="true" />{{ 'library.scores.export' | transloco }}
     </a>

@@ -81,7 +81,8 @@
     "empty": "Keine Stücke gefunden.",
     "deleteTitle": "„{{ title }}“ löschen?",
     "deleteText": "Das Stück wird mit allen Notenblättern gelöscht und aus Mappen und Setlists entfernt. Das lässt sich nicht rückgängig machen.",
-    "deleted": "„{{ title }}“ gelöscht."
+    "deleted": "„{{ title }}“ gelöscht.",
+    "import": "Importieren"
   },
   "score": {
     "inFolders": "In Mappen",
@@ -256,5 +257,121 @@
     "removedAnnounce": "{{ title }} aus der Setlist entfernt.",
     "addedAnnounce": "{{ title }} an Position {{ position }} hinzugefügt.",
     "empty": "Die Setlist ist noch leer."
+  },
+  "import": {
+    "title": "Stücke importieren",
+    "intro": "Lade eine CSV-Datei mit deinen bisherigen Stücken hoch und ordne jeder Spalte ein Feld zu. Vor dem Import siehst du, welche Stücke neu sind und welche es schon gibt.",
+    "needsEdit": "Für den Import brauchst du zusätzlich das Recht, Stücke zu bearbeiten.",
+    "step": {
+      "file": "1. Datei wählen",
+      "mapping": "2. Spalten zuordnen",
+      "preview": "3. Vorschau prüfen"
+    },
+    "chooseFile": "CSV-Datei wählen",
+    "fileHint": "Erste Zeile = Spaltennamen. Trennzeichen (Komma, Semikolon) und Kodierung werden erkannt.",
+    "fileInfo": "{{ rows }} Zeilen, {{ columns }} Spalten, Trennzeichen „{{ delimiter }}“, {{ encoding }}",
+    "readError": "„{{ name }}“ ließ sich nicht als CSV lesen oder enthält keine Daten.",
+    "mappingHint": "Jede Spalte kann einem festen Feld, einem eigenen Feld, einem neuen eigenen Feld oder der Mappe zugeordnet werden. Die Zuordnung wird für Spalten mit gleichem Namen gemerkt.",
+    "column": "Spalte",
+    "examples": "Beispielwerte",
+    "emptyColumn": "leer",
+    "target": "Ziel",
+    "targetFor": "Ziel für Spalte {{ column }}",
+    "ignore": "Nicht importieren",
+    "groupFixed": "Feste Felder",
+    "groupCustom": "Eigene Felder",
+    "groupFolder": "Mappe",
+    "newField": "Neues eigenes Feld …",
+    "newFieldName": "Name des neuen Felds für Spalte {{ column }}",
+    "newFieldType": "Typ des neuen Felds für Spalte {{ column }}",
+    "folder": "Mappe",
+    "folderNumber": "Nummer in der Mappe",
+    "fixedFolder": "Alle Stücke in diese Mappe (optional)",
+    "fixedFolderHint": "Nur nötig, wenn keine Spalte die Mappe enthält. Gibt es die Mappe noch nicht, wird sie angelegt.",
+    "folderEnsemble": "Ensemble der Mappen",
+    "folderEnsembleHint": "Mappen werden in diesem Ensemble gesucht und fehlende dort angelegt.",
+    "chooseEnsemble": "Ensemble wählen",
+    "noNumberColumn": "Keine Spalte ist „Nummer in der Mappe“ zugeordnet – ohne Nummer werden keine Mappen-Einträge angelegt.",
+    "problem": {
+      "titleMissing": "Eine Spalte muss dem Titel zugeordnet sein.",
+      "duplicateTarget": "Ein Ziel ist mehreren Spalten zugeordnet.",
+      "newFieldName": "Ein neues Feld braucht einen Namen.",
+      "newFieldTaken": "Ein neues Feld heißt wie ein bestehendes oder ein anderes neues Feld."
+    },
+    "showPreview": "Vorschau anzeigen",
+    "refreshPreview": "Vorschau aktualisieren",
+    "previewHint": "Gibt es ein Stück schon, wird es standardmäßig verknüpft: Es kommt in die Mappe, und nur leere Felder werden ergänzt. Pro Zeile kannst du das ändern.",
+    "summary": "Zusammenfassung",
+    "count": {
+      "create": {
+        "one": "1 neues Stück",
+        "other": "{{ count }} neue Stücke"
+      },
+      "link": {
+        "one": "1 verknüpft",
+        "other": "{{ count }} verknüpft"
+      },
+      "overwrite": {
+        "one": "1 überschrieben",
+        "other": "{{ count }} überschrieben"
+      },
+      "skip": {
+        "one": "1 übersprungen",
+        "other": "{{ count }} übersprungen"
+      },
+      "failed": {
+        "one": "1 Zeile mit Fehler",
+        "other": "{{ count }} Zeilen mit Fehler"
+      },
+      "options": {
+        "one": "1 neuer Auswahlwert",
+        "other": "{{ count }} neue Auswahlwerte"
+      }
+    },
+    "newFolders": "Neue Mappen: {{ names }}",
+    "show": "Anzeigen",
+    "filter": {
+      "all": "Alle Zeilen",
+      "issues": "Nur Zeilen mit Hinweisen",
+      "matches": "Nur vorhandene Stücke"
+    },
+    "line": "Zeile",
+    "match": "Vorhandenes Stück",
+    "noMatch": "neu",
+    "inFile": "weiter oben in der Datei",
+    "newFolder": "neu",
+    "action": "Aktion",
+    "actionFor": "Aktion für Zeile {{ line }}",
+    "actions": {
+      "create": "Neu anlegen",
+      "link": "Verknüpfen",
+      "overwrite": "Überschreiben",
+      "skip": "Überspringen"
+    },
+    "notImported": "Wird nicht importiert",
+    "noRows": "Keine Zeilen für diesen Filter.",
+    "issue": {
+      "required": "Pflichtwert fehlt",
+      "too_big": "Wert ist zu lang",
+      "invalid_number": "keine Zahl",
+      "invalid_boolean": "kein Ja/Nein-Wert",
+      "invalid_date": "kein Datum (TT.MM.JJJJ)",
+      "invalid_duration": "keine Dauer (m:ss)",
+      "invalid_link": "kein gültiger Link",
+      "ambiguous": "Mehrere Stücke passen – das älteste wird verwendet.",
+      "folder-number-missing": "Keine Nummer – das Stück kommt nicht in die Mappe.",
+      "folder-number-invalid": "Nummer ist länger als 10 Zeichen – das Stück kommt nicht in die Mappe.",
+      "folder-number-taken": "Die Nummer ist in der Mappe schon vergeben – das Stück kommt nicht in die Mappe.",
+      "folder-other-number": "Das Stück steht schon mit einer anderen Nummer in der Mappe; die Nummer bleibt."
+    },
+    "run": {
+      "one": "1 Stück importieren",
+      "other": "{{ count }} Stücke importieren"
+    },
+    "done": "Import abgeschlossen.",
+    "resultTitle": "Import abgeschlossen",
+    "toScores": "Zu den Stücken",
+    "again": "Weitere Datei importieren",
+    "requiredUnmapped": "Pflichtfelder ohne Spalte: „{{ names }}“. Neue Stücke brauchen dort einen Wert und werden sonst nicht angelegt; vorhandene Stücke werden trotzdem verknüpft."
   }
 }

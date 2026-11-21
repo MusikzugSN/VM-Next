@@ -109,6 +109,11 @@ Notenwart:innen pflegen Stücke mit frei definierbaren Feldern, eine einzige Sti
 3. **N-3 (Muss)** Eigene Felder verhalten sich wie feste: im Formular, als ein- und ausblendbare Tabellenspalte, filter-, sortier- und durchsuchbar, im Export.
 4. **N-4 (Muss)** Jedes Stück zeigt seine Vollständigkeit: vorhandene Stimmen gegenüber der Besetzung des Ensembles (z. B. 18/24), mit Liste der fehlenden.
 5. **N-5 (Muss)** Ein Stück kann in mehreren Mappen stehen, mit eigener Nummer je Mappe; in Mappen-Ansichten steht diese Nummer hervorgehoben vor dem Titel.
+6. **N-19 (Muss)** CSV-Import von Stücken (Altdaten): Notenwart:innen laden eine CSV-Datei hoch (UTF-8 oder Windows-1252, Trennzeichen `,` oder `;` automatisch erkannt, erste Zeile = Spaltennamen) und ordnen jeder Spalte ein Ziel zu: ein festes Feld, ein eigenes Feld, ein neu angelegtes eigenes Feld (Auswahloptionen entstehen aus den Werten der Datei), „Mappe“ oder „Nummer in der Mappe“ – oder „nicht importieren“.
+   - Die Mappe kommt aus einer Spalte oder ist ein fester Name; fehlende Mappen werden im gewählten Ensemble angelegt.
+   - Werte werden beim Import umgewandelt: Leerzeichen am Rand fallen weg, Ja/Nein (`true`, `ja`, `x`, `1` …), Zahlen mit Komma, Datum `TT.MM.JJJJ`, Dauer `m:ss`, Mehrfachauswahl durch Komma getrennt.
+   - Eine Vorschau zeigt je Zeile, ob das Stück neu ist oder schon existiert (gleicher Titel, bei gesetztem Komponisten auch gleicher Komponist). Standard bei Treffer: verknüpfen – Mappen-Eintrag ergänzen und nur leere Felder füllen; je Zeile umstellbar auf überschreiben, neu anlegen oder überspringen. Gleiche Stücke innerhalb einer Datei werden zusammengeführt.
+   - Recht: Stücke anlegen und bearbeiten; für Mappen zusätzlich das Mappen-Recht im Ensemble. Die Zuordnung wird im Browser pro Spaltenname gemerkt.
 
 ### Stimmen und Instrumente
 
@@ -124,6 +129,7 @@ Notenwart:innen pflegen Stücke mit frei definierbaren Feldern, eine einzige Sti
 3. **N-12 (Muss)** Prüfansicht auf einem Bildschirm: Warteschlange, PDF-Vorschau mit Blättern, Drehen und Zuschneiden, Zuordnung von Stück und Stimme, „Annehmen & weiter“ und „Ablehnen“ mit Begründung. Die eigene Seite zum Zuschneiden entfällt.
 4. **N-13 (Soll)** Tastenkürzel in der Prüfansicht: A annehmen, R ablehnen, Pfeiltasten blättern.
 5. **N-14 (Muss)** Die hochladende Person sieht den Status ihrer Uploads, inklusive Ablehnungsgrund, in VM-Web. Eine Benachrichtigung per E-Mail kommt später.
+6. **N-18 (Muss)** Sammel-PDF aufteilen: Im Upload-Dialog lässt sich jede PDF mit „Aufteilen …“ in einem Viewer öffnen. Man scrollt durch die Seiten und legt an einer Seite fest „ab hier: Stück X, Stimme Y“; die Werte gelten bis zur nächsten Änderung. Gewechselt wird nur an Seitengrenzen, Seiten (z. B. Deckblatt) können übersprungen werden. Fehlt ein Stück, wird es mit dem Recht „Stücke anlegen“ direkt im Viewer angelegt, sonst bleibt es leer und die Prüfung ordnet zu. Die Abschnitte ersetzen die PDF in der Upload-Liste und werden wie normale Uploads behandelt (N-10).
 
 ### Mappen, Events und Tags
 
@@ -247,13 +253,13 @@ Die erste Version enthält Mein Bereich, Notenverwaltung mit Prüfung und den Dr
 | Bereich | Erste Version | Später |
 | --- | --- | --- |
 | Mein Bereich | M-1 bis M-9 | Benachrichtigungen, Offline-Nutzung (M-10) |
-| Notenverwaltung & Prüfung | N-1 bis N-17 | E-Mail bei Ablehnung (N-14) |
+| Notenverwaltung & Prüfung | N-1 bis N-19 | E-Mail bei Ablehnung (N-14) |
 | Drucken | D-1 bis D-5, D-7, Druckservice für Linux | D-6, Druckservice für Windows |
 | Anmeldung | A-1 bis A-5 | A-6, Rollen aus dem Identity-Server (A-7) |
 | Rechte | R-1 bis R-7 | – |
 | Systemverwaltung | S-1 bis S-5 | Änderungsprotokoll (S-6) |
 | Oberfläche | Lightmode, responsiv | Darkmode |
-| Daten | Neustart ohne Migration | – (kein Import-Werkzeug) |
+| Daten | Neustart; Stücke und Mappen per CSV-Import (N-19) | Import von Noten-PDFs aus Altdaten |
 
 ## Entscheidungen & Annahmen
 
@@ -269,7 +275,7 @@ Alle neun offenen Punkte sind entschieden; offen bleibt nur die Feinabstimmung d
 | Fremde Stimme | Frei umschaltbar in der Kopfzeile | M-2 |
 | Vorstand | Bleibt, pro Ensemble: Mitglieder sehen, Events verwalten | R-3, R-4, Standardrollen |
 | Ablehnung | Erst nur in VM-Web, E-Mail später | N-14 |
-| Altdaten | Kein Import-Werkzeug | MVP-Umfang |
+| Altdaten | CSV-Import für Stücke und Mappen mit Spaltenzuordnung; Sammel-PDFs werden im Upload-Dialog aufgeteilt | N-18, N-19, MVP-Umfang |
 
 Zusätzlich geklärt: Alle Mitglieder dürfen den Druckservice nutzen (D-7), die Rechte-Matrix gehört ins MVP (R-7), Hochladen ist ein Dialog, Elemente ohne Ensemble gelten für alle mit dem Recht in mindestens einem Ensemble (R-4), und der Druckverlauf ersetzt die Druckwarteschlange.
 

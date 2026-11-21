@@ -6,3 +6,4 @@ export * from './score-details.schema';
 export * from './score-completeness.schema';
 export * from './score-sheets.schema';
 export * from './score-folders.schema';
+export * from './score-import.schema';

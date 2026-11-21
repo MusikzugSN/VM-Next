@@ -10,6 +10,7 @@ import {
   lucideColumns3,
   lucideDownload,
   lucideEllipsis,
+  lucideFileSpreadsheet,
   lucidePlus,
   lucidePrinter,
   lucideSlidersHorizontal,
@@ -87,6 +88,7 @@ interface Column {
     provideIcons({
       lucidePlus,
       lucideDownload,
+      lucideFileSpreadsheet,
       lucideSlidersHorizontal,
       lucideColumns3,
       lucideX,
@@ -113,6 +115,8 @@ export class ScoresPage {
 
   protected readonly newScorePath = APP_ROUTES.library.newScore;
   protected readonly canCreate = computed(() => this.session.can('score.create'));
+  protected readonly importPath = APP_ROUTES.library.importScores;
+  protected readonly canImport = computed(() => this.session.can('score.create') && this.session.can('score.edit'));
   protected readonly canDelete = computed(() => this.session.can('score.delete'));
   protected readonly filterOpen = signal(false);
 

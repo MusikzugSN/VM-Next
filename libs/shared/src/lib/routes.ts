@@ -103,6 +103,7 @@ export const API_ROUTES = {
     updateField: post('field-definitions/:fieldId/update-definition'),
     deleteField: post('field-definitions/:fieldId/delete'),
     reorderFields: post('field-definitions/reorder'),
+    importScores: post('scores/import'),
   },
 
   voices: {

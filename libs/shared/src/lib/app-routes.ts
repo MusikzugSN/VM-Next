@@ -31,6 +31,7 @@ export const APP_ROUTES = {
     root: '/library',
     scores: '/library/scores',
     newScore: '/library/scores/new',
+    importScores: '/library/scores/import',
     score: '/library/scores/:scoreId',
     review: '/library/review',
     reviewUpload: '/library/review/:uploadId',

@@ -51,6 +51,7 @@ Die Routen weichen bewusst von den deutschen Vorschlägen in `requirements.md` a
 | Meine Uploads | `/me/uploads` | Mitglied |
 | Profil | `/me/profile` | Mitglied |
 | Stücke / anlegen / Stück | `/library/scores`, `/library/scores/new`, `/library/scores/:scoreId` | `score.view` / `score.create` |
+| Stücke importieren (CSV) | `/library/scores/import` | `score.create` und `score.edit` |
 | Prüfung | `/library/review`, `/library/review/:uploadId` | `sheet.approve` |
 | Mappen / bearbeiten | `/library/folders`, `/library/folders/:folderId` | `folder.view` |
 | Events / bearbeiten | `/library/events`, `/library/events/:eventId` | `event.view` |
@@ -146,6 +147,7 @@ Tabs, die einen Teil einer Seite zeigen, sind Query-Parameter. So bleiben Links 
   - Mobil als Karten.
 - `/library/scores/new`: Formular mit eigenen Feldern; „Feld hinzufügen“ legt ein neues eigenes Feld direkt im Formular an (N-2).
 - `/library/scores/:scoreId` mit den Tabs Stammdaten, Stimmen & Vollständigkeit sowie Mappen & Nummern.
+- `/library/scores/import` (N-19): CSV wählen → je Spalte ein Ziel wählen (festes Feld, eigenes Feld, neues eigenes Feld, Mappe, Nummer in der Mappe, nicht importieren), Mappe alternativ als fester Name, Ensemble für Mappen → Vorschau über `scores/scores/import` mit `dryRun` (Treffer, Aktion je Zeile umstellbar, Fehler und Warnungen) → Importieren. Die Zuordnung wird je Spaltenname in `localStorage` gemerkt.
 - `/library/voices`: Liste nach Instrument gruppiert, mit Autovervollständigung und Ersatzstimmen.
 - `/library/tags`: Tags anlegen, umbenennen und löschen; die Bestätigung erfolgt als Toast mit „Rückgängig“, wo das umkehrbar ist.
 - Mappen und Events verwalten:
@@ -176,6 +178,7 @@ Diese Stufe ist die größte. Bei Bedarf teile ich sie in **3a** (Stücke, Stimm
   - Zuordnung von Stück und Stimme.
   - „Annehmen & weiter“ und „Ablehnen mit Grund“; Ersetzen nur mit Löschrecht.
 - Tastenkürzel A / R / ← / → (N-13) über `previousUploadId`/`nextUploadId`. Die Kürzel sind nur aktiv, wenn der Fokus nicht in einem Eingabefeld liegt.
+- Sammel-PDF aufteilen (N-18): „Aufteilen …“ an jeder PDF im Upload-Dialog öffnet einen Viewer mit allen Seiten untereinander. An einer Seite setzt man „ab hier“ Stück und Stimme oder „überspringen“; die Werte gelten bis zur nächsten Markierung. Beim Übernehmen teilt `pdf-lib` die PDF im Browser, die Abschnitte ersetzen die Datei in der Upload-Liste. Neue Stücke werden über `scores/scores/create` angelegt (nur mit `score.create`).
 - Auf dem Tablet lässt sich die Warteschlange einklappen.
 
 **Prüfung:**

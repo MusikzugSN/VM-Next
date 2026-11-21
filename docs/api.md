@@ -897,6 +897,51 @@ Stammdaten, eigene Felder und Vereins-Tags ersetzen. · N-1, N-2, N-17
 - **Path:** `scoreId` · **Body:** wie `create`, alle Felder Pflicht
 - **Response:** `204` · **Fehler:** wie `create`, zusätzlich `404 not-found`
 
+### `POST /internal/v1/scores/scores/import`
+
+CSV-Import von Stücken mit Spaltenzuordnung, Vorschau und Mappen-Einträgen. · N-19, N-2, N-5
+
+- **Recht:** `score.create` und `score.edit` · Ensemble (mind. eines); mit Mappen zusätzlich `folder.edit` in `folderEnsembleId` (ohne `folder.view` → `404`), für neue Mappen `folder.create`
+- Die CSV wird im Browser gelesen und zugeordnet; der Server bekommt **rohe Zellwerte** und wandelt sie um: Leerzeichen am Rand fallen weg; Zahl `1,5`/`1.5`; Ja/Nein `true`/`ja`/`x`/`1` bzw. `false`/`nein`/`0`; Datum `TT.MM.JJJJ` oder ISO; `duration` als `m:ss`, `h:mm:ss` oder Sekunden; Auswahl über die Bezeichnung (ohne Groß-/Kleinschreibung), unbekannte Bezeichnungen werden neue Optionen; Mehrfachauswahl durch `,` oder `;` getrennt.
+- **Treffer:** gleicher Titel (ohne Groß-/Kleinschreibung, Leerzeichen zusammengefasst); haben Zeile und Stück einen Komponisten, muss auch er passen. Bei mehreren Treffern gilt der älteste (Warnung `ambiguous`). Spätere Zeilen derselben Datei treffen auf Stücke früherer Zeilen (`match.inFile`).
+- **Aktion je Zeile** (`action`, sonst automatisch): `create` · `link` (Standard bei Treffer: Mappen-Eintrag ergänzen, nur leere Felder füllen) · `overwrite` (alle zugeordneten, nicht leeren Werte setzen) · `skip`.
+- **Mappen:** Name ohne Groß-/Kleinschreibung im Ensemble `folderEnsembleId` gesucht, fehlende werden angelegt. Steht das Stück schon in der Mappe, bleibt die Nummer (`folder-other-number`); eine belegte Nummer wird nicht vergeben (`folder-number-taken`). Beides sind Warnungen, das Stück wird trotzdem importiert.
+- `dryRun: true` liefert nur die Vorschau; `false` schreibt alles in **einer** Transaktion. Zeilen mit Fehler (`level: "error"`) werden nicht importiert, die übrigen schon.
+- **Body** (max. 5000 Zeilen):
+
+```json
+{
+  "dryRun": true,
+  "newFields": [{ "key": "genre", "name": "Genre", "type": "select" }],
+  "folderEnsembleId": "ens-1",
+  "rows": [
+    { "line": 2, "fixed": { "title": "Waldzauber", "composer": "Peter Fihn", "duration": "3:30" },
+      "custom": { "new:genre": "Walzer", "f-archive": "A-117" },
+      "folder": { "name": "Konzertmappe", "number": "3" } },
+    { "line": 3, "fixed": { "title": "Schönfeld-Marsch" }, "custom": {}, "folder": null, "action": "overwrite" }
+  ]
+}
+```
+
+- **Response 200** (gleiche Form für Vorschau und Import; `scoreId` nur nach dem Import):
+
+```json
+{
+  "dryRun": true,
+  "rows": [
+    { "line": 2, "title": "Waldzauber", "action": "create", "failed": false, "match": null,
+      "folder": { "name": "Konzertmappe", "number": "3", "isNew": false }, "issues": [], "scoreId": null },
+    { "line": 3, "title": "Schönfeld-Marsch", "action": "overwrite", "failed": false,
+      "match": { "id": "score-9", "title": "Schönfeld-Marsch", "composer": null, "inFile": false },
+      "folder": null, "issues": [], "scoreId": null }
+  ],
+  "summary": { "create": 1, "link": 0, "overwrite": 1, "skip": 0, "failed": 0, "newFolders": [], "newOptions": 1 }
+}
+```
+
+- **Codes in `issues[]`** (`target`: `title`, `composer`, …, `duration`, `field:<id>`, `new:<key>`, `folder`): Fehler `required`, `too_big`, `invalid_number`, `invalid_boolean`, `invalid_date`, `invalid_duration`, `invalid_link`; Warnungen `ambiguous`, `folder-number-missing`, `folder-number-invalid` (über 10 Zeichen), `folder-number-taken`, `folder-other-number`.
+- **Fehler:** `400 validation-failed` (unbekannte Feld-ID in `custom`, `folderEnsembleId` fehlt bei Mappen), `403 forbidden`, `404 not-found` (Ensemble), `409 name-taken` (neues Feld heißt wie ein bestehendes)
+
 ### `POST /internal/v1/scores/scores/{scoreId}/delete`
 
 Stück löschen inkl. Blätter, Mappen-/Setlist-Einträgen, Tags; offene Uploads verlieren die Zuordnung. · N-1
@@ -1585,18 +1630,18 @@ Je Ensemble eine geordnete Liste „ab `fromPages` Seiten → `simplex` (einseit
 | `me` | 19 | 7 | 26 | 4 / 0 |
 | `uploads` | 2 | 1 | 3 | 0 / 1 |
 | `review` | 3 | 2 | 5 | 1 / 0 |
-| `scores` | 10 | 8 | 18 | 2 / 0 |
+| `scores` | 10 | 9 | 19 | 2 / 0 |
 | `voices` | 2 | 7 | 9 | 0 / 0 |
 | `folders` | 5 | 7 | 12 | 0 / 0 |
 | `events` | 5 | 5 | 10 | 0 / 0 |
 | `tags` | 1 | 3 | 4 | 0 / 0 |
 | `print` | 2 | 0 | 2 | 1 / 0 |
 | `system` | 12 | 25 | 37 | 0 / 1 |
-| **Summe** | **66** | **66** | **132** | **9 / 2** |
+| **Summe** | **66** | **67** | **133** | **9 / 2** |
 
 Plus `GET /health`. `POST me/downloads/selection-zip` zählt als POST und als 📄.
 
-Abdeckung der Muss-Anforderungen: R-1 bis R-7, A-1 bis A-5, M-1 bis M-9, N-1 bis N-12, N-14 bis N-17, D-1 bis D-3, D-7, S-1 bis S-5. Ohne API-Anteil: D-4, D-5 (lokaler Druckservice), N-13 (Tastenkürzel, nur Frontend, nutzt `previousUploadId`/`nextUploadId`). D-6 (Druckregeln) ist inzwischen enthalten. Bewusst nicht enthalten: A-6, A-7, M-10, S-6.
+Abdeckung der Muss-Anforderungen: R-1 bis R-7, A-1 bis A-5, M-1 bis M-9, N-1 bis N-12, N-14 bis N-17, N-19, D-1 bis D-3, D-7, S-1 bis S-5. Ohne API-Anteil: D-4, D-5 (lokaler Druckservice), N-13 (Tastenkürzel, nur Frontend, nutzt `previousUploadId`/`nextUploadId`), N-18 (Sammel-PDF wird im Browser aufgeteilt und über `uploads/sheets/upload` gesendet). D-6 (Druckregeln) ist inzwischen enthalten. Bewusst nicht enthalten: A-6, A-7, M-10, S-6.
 
 ---
 

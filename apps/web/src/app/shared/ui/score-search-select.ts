@@ -2,12 +2,13 @@ import { ChangeDetectionStrategy, Component, inject, input, output, signal } fro
 import { rxResource } from '@angular/core/rxjs-interop';
 import { TranslocoPipe } from '@jsverse/transloco';
 import { NgIcon, provideIcons } from '@ng-icons/core';
-import { lucideSearch } from '@ng-icons/lucide';
-import { apiUrl, scoreSearchResponseSchema, type ScoreSearchItem } from '@vm-web/shared';
-import { of } from 'rxjs';
+import { lucidePlus, lucideSearch } from '@ng-icons/lucide';
+import { apiUrl, createdResponseSchema, scoreSearchResponseSchema, type ScoreSearchItem } from '@vm-web/shared';
+import { firstValueFrom, of } from 'rxjs';
 
 import { ZardInputComponent } from '@/shared/components/input';
 
+import { ActionRunner } from '../../core/actions/action-runner';
 import { ApiClient } from '../../core/api/api-client';
 import { debounced } from '../../core/util/debounced';
 
@@ -23,7 +24,7 @@ export interface ChosenScore {
 @Component({
   selector: 'vm-score-search-select',
   imports: [NgIcon, TranslocoPipe, ZardInputComponent],
-  viewProviders: [provideIcons({ lucideSearch })],
+  viewProviders: [provideIcons({ lucideSearch, lucidePlus })],
   changeDetection: ChangeDetectionStrategy.OnPush,
   host: { class: 'flex flex-col gap-1.5' },
   template: `
@@ -64,6 +65,18 @@ export interface ChosenScore {
               <li class="px-3 py-2 text-muted-foreground">{{ 'upload.noScore' | transloco }}</li>
             }
           }
+          @if (allowCreate()) {
+            <li class="border-t">
+              <button
+                type="button"
+                class="flex min-h-11 w-full items-center gap-2 px-3 py-1.5 text-start font-medium text-primary hover:bg-accent xl:min-h-9"
+                [disabled]="creating()"
+                (click)="create()"
+              >
+                <ng-icon name="lucidePlus" aria-hidden="true" />{{ 'upload.createScore' | transloco: { title: query().trim() } }}
+              </button>
+            </li>
+          }
         </ul>
       }
     }
@@ -74,7 +87,11 @@ export class ScoreSearchSelect {
 
   readonly value = input<ChosenScore | null>(null);
   readonly controlId = input<string | null>(null);
+  /** Offers „„<Suche>“ als neues Stück anlegen“ below the hits (N-18, needs `score.create`). */
+  readonly allowCreate = input(false);
   readonly changed = output<ChosenScore | null>();
+  private readonly actions = inject(ActionRunner);
+  protected readonly creating = signal(false);
 
   protected readonly search = signal('');
   protected readonly query = debounced(this.search);
@@ -83,6 +100,22 @@ export class ScoreSearchSelect {
     stream: ({ params }) =>
       params ? this.api.get(apiUrl('uploads', 'scoreSearch'), scoreSearchResponseSchema, { q: params, limit: 8 }) : of({ items: [], nextCursor: null }),
   });
+
+  /** Creates a score with only the title (the rest is filled in later in the library). */
+  protected async create(): Promise<void> {
+    const title = this.query().trim().slice(0, 200);
+    if (!title) return;
+    this.creating.set(true);
+    const body = { title, composer: null, arranger: null, publisher: null, publisherNumber: null, durationSeconds: null };
+    const done = await this.actions.run(() => firstValueFrom(this.api.post(apiUrl('scores', 'createScore'), body, createdResponseSchema)), {
+      success: { key: 'upload.scoreCreated', params: { title } },
+    });
+    this.creating.set(false);
+    if (done) {
+      this.search.set('');
+      this.changed.emit({ id: done.value.id, title });
+    }
+  }
 
   protected choose(score: ScoreSearchItem): void {
     this.search.set('');

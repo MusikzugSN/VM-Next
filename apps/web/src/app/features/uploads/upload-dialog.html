@@ -1,4 +1,11 @@
-<z-dialog [(zVisible)]="open" zWidth="720px" [zMaskClosable]="!sending()">
+<z-dialog [(zVisible)]="open" [zWidth]="splitItem() ? '1180px' : '720px'" [zMaskClosable]="!sending() && !splitItem()">
+  @if (splitItem(); as item) {
+    <z-dialog-header>
+      <h2 z-dialog-title>{{ 'upload.split.title' | transloco: { name: item.file.name } }}</h2>
+      <p z-dialog-description>{{ 'upload.split.intro' | transloco }}</p>
+    </z-dialog-header>
+    <vm-upload-split [file]="item.file" [preset]="splitPreset()" (done)="onSplit($event)" (cancelled)="splitKey.set(null)" />
+  } @else {
   <z-dialog-header>
     <h2 z-dialog-title>{{ 'upload.title' | transloco }}</h2>
     <p z-dialog-description>{{ 'upload.intro' | transloco }}</p>
@@ -35,6 +42,19 @@
               <ng-icon name="lucideFileText" class="shrink-0 text-muted-foreground" aria-hidden="true" />
               <span class="min-w-0 flex-1 truncate font-mono text-[13px]">{{ item.file.name }}</span>
               <span class="text-xs text-muted-foreground tabular-nums">{{ size(item) }}</span>
+              @if (!item.problem) {
+                <button
+                  z-button
+                  zType="ghost"
+                  zSize="sm"
+                  type="button"
+                  [zDisabled]="sending()"
+                  (click)="splitKey.set(item.key)"
+                  [attr.aria-label]="'upload.split.open' | transloco: { name: item.file.name }"
+                >
+                  <ng-icon name="lucideScissors" aria-hidden="true" />{{ 'upload.split.button' | transloco }}
+                </button>
+              }
               <button
                 z-button
                 zType="ghost"
@@ -109,4 +129,5 @@
       </button>
     </div>
   </z-dialog-footer>
+  }
 </z-dialog>

@@ -19,6 +19,8 @@ import {
   scoreTableQuerySchema,
   scoreTableResponseSchema,
   scoreTagOptionsResponseSchema,
+  scoreImportBodySchema,
+  scoreImportResponseSchema,
   sheetParamsSchema,
   updateFieldBodySchema,
   updateScoreDetailsBodySchema,
@@ -26,6 +28,7 @@ import {
   type CreateScoreBody,
   type ReorderFieldsBody,
   type ScoreCompletenessQuery,
+  type ScoreImportBody,
   type ScoreTableExportQuery,
   type ScoreTableQuery,
   type UpdateFieldBody,
@@ -38,6 +41,7 @@ import { ResponseSchema } from '../common/validation/zod-response.interceptor';
 import { ZodValidationPipe as Zod } from '../common/validation/zod-validation.pipe';
 import { todayIn } from '../common/time/today';
 import { FieldsService } from './fields.service';
+import { ScoreImportService } from './score-import.service';
 import { ScoresService } from './scores.service';
 
 const R = API_ROUTES.scores;
@@ -48,6 +52,7 @@ export class ScoresController {
   constructor(
     @Inject(ScoresService) private readonly scores: ScoresService,
     @Inject(FieldsService) private readonly fields: FieldsService,
+    @Inject(ScoreImportService) private readonly importer: ScoreImportService,
   ) {}
 
   @RequirePermission('score.view')
@@ -131,6 +136,15 @@ export class ScoresController {
   @ResponseSchema(createdResponseSchema)
   create(@Body(new Zod(createScoreBodySchema)) body: CreateScoreBody) {
     return this.scores.create(body);
+  }
+
+  /** CSV import (N-19); the service additionally checks `score.edit` and the folder permissions. */
+  @RequirePermission('score.create')
+  @Post(R.importScores.path)
+  @HttpCode(200)
+  @ResponseSchema(scoreImportResponseSchema)
+  importScores(@Body(new Zod(scoreImportBodySchema)) body: ScoreImportBody, @CurrentAccess() access: AccessContext) {
+    return this.importer.run(body, access);
   }
 
   @RequirePermission('score.edit')

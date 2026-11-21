@@ -11,6 +11,7 @@ const section = { key: 'nav.library.section', path: r.scores };
 /** List page of each detail page, for the breadcrumbs. */
 const parents: Partial<Record<AppPath, Crumb>> = {
   [r.newScore]: { key: 'nav.library.scores', path: r.scores },
+  [r.importScores]: { key: 'nav.library.scores', path: r.scores },
   [r.score]: { key: 'nav.library.scores', path: r.scores },
   [r.reviewUpload]: { key: 'nav.library.review', path: r.review },
   [r.folder]: { key: 'nav.library.folders', path: r.folders },
@@ -34,6 +35,9 @@ export const LIBRARY_ROUTES: Routes = [
       ),
       libraryPage(r.newScore, 'pages.newScore', requirePermission('score.create'), () =>
         import('./scores/new-score-page').then((m) => m.NewScorePage),
+      ),
+      libraryPage(r.importScores, 'pages.importScores', requirePermission('score.create'), () =>
+        import('./scores/import/score-import-page').then((m) => m.ScoreImportPage),
       ),
       libraryPage(r.score, 'terms.score', requirePermission('score.view'), () =>
         import('./scores/score-page').then((m) => m.LibraryScorePage),
