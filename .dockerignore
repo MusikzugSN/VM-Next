@@ -1,0 +1,19 @@
+# Build context for apps/api/Dockerfile, apps/web/Dockerfile and apps/print-service/Dockerfile.sea
+# (all built from the repository root). Keep the context small and free of local state.
+.git
+.github
+.idea
+.vscode
+.claude
+.angular
+.nx
+node_modules
+**/node_modules
+dist
+tmp
+out-tsc
+coverage
+**/.env
+**/*.log
+deploy
+docs

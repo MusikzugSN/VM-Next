@@ -1,0 +1,6 @@
+# Files that run inside Linux (containers, install tarball) must keep LF line endings on Windows too
+*.sh text eol=lf
+*.service text eol=lf
+*.mjs text eol=lf
+Dockerfile* text eol=lf
+*.template text eol=lf

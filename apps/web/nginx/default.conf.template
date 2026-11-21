@@ -1,0 +1,76 @@
+# nginx config of the vm-next-web image. ${API_UPSTREAM} and ${CLIENT_MAX_BODY_SIZE} are filled in at
+# container start (envsubst); every other $variable is nginx's own.
+# TLS is terminated by the club's reverse proxy in front of this container.
+
+# Keep the scheme the outer reverse proxy saw; fall back to our own when called directly.
+map $http_x_forwarded_proto $vm_forwarded_proto {
+    default $http_x_forwarded_proto;
+    ''      $scheme;
+}
+
+server {
+    listen 8080;
+    listen [::]:8080;
+    server_name _;
+    server_tokens off;
+
+    root /usr/share/nginx/html;
+    index index.html;
+
+    # PDF uploads (UPLOAD_MAX_FILE_MB in the API) must fit
+    client_max_body_size ${CLIENT_MAX_BODY_SIZE};
+
+    add_header X-Content-Type-Options "nosniff" always;
+    add_header Referrer-Policy "same-origin" always;
+
+    gzip on;
+    gzip_types text/css application/javascript application/json image/svg+xml;
+    gzip_min_length 1024;
+
+    # --- API ---------------------------------------------------------------------------------------
+    location /internal/ {
+        proxy_pass ${API_UPSTREAM};
+        proxy_http_version 1.1;
+        proxy_set_header Host $host;
+        proxy_set_header X-Forwarded-Host $host;
+        proxy_set_header X-Forwarded-Proto $vm_forwarded_proto;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header Connection "";
+        # stream large uploads and ZIP/PDF downloads instead of buffering them
+        proxy_request_buffering off;
+        proxy_buffering off;
+        proxy_read_timeout 300s;
+        proxy_send_timeout 300s;
+    }
+
+    location = /health {
+        proxy_pass ${API_UPSTREAM};
+        proxy_set_header Host $host;
+    }
+
+    # --- Angular app -------------------------------------------------------------------------------
+    # Hashed bundles (outputHashing: all) never change under the same name
+    location ~* "-[a-z0-9]{8}\.(?:js|css)$" {
+        add_header Cache-Control "public, max-age=31536000, immutable";
+        add_header X-Content-Type-Options "nosniff" always;
+        try_files $uri =404;
+    }
+
+    # pdf.js worker is an ES module: browsers refuse it unless it is served as JavaScript
+    # (nginx's mime.types does not know .mjs)
+    location ~* \.mjs$ {
+        types { }
+        default_type text/javascript;
+        add_header Cache-Control "no-cache";
+        add_header X-Content-Type-Options "nosniff" always;
+        try_files $uri =404;
+    }
+
+    # Everything else (index.html, translations, pdf.js assets): revalidate on every load
+    location / {
+        add_header Cache-Control "no-cache";
+        add_header X-Content-Type-Options "nosniff" always;
+        add_header Referrer-Policy "same-origin" always;
+        try_files $uri $uri/ /index.html;
+    }
+}
