@@ -44,6 +44,21 @@
         }
       }
     },
+    "build-sea": {
+      "executor": "nx:run-commands",
+      "cache": true,
+      "inputs": [
+        "production",
+        "^production",
+        "{workspaceRoot}/package.json"
+      ],
+      "outputs": [
+        "{workspaceRoot}/dist/apps/print-service-sea"
+      ],
+      "options": {
+        "command": "node apps/print-service/scripts/build-sea.mjs"
+      }
+    },
     "prune-lockfile": {
       "dependsOn": [
         "build"

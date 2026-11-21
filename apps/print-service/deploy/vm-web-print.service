@@ -1,12 +1,12 @@
-# systemd user unit for the VM-Web Druckservice (Linux, CUPS).
-# Install:  cp vm-web-print.service ~/.config/systemd/user/
-#           systemctl --user daemon-reload && systemctl --user enable --now vm-web-print
+# systemd user unit for the VM-Web Druckservice (Linux, CUPS). Installed by install.sh:
+#   ~/.local/bin/vm-web-print (single executable, no Node.js needed)
+#   ~/.config/systemd/user/vm-web-print.service
 [Unit]
 Description=VM-Web Druckservice
 After=network.target cups.service
 
 [Service]
-ExecStart=/usr/bin/env node %h/.local/lib/vm-web-print/main.js
+ExecStart=%h/.local/bin/vm-web-print
 Restart=on-failure
 RestartSec=5
 

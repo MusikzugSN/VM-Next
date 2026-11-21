@@ -3,8 +3,11 @@ import { CupsBackend } from './cups-backend';
 import { JobService } from './jobs';
 import { createPrintServer } from './server';
 
+/** Set by scripts/build-sea.mjs from the release version; absent in `nx build`/`nx serve`. */
+declare const __VMWEB_PRINT_VERSION__: string | undefined;
+
 /** Version of the service, reported by GET /v1/status. */
-const VERSION = '1.0.0';
+const VERSION = typeof __VMWEB_PRINT_VERSION__ === 'string' ? __VMWEB_PRINT_VERSION__ : '0.0.0-dev';
 
 /**
  * VM-Web Druckservice (D-3 bis D-5): listens on 127.0.0.1 only and prints jobs from the configured

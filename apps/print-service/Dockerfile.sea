@@ -1,0 +1,21 @@
+# syntax=docker/dockerfile:1.7
+# Builds the print service as a single Linux executable plus install tarball, without a local Linux.
+# From the repository root (writes to dist/apps/print-service-sea/):
+#   docker buildx build -f apps/print-service/Dockerfile.sea --platform linux/amd64 \
+#     --output type=local,dest=dist/apps/print-service-sea .
+# glibc-based image on purpose: the binary is a copy of this node, and desktops run glibc.
+ARG NODE_VERSION=24
+ARG PNPM_VERSION=12.21.0
+
+FROM node:${NODE_VERSION}-bookworm-slim AS build
+ARG PNPM_VERSION
+RUN npm install -g pnpm@${PNPM_VERSION}
+WORKDIR /src
+COPY package.json pnpm-lock.yaml pnpm-workspace.yaml ./
+RUN --mount=type=cache,id=pnpm-store,target=/pnpm-store \
+    pnpm config set store-dir /pnpm-store && pnpm install --frozen-lockfile
+COPY . .
+RUN node apps/print-service/scripts/build-sea.mjs
+
+FROM scratch AS export
+COPY --from=build /src/dist/apps/print-service-sea/ /

@@ -6,6 +6,9 @@
     "dev:up": "wsl docker compose -f docker-compose.dev.yml up -d",
     "dev:down": "wsl docker compose -f docker-compose.dev.yml down",
     "dev:logs": "wsl docker compose -f docker-compose.dev.yml logs -f",
+    "docker:api": "wsl docker build -f apps/api/Dockerfile -t vm-next-api:dev .",
+    "docker:web": "wsl docker build -f apps/web/Dockerfile -t vm-next-web:dev .",
+    "print:sea": "wsl docker buildx build -f apps/print-service/Dockerfile.sea --platform linux/amd64 --output type=local,dest=dist/apps/print-service-sea .",
     "db:generate": "cd apps/api && drizzle-kit generate",
     "db:migrate": "cd apps/api && drizzle-kit migrate",
     "db:studio": "cd apps/api && drizzle-kit studio"
@@ -80,6 +83,7 @@
     "jsdom": "^27.1.0",
     "nx": "24.0.6",
     "postcss": "^8.5.33",
+    "postject": "1.0.0-alpha.6",
     "tailwindcss": "^4.3.5",
     "tailwindcss-animate": "^1.0.7",
     "tslib": "^2.3.0",
