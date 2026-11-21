@@ -3,7 +3,7 @@ import { rxResource } from '@angular/core/rxjs-interop';
 import { Router, RouterLink } from '@angular/router';
 import { TranslocoPipe, TranslocoService } from '@jsverse/transloco';
 import { NgIcon, provideIcons } from '@ng-icons/core';
-import { lucideChevronLeft, lucidePlus, lucideTrash2, lucideX } from '@ng-icons/lucide';
+import { lucideChevronLeft, lucidePlus, lucidePrinter, lucideTrash2, lucideX } from '@ng-icons/lucide';
 import {
   APP_ROUTES,
   apiUrl,
@@ -31,6 +31,7 @@ import { ToggleSwitch } from '../../../shared/ui/toggle-switch';
 import { FormDialog } from '../../../shared/ui/form-dialog';
 import { ScorePicker, type CandidatePage, type PickedScore } from '../ui/score-picker';
 import { usePageName } from '../../../core/layout/page';
+import { PrintLauncher } from '../../../core/actions/pending-features';
 
 /** Mappe bearbeiten (N-5, N-15): name, visibility, scores with their own number in this folder. */
 @Component({
@@ -49,11 +50,12 @@ import { usePageName } from '../../../core/layout/page';
     ToggleSwitch,
     ScorePicker,
   ],
-  viewProviders: [provideIcons({ lucideChevronLeft, lucidePlus, lucideTrash2, lucideX })],
+  viewProviders: [provideIcons({ lucidePrinter, lucideChevronLeft, lucidePlus, lucideTrash2, lucideX })],
   changeDetection: ChangeDetectionStrategy.OnPush,
   templateUrl: './edit-folder-page.html',
 })
 export class EditFolderPage {
+  private readonly printer = inject(PrintLauncher);
   /** Breadcrumb and document title show the loaded element's name. */
   private readonly pageName = usePageName(() => this.details.hasValue() ? this.details.value().name : null);
   private readonly api = inject(ApiClient);
@@ -176,6 +178,11 @@ export class EditFolderPage {
       success: { key: 'library.folders.deleted', params: { name } },
     });
     if (done) void this.router.navigateByUrl(this.foldersPath);
+  }
+
+  /** Druckdialog (D-1) for the whole folder; the voices come from the voice switch. */
+  protected print(): void {
+    this.printer.open({ scope: 'folder', id: this.folderId(), title: this.details.hasValue() ? this.details.value().name : '' });
   }
 }
 

@@ -3,7 +3,7 @@ import { rxResource } from '@angular/core/rxjs-interop';
 import { Router, RouterLink } from '@angular/router';
 import { TranslocoPipe } from '@jsverse/transloco';
 import { NgIcon, provideIcons } from '@ng-icons/core';
-import { lucideEye, lucideFolderOpen, lucideTrash2, lucideUpload } from '@ng-icons/lucide';
+import { lucideEye, lucideFolderOpen, lucidePrinter, lucideTrash2, lucideUpload } from '@ng-icons/lucide';
 import {
   APP_ROUTES,
   apiUrl,
@@ -40,6 +40,7 @@ import { buildScoreBody, scoreFormFromDetails, type ScoreFormErrors, type ScoreF
 import { formatDuration } from './score-query';
 import { TreeLabelPipe } from '../../../shared/ui/tree-label.pipe';
 import { usePageName } from '../../../core/layout/page';
+import { PrintLauncher } from '../../../core/actions/pending-features';
 
 export type ScoreTab = 'details' | 'voices' | 'folders';
 
@@ -79,11 +80,12 @@ export function groupCompleteness(
     CompletenessBadge,
     ScoreForm,
   ],
-  viewProviders: [provideIcons({ lucideUpload, lucideEye, lucideTrash2, lucideFolderOpen })],
+  viewProviders: [provideIcons({ lucidePrinter, lucideUpload, lucideEye, lucideTrash2, lucideFolderOpen })],
   changeDetection: ChangeDetectionStrategy.OnPush,
   templateUrl: './score-page.html',
 })
 export class LibraryScorePage {
+  private readonly printer = inject(PrintLauncher);
   /** Breadcrumb and document title show the loaded element's name. */
   private readonly pageName = usePageName(() => this.details.hasValue() ? this.details.value().title : null);
   private readonly api = inject(ApiClient);
@@ -239,5 +241,10 @@ export class LibraryScorePage {
       success: { key: 'library.scores.deleted', params: { title } },
     });
     if (done) void this.router.navigateByUrl(APP_ROUTES.library.scores);
+  }
+
+  /** Druckdialog (D-1) for the whole score; the voices come from the voice switch. */
+  protected print(): void {
+    this.printer.open({ scope: 'score', id: this.scoreId(), title: this.details.hasValue() ? this.details.value().title : '' });
   }
 }

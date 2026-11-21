@@ -11,4 +11,5 @@ export * from './lib/folders';
 export * from './lib/events';
 export * from './lib/tags';
 export * from './lib/print';
+export * from './lib/print-service';
 export * from './lib/system';

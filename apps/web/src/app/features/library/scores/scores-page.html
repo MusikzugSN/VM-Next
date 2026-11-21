@@ -84,8 +84,17 @@
 @if (viewport.isMobile()) {
   <ul class="flex flex-col gap-2">
     @for (row of list.items(); track row.id) {
-      <li>
-        <a [routerLink]="link(row)" class="flex items-center gap-3 rounded-lg border bg-card p-4 text-foreground no-underline shadow-sm">
+      <li class="flex items-center gap-1 rounded-lg border bg-card shadow-sm" [class.border-primary]="selected().has(row.id)">
+        <label class="flex size-11 shrink-0 items-center justify-center ms-2">
+          <input
+            type="checkbox"
+            class="size-5 accent-primary"
+            [checked]="selected().has(row.id)"
+            (change)="toggle(row.id)"
+            [attr.aria-label]="'common.selection.selectRow' | transloco: { title: row.title }"
+          />
+        </label>
+        <a [routerLink]="link(row)" class="flex min-w-0 flex-1 items-center gap-3 py-4 pe-4 text-foreground no-underline">
           <span class="flex min-w-0 flex-1 flex-col">
             <span class="text-base font-semibold">{{ row.title }}</span>
             <span class="text-muted-foreground">{{ row.composer ?? '' }}</span>
@@ -100,6 +109,15 @@
     <table class="w-full">
       <thead class="bg-muted text-xs font-medium text-muted-foreground">
         <tr>
+          <th scope="col" class="w-10 px-3 py-2.5">
+            <input
+              type="checkbox"
+              class="size-4 accent-primary"
+              [checked]="allSelected()"
+              (change)="toggleAll()"
+              [attr.aria-label]="'common.selection.selectAll' | transloco"
+            />
+          </th>
           @for (column of columns(); track column.id) {
             <th scope="col" class="px-3 py-2.5 text-start whitespace-nowrap" [attr.aria-sort]="ariaSort(column)">
               <button type="button" class="inline-flex min-h-9 items-center gap-1 hover:text-foreground" (click)="sortBy(column)">
@@ -125,7 +143,16 @@
       </thead>
       <tbody>
         @for (row of list.items(); track row.id) {
-          <tr class="border-t">
+          <tr class="border-t" [class.bg-primary-soft]="selected().has(row.id)">
+            <td class="px-3 py-3 align-top">
+              <input
+              type="checkbox"
+              class="size-4 accent-primary"
+              [checked]="selected().has(row.id)"
+              (change)="toggle(row.id)"
+              [attr.aria-label]="'common.selection.selectRow' | transloco: { title: row.title }"
+            />
+            </td>
             @for (column of columns(); track column.id) {
               <td class="px-3 py-3 align-top">
                 @switch (column.id) {
@@ -190,4 +217,9 @@
 }
 
 <vm-list-state [list]="list" emptyKey="library.scores.empty" />
+<vm-selection-bar [count]="selected().size" (cleared)="selected.set(emptySelection)">
+  <button z-button type="button" (click)="printSelection()">
+    <ng-icon name="lucidePrinter" aria-hidden="true" />{{ 'common.selection.print' | transloco }}
+  </button>
+</vm-selection-bar>
 <vm-score-filter-dialog [(open)]="filterOpen" [state]="state()" (applied)="applyFilter($event)" />

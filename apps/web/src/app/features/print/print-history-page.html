@@ -1,0 +1,135 @@
+<div>
+  <h1 class="text-2xl font-semibold">{{ 'nav.print.history' | transloco }}</h1>
+  <p class="mt-2 text-muted-foreground">{{ 'print.history.introNoLimit' | transloco }}</p>
+</div>
+
+@if (state(); as s) {
+  @if (s.kind === 'ready') {
+    <div class="flex flex-col gap-2 rounded-lg border bg-card p-4 shadow-sm md:flex-row md:items-center">
+      <span class="flex flex-1 items-center gap-2 font-medium text-success-ink">
+        <ng-icon name="lucideCircleCheck" aria-hidden="true" />{{ 'print.history.connected' | transloco }}
+      </span>
+      <span class="text-muted-foreground">
+        {{ 'print.history.printers' | tPlural: printerCount() }}
+        @if (defaultPrinter(); as printer) {
+          · {{ printer.name }}
+        }
+        · v{{ s.status.version }}
+      </span>
+    </div>
+  } @else {
+    <section aria-labelledby="h-install" class="flex flex-col gap-4 rounded-lg border bg-card p-4 shadow-sm md:p-6">
+      <div role="status" class="flex items-start gap-2 rounded-md bg-warning-soft p-4 text-warning-ink">
+        <ng-icon name="lucideTriangleAlert" class="mt-0.5 shrink-0" aria-hidden="true" />
+        <span>
+          <strong class="font-semibold">{{ (s.kind === 'offline' ? 'print.history.offline' : 'print.history.incompatible.' + s.reason) | transloco }}</strong>
+          @if (s.kind === 'offline') {
+            {{ 'print.history.offlineText' | transloco }}
+          }
+        </span>
+      </div>
+      <h2 id="h-install" class="text-lg font-semibold">{{ 'print.history.installTitle' | transloco }}</h2>
+      <ol class="flex list-decimal flex-col gap-3 ps-5">
+        <li>{{ 'print.history.steps.install' | transloco }}</li>
+        <li class="flex flex-col gap-2">
+          {{ 'print.history.steps.origin' | transloco }}
+          <span class="flex flex-wrap items-center gap-2">
+            <code class="rounded-md bg-muted px-3 py-2 font-mono text-[13px]">{{ origin }}</code>
+            <button z-button zType="ghost" type="button" (click)="copyOrigin()">
+              <ng-icon name="lucideCopy" aria-hidden="true" />{{ 'print.history.copy' | transloco }}
+            </button>
+          </span>
+        </li>
+        <li>{{ 'print.history.steps.start' | transloco }}</li>
+      </ol>
+      <button z-button zType="outline" type="button" class="self-start" (click)="refresh()">
+        <ng-icon name="lucideRepeat" aria-hidden="true" />{{ 'print.history.recheck' | transloco }}
+      </button>
+    </section>
+  }
+} @else {
+  <p class="text-muted-foreground" aria-live="polite">{{ 'print.history.checking' | transloco }}</p>
+}
+
+@if (ready()) {
+  @if (jobs().length === 0 && loaded()) {
+    <p class="rounded-lg border border-dashed p-8 text-center text-muted-foreground">{{ 'print.history.empty' | transloco }}</p>
+  } @else if (viewport.isMobile()) {
+    <ul class="flex flex-col gap-2">
+      @for (job of jobs(); track job.id) {
+        <li class="flex flex-col gap-2 rounded-lg border bg-card p-4 shadow-sm">
+          <div class="flex items-start justify-between gap-2">
+            <span class="flex flex-col">
+              <span class="text-xs text-muted-foreground">{{ 'print.history.kinds.' + job.source.kind | transloco }}</span>
+              <span class="font-semibold">{{ job.source.title }}</span>
+            </span>
+            <ng-container [ngTemplateOutlet]="statusBadge" [ngTemplateOutletContext]="{ $implicit: job }" />
+          </div>
+          <span class="text-muted-foreground">{{ voices(job) }} · {{ 'print.pages' | tPlural: job.pages }} · {{ job.createdAt | date: 'dd.MM., HH:mm' }}</span>
+          @if (job.error) {
+            <span class="text-[13px] text-destructive-ink">{{ job.error }}</span>
+          }
+          <ng-container [ngTemplateOutlet]="actions" [ngTemplateOutletContext]="{ $implicit: job }" />
+        </li>
+      }
+    </ul>
+  } @else {
+    <div class="overflow-x-auto rounded-lg border bg-card shadow-sm">
+      <table class="w-full">
+        <thead class="bg-muted text-xs font-medium text-muted-foreground">
+          <tr>
+            <th scope="col" class="px-4 py-3 text-start">{{ 'print.history.job' | transloco }}</th>
+            <th scope="col" class="px-4 py-3 text-start">{{ 'print.history.voice' | transloco }}</th>
+            <th scope="col" class="px-4 py-3 text-end">{{ 'print.history.pages' | transloco }}</th>
+            <th scope="col" class="px-4 py-3 text-start">{{ 'print.history.printer' | transloco }}</th>
+            <th scope="col" class="px-4 py-3 text-start">{{ 'print.history.sentAt' | transloco }}</th>
+            <th scope="col" class="px-4 py-3 text-start">{{ 'print.history.status' | transloco }}</th>
+            <th scope="col" class="px-4 py-3 text-end"><span class="sr-only">{{ 'print.history.actions' | transloco }}</span></th>
+          </tr>
+        </thead>
+        <tbody>
+          @for (job of jobs(); track job.id) {
+            <tr class="border-t align-top">
+              <td class="px-4 py-3">
+                <span class="block text-xs text-muted-foreground">{{ 'print.history.kinds.' + job.source.kind | transloco }}</span>
+                <span class="font-medium">{{ job.source.title }}</span>
+                @if (job.error) {
+                  <span class="mt-1 block text-[13px] text-destructive-ink">{{ job.error }}</span>
+                }
+              </td>
+              <td class="px-4 py-3">{{ voices(job) }}</td>
+              <td class="px-4 py-3 text-end tabular-nums">{{ job.pages }}</td>
+              <td class="px-4 py-3 text-muted-foreground">{{ job.printer.name }}</td>
+              <td class="px-4 py-3 whitespace-nowrap text-muted-foreground tabular-nums">{{ job.createdAt | date: 'dd.MM.yyyy, HH:mm' }}</td>
+              <td class="px-4 py-3"><ng-container [ngTemplateOutlet]="statusBadge" [ngTemplateOutletContext]="{ $implicit: job }" /></td>
+              <td class="px-4 py-2 text-end"><ng-container [ngTemplateOutlet]="actions" [ngTemplateOutletContext]="{ $implicit: job }" /></td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    </div>
+  }
+  <p class="text-[13px] text-muted-foreground">{{ 'print.history.keepHint' | transloco }}</p>
+}
+
+<ng-template #statusBadge let-job>
+  <span class="inline-flex items-center rounded-sm px-2 py-0.5 text-xs font-medium whitespace-nowrap" [class]="statusClass($any(job).status)">
+    @if ($any(job).status === 'printing' && $any(job).printedPages !== null) {
+      {{ 'print.history.progress' | transloco: { printed: $any(job).printedPages, pages: $any(job).pages } }}
+    } @else {
+      {{ 'print.jobStatus.' + $any(job).status | transloco }}
+    }
+  </span>
+</ng-template>
+
+<ng-template #actions let-job>
+  @if (isRunning($any(job).status)) {
+    <button z-button zType="ghost" type="button" (click)="cancel(job)" [attr.aria-label]="('print.history.cancel' | transloco) + ': ' + $any(job).source.title">
+      <ng-icon name="lucideX" aria-hidden="true" />{{ 'print.history.cancel' | transloco }}
+    </button>
+  } @else if (canRetry($any(job).status)) {
+    <button z-button zType="ghost" type="button" (click)="retry(job)" [attr.aria-label]="('print.history.retry' | transloco) + ': ' + $any(job).source.title">
+      <ng-icon name="lucideRepeat" aria-hidden="true" />{{ 'print.history.retry' | transloco }}
+    </button>
+  }
+</ng-template>

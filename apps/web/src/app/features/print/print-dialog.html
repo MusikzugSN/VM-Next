@@ -1,0 +1,202 @@
+<z-dialog [(zVisible)]="open" zWidth="40rem" [zMaskClosable]="!busy()">
+  @if (request(); as req) {
+    <z-dialog-header>
+      <h2 z-dialog-title>{{ 'print.title.' + req.scope | transloco }}</h2>
+      <p z-dialog-description>
+        {{ req.title }}
+        @if (current(); as p) {
+          · {{ 'print.pages' | tPlural: p.totalPages }}
+        }
+      </p>
+    </z-dialog-header>
+
+    <div class="flex min-h-0 flex-1 flex-col gap-6 overflow-y-auto md:max-h-[65dvh] md:flex-none">
+      @if (req.scope === 'folder' || req.scope === 'event') {
+        <fieldset class="flex flex-col gap-2">
+          <legend class="mb-2 font-medium">{{ 'print.scope' | transloco }}</legend>
+          <div role="radiogroup" class="grid grid-cols-2 gap-2">
+            @for (m of ['all', 'selection']; track m) {
+              <button
+                type="button"
+                role="radio"
+                [attr.aria-checked]="mode() === m"
+                (click)="mode.set($any(m))"
+                class="flex min-h-11 items-center gap-2 rounded-md border px-3 text-start font-medium"
+                [class]="mode() === m ? 'border-primary bg-primary-soft text-primary' : 'border-input bg-background'"
+              >
+                <span class="flex size-4 shrink-0 items-center justify-center rounded-full border" [class.border-primary]="mode() === m" aria-hidden="true">
+                  @if (mode() === m) {
+                    <span class="size-2 rounded-full bg-primary"></span>
+                  }
+                </span>
+                {{ (m === 'all' ? 'print.whole.' + req.scope : 'print.selection') | transloco }}
+              </button>
+            }
+          </div>
+          @if (mode() === 'selection') {
+            <ul class="flex max-h-56 flex-col overflow-y-auto rounded-md border" [attr.aria-label]="'print.selectScores' | transloco">
+              @for (s of selectableScores(); track s.scoreId; let first = $first) {
+                <li [class.border-t]="!first">
+                  <label class="flex min-h-11 items-center gap-3 px-4 py-2 xl:min-h-9">
+                    <input type="checkbox" class="size-4 accent-primary" [checked]="selectedScores().has(s.scoreId)" (change)="toggleScore(s.scoreId)" />
+                    @if (s.number) {
+                      <span class="w-8 text-muted-foreground tabular-nums">{{ s.number }}</span>
+                    }
+                    <span class="font-medium">{{ s.title }}</span>
+                  </label>
+                </li>
+              } @empty {
+                <li class="px-4 py-3 text-muted-foreground">{{ 'common.loading' | transloco }}</li>
+              }
+            </ul>
+          }
+        </fieldset>
+      }
+
+      <fieldset class="flex flex-col gap-2">
+        <legend class="mb-2 font-medium">{{ 'print.voices' | transloco }}</legend>
+        <div class="flex flex-wrap gap-2">
+          @for (voice of voiceChoices(); track voice.id) {
+            <button
+              type="button"
+              [attr.aria-pressed]="voiceIds().includes(voice.id)"
+              (click)="toggleVoice(voice.id)"
+              class="inline-flex h-11 items-center gap-1.5 rounded-md border px-3 font-medium xl:h-9"
+              [class]="voiceIds().includes(voice.id) ? 'border-primary bg-primary-soft text-primary' : 'border-input bg-background'"
+            >
+              @if (voiceIds().includes(voice.id)) {
+                <ng-icon name="lucideCheck" aria-hidden="true" />
+              }
+              {{ voice.name }}
+            </button>
+          }
+        </div>
+        <div class="flex flex-col gap-1.5 md:w-72">
+          <label for="print-add-voice" class="text-[13px] text-muted-foreground">{{ 'print.addVoice' | transloco }}</label>
+          <vm-voice-select controlId="print-add-voice" [value]="null" (changed)="addVoice($event)" />
+        </div>
+        @if (!voiceIds().length) {
+          <p class="text-[13px] text-destructive-ink">{{ 'print.noVoice' | transloco }}</p>
+        }
+      </fieldset>
+
+      <div class="flex flex-col gap-2">
+        <vm-toggle-field [label]="'print.duplex' | transloco" [hint]="'print.duplexHint' | transloco" [checked]="duplex()" (toggled)="duplex.set($event)" />
+        <vm-toggle-field
+          [label]="'print.substitutes' | transloco"
+          [hint]="'print.substitutesHint' | transloco"
+          [checked]="withSubstitutes()"
+          (toggled)="withSubstitutes.set($event)"
+        />
+      </div>
+
+      <section aria-labelledby="print-how" class="flex flex-col gap-2">
+        <h3 id="print-how" class="font-medium">{{ 'print.how' | transloco }}</h3>
+        @if (plan.error(); as error) {
+          <p role="alert" class="rounded-md bg-destructive-soft p-4 text-destructive-ink">{{ $any(error).messageKey ?? 'errors.unknown' | transloco }}</p>
+        } @else if (current(); as p) {
+          <ul class="flex flex-col rounded-md border text-[13px]">
+            @for (doc of p.documents; track doc.scoreId + doc.voice.id; let first = $first) {
+              @let s = sheets(doc.pages, doc.blankPagesAfter);
+              <li class="flex items-start gap-3 px-4 py-2.5" [class.border-t]="!first">
+                @if (doc.number) {
+                  <span class="w-8 shrink-0 text-muted-foreground tabular-nums">{{ doc.number }}</span>
+                }
+                <span class="flex min-w-0 flex-1 flex-col gap-0.5">
+                  <span class="font-medium">{{ doc.title }}</span>
+                  <span class="text-muted-foreground">
+                    {{ doc.voice.name }}
+                    @if (doc.kind === 'substitute') {
+                      <span class="ms-1 rounded-sm bg-brass-soft px-1.5 py-0.5 text-xs font-medium text-brass-ink">{{ 'print.substitute' | transloco }}</span>
+                    }
+                  </span>
+                </span>
+                <span class="shrink-0 text-end">
+                  <span class="text-muted-foreground tabular-nums">{{ 'print.pages' | tPlural: doc.pages }}</span>
+                  → {{ s.key | transloco: s.params }}
+                </span>
+              </li>
+            }
+            @for (m of p.missing; track m.id) {
+              <li class="flex items-center gap-3 border-t px-4 py-2.5">
+                <span class="flex-1 font-medium">{{ m.name }}</span>
+                <span class="inline-flex items-center gap-1 rounded-sm bg-destructive-soft px-2 py-0.5 text-xs font-medium text-destructive-ink">
+                  <ng-icon name="lucideCircleAlert" size="14" aria-hidden="true" />{{ 'print.missing' | transloco }}
+                </span>
+              </li>
+            }
+          </ul>
+        } @else if (plan.isLoading()) {
+          <p class="text-muted-foreground" aria-live="polite">{{ 'common.loading' | transloco }}</p>
+        }
+      </section>
+
+      @if (current(); as p) {
+        @switch (action()) {
+          @case ('browser') {
+            <p role="note" class="flex items-start gap-2 rounded-md bg-primary-soft p-4 text-primary">
+              <ng-icon name="lucidePrinter" class="mt-0.5 shrink-0" aria-hidden="true" />
+              {{ 'print.routeBrowser' | transloco: { pages: p.totalPages, limit: p.pageLimit } }}
+            </p>
+          }
+          @case ('service') {
+            <div class="flex flex-col gap-3 rounded-md bg-success-soft p-4 text-success-ink">
+              <p class="flex items-start gap-2">
+                <ng-icon name="lucideCheck" class="mt-0.5 shrink-0" aria-hidden="true" />
+                {{ 'print.routeService' | transloco: { pages: p.totalPages } }}
+              </p>
+              @if (printers().length > 1) {
+                <label class="flex flex-col gap-1.5 text-foreground">
+                  <span class="font-medium">{{ 'print.printer' | transloco }}</span>
+                  <select z-native-select [value]="printerId() ?? ''" (change)="printerId.set($any($event.target).value || null)">
+                    @for (printer of printers(); track printer.id) {
+                      <option [value]="printer.id" [selected]="printer.id === printerId()">
+                        {{ printer.name }}{{ printer.isDefault ? ' (' + ('print.defaultPrinter' | transloco) + ')' : '' }}
+                      </option>
+                    }
+                  </select>
+                </label>
+              }
+            </div>
+          }
+          @case ('fallback') {
+            <div role="alert" class="flex flex-col gap-3 rounded-md bg-warning-soft p-4 text-warning-ink">
+              <p class="flex items-start gap-2">
+                <ng-icon name="lucideTriangleAlert" class="mt-0.5 shrink-0" aria-hidden="true" />
+                <span>
+                  <strong class="font-semibold">{{ 'print.serviceMissing' | transloco }}</strong>
+                  {{ 'print.serviceMissingText' | transloco: { pages: p.totalPages, limit: p.pageLimit } }}
+                </span>
+              </p>
+              <div class="flex flex-wrap gap-2">
+                <a z-button zType="outline" [routerLink]="historyPath" (click)="open.set(false)">{{ 'print.installGuide' | transloco }}</a>
+                <button z-button zType="ghost" type="button" (click)="recheckService()">
+                  <ng-icon name="lucideRepeat" aria-hidden="true" />{{ 'print.recheck' | transloco }}
+                </button>
+              </div>
+            </div>
+          }
+          @case ('device') {
+            <p role="note" class="flex items-start gap-2 rounded-md bg-primary-soft p-4 text-primary">
+              <ng-icon name="lucidePrinter" class="mt-0.5 shrink-0" aria-hidden="true" />
+              <span><strong class="font-semibold">{{ 'print.deviceTitle' | transloco }}</strong> {{ 'print.deviceText' | transloco }}</span>
+            </p>
+          }
+        }
+      }
+    </div>
+
+    <z-dialog-footer>
+      <button z-button zType="secondary" type="button" (click)="open.set(false)">{{ 'common.cancel' | transloco }}</button>
+      @if (action() === 'device' && canShare) {
+        <button z-button zType="outline" type="button" [zDisabled]="busy()" (click)="share()">
+          <ng-icon name="lucideShare2" aria-hidden="true" />{{ 'print.share' | transloco }}
+        </button>
+      }
+      <button z-button type="button" [zLoading]="busy()" [zDisabled]="busy() || !action()" (click)="run()">
+        <ng-icon [name]="action() === 'device' ? 'lucideExternalLink' : 'lucidePrinter'" aria-hidden="true" />
+        {{ (action() ? 'print.actions.' + action() : 'common.print') | transloco }}
+      </button>
+    </z-dialog-footer>
+  }
+</z-dialog>

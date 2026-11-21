@@ -29,7 +29,12 @@ export class ApiClient {
     return this.http.post<unknown>(url, body).pipe(map(() => undefined));
   }
 
-  /** POST whose answer is a file (print PDF). */
+  /** GET whose answer is a file (print PDF, D-1). */
+  getBlob(url: string, query: ApiQuery = {}): Observable<Blob> {
+    return this.http.get(url, { params: toParams(query), responseType: 'blob' });
+  }
+
+  /** POST whose answer is a file. */
   postBlob(url: string, body: unknown): Observable<Blob> {
     return this.http.post(url, body, { responseType: 'blob' });
   }

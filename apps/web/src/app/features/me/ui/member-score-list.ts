@@ -1,17 +1,24 @@
-import { ChangeDetectionStrategy, Component, computed, inject, input } from '@angular/core';
+import { ChangeDetectionStrategy, Component, computed, inject, input, signal } from '@angular/core';
 import { RouterLink } from '@angular/router';
-import { TranslocoPipe } from '@jsverse/transloco';
+import { TranslocoPipe, TranslocoService } from '@jsverse/transloco';
 import { PluralPipe } from '../../../core/i18n/plural.pipe';
 import { NgIcon, provideIcons } from '@ng-icons/core';
-import { lucideDownload, lucideUpload } from '@ng-icons/lucide';
-import { APP_ROUTES, appPath, type MemberScoreRow, type MemberSheet } from '@vm-web/shared';
+import { lucideDownload, lucideFileArchive, lucidePrinter, lucideUpload } from '@ng-icons/lucide';
+import { APP_ROUTES, apiUrl, appPath, type MemberScoreRow, type MemberSheet } from '@vm-web/shared';
+import { firstValueFrom } from 'rxjs';
 
 import { ZardButtonComponent } from '@/shared/components/button';
+import { ZardSonnerService } from '@/shared/components/sonner';
 
-import { UploadLauncher } from '../../../core/actions/pending-features';
+import { PrintLauncher, UploadLauncher } from '../../../core/actions/pending-features';
+import { ApiClient } from '../../../core/api/api-client';
+import { isApiProblem } from '../../../core/api/api-problem';
 import { sheetPdfUrl } from '../../../core/api/urls';
 import { SessionStore } from '../../../core/auth/session.store';
 import { ViewportService } from '../../../core/layout/viewport';
+import { saveBlob } from '../../../core/util/save-blob';
+import { VoiceContextStore } from '../../../core/voices/voice-context.store';
+import { SelectionBar } from '../../../shared/ui/selection-bar';
 import { StatusBadge } from '../../../shared/ui/status-badge';
 
 export type ScoreListRow = MemberScoreRow & { position?: number };
@@ -36,11 +43,12 @@ export function displayNumber(value: string | number | null | undefined): string
 /**
  * ScoreRow (Design Guideline) as a list: table from tablet width, cards on phones.
  * Title opens the score page; „Stimme fehlt“ always offers „Hochladen“ (M-9).
+ * Rows can be selected for a ZIP or a print of the selection (M-6, M-7).
  */
 @Component({
   selector: 'vm-member-score-list',
-  imports: [PluralPipe, RouterLink, NgIcon, TranslocoPipe, ZardButtonComponent, StatusBadge],
-  viewProviders: [provideIcons({ lucideDownload, lucideUpload })],
+  imports: [PluralPipe, RouterLink, NgIcon, TranslocoPipe, ZardButtonComponent, StatusBadge, SelectionBar],
+  viewProviders: [provideIcons({ lucideDownload, lucideUpload, lucideFileArchive, lucidePrinter })],
   changeDetection: ChangeDetectionStrategy.OnPush,
   templateUrl: './member-score-list.html',
 })
@@ -54,6 +62,8 @@ export class MemberScoreList {
   readonly numbering = input<'number' | 'position' | 'none'>('number');
   readonly folderId = input<string | null>(null);
   readonly eventId = input<string | null>(null);
+  /** Name of the list (folder, event, tag) for print history and file names. */
+  readonly listTitle = input('');
 
   protected readonly canUpload = computed(() => this.session.can('sheet.upload'));
   protected readonly items = computed(() =>
@@ -72,6 +82,74 @@ export class MemberScoreList {
       };
     }),
   );
+
+  private readonly api = inject(ApiClient);
+  private readonly printer = inject(PrintLauncher);
+  private readonly voices = inject(VoiceContextStore);
+  private readonly sonner = inject(ZardSonnerService);
+  private readonly transloco = inject(TranslocoService);
+
+  /** Selected score ids; rows without a sheet („Stimme fehlt“) cannot be selected. */
+  protected readonly selected = signal<ReadonlySet<string>>(new Set());
+  protected readonly selectable = computed(() => this.items().filter((item) => !item.missing).map((item) => item.row.scoreId));
+  protected readonly allSelected = computed(() => this.selectable().length > 0 && this.selectable().every((id) => this.selected().has(id)));
+  protected readonly zipping = signal(false);
+
+  protected toggle(scoreId: string): void {
+    this.selected.update((current) => {
+      const next = new Set(current);
+      if (next.has(scoreId)) next.delete(scoreId);
+      else next.add(scoreId);
+      return next;
+    });
+  }
+
+  protected toggleAll(): void {
+    this.selected.set(this.allSelected() ? new Set() : new Set(this.selectable()));
+  }
+
+  protected clearSelection(): void {
+    this.selected.set(new Set());
+  }
+
+  /** In list order, so the ZIP and the print follow the folder or setlist. */
+  private selectedIds(): string[] {
+    return this.items()
+      .map((item) => item.row.scoreId)
+      .filter((id) => this.selected().has(id));
+  }
+
+  protected async downloadZip(): Promise<void> {
+    this.zipping.set(true);
+    try {
+      const zip = await firstValueFrom(
+        this.api.postBlob(apiUrl('me', 'selectionZip'), {
+          scoreIds: this.selectedIds(),
+          folderId: this.folderId() ?? undefined,
+          eventId: this.eventId() ?? undefined,
+          voiceIds: [...this.voices.overrideIds()],
+          substitutes: 'fallback',
+        }),
+      );
+      const title = this.listTitle() || this.transloco.translate('common.selection.title');
+      saveBlob(zip, `${title.replace(/[\\/:*?"<>|]+/g, ' ').trim()}.zip`);
+    } catch (error) {
+      this.sonner.error(this.transloco.translate(isApiProblem(error) ? error.messageKey : 'common.selection.zipFailed'));
+    } finally {
+      this.zipping.set(false);
+    }
+  }
+
+  protected printSelection(): void {
+    this.printer.open({
+      scope: 'selection',
+      id: '',
+      title: this.listTitle() || this.transloco.translate('common.selection.title'),
+      scoreIds: this.selectedIds(),
+      folderId: this.folderId() ?? undefined,
+      eventId: this.eventId() ?? undefined,
+    });
+  }
 
   protected upload(row: ScoreListRow): void {
     this.uploads.open({ scoreId: row.scoreId, scoreTitle: row.title });

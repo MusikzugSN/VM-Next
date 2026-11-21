@@ -98,7 +98,7 @@
       </span>
     </label>
 
-    <vm-member-score-list [rows]="list.items()" numbering="none" />
+    <vm-member-score-list [rows]="list.items()" numbering="none" [listTitle]="current.tag.name" />
     <vm-list-state [list]="list" emptyKey="me.tags.empty" />
   </section>
 } @else if (tagId() && tags.hasValue()) {

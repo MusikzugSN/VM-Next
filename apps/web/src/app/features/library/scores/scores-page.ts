@@ -11,6 +11,7 @@ import {
   lucideDownload,
   lucideEllipsis,
   lucidePlus,
+  lucidePrinter,
   lucideSlidersHorizontal,
   lucideX,
 } from '@ng-icons/lucide';
@@ -52,6 +53,8 @@ import {
   scoreTableQuery,
   type ScoreQueryState,
 } from './score-query';
+import { PrintLauncher } from '../../../core/actions/pending-features';
+import { SelectionBar } from '../../../shared/ui/selection-bar';
 
 const HIDDEN_COLUMNS_KEY = 'vmweb.scoreTable.hiddenColumns';
 
@@ -78,6 +81,7 @@ interface Column {
     CompletenessBadge,
     FieldValue,
     ScoreFilterDialog,
+    SelectionBar,
   ],
   viewProviders: [
     provideIcons({
@@ -90,6 +94,7 @@ interface Column {
       lucideArrowUp,
       lucideArrowDown,
       lucideChevronsUpDown,
+      lucidePrinter,
     }),
   ],
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -163,6 +168,38 @@ export class ScoresPage {
       const q = this.searchDebounced();
       if (q !== untracked(this.state).q) this.navigate({ ...untracked(this.state), q }, true);
     });
+  }
+
+  private readonly printer = inject(PrintLauncher);
+
+  /** Selected scores for „Drucken“ (M-7); kept while filtering, cleared on demand. */
+  protected readonly selected = signal<ReadonlySet<string>>(new Set());
+  protected readonly emptySelection: ReadonlySet<string> = new Set();
+  protected readonly allSelected = computed(() => {
+    const items = this.list.items();
+    return items.length > 0 && items.every((row) => this.selected().has(row.id));
+  });
+
+  protected toggle(id: string): void {
+    this.selected.update((current) => {
+      const next = new Set(current);
+      if (next.has(id)) next.delete(id);
+      else next.add(id);
+      return next;
+    });
+  }
+
+  protected toggleAll(): void {
+    this.selected.set(this.allSelected() ? new Set() : new Set(this.list.items().map((row) => row.id)));
+  }
+
+  /** Prints the selection in table order (F-9: any score with score.view). */
+  protected printSelection(): void {
+    const order = this.list.items().map((row) => row.id);
+    const chosen = this.selected();
+    const known = order.filter((id) => chosen.has(id));
+    const scoreIds = [...known, ...[...chosen].filter((id) => !known.includes(id))];
+    this.printer.open({ scope: 'selection', id: '', title: this.transloco.translate('common.selection.title'), scoreIds });
   }
 
   protected link(row: ScoreTableRow): string {

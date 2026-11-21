@@ -2,6 +2,16 @@
   <ul class="flex flex-col gap-2">
     @for (item of items(); track item.row.scoreId) {
       <li class="flex items-center gap-3 rounded-lg border bg-card py-3 ps-3 pe-2 shadow-sm">
+        <label class="-ms-1 flex size-11 shrink-0 items-center justify-center self-start">
+          <input
+              type="checkbox"
+              class="size-5 accent-primary"
+              [checked]="selected().has(item.row.scoreId)"
+              [disabled]="item.missing"
+              (change)="toggle(item.row.scoreId)"
+              [attr.aria-label]="'common.selection.selectRow' | transloco: { title: item.row.title }"
+            />
+        </label>
         @if (numbering() !== 'none') {
           <span
             class="flex size-11 shrink-0 self-start items-center justify-center rounded-md bg-primary-soft text-base font-semibold text-primary tabular-nums"
@@ -59,6 +69,16 @@
     <table class="w-full text-start">
       <thead class="bg-muted text-xs font-medium text-muted-foreground">
         <tr>
+          <th scope="col" class="w-12 px-4 py-3">
+            <input
+              type="checkbox"
+              class="size-4 accent-primary"
+              [checked]="allSelected()"
+              [disabled]="!selectable().length"
+              (change)="toggleAll()"
+              [attr.aria-label]="'common.selection.selectAll' | transloco"
+            />
+          </th>
           @if (numbering() !== 'none') {
             <th scope="col" class="w-16 px-4 py-3 text-start">{{ 'me.list.number' | transloco }}</th>
           }
@@ -70,7 +90,17 @@
       </thead>
       <tbody>
         @for (item of items(); track item.row.scoreId) {
-          <tr class="border-t">
+          <tr class="border-t" [class.bg-primary-soft]="selected().has(item.row.scoreId)">
+            <td class="px-4 py-3">
+              <input
+              type="checkbox"
+              class="size-4 accent-primary"
+              [checked]="selected().has(item.row.scoreId)"
+              [disabled]="item.missing"
+              (change)="toggle(item.row.scoreId)"
+              [attr.aria-label]="'common.selection.selectRow' | transloco: { title: item.row.title }"
+            />
+            </td>
             @if (numbering() !== 'none') {
               <td class="px-4 py-3">
                 <span
@@ -122,3 +152,12 @@
     </table>
   </div>
 }
+
+<vm-selection-bar [count]="selected().size" (cleared)="clearSelection()">
+  <button z-button zType="outline" type="button" [zLoading]="zipping()" [zDisabled]="zipping()" (click)="downloadZip()">
+    <ng-icon name="lucideFileArchive" aria-hidden="true" />{{ 'common.selection.zip' | transloco }}
+  </button>
+  <button z-button type="button" (click)="printSelection()">
+    <ng-icon name="lucidePrinter" aria-hidden="true" />{{ 'common.selection.print' | transloco }}
+  </button>
+</vm-selection-bar>

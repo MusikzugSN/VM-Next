@@ -20,11 +20,16 @@
         </ul>
       }
     </div>
-    @if (canUpload()) {
-      <button z-button type="button" class="w-full md:w-auto" (click)="upload()">
-        <ng-icon name="lucideUpload" aria-hidden="true" />{{ 'library.score.uploadVoices' | transloco }}
+    <div class="flex flex-col gap-2 md:flex-row">
+      <button z-button zType="outline" type="button" class="w-full md:w-auto" (click)="print()">
+        <ng-icon name="lucidePrinter" aria-hidden="true" />{{ 'common.print' | transloco }}
       </button>
-    }
+      @if (canUpload()) {
+        <button z-button type="button" class="w-full md:w-auto" (click)="upload()">
+          <ng-icon name="lucideUpload" aria-hidden="true" />{{ 'library.score.uploadVoices' | transloco }}
+        </button>
+      }
+    </div>
   </div>
 
   <nav [attr.aria-label]="'library.score.sections' | transloco" class="flex gap-1 overflow-x-auto overflow-y-hidden border-b">

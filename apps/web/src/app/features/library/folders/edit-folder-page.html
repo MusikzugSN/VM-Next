@@ -16,11 +16,16 @@
         }
       </p>
     </div>
-    @if (canEdit() && !adding()) {
-      <button z-button type="button" class="w-full md:w-auto" (click)="adding.set(true)">
-        <ng-icon name="lucidePlus" aria-hidden="true" />{{ 'library.common.addScore' | transloco }}
+    <div class="flex flex-col gap-2 md:flex-row">
+      <button z-button zType="outline" type="button" class="w-full md:w-auto" (click)="print()">
+        <ng-icon name="lucidePrinter" aria-hidden="true" />{{ 'common.print' | transloco }}
       </button>
-    }
+      @if (canEdit()) {
+        <button z-button type="button" class="w-full md:w-auto" (click)="adding.set(true)">
+          <ng-icon name="lucidePlus" aria-hidden="true" />{{ 'library.common.addScore' | transloco }}
+        </button>
+      }
+    </div>
   </div>
 
   <section aria-labelledby="h-folder" class="flex flex-col gap-4 rounded-lg border bg-card p-4 shadow-sm md:p-6">

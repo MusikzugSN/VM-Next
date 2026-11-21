@@ -59,7 +59,21 @@
     "empty": "Keine Einträge",
     "moveUp": "{{ name }} nach oben",
     "moveDown": "{{ name }} nach unten",
-    "removeItem": "{{ name }} entfernen"
+    "removeItem": "{{ name }} entfernen",
+    "selection": {
+      "label": "Auswahl",
+      "count": {
+        "one": "1 Stück ausgewählt",
+        "other": "{{ count }} Stücke ausgewählt"
+      },
+      "clear": "Auswahl aufheben",
+      "selectAll": "Alle auswählen",
+      "selectRow": "{{ title }} auswählen",
+      "zip": "Als ZIP",
+      "print": "Drucken",
+      "zipFailed": "Das ZIP ließ sich nicht erstellen.",
+      "title": "Auswahl"
+    }
   },
   "terms": {
     "ensemble": "Ensemble",
@@ -170,9 +184,6 @@
       "text": "Diese Adresse gibt es nicht oder nicht mehr. Vielleicht wurde die Mappe oder das Event umbenannt oder archiviert.",
       "requested": "Aufgerufen:"
     }
-  },
-  "pending": {
-    "print": "Drucken folgt in Stufe 6 des Frontends."
   },
   "pdf": {
     "label": "PDF-Vorschau, Seite {{ page }} von {{ count }}. Mit den Pfeiltasten blättern.",
@@ -291,5 +302,126 @@
     "optionsHint": "Ein Wert pro Zeile. Umbenannte Werte gelten als neu.",
     "required": "Pflichtfeld",
     "requiredHint": "Ein Stück lässt sich dann nur mit einem Wert in diesem Feld speichern."
+  },
+  "print": {
+    "title": {
+      "score": "Stück drucken",
+      "folder": "Mappe drucken",
+      "event": "Event drucken",
+      "selection": "Auswahl drucken"
+    },
+    "pages": {
+      "one": "1 Seite",
+      "other": "{{ count }} Seiten"
+    },
+    "scope": "Umfang",
+    "whole": {
+      "folder": "Ganze Mappe",
+      "event": "Ganzes Event",
+      "score": "Ganzes Stück",
+      "selection": "Auswahl"
+    },
+    "selection": "Auswahl",
+    "selectScores": "Stücke für den Druck",
+    "voices": "Stimmen",
+    "addVoice": "Weitere Stimme hinzufügen",
+    "noVoice": "Wähle mindestens eine Stimme.",
+    "duplex": "Beidseitig drucken",
+    "duplexHint": "Jedes Stück beginnt auf einem neuen Blatt; dafür fügt VM-Web Leerseiten ein.",
+    "substitutes": "Ersatzstimmen verwenden",
+    "substitutesHint": "Fehlt eine Stimme, wird die hinterlegte Ersatzstimme gedruckt.",
+    "how": "So wird gedruckt",
+    "substitute": "Ersatz",
+    "missing": "Stimme fehlt",
+    "sheets": {
+      "single": "1 Blatt einseitig",
+      "simplex": "{{ sheets }} Blätter einseitig",
+      "duplexOne": "1 Blatt beidseitig",
+      "duplex": "{{ sheets }} Blätter beidseitig"
+    },
+    "routeBrowser": "{{ pages }} Seiten – du druckst über den Druckdialog des Browsers (bis {{ limit }} Seiten).",
+    "routeService": "{{ pages }} Seiten – wird über den Druckservice auf diesem Computer gedruckt.",
+    "printer": "Drucker",
+    "defaultPrinter": "Standard",
+    "serviceMissing": "Druckservice nicht erreichbar.",
+    "serviceMissingText": "Aufträge über {{ limit }} Seiten druckt der Druckservice auf diesem Computer. Du kannst die {{ pages }} Seiten trotzdem über den Browser drucken.",
+    "installGuide": "Installationsanleitung",
+    "recheck": "Erneut prüfen",
+    "deviceTitle": "Auf dem Smartphone oder Tablet druckst du über dein Gerät.",
+    "deviceText": "Das PDF ist schon fertig aufbereitet.",
+    "share": "Teilen",
+    "actions": {
+      "browser": "Drucken",
+      "service": "An Druckservice senden",
+      "fallback": "Im Browser drucken",
+      "device": "PDF öffnen"
+    },
+    "sent": "Auftrag an den Druckservice gesendet.",
+    "sentHint": "Den Stand siehst du im Druckverlauf.",
+    "browserFailed": "Der Druckdialog des Browsers ließ sich nicht öffnen.",
+    "shareUnsupported": "Dieser Browser kann keine Dateien teilen. Öffne das PDF stattdessen.",
+    "serviceErrors": {
+      "offline": "Der Druckservice ist nicht mehr erreichbar.",
+      "origin-not-allowed": "Der Druckservice nimmt keine Aufträge von dieser VM-Web-Adresse an.",
+      "contract-unsupported": "Der Druckservice ist zu alt für diese VM-Web-Version. Bitte aktualisieren.",
+      "invalid-job": "Der Druckservice hat den Auftrag abgelehnt.",
+      "printer-not-found": "Der gewählte Drucker ist nicht mehr vorhanden.",
+      "job-not-found": "Diesen Auftrag gibt es im Druckservice nicht mehr.",
+      "internal-error": "Der Druckservice meldet einen Fehler."
+    },
+    "history": {
+      "intro": "Deine Druckaufträge über den Druckservice auf diesem Computer. Bis {{ limit }} Seiten druckst du direkt über den Browser.",
+      "introNoLimit": "Deine Druckaufträge über den Druckservice auf diesem Computer. Kleine Aufträge druckst du direkt über den Browser.",
+      "connected": "Druckservice auf diesem Computer verbunden",
+      "printers": {
+        "one": "1 Drucker",
+        "other": "{{ count }} Drucker"
+      },
+      "checking": "Druckservice wird gesucht …",
+      "offline": "Kein Druckservice auf diesem Computer",
+      "offlineText": "Große Aufträge wie ganze Mappen oder Events druckt der Druckservice. Er läuft auf deinem Computer und nimmt nur Aufträge von dieser VM-Web-Adresse an.",
+      "incompatible": {
+        "origin": "Der Druckservice läuft, nimmt aber keine Aufträge von dieser VM-Web-Adresse an.",
+        "contract": "Der Druckservice läuft, ist aber zu alt für diese VM-Web-Version."
+      },
+      "installTitle": "So richtest du den Druckservice ein",
+      "steps": {
+        "install": "Druckservice „vm-web-print“ installieren (Linux, druckt über CUPS). Den Download bekommst du von deinem Verein.",
+        "origin": "Als erlaubte VM-Web-Adresse eintragen:",
+        "start": "Druckservice starten und diese Seite neu laden."
+      },
+      "copy": "Adresse kopieren",
+      "copied": "Adresse kopiert.",
+      "recheck": "Erneut prüfen",
+      "empty": "Noch keine Druckaufträge über den Druckservice.",
+      "job": "Auftrag",
+      "voice": "Stimme",
+      "pages": "Seiten",
+      "printer": "Drucker",
+      "sentAt": "Gesendet",
+      "status": "Status",
+      "actions": "Aktionen",
+      "allVoices": "Alle Stimmen",
+      "progress": "Druckt {{ printed }}/{{ pages }}",
+      "cancel": "Abbrechen",
+      "retry": "Erneut senden",
+      "retried": "Auftrag erneut gesendet.",
+      "cancelled": "Auftrag abgebrochen.",
+      "kinds": {
+        "score": "Stück",
+        "folder": "Mappe",
+        "event": "Event",
+        "selection": "Auswahl"
+      },
+      "keepHint": "Der Verlauf liegt nur auf diesem Computer und zeigt die Aufträge der letzten 30 Tage.",
+      "changed": "„{{ title }}“: {{ status }}"
+    },
+    "jobStatus": {
+      "waiting": "Wartend",
+      "printing": "Druckt",
+      "done": "Fertig",
+      "failed": "Fehler",
+      "cancelled": "Abgebrochen"
+    }
   }
 }

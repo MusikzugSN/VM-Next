@@ -99,7 +99,7 @@ import { usePageName } from '../../core/layout/page';
       }
     </div>
 
-    <vm-member-score-list [rows]="list.items()" numbering="number" [folderId]="folderId()" />
+    <vm-member-score-list [rows]="list.items()" numbering="number" [folderId]="folderId()" [listTitle]="overview.hasValue() ? overview.value().name : ''" />
     <vm-list-state [list]="list" emptyKey="me.folder.empty" />
   `,
 })
@@ -146,6 +146,7 @@ export class FolderPage {
   protected readonly zip = computed(() => folderZipUrl(this.folderId(), this.voices.overrideIds()));
 
   protected print(): void {
-    this.printer.open({ folderId: this.folderId() });
+    const name = this.overview.hasValue() ? this.overview.value().name : '';
+    this.printer.open({ scope: 'folder', id: this.folderId(), title: name });
   }
 }

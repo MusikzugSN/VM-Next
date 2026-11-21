@@ -11,6 +11,7 @@ import { filter, skip } from 'rxjs';
 import { ZardSheetImports } from '@/shared/components/sheet/sheet.imports';
 import { ZardSonnerComponent } from '@/shared/components/sonner';
 
+import { PrintDialog } from '../../features/print/print-dialog';
 import { UploadDialog } from '../../features/uploads/upload-dialog';
 import { BrandingStore } from '../branding/branding.store';
 import { ClubLogo } from '../branding/club-logo';
@@ -40,6 +41,7 @@ import { VoiceSwitcher } from './voice-switcher';
     UserMenu,
     VoiceSwitcher,
     UploadDialog,
+    PrintDialog,
     ZardSonnerComponent,
   ],
   viewProviders: [provideIcons({ lucideMenu, lucideHouse, lucideFolderOpen, lucideCalendar, lucideUser })],

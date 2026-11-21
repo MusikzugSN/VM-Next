@@ -113,7 +113,8 @@ export class ScorePage {
 
   protected print(): void {
     const sheet = this.sheet();
-    if (sheet) this.printer.open({ scoreId: this.scoreId(), sheetIds: [sheet.sheetId] });
+    // A substitute sheet is printed for the voice it stands in for, with substitutes allowed.
+    if (sheet) this.printer.open({ scope: 'score', id: this.scoreId(), title: this.score()?.title ?? '', voiceIds: [sheet.substituteFor?.id ?? sheet.voice.id] });
   }
 
   protected upload(voiceId?: string): void {

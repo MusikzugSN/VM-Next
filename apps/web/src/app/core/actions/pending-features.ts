@@ -1,7 +1,4 @@
-import { inject, Injectable, signal } from '@angular/core';
-import { TranslocoService } from '@jsverse/transloco';
-
-import { ZardSonnerService } from '@/shared/components/sonner';
+import { Injectable, signal } from '@angular/core';
 
 /** What an upload starts from (N-11, M-9): preselected score and voice. */
 export interface UploadContext {
@@ -11,8 +8,19 @@ export interface UploadContext {
   voiceId?: string;
 }
 
-/** What a print starts from (D-1): a folder, an event or single sheets. */
-export type PrintContext = { folderId: string } | { eventId: string } | { scoreId: string; sheetIds: string[] };
+/** What a print starts from (D-1, M-7): a score, folder, event or a selection from a list, with a title for dialog and history. */
+export interface PrintRequest {
+  scope: 'score' | 'folder' | 'event' | 'selection';
+  /** Score, folder or event id; empty for a selection. */
+  id: string;
+  title: string;
+  /** Preselected voices; without them the active voices of the voice switch (M-2). */
+  voiceIds?: readonly string[];
+  /** Selection only: the chosen scores and the list they come from (numbers and order, F-9). */
+  scoreIds?: readonly string[];
+  folderId?: string;
+  eventId?: string;
+}
 
 /**
  * Opens the upload dialog (N-11) from anywhere; the dialog itself lives in the app shell.
@@ -38,14 +46,17 @@ export class UploadLauncher {
   }
 }
 
-/** Entry point for the print dialog (Stufe 6); until then it explains that the function follows. */
+/** Opens the print dialog (D-1) from anywhere; the dialog itself lives in the app shell. */
 @Injectable({ providedIn: 'root' })
 export class PrintLauncher {
-  private readonly sonner = inject(ZardSonnerService);
-  private readonly transloco = inject(TranslocoService);
+  /** Open request; `null` = dialog closed. */
+  readonly request = signal<PrintRequest | null>(null);
 
-  open(context: PrintContext): void {
-    void context;
-    this.sonner.info(this.transloco.translate('pending.print'));
+  open(request: PrintRequest): void {
+    this.request.set({ ...request });
+  }
+
+  close(): void {
+    this.request.set(null);
   }
 }

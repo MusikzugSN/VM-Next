@@ -62,7 +62,7 @@ import { usePageName } from '../../core/layout/page';
         <h2 id="h-setlist" class="text-lg font-semibold">{{ 'me.event.setlist' | transloco }}</h2>
         <span class="text-muted-foreground">{{ 'me.event.order' | transloco }}</span>
       </div>
-      <vm-member-score-list [rows]="list.items()" numbering="position" [eventId]="eventId()" />
+      <vm-member-score-list [rows]="list.items()" numbering="position" [eventId]="eventId()" [listTitle]="overview.hasValue() ? overview.value().name : ''" />
       <vm-list-state [list]="list" emptyKey="me.event.empty" />
     </section>
   `,
@@ -99,6 +99,7 @@ export class EventPage {
   protected readonly zip = computed(() => eventZipUrl(this.eventId(), this.voices.overrideIds()));
 
   protected print(): void {
-    this.printer.open({ eventId: this.eventId() });
+    const name = this.overview.hasValue() ? this.overview.value().name : '';
+    this.printer.open({ scope: 'event', id: this.eventId(), title: name });
   }
 }

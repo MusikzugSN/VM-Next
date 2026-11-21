@@ -4,7 +4,7 @@ import { rxResource } from '@angular/core/rxjs-interop';
 import { Router, RouterLink } from '@angular/router';
 import { TranslocoPipe, TranslocoService } from '@jsverse/transloco';
 import { NgIcon, provideIcons } from '@ng-icons/core';
-import { lucideArrowDown, lucideArrowUp, lucideChevronLeft, lucideGripVertical, lucidePlus, lucideTrash2, lucideX } from '@ng-icons/lucide';
+import { lucideArrowDown, lucideArrowUp, lucideChevronLeft, lucideGripVertical, lucidePlus, lucidePrinter, lucideTrash2, lucideX } from '@ng-icons/lucide';
 import {
   APP_ROUTES,
   apiUrl,
@@ -28,6 +28,7 @@ import { FormDialog } from '../../../shared/ui/form-dialog';
 import { ScorePicker, type CandidatePage, type PickedScore } from '../ui/score-picker';
 import { moveItem } from '../voices/voice-dialog';
 import { usePageName } from '../../../core/layout/page';
+import { PrintLauncher } from '../../../core/actions/pending-features';
 
 /** API limit of `set-setlist`. */
 export const MAX_SETLIST = 200;
@@ -51,11 +52,12 @@ type Item = Pick<SetlistEntry, 'scoreId' | 'title' | 'composer'>;
     ToggleSwitch,
     ScorePicker,
   ],
-  viewProviders: [provideIcons({ lucideChevronLeft, lucideGripVertical, lucideArrowUp, lucideArrowDown, lucideX, lucidePlus, lucideTrash2 })],
+  viewProviders: [provideIcons({ lucidePrinter, lucideChevronLeft, lucideGripVertical, lucideArrowUp, lucideArrowDown, lucideX, lucidePlus, lucideTrash2 })],
   changeDetection: ChangeDetectionStrategy.OnPush,
   templateUrl: './edit-event-page.html',
 })
 export class EditEventPage {
+  private readonly printer = inject(PrintLauncher);
   /** Breadcrumb and document title show the loaded element's name. */
   private readonly pageName = usePageName(() => this.details.hasValue() ? this.details.value().name : null);
   private readonly api = inject(ApiClient);
@@ -221,5 +223,10 @@ export class EditEventPage {
     this.announcement.set(
       this.transloco.translate('library.event.movedAnnounce', { title: item.title, position: index + 1, count: this.items().length }),
     );
+  }
+
+  /** Druckdialog (D-1) for the whole event; the voices come from the voice switch. */
+  protected print(): void {
+    this.printer.open({ scope: 'event', id: this.eventId(), title: this.details.hasValue() ? this.details.value().name : '' });
   }
 }
