@@ -273,7 +273,7 @@ Diese Stufe ist die größte. Bei Bedarf teile ich sie in **3a** (Stücke, Stimm
   - Die Pfeiltasten wechseln zwischen Uploads (N-13); Seiten blättert man mit den Buttons der Werkzeugleiste.
 - **Toasts** sitzen in der Seitenhülle, nicht in der Root-Komponente; dadurch bleiben ngx-sonner und tailwind-merge aus dem Start-Bundle (589 statt 691 kB).
 - **Systemverwaltung (Stufe 5):**
-  - Kein Tab „Druck“ (Druckregeln je Ensemble) im Ensemble-Detail; D-6 hat keinen API-Endpunkt im MVP.
+  - Tab „Druck“ (Druckregeln je Ensemble) kam später dazu, siehe „Druckregeln“.
   - Mitglieder kommen über die Benutzer-Seite ins Ensemble; der Tab „Mitglieder“ im Ensemble zeigt sie nur an.
   - Die Besetzung wird mit Checkboxen je Instrument gewählt; ihre Reihenfolge folgt der Reihenfolge der Instrumente und Stimmen.
   - Rechte-Matrix: „Anlegen“, „Bearbeiten“ und „Löschen“ setzen „Sehen“ im selben Bereich mit; wer „Sehen“ abwählt, nimmt dem Bereich alle Rechte.
@@ -297,6 +297,9 @@ Diese Stufe ist die größte. Bei Bedarf teile ich sie in **3a** (Stücke, Stimm
   - Vertrag mit dem Druckservice in `libs/shared/src/lib/print-service` und `docs/print-service.md`: `http://127.0.0.1:17631/v1`, `GET /status`, `GET/POST /jobs`, `POST /jobs/{id}/cancel|retry`, Origin-Prüfung gegen die eingetragene VM-Web-Adresse, CORS inkl. Private Network Access. Der Druckservice selbst wird danach gebaut.
   - Der Druckdialog sitzt in der Seitenhülle (`PrintLauncher.open({ scope, id, title, voiceIds })`) und ist erreichbar aus Mein Bereich (Mappe, Event, Stück) und der Notenverwaltung (Stück, Mappe bearbeiten, Event bearbeiten). Wahl: Umfang (ganz oder Auswahl), Stimmen, beidseitig, Ersatzstimmen; „So wird gedruckt“ zeigt Seiten → Blätter je Stück und fehlende Stimmen.
   - Weg: bis zur Seitengrenze Browser (verstecktes iframe + `print()`), darüber Druckservice mit Druckerwahl; ohne Druckservice Warnung, Link zur Anleitung und „Im Browser drucken“ (D-3). Auf Handy und Tablet „PDF öffnen“ bzw. „Teilen“.
-  - Druckregeln je Ensemble (D-6) sind im MVP nicht enthalten; angezeigt wird, was der Plan der API liefert (Seiten, Leerseiten).
   - Druckverlauf `/print`: Status des Druckservice, Aufträge mit Wartend/Druckt/Fertig/Fehler/Abgebrochen, Abbrechen und „Erneut senden“, Abfrage alle 2 s bei sichtbarer Seite, Statuswechsel als Toast; ohne Druckservice die Installationsanleitung mit der VM-Web-Adresse zum Kopieren.
-  - Aus der Stückliste (Auswahl mehrerer Stücke) wird nicht gedruckt: Die Tabelle hat keine Mehrfachauswahl.
+- **Nach Stufe 6:**
+  - Mehrfachauswahl in den Listen von Mein Bereich (Mappe, Event, Tag) mit „Als ZIP“ und „Drucken“ (M-6, M-7) und in der Stückliste der Notenverwaltung mit „Drucken“; die Aktionen stehen in einer schwebenden Leiste (`vm-selection-bar`), damit sich die Liste nicht verschiebt.
+  - Sitzungen liegen in Postgres (`cache_entries`), API-Neustarts melden nicht mehr ab.
+  - Druckservice für Linux/CUPS in `apps/print-service` (README mit Einrichtung).
+  - **Druckregeln (S-2, D-6):** Tab „Druck“ im Ensemble-Detail mit Regeln „ab X Seiten → einseitig/beidseitig“, Vererbung von übergeordneten Ensembles, sonst Standard (1 Seite einseitig, ab 2 beidseitig). Der Druckdialog fragt „beidseitig“ nicht mehr ab, sondern zeigt die angewandten Regeln und je Stück Druckart und Blätter; Mappen und Events drucken nach den Regeln ihres Ensembles, einzelne Stücke nach denen des Hauptensembles.

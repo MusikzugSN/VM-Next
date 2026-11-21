@@ -1,11 +1,29 @@
 import { degrees, PDFDocument } from 'pdf-lib';
-import { A4, blankPagesAfter, buildPrintPdf, MARGIN, placePage, printRoute } from './print-layout';
+import { A4, buildPrintPdf, layoutDocuments, MARGIN, placePage, printRoute } from './print-layout';
 
-describe('blankPagesAfter (D-1, F-8)', () => {
-  it('adds a blank page after odd page counts in duplex, never after the last document', () => {
-    expect(blankPagesAfter([1, 2, 3, 1], true)).toEqual([1, 0, 1, 0]);
-    expect(blankPagesAfter([1, 3], false)).toEqual([0, 0]);
-    expect(blankPagesAfter([], true)).toEqual([]);
+describe('layoutDocuments (D-1, D-6, F-8)', () => {
+  it('starts every duplex score on a new sheet and never ends with a blank page', () => {
+    const layout = layoutDocuments([2, 3, 1], ['duplex', 'duplex', 'duplex']);
+    expect(layout.duplex).toBe(true);
+    expect(layout.documents.map((d) => [d.blanks, d.sheets])).toEqual([
+      [0, 1],
+      [1, 2],
+      [0, 1],
+    ]);
+    expect(layout.totalPages).toBe(7);
+  });
+
+  it('gives single-sided scores a blank back page in a duplex job', () => {
+    const layout = layoutDocuments([1, 2, 2], ['simplex', 'duplex', 'simplex']);
+    expect(layout.documents.map((d) => d.slots.join(','))).toEqual(['page,blank', 'page,page', 'page,blank,page']);
+    expect(layout.documents.map((d) => d.sheets)).toEqual([1, 1, 2]);
+  });
+
+  it('inserts nothing when every score is single-sided', () => {
+    const layout = layoutDocuments([1, 3], ['simplex', 'simplex']);
+    expect(layout).toMatchObject({ duplex: false, totalPages: 4 });
+    expect(layout.documents.map((d) => d.sheets)).toEqual([1, 3]);
+    expect(layoutDocuments([], []).totalPages).toBe(0);
   });
 });
 
@@ -83,7 +101,7 @@ describe('buildPrintPdf (D-1)', () => {
   }
 
   it('places every page on A4 and inserts blank pages for duplex', async () => {
-    const { bytes, pageCount } = await buildPrintPdf([await doc(1), await doc(2, { size: [842, 595] }), await doc(3, { rotate: 90 })], true);
+    const { bytes, pageCount } = await buildPrintPdf([await doc(1), await doc(2, { size: [842, 595] }), await doc(3, { rotate: 90 })], ['duplex', 'duplex', 'duplex']);
     expect(pageCount).toBe(1 + 1 + 2 + 3);
     const out = await PDFDocument.load(bytes);
     const sizes = out.getPages().map((p) => {
@@ -95,7 +113,7 @@ describe('buildPrintPdf (D-1)', () => {
     expect(out.getPages().every((p) => p.getRotation().angle === 0)).toBe(true);
   });
 
-  it('adds no blank pages without duplex', async () => {
-    expect((await buildPrintPdf([await doc(1), await doc(1)], false)).pageCount).toBe(2);
+  it('adds no blank pages when every score is single-sided', async () => {
+    expect((await buildPrintPdf([await doc(1), await doc(1)], ['simplex', 'simplex'])).pageCount).toBe(2);
   });
 });

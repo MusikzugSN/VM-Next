@@ -34,13 +34,15 @@ import { PageProblem } from '../../../shared/ui/page-problem';
 import { SearchField } from '../../../shared/ui/search-field';
 import { TreeLabelPipe } from '../../../shared/ui/tree-label.pipe';
 import { usePageName } from '../../../core/layout/page';
+import { PrintRulesTab } from './print-rules-tab';
 
-type EnsembleTab = 'details' | 'lineup' | 'members';
+type EnsembleTab = 'details' | 'lineup' | 'members' | 'print';
+const TABS: readonly EnsembleTab[] = ['details', 'lineup', 'members', 'print'];
 
 /** Ensemble (S-2, F-3, N-8): Stammdaten · Besetzung · Mitglieder (tab in `?tab=`). */
 @Component({
   selector: 'vm-system-ensemble-page',
-  imports: [TreeLabelPipe, DatePipe, RouterLink, NgIcon, TranslocoPipe, PluralPipe, ZardButtonComponent, ZardNativeSelectDirective, ListState, NameDialog, PageProblem, SearchField],
+  imports: [TreeLabelPipe, DatePipe, RouterLink, NgIcon, TranslocoPipe, PluralPipe, ZardButtonComponent, ZardNativeSelectDirective, ListState, NameDialog, PageProblem, SearchField, PrintRulesTab],
   viewProviders: [provideIcons({ lucideChevronLeft, lucideWandSparkles })],
   changeDetection: ChangeDetectionStrategy.OnPush,
   templateUrl: './ensemble-page.html',
@@ -62,11 +64,12 @@ export class EnsemblePage {
   protected readonly listPath = APP_ROUTES.system.ensembles;
   protected readonly canEdit = computed(() => this.session.can('ensemble.edit'));
   protected readonly canSeeUsers = computed(() => this.session.can('user.view'));
-  protected readonly current = computed<EnsembleTab>(() => (this.tab() === 'lineup' || this.tab() === 'members' ? (this.tab() as EnsembleTab) : 'details'));
+  protected readonly current = computed<EnsembleTab>(() => (TABS.includes(this.tab() as EnsembleTab) ? (this.tab() as EnsembleTab) : 'details'));
   protected readonly tabs: { id: EnsembleTab; labelKey: string }[] = [
     { id: 'details', labelKey: 'system.ensemble.tabDetails' },
     { id: 'lineup', labelKey: 'system.ensemble.tabLineup' },
     { id: 'members', labelKey: 'system.ensemble.tabMembers' },
+    { id: 'print', labelKey: 'system.ensemble.tabPrint' },
   ];
 
   protected readonly details = rxResource({

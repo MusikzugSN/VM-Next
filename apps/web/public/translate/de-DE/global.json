@@ -326,8 +326,6 @@
     "voices": "Stimmen",
     "addVoice": "Weitere Stimme hinzufügen",
     "noVoice": "Wähle mindestens eine Stimme.",
-    "duplex": "Beidseitig drucken",
-    "duplexHint": "Jedes Stück beginnt auf einem neuen Blatt; dafür fügt VM-Web Leerseiten ein.",
     "substitutes": "Ersatzstimmen verwenden",
     "substitutesHint": "Fehlt eine Stimme, wird die hinterlegte Ersatzstimme gedruckt.",
     "how": "So wird gedruckt",
@@ -422,6 +420,12 @@
       "done": "Fertig",
       "failed": "Fehler",
       "cancelled": "Abgebrochen"
+    },
+    "rulesOf": "Gedruckt nach den Druckregeln von {{ name }}.",
+    "rulesDefault": "Gedruckt nach den Standard-Druckregeln.",
+    "modes": {
+      "simplex": "Einseitig",
+      "duplex": "Beidseitig, lange Kante"
     }
   }
 }

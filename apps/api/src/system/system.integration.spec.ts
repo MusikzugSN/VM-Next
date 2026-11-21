@@ -20,6 +20,7 @@ import { RolesService } from './roles.service';
 import { SystemConfigController, SystemEnsemblesController, SystemRolesController, SystemUsersController } from './system.controller';
 import { logoMulterOptions } from './system.module';
 import { UsersService } from './users.service';
+import { PrintRulesService } from '../print-rules/print-rules.service';
 
 const PNG = Buffer.from([0x89, 0x50, 0x4e, 0x47, 0x0d, 0x0a, 0x1a, 0x0a, 1, 2, 3]);
 
@@ -69,7 +70,7 @@ describe.skipIf(!TEST_DATABASE_URL)('Systemverwaltung (TEST_DATABASE_URL)', () =
       {
         imports: [MulterModule.registerAsync({ useFactory: logoMulterOptions })],
         controllers: [SystemUsersController, SystemEnsemblesController, SystemRolesController, SystemConfigController],
-        providers: [UsersService, EnsemblesService, RolesService, ConfigService, ClubSettingsRepository],
+        providers: [UsersService, EnsemblesService, RolesService, ConfigService, ClubSettingsRepository, PrintRulesService],
       },
       { database: testDb.db, providers: [{ provide: FILE_STORAGE, useValue: storage }] },
     );
@@ -266,6 +267,30 @@ describe.skipIf(!TEST_DATABASE_URL)('Systemverwaltung (TEST_DATABASE_URL)', () =
       expect(applied.status).toBe(200);
       expect(applied.body).toMatchObject({ createdInstruments: 0, createdVoices: 0 }); // template voices exist already (Big Band)
       expect((await api('sara', `ensembles/${ids.orchestra}/lineup`)).body.voices).toHaveLength(applied.body.lineupSize);
+    });
+
+    it('keeps print rules per ensemble, inherited by sub-ensembles (S-2, D-6, F-3)', async () => {
+      // Without own rules: shipped default.
+      expect((await api('sara', `ensembles/${ids.windClass}/print-rules`)).body).toEqual({
+        rules: [
+          { fromPages: 1, mode: 'simplex' },
+          { fromPages: 2, mode: 'duplex' },
+        ],
+        own: false,
+        inheritedFrom: null,
+      });
+      const rules = [
+        { fromPages: 1, mode: 'simplex' },
+        { fromPages: 4, mode: 'duplex' },
+      ];
+      expect((await api('sara', `ensembles/${ids.orchestra}/set-print-rules`, { rules })).status).toBe(204);
+      expect((await api('sara', `ensembles/${ids.orchestra}/print-rules`)).body).toMatchObject({ rules, own: true, inheritedFrom: null });
+      // The wind class sits below the orchestra and inherits its rules.
+      expect((await api('sara', `ensembles/${ids.windClass}/print-rules`)).body).toMatchObject({ rules, own: false, inheritedFrom: { id: ids.orchestra } });
+      // Incomplete or unordered rule sets are refused.
+      expect((await api('sara', `ensembles/${ids.orchestra}/set-print-rules`, { rules: [{ fromPages: 2, mode: 'duplex' }] })).status).toBe(400);
+      expect((await api('sara', `ensembles/${ids.orchestra}/reset-print-rules`, {})).status).toBe(204);
+      expect((await api('sara', `ensembles/${ids.orchestra}/print-rules`)).body.own).toBe(false);
     });
 
     it('renames, also the root (H-4), with unique names among siblings', async () => {

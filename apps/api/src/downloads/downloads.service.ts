@@ -1,5 +1,5 @@
 import { Inject, Injectable, Logger } from '@nestjs/common';
-import type { PrintPlanResponse, PrintQuery, SubstituteMode } from '@vm-web/shared';
+import { printModeFor, type PrintPlanResponse, type PrintQuery, type SubstituteMode } from '@vm-web/shared';
 import { ZipArchive } from 'archiver';
 import { eq } from 'drizzle-orm';
 import { once } from 'node:events';
@@ -8,13 +8,14 @@ import type { AccessContext } from '../access/access-context';
 import { sanitizeFileName, sheetFileName, uniqueNames } from '../common/files/download-names';
 import { ProblemException } from '../common/problem-details/problem.exception';
 import { DATABASE, type Database } from '../db/database';
-import { scores, sheets, voices } from '../db/schema';
+import { events, folders, scores, sheets, voices } from '../db/schema';
 import { MeRepository } from '../me/me.repository';
+import { PrintRulesService } from '../print-rules/print-rules.service';
 import { ClubSettingsRepository } from '../settings/club-settings.repository';
 import { FILE_STORAGE, type IFileStorage } from '../storage/file-storage';
 import { streamToBuffer } from '../storage/stream-utils';
 import { OutputService, type OutputPlan, type OutputScope } from './output.service';
-import { blankPagesAfter, buildPrintPdf, printRoute } from './print-layout';
+import { buildPrintPdf, layoutDocuments, printRoute } from './print-layout';
 
 export interface FileResult<T = Readable> {
   body: T;
@@ -32,6 +33,7 @@ export class DownloadsService {
     @Inject(OutputService) private readonly output: OutputService,
     @Inject(ClubSettingsRepository) private readonly settings: ClubSettingsRepository,
     @Inject(FILE_STORAGE) private readonly storage: IFileStorage,
+    @Inject(PrintRulesService) private readonly printRules: PrintRulesService,
   ) {}
 
   /** One sheet as PDF (M-6): any voice of a score visible in Mein Bereich (M-2 switching). */
@@ -80,17 +82,22 @@ export class DownloadsService {
     return { body: archive, fileName: `${outputName(plan)}.zip` };
   }
 
-  /** Content of the print dialog (D-1, D-2, D-3). */
+  /** Content of the print dialog (D-1, D-2, D-3, D-6). */
   async printPlan(access: AccessContext, query: PrintQuery): Promise<PrintPlanResponse> {
     const plan = await this.output.plan(access, 'print', scopeOf(query), query.voiceId, query.substitutes);
     const pages = plan.documents.map((d) => d.sheet.pageCount);
-    const blanks = blankPagesAfter(pages, query.duplex);
-    const totalPages = pages.reduce((a, b) => a + b, 0) + blanks.reduce((a, b) => a + b, 0);
+    const effective = await this.printRules.effective(await this.contextEnsemble(query));
+    const layout = layoutDocuments(
+      pages,
+      pages.map((p) => printModeFor(p, effective.rules)),
+    );
     const { browserPrintPageLimit } = await this.settings.get();
     return {
-      totalPages,
+      totalPages: layout.totalPages,
       pageLimit: browserPrintPageLimit,
-      route: printRoute(totalPages, browserPrintPageLimit),
+      route: printRoute(layout.totalPages, browserPrintPageLimit),
+      duplex: layout.duplex,
+      rules: { source: effective.source, items: effective.rules },
       documents: plan.documents.map((d, i) => ({
         scoreId: d.scoreId,
         number: d.number,
@@ -98,7 +105,9 @@ export class DownloadsService {
         voice: d.sheet.voice,
         kind: d.sheet.kind,
         pages: d.sheet.pageCount,
-        blankPagesAfter: blanks[i],
+        mode: layout.documents[i].mode,
+        sheets: layout.documents[i].sheets,
+        blankPagesAfter: layout.documents[i].blanks,
       })),
       missing: plan.missing.map((m) => ({ id: m.scoreId, name: m.title })),
     };
@@ -110,8 +119,25 @@ export class DownloadsService {
     if (!plan.documents.length) throw ProblemException.notFound('Nothing to print');
     const sources: Uint8Array[] = [];
     for (const doc of plan.documents) sources.push(await streamToBuffer(await this.read(doc.fileKey)));
-    const pdf = await buildPrintPdf(sources, query.duplex);
+    const { rules } = await this.printRules.effective(await this.contextEnsemble(query));
+    const pdf = await buildPrintPdf(
+      sources,
+      plan.documents.map((d) => printModeFor(d.sheet.pageCount, rules)),
+    );
     return { body: Buffer.from(pdf.bytes), fileName: `Druck – ${outputName(plan)}.pdf` };
+  }
+
+  /** Ensemble whose print rules apply: that of the folder or event, otherwise none (main ensemble, D-6). */
+  private async contextEnsemble(query: PrintQuery): Promise<string | null> {
+    if (query.folderId) {
+      const [row] = await this.db.select({ ensembleId: folders.ensembleId }).from(folders).where(eq(folders.id, query.folderId));
+      return row?.ensembleId ?? null;
+    }
+    if (query.eventId) {
+      const [row] = await this.db.select({ ensembleId: events.ensembleId }).from(events).where(eq(events.id, query.eventId));
+      return row?.ensembleId ?? null;
+    }
+    return null;
   }
 
   private async read(fileKey: string): Promise<Readable> {

@@ -111,6 +111,9 @@
         }
       </section>
     }
+    @case ('print') {
+      <vm-print-rules-tab [ensembleId]="e.id" [ensembleName]="e.name" [canEdit]="canEdit()" />
+    }
     @case ('members') {
       <vm-search-field [(value)]="memberSearch" labelKey="system.ensemble.searchMembers" />
       <ul class="overflow-hidden rounded-lg border bg-card shadow-sm" [class.hidden]="members.items().length === 0">

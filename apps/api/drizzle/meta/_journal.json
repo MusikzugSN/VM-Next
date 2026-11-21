@@ -43,6 +43,13 @@
       "when": 1795253151651,
       "tag": "0005_session_cache",
       "breakpoints": true
+    },
+    {
+      "idx": 6,
+      "version": "7",
+      "when": 1795253856169,
+      "tag": "0006_print_rules",
+      "breakpoints": true
     }
   ]
 }

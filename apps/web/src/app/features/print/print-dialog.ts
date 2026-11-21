@@ -4,7 +4,7 @@ import { RouterLink } from '@angular/router';
 import { TranslocoPipe, TranslocoService } from '@jsverse/transloco';
 import { NgIcon, provideIcons } from '@ng-icons/core';
 import { lucideCheck, lucideCircleAlert, lucideExternalLink, lucidePrinter, lucideRepeat, lucideShare2, lucideTriangleAlert, lucideX } from '@ng-icons/lucide';
-import { APP_ROUTES, PRINT_SERVICE_CONTRACT, apiUrl, printPlanResponseSchema, type VoiceRef } from '@vm-web/shared';
+import { APP_ROUTES, PRINT_SERVICE_CONTRACT, apiUrl, printPlanResponseSchema, type PrintMode, type VoiceRef } from '@vm-web/shared';
 import { firstValueFrom, from } from 'rxjs';
 
 import { ZardButtonComponent } from '@/shared/components/button';
@@ -58,7 +58,6 @@ export class PrintDialog {
   protected readonly voiceIds = signal<readonly string[]>([]);
   /** Voices offered as chips: active, profile, preselected and added ones. */
   protected readonly voiceChoices = signal<readonly VoiceRef[]>([]);
-  protected readonly duplex = signal(true);
   protected readonly withSubstitutes = signal(true);
   protected readonly printerId = signal<string | null>(null);
   protected readonly busy = signal(false);
@@ -67,7 +66,6 @@ export class PrintDialog {
     mode: this.mode(),
     scoreIds: [...this.selectedScores()],
     voiceIds: this.voiceIds(),
-    duplex: this.duplex(),
     substitutes: this.withSubstitutes() ? 'fallback' : 'none',
   }));
   protected readonly ready = computed(() => this.voiceIds().length > 0 && (this.mode() === 'all' || this.selectedScores().size > 0));
@@ -149,7 +147,6 @@ export class PrintDialog {
     this.selectedScores.set(new Set());
     this.voiceChoices.set([...known.values()]);
     this.voiceIds.set(preselected);
-    this.duplex.set(true);
     this.withSubstitutes.set(true);
     this.open.set(true);
   }
@@ -173,8 +170,8 @@ export class PrintDialog {
     });
   }
 
-  protected sheets(pages: number, blank: number) {
-    return sheetsLabel(pages, blank, this.duplex());
+  protected sheets(sheets: number, mode: PrintMode) {
+    return sheetsLabel(sheets, mode);
   }
 
   protected recheckService(): void {
@@ -230,7 +227,8 @@ export class PrintDialog {
         source: { kind: this.mode() === 'selection' && request.scope !== 'score' ? 'selection' : request.scope, title: request.title || '–', voices: this.voiceNames() },
         printerId: this.printerId(),
         pages: plan.totalPages,
-        duplex: this.duplex(),
+        // The plan decides by the ensemble's print rules (D-6).
+        duplex: plan.duplex,
         copies: 1,
       });
       this.sonner.success(this.transloco.translate('print.sent'), { description: this.transloco.translate('print.sentHint') });

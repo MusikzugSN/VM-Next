@@ -4,7 +4,8 @@ import { mkdtemp, rm } from 'node:fs/promises';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { PDFDocument } from 'pdf-lib';
-import { clubSettings, sheets } from '../db/schema';
+import { clubSettings, ensemblePrintRules, sheets } from '../db/schema';
+import { PrintRulesService } from '../print-rules/print-rules.service';
 import { MeRepository } from '../me/me.repository';
 import { MeService } from '../me/me.service';
 import { ClubSettingsRepository } from '../settings/club-settings.repository';
@@ -115,7 +116,7 @@ describe.skipIf(!TEST_DATABASE_URL)('Druck und Download (TEST_DATABASE_URL)', ()
     await b.setlist(ids.concert, [ids.polka, ids.march]);
 
     t = await createTestApp(
-      { controllers: [DownloadsController, PrintController], providers: [DownloadsService, OutputService, MeRepository, MeService, ClubSettingsRepository] },
+      { controllers: [DownloadsController, PrintController], providers: [DownloadsService, OutputService, MeRepository, MeService, ClubSettingsRepository, PrintRulesService] },
       { database: testDb.db, providers: [{ provide: FILE_STORAGE, useValue: storage }], config: { APP_TIMEZONE: 'Europe/Berlin' } },
     );
   });
@@ -227,21 +228,31 @@ describe.skipIf(!TEST_DATABASE_URL)('Druck und Download (TEST_DATABASE_URL)', ()
     });
   });
 
-  describe('print (D-1, D-2, D-3, F-9)', () => {
-    it('plans with duplex blank pages, page limit and missing scores', async () => {
+  describe('print (D-1, D-2, D-3, D-6, F-9)', () => {
+    it('plans by the default rules with blank pages, page limit and missing scores', async () => {
       const plan = json(await fetchAs('anna', `print/print-plan?scope=folder&folderId=${ids.marschbuch}`));
       expect(plan).toEqual({
-        totalPages: 4, // 1 + blank + 2
+        totalPages: 4, // 1 + blank back page (single-sided) + 2
         pageLimit: 3,
         route: 'print-service',
+        duplex: true,
+        rules: { source: null, items: [{ fromPages: 1, mode: 'simplex' }, { fromPages: 2, mode: 'duplex' }] },
         documents: [
-          expect.objectContaining({ number: '2', title: 'Alte Kameraden', kind: 'own', pages: 1, blankPagesAfter: 1 }),
-          expect.objectContaining({ number: '10', title: 'Böhmischer Traum', kind: 'substitute', pages: 2, blankPagesAfter: 0 }),
+          expect.objectContaining({ number: '2', title: 'Alte Kameraden', kind: 'own', pages: 1, mode: 'simplex', sheets: 1, blankPagesAfter: 1 }),
+          expect.objectContaining({ number: '10', title: 'Böhmischer Traum', kind: 'substitute', pages: 2, mode: 'duplex', sheets: 1, blankPagesAfter: 0 }),
         ],
         missing: [{ id: ids.hymn, name: 'Highland Cathedral' }],
       });
-      const single = json(await fetchAs('anna', `print/print-plan?scope=score&scoreId=${ids.march}&duplex=false`));
-      expect(single).toMatchObject({ totalPages: 1, route: 'browser' });
+      const single = json(await fetchAs('anna', `print/print-plan?scope=score&scoreId=${ids.march}`));
+      expect(single).toMatchObject({ totalPages: 1, route: 'browser', duplex: false });
+    });
+
+    it('applies the print rules of the folder ensemble, inherited by sub-ensembles (D-6, F-3)', async () => {
+      await testDb.db.insert(ensemblePrintRules).values([{ ensembleId: ids.root, fromPages: 1, mode: 'simplex' }]);
+      const plan = json(await fetchAs('anna', `print/print-plan?scope=folder&folderId=${ids.marschbuch}`));
+      expect(plan).toMatchObject({ totalPages: 3, duplex: false, rules: { source: { id: ids.root, name: 'Verein' } } });
+      expect((await PDFDocument.load((await fetchAs('anna', `print/document?scope=folder&folderId=${ids.marschbuch}`)).bytes)).getPageCount()).toBe(3);
+      await testDb.db.delete(ensemblePrintRules);
     });
 
     it('builds the print-ready PDF matching the plan', async () => {
@@ -251,7 +262,6 @@ describe.skipIf(!TEST_DATABASE_URL)('Druck und Download (TEST_DATABASE_URL)', ()
       const doc = await PDFDocument.load(res.bytes);
       expect(doc.getPageCount()).toBe(4);
       expect(doc.getPages().every((p) => Math.round(p.getWidth()) === 595 && Math.round(p.getHeight()) === 842)).toBe(true);
-      expect((await PDFDocument.load((await fetchAs('anna', `print/document?scope=folder&folderId=${ids.marschbuch}&duplex=false`)).bytes)).getPageCount()).toBe(3);
     });
 
     it('lets view permissions print beyond Mein Bereich (F-9)', async () => {

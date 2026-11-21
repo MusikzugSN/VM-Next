@@ -187,6 +187,9 @@ export const API_ROUTES = {
     unarchiveEnsemble: post('ensembles/:ensembleId/unarchive'),
     setLineup: post('ensembles/:ensembleId/set-lineup'),
     applyLineupTemplate: post('ensembles/:ensembleId/apply-lineup-template'),
+    ensemblePrintRules: get('ensembles/:ensembleId/print-rules'),
+    setPrintRules: post('ensembles/:ensembleId/set-print-rules'),
+    resetPrintRules: post('ensembles/:ensembleId/reset-print-rules'),
     // roles (S-3, R-7)
     roleList: get('role-list'),
     permissionCatalog: get('permission-catalog'),

@@ -133,7 +133,8 @@
     "templateDone": "Vorlage übernommen: {{ lineupSize }} Stimmen, {{ createdVoices }} neu angelegt.",
     "searchMembers": "Mitglied suchen",
     "noMembers": "Keine Mitglieder.",
-    "membersHint": "Mitglieder fügst du über die Benutzer-Seite hinzu."
+    "membersHint": "Mitglieder fügst du über die Benutzer-Seite hinzu.",
+    "tabPrint": "Druck"
   },
   "roles": {
     "intro": "Eine Rolle bündelt Rechte. Sie wird je Ensemble vergeben.",
@@ -227,6 +228,38 @@
       "deleteText": "Das Feld und alle seine Werte in den Stücken werden endgültig gelöscht.",
       "deleted": "Feld „{{ name }}“ gelöscht.",
       "empty": "Noch keine eigenen Felder angelegt."
+    }
+  },
+  "printRules": {
+    "title": "So werden Stücke gedruckt",
+    "hint": "Wie ein Stück aufs Papier kommt, richtet sich nach seiner Seitenzahl. Die Regeln gelten für alle Druckaufträge aus Mappen und Events von {{ name }} – im Browser und über den Druckservice.",
+    "own": "Eigene Regeln dieses Ensembles. Unter-Ensembles ohne eigene Regeln übernehmen sie.",
+    "inherited": "Übernommen von {{ name }}. Speichern legt eigene Regeln für dieses Ensemble an.",
+    "default": "Es gelten die Standardregeln. Speichern legt eigene Regeln für dieses Ensemble an.",
+    "pages": "Seiten",
+    "mode": "Druckart",
+    "example": "Beispiel",
+    "actions": "Aktionen",
+    "from": "ab",
+    "pagesUnit": "Seiten",
+    "until": "bis {{ end }}",
+    "fromLabel": "Regel {{ index }}: ab Seitenzahl",
+    "modeLabel": "Druckart für {{ range }}",
+    "rangeOne": "1 Seite",
+    "rangeSingle": "{{ from }} Seiten",
+    "range": "{{ from }}–{{ end }} Seiten",
+    "rangeFrom": "ab {{ from }} Seiten",
+    "sample": "{{ pages }} → {{ sheets }}, {{ mode }}",
+    "remove": "Regel für {{ range }} entfernen",
+    "add": "Regel hinzufügen",
+    "reset": "Übergeordnete Regeln verwenden",
+    "invalid": "Die Seitenzahlen müssen von oben nach unten größer werden.",
+    "saved": "Druckregeln gespeichert.",
+    "resetDone": "Das Ensemble übernimmt wieder die übergeordneten Regeln.",
+    "footnote": "Papier ist immer A4. Im Druckdialog sehen Mitglieder nur die Zusammenfassung, z. B. „2 Seiten → 1 Blatt beidseitig“; einseitig oder beidseitig fragt VM-Web nicht mehr je Auftrag ab.",
+    "sheets": {
+      "one": "1 Blatt",
+      "other": "{{ count }} Blätter"
     }
   }
 }

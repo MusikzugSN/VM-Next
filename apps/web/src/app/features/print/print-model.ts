@@ -1,4 +1,4 @@
-import type { PrintJob, PrintJobStatus, PrintPlanResponse, SubstituteMode } from '@vm-web/shared';
+import type { PrintJob, PrintJobStatus, PrintMode, PrintPlanResponse, SubstituteMode } from '@vm-web/shared';
 
 import type { ApiQuery } from '../../core/api/api-client';
 import type { PrintRequest } from '../../core/actions/pending-features';
@@ -9,7 +9,6 @@ export interface PrintOptions {
   mode: 'all' | 'selection';
   scoreIds: readonly string[];
   voiceIds: readonly string[];
-  duplex: boolean;
   substitutes: SubstituteMode;
 }
 
@@ -18,7 +17,6 @@ export function printQuery(request: PrintRequest, options: PrintOptions): ApiQue
   const base: ApiQuery = {
     voiceId: [...options.voiceIds],
     substitutes: options.substitutes,
-    duplex: options.duplex,
   };
   if (request.scope === 'selection') {
     return { ...base, scope: 'selection', scoreIds: [...(request.scoreIds ?? [])], folderId: request.folderId, eventId: request.eventId };
@@ -42,14 +40,10 @@ export function planScores(plan: PrintPlanResponse): { scoreId: string; number: 
   return result;
 }
 
-/**
- * How a document lands on paper, as i18n key + params: „2 Seiten → 1 Blatt beidseitig“.
- * The PDF already holds the blank pages (D-1); here only sheets are counted.
- */
-export function sheetsLabel(pages: number, blankPagesAfter: number, duplex: boolean): { key: string; params: { sheets: number } } {
-  const total = pages + blankPagesAfter;
-  if (!duplex || total === 1) return { key: total === 1 ? 'print.sheets.single' : 'print.sheets.simplex', params: { sheets: total } };
-  return { key: Math.ceil(total / 2) === 1 ? 'print.sheets.duplexOne' : 'print.sheets.duplex', params: { sheets: Math.ceil(total / 2) } };
+/** How a score lands on paper by its print rule (D-6), as i18n key + params: „→ 1 Blatt beidseitig“. */
+export function sheetsLabel(sheets: number, mode: PrintMode): { key: string; params: { sheets: number } } {
+  if (mode === 'simplex') return { key: sheets === 1 ? 'print.sheets.single' : 'print.sheets.simplex', params: { sheets } };
+  return { key: sheets === 1 ? 'print.sheets.duplexOne' : 'print.sheets.duplex', params: { sheets } };
 }
 
 /** Status changes between two polls of the history, for the toasts (D-5). */

@@ -51,6 +51,7 @@ describe('common query schemas', () => {
 
   it('requires the id matching the print scope', () => {
     expect(printQuerySchema.safeParse({ scope: 'folder' }).success).toBe(false);
-    expect(printQuerySchema.parse({ scope: 'folder', folderId: ID, duplex: 'false' }).duplex).toBe(false);
+    // Duplex is no longer chosen per job; the ensemble's print rules decide (D-6).
+    expect(printQuerySchema.parse({ scope: 'folder', folderId: ID })).toMatchObject({ scope: 'folder', folderId: ID, substitutes: 'fallback' });
   });
 });

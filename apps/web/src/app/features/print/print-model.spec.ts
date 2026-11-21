@@ -2,7 +2,7 @@ import type { PrintJob, PrintPlanResponse } from '@vm-web/shared';
 
 import { planScores, printQuery, sheetsLabel, statusChanges } from './print-model';
 
-const options = { mode: 'all' as const, scoreIds: [], voiceIds: ['v1'], duplex: true, substitutes: 'fallback' as const };
+const options = { mode: 'all' as const, scoreIds: [], voiceIds: ['v1'], substitutes: 'fallback' as const };
 
 describe('printQuery', () => {
   it('prints a whole folder', () => {
@@ -11,7 +11,6 @@ describe('printQuery', () => {
       folderId: 'f1',
       voiceId: ['v1'],
       substitutes: 'fallback',
-      duplex: true,
     });
   });
 
@@ -38,12 +37,12 @@ describe('printQuery', () => {
 
 describe('sheetsLabel', () => {
   it.each([
-    [1, 0, true, 'print.sheets.single', 1],
-    [2, 0, true, 'print.sheets.duplexOne', 1],
-    [3, 1, true, 'print.sheets.duplex', 2],
-    [3, 0, false, 'print.sheets.simplex', 3],
-  ])('%i pages + %i blank, duplex %s → %s', (pages, blank, duplex, key, sheets) => {
-    expect(sheetsLabel(pages, blank, duplex)).toEqual({ key, params: { sheets } });
+    [1, 'simplex', 'print.sheets.single'],
+    [3, 'simplex', 'print.sheets.simplex'],
+    [1, 'duplex', 'print.sheets.duplexOne'],
+    [2, 'duplex', 'print.sheets.duplex'],
+  ] as const)('%i sheets %s → %s', (sheets, mode, key) => {
+    expect(sheetsLabel(sheets, mode)).toEqual({ key, params: { sheets } });
   });
 });
 
@@ -56,9 +55,19 @@ describe('planScores', () => {
       voice: { id: voice, name: voice, instrumentId: 'i' },
       kind: 'own' as const,
       pages: 1,
+      mode: 'simplex' as const,
+      sheets: 1,
       blankPagesAfter: 0,
     });
-    const plan: PrintPlanResponse = { totalPages: 3, pageLimit: 10, route: 'browser', documents: [doc('a', 'v1'), doc('a', 'v2'), doc('b', 'v1')], missing: [] };
+    const plan: PrintPlanResponse = {
+      totalPages: 3,
+      pageLimit: 10,
+      route: 'browser',
+      duplex: false,
+      rules: { source: null, items: [{ fromPages: 1, mode: 'simplex' }] },
+      documents: [doc('a', 'v1'), doc('a', 'v2'), doc('b', 'v1')],
+      missing: [],
+    };
     expect(planScores(plan).map((s) => s.scoreId)).toEqual(['a', 'b']);
   });
 });

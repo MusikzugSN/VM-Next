@@ -15,6 +15,9 @@ import {
   ensembleMembersQuerySchema,
   ensembleMembersResponseSchema,
   ensembleParamsSchema,
+  ensemblePrintRulesResponseSchema,
+  setPrintRulesBodySchema,
+  type SetPrintRulesBody,
   LOGO_FILE_FIELD,
   permissionCatalogResponseSchema,
   removeMembershipBodySchema,
@@ -63,6 +66,7 @@ import { ConfigService } from './config.service';
 import { EnsemblesService } from './ensembles.service';
 import { RolesService } from './roles.service';
 import { UsersService } from './users.service';
+import { PrintRulesService } from '../print-rules/print-rules.service';
 
 const R = API_ROUTES.system;
 type UserParams = { userId: string };
@@ -148,7 +152,10 @@ export class SystemUsersController {
 /** Ensembles (S-2, F-3, N-4, N-8). Members also with `member.view` in the ensemble (R-3). */
 @Controller(R.base)
 export class SystemEnsemblesController {
-  constructor(@Inject(EnsemblesService) private readonly ensembles: EnsemblesService) {}
+  constructor(
+    @Inject(EnsemblesService) private readonly ensembles: EnsemblesService,
+    @Inject(PrintRulesService) private readonly printRules: PrintRulesService,
+  ) {}
 
   @RequirePermission('ensemble.view')
   @Get(R.ensembleList.path)
@@ -211,6 +218,29 @@ export class SystemEnsemblesController {
   @HttpCode(204)
   async unarchive(@Param(new Zod(ensembleParamsSchema)) p: EnsembleParams) {
     await this.ensembles.unarchive(p.ensembleId);
+  }
+
+  /** Print rules in effect, own or inherited (S-2, D-6). */
+  @RequirePermission('ensemble.view')
+  @Get(R.ensemblePrintRules.path)
+  @ResponseSchema(ensemblePrintRulesResponseSchema)
+  printRulesOf(@Param(new Zod(ensembleParamsSchema)) p: EnsembleParams) {
+    return this.printRules.forEnsemble(p.ensembleId);
+  }
+
+  @RequirePermission('ensemble.edit')
+  @Post(R.setPrintRules.path)
+  @HttpCode(204)
+  async setPrintRules(@Param(new Zod(ensembleParamsSchema)) p: EnsembleParams, @Body(new Zod(setPrintRulesBodySchema)) body: SetPrintRulesBody) {
+    await this.printRules.set(p.ensembleId, body.rules);
+  }
+
+  /** Drops own rules; the ensemble inherits again. */
+  @RequirePermission('ensemble.edit')
+  @Post(R.resetPrintRules.path)
+  @HttpCode(204)
+  async resetPrintRules(@Param(new Zod(ensembleParamsSchema)) p: EnsembleParams) {
+    await this.printRules.reset(p.ensembleId);
   }
 
   @RequirePermission('ensemble.edit')

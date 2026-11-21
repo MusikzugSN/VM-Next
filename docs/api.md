@@ -1237,11 +1237,12 @@ Gemeinsame Query (`printQuerySchema`):
 | `scoreIds` | wiederholbar, Pflicht bei `selection` (max. 200) |
 | `voiceId` | wiederholbar, Stimmen-Kontext (M-2) |
 | `substitutes` | `fallback` (Standard) \| `all` \| `none` (M-3) |
-| `duplex` | `true` (Standard) \| `false` – Leerseiten, damit jedes Stück auf einem neuen Blatt beginnt (D-1) |
 
 ### `GET /internal/v1/print/print-plan`
 
-Inhalt des Druckdialogs: Seitenzahl, Weg (Browser oder Druckservice), Dokumente, Fehlendes. · D-1, D-2, D-3, M-7
+Inhalt des Druckdialogs: Seitenzahl, Weg (Browser oder Druckservice), angewandte Druckregeln, Dokumente, Fehlendes. · D-1, D-2, D-3, D-6, M-7
+
+Einseitig oder beidseitig fragt VM-Web nicht je Auftrag ab: Es gelten die Druckregeln des Ensembles der Mappe bzw. des Events, sonst die des Hauptensembles (siehe [Druckregeln](#druckregeln-s-2-d-6)). Sobald ein Stück beidseitig gedruckt wird, ist der ganze Auftrag `duplex`; einseitige Stücke bekommen dann eine leere Rückseite, beidseitige mit ungerader Seitenzahl eine Leerseite am Ende, damit jedes Stück auf einem neuen Blatt beginnt.
 
 - **Recht:** Mitglied
 - **Query:** siehe oben
@@ -1252,8 +1253,10 @@ Inhalt des Druckdialogs: Seitenzahl, Weg (Browser oder Druckservice), Dokumente,
   "totalPages": 62,
   "pageLimit": 10,
   "route": "print-service",
+  "duplex": true,
+  "rules": { "source": { "id": "ens-1", "name": "Hauptorchester" }, "items": [{ "fromPages": 1, "mode": "simplex" }, { "fromPages": 2, "mode": "duplex" }] },
   "documents": [
-    { "scoreId": "score-9", "number": "1", "title": "Alte Kameraden", "voice": { "id": "v-tp1", "name": "Trompete 1 in B", "instrumentId": "i-tp" }, "kind": "own", "pages": 1, "blankPagesAfter": 1 }
+    { "scoreId": "score-9", "number": "1", "title": "Alte Kameraden", "voice": { "id": "v-tp1", "name": "Trompete 1 in B", "instrumentId": "i-tp" }, "kind": "own", "pages": 1, "mode": "simplex", "sheets": 1, "blankPagesAfter": 1 }
   ],
   "missing": [{ "id": "score-12", "name": "Florentiner Marsch" }]
 }
@@ -1424,6 +1427,28 @@ Benutzerliste mit Ensembles & Rollen, Stimmen, Status, letzter Anmeldung. · S-1
 - **Recht:** `ensemble.edit` · Verein · **Body:** keiner
 - **Response 200:** `{ "createdInstruments": 0, "createdVoices": 2, "lineupSize": 24 }` · **Fehler:** `404 not-found`
 
+#### Druckregeln (S-2, D-6)
+
+Je Ensemble eine geordnete Liste „ab `fromPages` Seiten → `simplex` (einseitig) | `duplex` (beidseitig, lange Kante)“; eine Regel gilt bis zur nächsten. Die erste Regel beginnt bei 1 Seite. Ensembles ohne eigene Regeln erben die des nächsten übergeordneten Ensembles mit Regeln (F-3), sonst gilt der mitgelieferte Standard `[{ "fromPages": 1, "mode": "simplex" }, { "fromPages": 2, "mode": "duplex" }]`. Papier ist immer A4 (D-1). Schemas: `printRulesSchema`, `DEFAULT_PRINT_RULES`.
+
+#### `GET /internal/v1/system/ensembles/{ensembleId}/print-rules`
+
+- **Zweck:** Geltende Regeln, eigene oder geerbte. · S-2, D-6
+- **Recht:** `ensemble.view` · Verein
+- **Response 200:** `{ "rules": [{ "fromPages": 1, "mode": "simplex" }, { "fromPages": 2, "mode": "duplex" }], "own": false, "inheritedFrom": { "id": "ens-root", "name": "Verein" } }` (`inheritedFrom: null` = Standard) · **Fehler:** `404 not-found`
+
+#### `POST /internal/v1/system/ensembles/{ensembleId}/set-print-rules`
+
+- **Zweck:** Eigene Regeln setzen (ersetzt alle). · S-2, D-6
+- **Recht:** `ensemble.edit` · Verein · **Body:** `{ "rules": [{ "fromPages": 1, "mode": "simplex" }, { "fromPages": 4, "mode": "duplex" }] }` (1–20 Regeln, Beginn bei 1, aufsteigend)
+- **Response:** `204` · **Fehler:** `400 validation-failed`, `404 not-found`
+
+#### `POST /internal/v1/system/ensembles/{ensembleId}/reset-print-rules`
+
+- **Zweck:** Eigene Regeln entfernen; das Ensemble erbt wieder. · S-2, D-6
+- **Recht:** `ensemble.edit` · Verein · **Body:** keiner
+- **Response:** `204` · **Fehler:** `404 not-found`
+
 ### Rollen (S-3, R-3, R-5, R-7)
 
 #### `GET /internal/v1/system/role-list`
@@ -1571,7 +1596,7 @@ Benutzerliste mit Ensembles & Rollen, Stimmen, Status, letzter Anmeldung. · S-1
 
 Plus `GET /health`. `POST me/downloads/selection-zip` zählt als POST und als 📄.
 
-Abdeckung der Muss-Anforderungen: R-1 bis R-7, A-1 bis A-5, M-1 bis M-9, N-1 bis N-12, N-14 bis N-17, D-1 bis D-3, D-7, S-1 bis S-5. Ohne API-Anteil: D-4, D-5 (lokaler Druckservice), N-13 (Tastenkürzel, nur Frontend, nutzt `previousUploadId`/`nextUploadId`). Bewusst nicht enthalten: A-6, A-7, M-10, D-6, S-6.
+Abdeckung der Muss-Anforderungen: R-1 bis R-7, A-1 bis A-5, M-1 bis M-9, N-1 bis N-12, N-14 bis N-17, D-1 bis D-3, D-7, S-1 bis S-5. Ohne API-Anteil: D-4, D-5 (lokaler Druckservice), N-13 (Tastenkürzel, nur Frontend, nutzt `previousUploadId`/`nextUploadId`). D-6 (Druckregeln) ist inzwischen enthalten. Bewusst nicht enthalten: A-6, A-7, M-10, S-6.
 
 ---
 

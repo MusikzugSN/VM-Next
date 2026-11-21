@@ -1,7 +1,8 @@
 import * as z from 'zod';
-import { idSchema, queryArray, queryBoolean, refSchema } from '../common/ids.schema';
+import { idSchema, queryArray, refSchema } from '../common/ids.schema';
 import { voiceRefSchema } from '../common/voice.schema';
 import { substituteModeSchema } from '../me/downloads.schema';
+import { printModeSchema, printRulesSchema } from './print-rules.schema';
 
 /**
  * Print scope shared by `print/print-plan` and `print/document` (D-1..D-3, M-7).
@@ -19,8 +20,6 @@ export const printQuerySchema = z
     scoreIds: queryArray(idSchema, 200),
     voiceId: queryArray(idSchema, 20),
     substitutes: substituteModeSchema.default('fallback'),
-    /** Insert blank pages so that every score starts on a new sheet in duplex printing (D-1). */
-    duplex: queryBoolean.default(true),
   })
   .superRefine((q, ctx) => {
     const required = { score: 'scoreId', folder: 'folderId', event: 'eventId', selection: 'scoreIds' } as const;
@@ -40,6 +39,13 @@ export const printPlanResponseSchema = z.object({
   pageLimit: z.number().int(),
   /** `browser` if totalPages ≤ pageLimit, otherwise `print-service` (D-2, D-3). */
   route: z.enum(['browser', 'print-service']),
+  /**
+   * Print the job on both sides (D-6): `true` as soon as one score uses a duplex rule; single-sided
+   * scores then get a blank back page in the PDF. The print service sets the printer option from it.
+   */
+  duplex: z.boolean(),
+  /** Rules applied (D-6): of `source` (folder/event ensemble or the main ensemble), `null` = shipped default. */
+  rules: z.object({ source: refSchema.nullable(), items: printRulesSchema }),
   documents: z.array(
     z.object({
       scoreId: idSchema,
@@ -48,6 +54,10 @@ export const printPlanResponseSchema = z.object({
       voice: voiceRefSchema,
       kind: z.enum(['own', 'substitute']),
       pages: z.number().int(),
+      /** Rule for this page count (D-6). */
+      mode: printModeSchema,
+      /** Sheets of paper for this score. */
+      sheets: z.number().int(),
       blankPagesAfter: z.number().int(),
     }),
   ),
