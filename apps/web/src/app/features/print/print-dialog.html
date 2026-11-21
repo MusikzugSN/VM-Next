@@ -142,14 +142,14 @@
           @case ('browser') {
             <p role="note" class="flex items-start gap-2 rounded-md bg-primary-soft p-4 text-primary">
               <ng-icon name="lucidePrinter" class="mt-0.5 shrink-0" aria-hidden="true" />
-              {{ 'print.routeBrowser' | transloco: { pages: p.totalPages, limit: p.pageLimit } }}
+              {{ 'print.routeBrowser' | transloco: { pages: 'print.pages' | tPlural: p.totalPages, limit: p.pageLimit } }}
             </p>
           }
           @case ('service') {
             <div class="flex flex-col gap-3 rounded-md bg-success-soft p-4 text-success-ink">
               <p class="flex items-start gap-2">
                 <ng-icon name="lucideCheck" class="mt-0.5 shrink-0" aria-hidden="true" />
-                {{ 'print.routeService' | transloco: { pages: p.totalPages } }}
+                {{ 'print.routeService' | transloco: { pages: 'print.pages' | tPlural: p.totalPages } }}
               </p>
               @if (printers().length > 1) {
                 <label class="flex flex-col gap-1.5 text-foreground">
@@ -171,7 +171,7 @@
                 <ng-icon name="lucideTriangleAlert" class="mt-0.5 shrink-0" aria-hidden="true" />
                 <span>
                   <strong class="font-semibold">{{ 'print.serviceMissing' | transloco }}</strong>
-                  {{ 'print.serviceMissingText' | transloco: { pages: p.totalPages, limit: p.pageLimit } }}
+                  {{ 'print.serviceMissingText' | transloco: { pages: 'print.pages' | tPlural: p.totalPages, limit: p.pageLimit } }}
                 </span>
               </p>
               <div class="flex flex-wrap gap-2">
