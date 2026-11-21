@@ -2,7 +2,7 @@
 
 Der Druckservice (`apps/print-service`) läuft auf dem Rechner der Person und druckt große Aufträge direkt auf einen lokalen Drucker (D-3, D-4). VM-Web im Browser spricht ihn über `http://127.0.0.1:17631/v1` an. Die API von VM-Web ist nicht beteiligt: Der Browser holt das druckfertige PDF von `GET print/document` und schickt es an den Druckservice.
 
-Die Schemas liegen in `libs/shared/src/lib/print-service/print-service.schema.ts` (`PRINT_SERVICE_*`, `printJobMetaSchema`, `printJobSchema` …). Dieses Dokument beschreibt das Verhalten, das der Druckservice dazu einhalten muss. Gebaut wird er in einem eigenen Schritt nach dem Frontend; bis dahin zeigt VM-Web die Installationsanleitung und druckt über den Browser.
+Die Schemas liegen in `libs/shared/src/lib/print-service/print-service.schema.ts` (`PRINT_SERVICE_*`, `printJobMetaSchema`, `printJobSchema` …). Dieses Dokument beschreibt das Verhalten, das der Druckservice dazu einhalten muss. Umgesetzt in `apps/print-service` (Einrichtung: `apps/print-service/README.md`).
 
 ## Netzwerk und Sicherheit
 
@@ -33,8 +33,9 @@ Alle Antworten sind JSON. Fehler haben den Body `printServiceErrorSchema` (`code
 
 `waiting` → `printing` → `done`, bei Problemen `failed` mit `error` als Klartext für die Anzeige. `cancelled` nach `cancel`. Während `printing` meldet `printedPages` den Fortschritt, wenn CUPS ihn liefert, sonst `null`. Der Verlauf und die PDFs bleiben 30 Tage lokal gespeichert, damit „Erneut senden“ ohne VM-Web funktioniert.
 
-## Umsetzung (später)
+## Umsetzung
 
-- TypeScript/Node, Druckausgabe hinter einer Schnittstelle `PrinterBackend` (MVP: Linux/CUPS über `lp`/`lpstat`; Windows als zweite Umsetzung, D-4).
-- Konfiguration in `~/.config/vm-web-print/config.json`: `allowedOrigin`, Standarddrucker.
+- `apps/print-service`: Node ohne weitere Abhängigkeiten außer `zod` (HTTP mit `node:http`, Multipart über die eingebaute Fetch-API, Druck über `child_process`).
+- Druckausgabe hinter `PrinterBackend`; MVP: `CupsBackend` mit `lpstat`, `lpoptions`, `lp` (`sides=…`, `fit-to-page=false`) und `cancel`. CUPS meldet keinen Seitenfortschritt, `printedPages` bleibt `null`. Windows kommt als zweite Umsetzung dazu (D-4).
+- Konfiguration in `~/.config/vm-web-print/config.json` (`allowedOrigin`) oder `VMWEB_PRINT_ORIGIN`; Verlauf und PDFs in `~/.local/share/vm-web-print/`.
 - VM-Web fragt den Status beim Öffnen des Druckdialogs und im Druckverlauf ab (alle 2 s, solange die Seite sichtbar ist). Ist er nicht erreichbar (Timeout 1,5 s), zeigt VM-Web Warnung, Installationsanleitung und den Browser-Druck als Ausweg (D-3).

@@ -17,7 +17,7 @@
         "format": [
           "cjs"
         ],
-        "bundle": false,
+        "bundle": true,
         "main": "apps/print-service/src/main.ts",
         "tsConfig": "apps/print-service/tsconfig.app.json",
         "assets": [
@@ -29,7 +29,8 @@
           "outExtension": {
             ".js": ".js"
           }
-        }
+        },
+        "thirdParty": false
       },
       "configurations": {
         "development": {},
@@ -91,9 +92,23 @@
     },
     "serve": {
       "continuous": true,
+      "executor": "@nx/js:node",
+      "defaultConfiguration": "development",
       "dependsOn": [
-        "^build"
-      ]
+        "build"
+      ],
+      "options": {
+        "buildTarget": "print-service:build",
+        "runBuildTargetDependencies": false
+      },
+      "configurations": {
+        "development": {
+          "buildTarget": "print-service:build:development"
+        },
+        "production": {
+          "buildTarget": "print-service:build:production"
+        }
+      }
     }
   }
 }
