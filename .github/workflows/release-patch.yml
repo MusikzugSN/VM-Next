@@ -1,0 +1,69 @@
+name: 'Release: Bugfix'
+
+# Bugfix release on a release/X.Y branch: next free X.Y.Z from the tags, version commit, tag, build.
+# Run it with "Use workflow from: release/X.Y" once the backported fixes are merged there.
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: release
+  cancel-in-progress: false
+
+jobs:
+  prepare:
+    name: Work out version
+    runs-on: ubuntu-24.04
+    outputs:
+      version: ${{ steps.v.outputs.version }}
+      tag: ${{ steps.v.outputs.tag }}
+      latest: ${{ steps.v.outputs.latest }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - id: v
+        run: node .github/scripts/release-version.mjs patch "${{ github.ref_name }}"
+
+  checks:
+    name: Checks
+    needs: prepare
+    uses: ./.github/workflows/ci.yml
+
+  tag:
+    name: Tag ${{ needs.prepare.outputs.tag }}
+    needs: [prepare, checks]
+    runs-on: ubuntu-24.04
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.sha }}
+          # optional: a GitHub App or PAT token that may push to protected release branches
+          token: ${{ secrets.RELEASE_TOKEN || github.token }}
+      - name: Version commit and tag
+        env:
+          VERSION: ${{ needs.prepare.outputs.version }}
+          TAG: ${{ needs.prepare.outputs.tag }}
+        run: |
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          node .github/scripts/set-version.mjs "$VERSION"
+          git commit -am "chore(release): $VERSION"
+          git tag -a "$TAG" -m "VM-Next $VERSION"
+          # fails if someone pushed to the branch meanwhile – just run the workflow again
+          git push origin "HEAD:${{ github.ref_name }}" "$TAG"
+
+  build:
+    name: Build and publish
+    needs: [prepare, tag]
+    uses: ./.github/workflows/release-build.yml
+    permissions:
+      contents: write
+      packages: write
+    with:
+      version: ${{ needs.prepare.outputs.version }}
+      latest: ${{ needs.prepare.outputs.latest == 'true' }}

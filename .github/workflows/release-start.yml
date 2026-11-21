@@ -1,0 +1,87 @@
+name: 'Release: Start'
+
+# New release line from master: creates release/X.Y, sets version X.Y.0, tags vX.Y.0 and builds.
+# Bugfixes for that line: release-patch.yml on the release branch. See docs/release.md.
+on:
+  workflow_dispatch:
+    inputs:
+      bump:
+        description: Which part to raise
+        type: choice
+        options: [minor, major]
+        default: minor
+      version:
+        description: Optional exact version X.Y.0 (overrides bump, e.g. 1.0.0 for the first release)
+        type: string
+        required: false
+
+permissions:
+  contents: read
+
+concurrency:
+  group: release
+  cancel-in-progress: false
+
+jobs:
+  prepare:
+    name: Work out version
+    runs-on: ubuntu-24.04
+    outputs:
+      version: ${{ steps.v.outputs.version }}
+      tag: ${{ steps.v.outputs.tag }}
+      branch: ${{ steps.v.outputs.branch }}
+      latest: ${{ steps.v.outputs.latest }}
+    steps:
+      - name: Only from master
+        if: github.ref != 'refs/heads/master'
+        run: |
+          echo "::error::Start a release from master (was ${{ github.ref_name }})"
+          exit 1
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - id: v
+        run: node .github/scripts/release-version.mjs start "${{ inputs.bump }}" "${{ inputs.version }}"
+
+  checks:
+    name: Checks
+    needs: prepare
+    uses: ./.github/workflows/ci.yml
+
+  tag:
+    name: Create ${{ needs.prepare.outputs.branch }} and ${{ needs.prepare.outputs.tag }}
+    needs: [prepare, checks]
+    runs-on: ubuntu-24.04
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          # exactly the commit the checks ran on
+          ref: ${{ github.sha }}
+          # optional: a GitHub App or PAT token that may push to protected release branches
+          token: ${{ secrets.RELEASE_TOKEN || github.token }}
+      - name: Branch, version commit and tag
+        env:
+          VERSION: ${{ needs.prepare.outputs.version }}
+          TAG: ${{ needs.prepare.outputs.tag }}
+          BRANCH: ${{ needs.prepare.outputs.branch }}
+        run: |
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git switch -c "$BRANCH"
+          node .github/scripts/set-version.mjs "$VERSION"
+          git commit -am "chore(release): $VERSION"
+          git tag -a "$TAG" -m "VM-Next $VERSION"
+          git push origin "$BRANCH" "$TAG"
+
+  build:
+    name: Build and publish
+    needs: [prepare, tag]
+    uses: ./.github/workflows/release-build.yml
+    permissions:
+      contents: write
+      packages: write
+    with:
+      version: ${{ needs.prepare.outputs.version }}
+      latest: ${{ needs.prepare.outputs.latest == 'true' }}
