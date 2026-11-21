@@ -325,6 +325,7 @@ classDiagram
 | `user_voices` | Profilstimmen | PK `(user_id, voice_id)`; `position` für Anzeige; `user_id` `CASCADE`, `voice_id` `RESTRICT` | M-1, S-1 |
 | `club_settings` | Konfiguration, genau eine Zeile; `login_banner` ist Klartext (F-12) | Check `id = 1`; `default_ensemble_id` `SET NULL`, `default_role_id` `SET NULL` | S-4, A-2, A-3, D-2, D-4 |
 | `system_state` | Ablaufdaten wie „Standardrollen importiert“, „Vorlage importiert“ (Version) | Schlüssel z. B. `seed.roles`, `seed.lineup-template`, `seed.root` | R-5, N-8, S-5 |
+| `cache_entries` | Schlüssel-Wert-Speicher mit Ablaufzeit hinter `ICacheService`: Sitzungen, Sitzungsindex je Benutzer, Login-Zustand zwischen `auth/login` und `auth/callback` | Schlüssel nur als Hash (`session:<sha256>`), Wert JSONB, `expires_at` mit Index; abgelaufene Einträge werden beim Lesen ignoriert und alle 10 Minuten gelöscht. Sitzungen überstehen so API-Neustarts und mehrere API-Instanzen. | A-1, A-5 |
 
 Sichtbarkeit in Mein Bereich (H-1): Mappen und Events der Ensembles mit Mitgliedschaft und aller Unter-Ensembles (rekursives CTE nach unten).
 

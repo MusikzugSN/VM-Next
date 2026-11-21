@@ -166,7 +166,11 @@ describe.skipIf(!TEST_DATABASE_URL)('Notenverwaltung (TEST_DATABASE_URL)', () =>
     });
 
     it('lists only ensembles where creating is allowed, incl. sub-ensembles (F-3)', async () => {
-      expect((await api('lib', 'folders/ensemble-options')).body.items.map((e: { name: string }) => e.name)).toEqual(['Bläserklasse', 'Hauptorchester']);
+      // Tree order with depth (docs/api.md › Ensemble-Auswahl): the sub-ensemble follows its parent.
+      expect((await api('lib', 'folders/ensemble-options')).body.items.map((e: { name: string; depth: number }) => [e.name, e.depth])).toEqual([
+        ['Hauptorchester', 0],
+        ['Bläserklasse', 1],
+      ]);
       expect((await api('board', 'events/ensemble-options')).body.items.map((e: { name: string }) => e.name)).toEqual(['Jugendorchester']);
     });
 
@@ -299,7 +303,7 @@ describe.skipIf(!TEST_DATABASE_URL)('Notenverwaltung (TEST_DATABASE_URL)', () =>
         ['Horn 1 in F', 'substituted', 'Horn 1 in Es'],
       ]);
       expect((await api('lib', `scores/scores/${ids.march}/completeness?ensembleId=${ids.youth}`)).body.summary).toEqual({ present: 0, substituted: 0, total: 0 });
-      expect((await api('lib', 'scores/ensemble-options')).body).toEqual({ items: [{ id: ids.orchestra, name: 'Hauptorchester' }], defaultEnsembleId: ids.orchestra });
+      expect((await api('lib', 'scores/ensemble-options')).body).toEqual({ items: [{ id: ids.orchestra, name: 'Hauptorchester', depth: 0 }], defaultEnsembleId: ids.orchestra });
     });
 
     it('exports the filtered table as CSV with BOM, custom fields and neutralized formulas (N-3, F-10)', async () => {

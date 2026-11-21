@@ -118,7 +118,7 @@ pnpm nx test api
 | --- | --- |
 | `src/config/` | Umgebungsvariablen: Zod-Schema (`env.schema.ts`), typisierter Zugriff `AppConfig` |
 | `src/db/` | Drizzle-Anbindung (`DATABASE`-Token), Schema `schema/`, Migrationen beim Start |
-| `src/cache/` | `ICacheService` (`CACHE_SERVICE`-Token) mit In-Memory-Implementierung |
+| `src/cache/` | `ICacheService` (`CACHE_SERVICE`-Token): `PostgresCacheService` (Tabelle `cache_entries`) im Betrieb, `InMemoryCacheService` in Tests |
 | `src/storage/` | `IFileStorage` (`FILE_STORAGE`-Token) auf einem Verzeichnis (`FILE_STORAGE_PATH`) |
 | `src/common/problem-details/` | `ProblemException` und globaler Filter für RFC 9457 |
 | `src/common/validation/` | `ZodValidationPipe` (Requests) und `@ResponseSchema` (Responses) mit Schemas aus `@vm-web/shared` |

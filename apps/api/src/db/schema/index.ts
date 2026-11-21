@@ -12,3 +12,4 @@ export * from './tags';
 export * from './fields';
 export * from './lineup';
 export * from './uploads';
+export * from './cache-entries';
