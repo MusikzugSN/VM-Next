@@ -1,0 +1,21 @@
+{
+  "browser": {
+    "browserName": "chromium",
+    "isolated": true,
+    "launchOptions": {
+      "headless": false,
+      "args": ["--kiosk-printing", "--lang=de-DE"]
+    },
+    "contextOptions": {
+      "viewport": { "width": 1280, "height": 800 },
+      "locale": "de-DE",
+      "timezoneId": "Europe/Berlin",
+      "acceptDownloads": true
+    }
+  },
+  "server": { "port": 8933, "host": "0.0.0.0", "allowedHosts": ["*"] },
+  "outputDir": "/out/downloads/musiker-a",
+  "filePaths": "absolute",
+  "console": { "level": "warning" },
+  "timeouts": { "action": 10000, "navigation": 60000 }
+}

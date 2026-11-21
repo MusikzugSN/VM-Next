@@ -1,0 +1,21 @@
+{
+  "browser": {
+    "browserName": "chromium",
+    "isolated": true,
+    "launchOptions": {
+      "headless": false,
+      "args": ["--kiosk-printing", "--lang=de-DE"]
+    },
+    "contextOptions": {
+      "viewport": { "width": 390, "height": 844 },
+      "locale": "de-DE",
+      "timezoneId": "Europe/Berlin",
+      "acceptDownloads": true, "isMobile": true, "hasTouch": true, "deviceScaleFactor": 3
+    }
+  },
+  "server": { "port": 8934, "host": "0.0.0.0", "allowedHosts": ["*"] },
+  "outputDir": "/out/downloads/musiker-b",
+  "filePaths": "absolute",
+  "console": { "level": "warning" },
+  "timeouts": { "action": 10000, "navigation": 60000 }
+}

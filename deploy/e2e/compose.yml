@@ -1,0 +1,222 @@
+# KI-Testlauf (docs/e2e-acceptance.md): VM-Web produktionsnah hinter Traefik mit Keycloak, dazu ein
+# Browser-Container (Chromium + CUPS-PDF + Playwright MCP) und der Druckservice als Sidecar.
+# Start aus diesem Ordner (unter Windows in WSL):  ./run.sh up      Details: README.md
+# Nur für Tests: alle Passwörter hier sind feste Testwerte.
+name: vm-e2e
+
+x-node-ca: &node-ca
+  NODE_EXTRA_CA_CERTS: /certs/ca.crt
+
+services:
+  # --- TLS: eigene CA und ein Zertifikat für vm.test und auth.vm.test ------------------------------
+  certs:
+    image: alpine:3.22
+    command: ['/bin/sh', '/scripts/generate-certs.sh']
+    volumes:
+      - ./certs/generate-certs.sh:/scripts/generate-certs.sh:ro
+      - certs:/certs
+
+  traefik:
+    image: traefik:v3.7.19
+    restart: unless-stopped
+    depends_on:
+      certs:
+        condition: service_completed_successfully
+    command:
+      - --entrypoints.websecure.address=:443
+      - --entrypoints.web.address=:80
+      - --entrypoints.web.http.redirections.entrypoint.to=websecure
+      - --providers.file.filename=/etc/traefik/dynamic.yml
+      - --ping=true
+      - --log.level=INFO
+      - --accesslog=true
+    volumes:
+      - ./traefik/dynamic.yml:/etc/traefik/dynamic.yml:ro
+      - certs:/certs:ro
+    ports:
+      # nur für Menschen zum Zuschauen; Agenten arbeiten im Browser-Container
+      - '127.0.0.1:8443:443'
+    healthcheck:
+      test: ['CMD', 'traefik', 'healthcheck', '--ping']
+      interval: 5s
+      timeout: 3s
+      retries: 20
+    networks:
+      default:
+        # Browser, API und Orakel erreichen beide Hosts über Traefik, genau wie im Betrieb
+        aliases: [vm.test, auth.vm.test]
+
+  # --- Keycloak --------------------------------------------------------------------------------------
+  keycloak-db:
+    image: postgres:17-alpine
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: keycloak
+      POSTGRES_PASSWORD: keycloak
+      POSTGRES_DB: keycloak
+    volumes:
+      - keycloak-db:/var/lib/postgresql/data
+    healthcheck:
+      test: ['CMD-SHELL', 'pg_isready -U keycloak -d keycloak']
+      interval: 5s
+      timeout: 3s
+      retries: 20
+
+  keycloak:
+    image: quay.io/keycloak/keycloak:26.8.1
+    restart: unless-stopped
+    command: ['start', '--optimized=false']
+    depends_on:
+      keycloak-db:
+        condition: service_healthy
+    environment:
+      KC_DB: postgres
+      KC_DB_URL: jdbc:postgresql://keycloak-db:5432/keycloak
+      KC_DB_USERNAME: keycloak
+      KC_DB_PASSWORD: keycloak
+      KC_HOSTNAME: https://auth.vm.test
+      KC_HTTP_ENABLED: 'true'
+      KC_PROXY_HEADERS: xforwarded
+      KC_HEALTH_ENABLED: 'true'
+      KC_BOOTSTRAP_ADMIN_USERNAME: ${KEYCLOAK_ADMIN_USER:-kcadmin}
+      KC_BOOTSTRAP_ADMIN_PASSWORD: ${KEYCLOAK_ADMIN_PASSWORD:-kcadmin-e2e}
+    healthcheck:
+      test: ['CMD-SHELL', "exec 3<>/dev/tcp/127.0.0.1/9000 && printf 'GET /health/ready HTTP/1.0\\r\\n\\r\\n' >&3 && grep -q '\"UP\"' <&3"]
+      interval: 10s
+      timeout: 5s
+      retries: 30
+      start_period: 30s
+
+  # --- VM-Web ------------------------------------------------------------------------------------------
+  postgres:
+    image: postgres:17-alpine
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: vmnext
+      POSTGRES_PASSWORD: vmnext-e2e
+      POSTGRES_DB: vmnext
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+    healthcheck:
+      test: ['CMD-SHELL', 'pg_isready -U vmnext -d vmnext']
+      interval: 5s
+      timeout: 3s
+      retries: 20
+
+  api:
+    image: vm-next-api:e2e
+    build:
+      context: ../..
+      dockerfile: apps/api/Dockerfile
+    restart: unless-stopped
+    depends_on:
+      postgres:
+        condition: service_healthy
+      certs:
+        condition: service_completed_successfully
+    environment:
+      <<: *node-ca
+      NODE_ENV: production
+      PORT: 3000
+      TRUST_PROXY: 'true'
+      LOG_LEVEL: log
+      APP_TIMEZONE: Europe/Berlin
+      PUBLIC_BASE_URL: https://vm.test
+      DATABASE_URL: postgres://vmnext:vmnext-e2e@postgres:5432/vmnext
+      DB_MIGRATE_ON_START: 'true'
+      FILE_STORAGE_PATH: /data
+      UPLOAD_MAX_FILE_MB: 50
+      # Realm und Client legt der Admin in Phase 1 an (öffentlicher Client, nur PKCE, kein Secret).
+      # Die Discovery läuft erst beim ersten Login, die API startet also auch ohne Realm.
+      OIDC_ISSUER_URL: https://auth.vm.test/realms/verein
+      OIDC_CLIENT_ID: vm-web
+      OIDC_SCOPES: openid profile email
+    volumes:
+      - storage:/data
+      - certs:/certs:ro
+
+  web:
+    image: vm-next-web:e2e
+    build:
+      context: ../..
+      dockerfile: apps/web/Dockerfile
+    restart: unless-stopped
+    depends_on:
+      api:
+        condition: service_healthy
+    environment:
+      API_UPSTREAM: http://api:3000
+      CLIENT_MAX_BODY_SIZE: 60m
+
+  # --- Browser der Agenten -------------------------------------------------------------------------------
+  # Chromium unter Xvfb, CUPS mit CUPS-PDF als Standarddrucker und je Persona ein Playwright-MCP-Server
+  # (eigener Browser-Kontext, eigener Viewport, eigener Download-Ordner).
+  browser:
+    image: vm-e2e-browser:dev
+    build: ./browser
+    restart: unless-stopped
+    depends_on:
+      traefik:
+        condition: service_healthy
+    shm_size: 1gb
+    environment:
+      TZ: Europe/Berlin
+    volumes:
+      - certs:/certs:ro
+      - ./run/out:/out
+    ports:
+      - '127.0.0.1:8931:8931' # admin
+      - '127.0.0.1:8932:8932' # notenwart
+      - '127.0.0.1:8933:8933' # musiker-a
+      - '127.0.0.1:8934:8934' # musiker-b
+      - '127.0.0.1:8935:8935' # musiker-c
+      - '127.0.0.1:5900:5900' # VNC zum Zuschauen (ohne Passwort, nur localhost)
+    healthcheck:
+      # bereit, sobald CUPS den Standarddrucker kennt und alle fünf MCP-Server Verbindungen annehmen
+      # (curl-Exit 7 = Verbindung abgelehnt)
+      test: ['CMD-SHELL', 'lpstat -d | grep -q PDF && for p in 8931 8932 8933 8934 8935; do curl -s -o /dev/null --max-time 2 http://127.0.0.1:$$p/mcp; [ $$? -ne 7 ] || exit 1; done']
+      interval: 10s
+      timeout: 5s
+      retries: 30
+
+  # Druckservice (D-4) wie bei den Mitgliedern: lauscht auf 127.0.0.1 – hier dem des Browser-Containers
+  print-service:
+    image: vm-e2e-print-service:dev
+    build:
+      context: ../..
+      dockerfile: deploy/e2e/print-service/Dockerfile
+    restart: unless-stopped
+    network_mode: service:browser
+    depends_on:
+      browser:
+        condition: service_started
+    environment:
+      VMWEB_PRINT_ORIGIN: https://vm.test
+      CUPS_SERVER: 127.0.0.1
+    volumes:
+      - print-service-data:/home/node/.local/share/vm-web-print
+
+  # --- Werkzeuge: Fixtures erzeugen und Orakel (nur über `run.sh`, Profil tools) ----------------------
+  tools:
+    image: vm-e2e-tools:dev
+    build: ./tools
+    profiles: [tools]
+    environment:
+      <<: *node-ca
+      DATABASE_URL: postgres://vmnext:vmnext-e2e@postgres:5432/vmnext
+      KEYCLOAK_URL: https://auth.vm.test
+      KEYCLOAK_ADMIN_USER: ${KEYCLOAK_ADMIN_USER:-kcadmin}
+      KEYCLOAK_ADMIN_PASSWORD: ${KEYCLOAK_ADMIN_PASSWORD:-kcadmin-e2e}
+      VM_URL: https://vm.test
+    volumes:
+      - certs:/certs:ro
+      - ./fixtures:/e2e/fixtures
+      - ./run:/e2e/run
+      - storage:/storage:ro
+
+volumes:
+  certs:
+  keycloak-db:
+  postgres-data:
+  storage:
+  print-service-data:

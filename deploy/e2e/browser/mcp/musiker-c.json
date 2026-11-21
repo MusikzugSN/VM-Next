@@ -1,0 +1,21 @@
+{
+  "browser": {
+    "browserName": "chromium",
+    "isolated": true,
+    "launchOptions": {
+      "headless": false,
+      "args": ["--kiosk-printing", "--lang=de-DE"]
+    },
+    "contextOptions": {
+      "viewport": { "width": 820, "height": 1180 },
+      "locale": "de-DE",
+      "timezoneId": "Europe/Berlin",
+      "acceptDownloads": true, "hasTouch": true
+    }
+  },
+  "server": { "port": 8935, "host": "0.0.0.0", "allowedHosts": ["*"] },
+  "outputDir": "/out/downloads/musiker-c",
+  "filePaths": "absolute",
+  "console": { "level": "warning" },
+  "timeouts": { "action": 10000, "navigation": 60000 }
+}

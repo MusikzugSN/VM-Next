@@ -1,0 +1,7 @@
+# Rückfallebene: Realm „verein“ mit Client und fünf Benutzern fertig importieren, statt ihn in Phase 1
+# vom Admin-Agenten anlegen zu lassen.  ./run.sh up --realm-import
+services:
+  keycloak:
+    command: ['start', '--optimized=false', '--import-realm']
+    volumes:
+      - ./keycloak/realm-verein.json:/opt/keycloak/data/import/realm-verein.json:ro

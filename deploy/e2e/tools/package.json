@@ -1,0 +1,16 @@
+{
+  "name": "vm-e2e-tools",
+  "private": true,
+  "type": "module",
+  "description": "Fixtures und Orakel für den KI-Testlauf (docs/e2e-acceptance.md)",
+  "scripts": {
+    "fixtures": "node src/generate-fixtures.mjs",
+    "oracle": "node src/oracle.mjs"
+  },
+  "dependencies": {
+    "fflate": "0.8.2",
+    "pdf-lib": "1.17.1",
+    "pdfjs-dist": "4.10.38",
+    "pg": "8.16.3"
+  }
+}

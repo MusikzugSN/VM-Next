@@ -1,0 +1,65 @@
+# VM-Next production stack: web (nginx + Angular), api (NestJS) and PostgreSQL.
+# One club per installation. TLS is terminated by the club's reverse proxy, which forwards to
+# the web container (HTTP_BIND:HTTP_PORT). Setup: copy .env.example to .env, fill it in, then
+#   docker compose up -d
+name: vm-next
+
+services:
+  postgres:
+    image: postgres:17-alpine
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: vmnext
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?set POSTGRES_PASSWORD in .env}
+      POSTGRES_DB: vmnext
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+    healthcheck:
+      test: ['CMD-SHELL', 'pg_isready -U vmnext -d vmnext']
+      interval: 5s
+      timeout: 3s
+      retries: 20
+
+  api:
+    image: ${VM_NEXT_API_IMAGE:-ghcr.io/musikzugsn/vm-next-api}:${VM_NEXT_VERSION:-latest}
+    restart: unless-stopped
+    depends_on:
+      postgres:
+        condition: service_healthy
+    environment:
+      NODE_ENV: production
+      PORT: 3000
+      TRUST_PROXY: 'true'
+      LOG_LEVEL: ${LOG_LEVEL:-log}
+      APP_TIMEZONE: ${APP_TIMEZONE:-Europe/Berlin}
+      PUBLIC_BASE_URL: ${PUBLIC_BASE_URL:?set PUBLIC_BASE_URL in .env}
+      DATABASE_URL: postgres://vmnext:${POSTGRES_PASSWORD}@postgres:5432/vmnext
+      DB_MIGRATE_ON_START: 'true'
+      FILE_STORAGE_PATH: /data
+      UPLOAD_MAX_FILE_MB: ${UPLOAD_MAX_FILE_MB:-50}
+      OIDC_ISSUER_URL: ${OIDC_ISSUER_URL:?set OIDC_ISSUER_URL in .env}
+      OIDC_CLIENT_ID: ${OIDC_CLIENT_ID:?set OIDC_CLIENT_ID in .env}
+      OIDC_CLIENT_SECRET: ${OIDC_CLIENT_SECRET:-}
+      OIDC_SCOPES: ${OIDC_SCOPES:-openid profile email}
+      SESSION_IDLE_TTL_DAYS: ${SESSION_IDLE_TTL_DAYS:-14}
+      SESSION_ABSOLUTE_TTL_DAYS: ${SESSION_ABSOLUTE_TTL_DAYS:-90}
+    volumes:
+      - storage:/data
+
+  web:
+    image: ${VM_NEXT_WEB_IMAGE:-ghcr.io/musikzugsn/vm-next-web}:${VM_NEXT_VERSION:-latest}
+    restart: unless-stopped
+    depends_on:
+      api:
+        condition: service_healthy
+    environment:
+      API_UPSTREAM: http://api:3000
+      # a little more than UPLOAD_MAX_FILE_MB (multipart overhead)
+      CLIENT_MAX_BODY_SIZE: ${CLIENT_MAX_BODY_SIZE:-60m}
+    ports:
+      - '${HTTP_BIND:-127.0.0.1}:${HTTP_PORT:-8080}:8080'
+
+volumes:
+  postgres-data:
+  # PDFs and logo – back this up together with the database
+  storage:

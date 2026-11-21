@@ -1,0 +1,33 @@
+# Routen wie beim Reverse Proxy eines Vereins: TLS endet hier, VM-Web bekommt X-Forwarded-Proto.
+tls:
+  certificates:
+    - certFile: /certs/server.crt
+      keyFile: /certs/server.key
+  stores:
+    default:
+      defaultCertificate:
+        certFile: /certs/server.crt
+        keyFile: /certs/server.key
+
+http:
+  routers:
+    vm:
+      rule: Host(`vm.test`)
+      entryPoints: [websecure]
+      service: vm
+      tls: {}
+    auth:
+      rule: Host(`auth.vm.test`)
+      entryPoints: [websecure]
+      service: keycloak
+      tls: {}
+
+  services:
+    vm:
+      loadBalancer:
+        servers:
+          - url: http://web:8080
+    keycloak:
+      loadBalancer:
+        servers:
+          - url: http://keycloak:8080

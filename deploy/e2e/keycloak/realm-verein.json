@@ -1,0 +1,38 @@
+{
+  "realm": "verein",
+  "displayName": "Musikverein (Test)",
+  "enabled": true,
+  "registrationAllowed": false,
+  "loginWithEmailAllowed": true,
+  "clients": [
+    {
+      "clientId": "vm-web",
+      "name": "VM-Web",
+      "enabled": true,
+      "protocol": "openid-connect",
+      "publicClient": true,
+      "standardFlowEnabled": true,
+      "directAccessGrantsEnabled": false,
+      "implicitFlowEnabled": false,
+      "rootUrl": "https://vm.test",
+      "redirectUris": ["https://vm.test/internal/v1/auth/callback"],
+      "webOrigins": ["https://vm.test"],
+      "attributes": {
+        "pkce.code.challenge.method": "S256",
+        "post.logout.redirect.uris": "https://vm.test/*"
+      }
+    }
+  ],
+  "users": [
+    { "username": "admin", "firstName": "Alex", "lastName": "Admin", "email": "admin@vm.test", "emailVerified": true, "enabled": true,
+      "credentials": [{ "type": "password", "value": "Admin-e2e-1", "temporary": false }], "requiredActions": [] },
+    { "username": "notenwart", "firstName": "Nora", "lastName": "Notenwart", "email": "notenwart@vm.test", "emailVerified": true, "enabled": true,
+      "credentials": [{ "type": "password", "value": "Notenwart-e2e-1", "temporary": false }], "requiredActions": [] },
+    { "username": "musiker-a", "firstName": "Anton", "lastName": "Trompete", "email": "musiker-a@vm.test", "emailVerified": true, "enabled": true,
+      "credentials": [{ "type": "password", "value": "MusikerA-e2e-1", "temporary": false }], "requiredActions": [] },
+    { "username": "musiker-b", "firstName": "Bea", "lastName": "Horn", "email": "musiker-b@vm.test", "emailVerified": true, "enabled": true,
+      "credentials": [{ "type": "password", "value": "MusikerB-e2e-1", "temporary": false }], "requiredActions": [] },
+    { "username": "musiker-c", "firstName": "Carla", "lastName": "Klarinette", "email": "musiker-c@vm.test", "emailVerified": true, "enabled": true,
+      "credentials": [{ "type": "password", "value": "MusikerC-e2e-1", "temporary": false }], "requiredActions": [] }
+  ]
+}

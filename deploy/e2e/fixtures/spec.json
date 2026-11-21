@@ -1,0 +1,97 @@
+{
+  "$comment": "Quelle für alle Fixtures des KI-Testlaufs. generate-fixtures.mjs erzeugt daraus die PDFs unter generated/ und expected.json. Änderungen hier, dann ./run.sh fixtures und expected.json gegenlesen.",
+  "ensemble": "Hauptorchester",
+  "imports": [
+    {
+      "id": "3.1",
+      "file": "konzertmappe.csv",
+      "mapping": {
+        "Titel": "title",
+        "Komponist": "composer",
+        "Arrangeur": "arranger",
+        "Verlag": "publisher",
+        "Genre": "new-select-field",
+        "Notenbücher": "folder",
+        "_Nummer": "folder-number"
+      }
+    },
+    {
+      "id": "3.2",
+      "file": "gruen.csv",
+      "mapping": {
+        "Titel": "title",
+        "Komponist": "composer",
+        "Arrangeur": "arranger",
+        "Verlag": "publisher",
+        "Genre": "existing-select-field",
+        "Notenbücher": "folder",
+        "Grün": "folder-number"
+      }
+    }
+  ],
+  "folder": "Konzertmappe",
+  "voices": {
+    "musiker-a": "Trompete 1 in B",
+    "musiker-b": "Horn 1 in F",
+    "musiker-b-substitute": "Horn 1 in Es",
+    "musiker-b-switch": "Trompete 2 in B",
+    "musiker-c": "Klarinette 1 in B"
+  },
+  "uploads": {
+    "$comment": "Phase 3.3: Notenwart:in lädt diese Einzel-PDFs in einem Rutsch hoch. Dateiname = Titel - Stimme.",
+    "phase": "3.3",
+    "sheets": [
+      { "title": "Festliche Intrade", "voice": "Trompete 1 in B", "pages": 12 },
+      { "title": "Festliche Intrade", "voice": "Trompete 2 in B", "pages": 2 },
+      { "title": "Festliche Intrade", "voice": "Horn 1 in F", "pages": 2 },
+      { "title": "Festliche Intrade", "voice": "Klarinette 1 in B", "pages": 3 },
+      { "title": "Heimatgrüße", "voice": "Trompete 1 in B", "pages": 3 },
+      { "title": "Heimatgrüße", "voice": "Horn 1 in F", "pages": 1 },
+      { "title": "Heimatgrüße", "voice": "Klarinette 1 in B", "pages": 2 },
+      { "title": "Am Ufer der Adria", "voice": "Trompete 1 in B", "pages": 2 },
+      { "title": "Am Ufer der Adria", "voice": "Horn 1 in Es", "pages": 2 },
+      { "title": "Waldzauber", "voice": "Trompete 1 in B", "pages": 1 },
+      { "title": "Waldzauber", "voice": "Horn 1 in F", "pages": 2 },
+      { "title": "Auf zum Start", "voice": "Trompete 1 in B", "pages": 4 },
+      { "title": "Auf zum Start", "voice": "Trompete 2 in B", "pages": 1 },
+      { "title": "Auf zum Start", "voice": "Horn 1 in F", "pages": 1 },
+      { "title": "Auf zum Start", "voice": "Klarinette 1 in B", "pages": 1 }
+    ]
+  },
+  "collection": {
+    "$comment": "Phase 3.4: Sammel-PDF mit Deckblatt. „Testpolka E2E“ gibt es noch nicht und wird im Viewer angelegt.",
+    "file": "sammel.pdf",
+    "cover": true,
+    "newScore": "Testpolka E2E",
+    "sections": [
+      { "title": "Preussens Gloria", "voice": "Posaune 1 in C", "pages": 2 },
+      { "title": "Preussens Gloria", "voice": "Tuba", "pages": 1 },
+      { "title": "Der Petersburger", "voice": "Posaune 1 in C", "pages": 1 },
+      { "title": "Der Petersburger", "voice": "Tuba", "pages": 2 },
+      { "title": "Testpolka E2E", "voice": "Posaune 1 in C", "pages": 2 },
+      { "title": "Testpolka E2E", "voice": "Tuba", "pages": 1 }
+    ]
+  },
+  "event": {
+    "name": "Frühlingskonzert",
+    "daysFromRun": 60,
+    "setlist": ["Auf zum Start", "Festliche Intrade", "Am Ufer der Adria", "Heimatgrüße", "Waldzauber"]
+  },
+  "musicianUploads": {
+    "$comment": "Phase 4/6: Uploads von Musiker C. „falsch“ trägt im Inhalt ein anderes Stück als der Dateiname.",
+    "good": { "file": "Am Ufer der Adria - Klarinette 1 in B.pdf", "title": "Am Ufer der Adria", "voice": "Klarinette 1 in B", "pages": 2 },
+    "wrong": { "file": "Waldzauber - Klarinette 1 in B.pdf", "title": "Waldzauber", "contentTitle": "Torgauer", "voice": "Klarinette 1 in B", "pages": 2 },
+    "retry": { "file": "Waldzauber - Klarinette 1 in B (korrigiert).pdf", "title": "Waldzauber", "voice": "Klarinette 1 in B", "pages": 2 },
+    "rejectionReason": "Falsches Stück im PDF"
+  },
+  "personalTag": { "user": "musiker-b", "name": "Lieblingsstück", "title": "Heimatgrüße" },
+  "printing": {
+    "pageLimit": 10,
+    "folderPrint": { "user": "notenwart", "voice": "Trompete 1 in B" },
+    "singlePrints": [
+      { "user": "musiker-a", "title": "Heimatgrüße", "voice": "Trompete 1 in B" },
+      { "user": "musiker-b", "title": "Auf zum Start", "voice": "Horn 1 in F" },
+      { "user": "musiker-c", "title": "Festliche Intrade", "voice": "Klarinette 1 in B" }
+    ]
+  }
+}
