@@ -1,7 +1,8 @@
 {
   "browser": {
     "browserName": "chromium",
-    "isolated": true,
+    "isolated": false,
+    "userDataDir": "/var/lib/vm-e2e/profiles/musiker-a",
     "launchOptions": {
       "headless": false,
       "args": ["--kiosk-printing", "--lang=de-DE"]
@@ -13,9 +14,11 @@
       "acceptDownloads": true
     }
   },
+  "sharedBrowserContext": true,
   "server": { "port": 8933, "host": "0.0.0.0", "allowedHosts": ["*"] },
   "outputDir": "/out/downloads/musiker-a",
   "filePaths": "absolute",
+  "allowUnrestrictedFileAccess": true,
   "console": { "level": "warning" },
   "timeouts": { "action": 10000, "navigation": 60000 }
 }

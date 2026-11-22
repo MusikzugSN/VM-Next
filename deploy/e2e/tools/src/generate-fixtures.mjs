@@ -1,7 +1,7 @@
 // Erzeugt aus fixtures/spec.json und den beiden CSVs die PDFs unter fixtures/generated/ und
 // fixtures/expected.json (E-5). Deterministisch: gleiche Eingaben → gleiche Dateien.
 //   node src/generate-fixtures.mjs [fixtures-dir]
-import { existsSync, mkdirSync, rmSync, writeFileSync } from 'node:fs';
+import { copyFileSync, existsSync, mkdirSync, rmSync, writeFileSync } from 'node:fs';
 import { join, resolve } from 'node:path';
 
 import { PDFDocument, StandardFonts, rgb } from 'pdf-lib';
@@ -50,6 +50,8 @@ const collectionPages = [];
 if (spec.collection.cover) collectionPages.push({ heading: 'Sammelband (Deckblatt)', label: 'Deckblatt – nicht importieren' });
 for (const s of spec.collection.sections) collectionPages.push(...sheetPages(s.title, s.voice, s.pages));
 writeFileSync(join(out, spec.collection.file), await pdf(collectionPages));
+// CSVs liegen für die Agenten neben den PDFs (/fixtures im Browser-Container)
+for (const imp of spec.imports) if (existsSync(join(dir, imp.file))) copyFileSync(join(dir, imp.file), join(out, imp.file));
 for (const key of ['good', 'wrong', 'retry']) {
   const u = spec.musicianUploads[key];
   writeFileSync(join(out, 'musician', u.file), await pdf(sheetPages(u.title, u.voice, u.pages, u.contentTitle ?? u.title)));

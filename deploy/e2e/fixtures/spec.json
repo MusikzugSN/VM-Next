@@ -65,11 +65,11 @@
     "newScore": "Testpolka E2E",
     "sections": [
       { "title": "Preussens Gloria", "voice": "Posaune 1 in C", "pages": 2 },
-      { "title": "Preussens Gloria", "voice": "Tuba", "pages": 1 },
+      { "title": "Preussens Gloria", "voice": "Tuba in C", "pages": 1 },
       { "title": "Der Petersburger", "voice": "Posaune 1 in C", "pages": 1 },
-      { "title": "Der Petersburger", "voice": "Tuba", "pages": 2 },
+      { "title": "Der Petersburger", "voice": "Tuba in C", "pages": 2 },
       { "title": "Testpolka E2E", "voice": "Posaune 1 in C", "pages": 2 },
-      { "title": "Testpolka E2E", "voice": "Tuba", "pages": 1 }
+      { "title": "Testpolka E2E", "voice": "Tuba in C", "pages": 1 }
     ]
   },
   "event": {

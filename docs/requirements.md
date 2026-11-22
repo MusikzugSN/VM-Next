@@ -237,7 +237,7 @@ VM-Web bleibt selbst gehostet, ein Verein pro Installation, mit einer Oberfläch
 | Bereich | Anforderung |
 | --- | --- |
 | Oberfläche | Angular mit [Zard UI](https://zardui.com/) (Tailwind CSS v4, Signals), Lightmode; Darkmode später. Gestaltung nach der [VM-Web Design Guideline](https://claude.ai/artifact/LDi95rWoEnHsFZeFaobAWS). |
-| Technik | Nx-Monorepo mit pnpm und Node 24 LTS in einem neuen Repository. Frontend Angular mit Zard UI, Backend NestJS, Datenbank PostgreSQL mit Drizzle. Ein gemeinsames Paket enthält Zod-Schemas für Requests und Responses sowie URL-Konstanten. PDFs erzeugt das Backend mit pdf-lib, die Vorschau im Browser läuft mit pdf.js. Unit-Tests mit Vitest, E2E-Tests später. Druckservice ebenfalls TypeScript/Node. |
+| Technik | Nx-Monorepo mit pnpm und Node 24 LTS in einem neuen Repository. Frontend Angular mit Zard UI, Backend NestJS, Datenbank PostgreSQL mit Drizzle. Ein gemeinsames Paket enthält Zod-Schemas für Requests und Responses sowie URL-Konstanten. PDFs erzeugt das Backend mit pdf-lib, die Vorschau im Browser läuft mit pdf.js. Unit-Tests mit Vitest. Ende-zu-Ende prüft ein KI-Testlauf die gebauten Images produktionsnah (Traefik, Keycloak, CUPS-PDF) mit Agenten als Admin, Notenwart:in und Musiker:innen; Akzeptanzkriterien in [e2e-acceptance.md](e2e-acceptance.md), Umgebung in `deploy/e2e`. Druckservice ebenfalls TypeScript/Node. |
 | Responsiv | Desktop ab 1280 px mit fester Seitenleiste, Tablet 768–1279 px mit ausklappbarer Navigation, Mobil unter 768 px mit Karten statt Tabellen; Tippflächen mindestens 44 px. |
 | Barrierefreiheit | Kontraste nach WCAG 2.2 AA, vollständig per Tastatur bedienbar, echte Buttons, Links und Labels. |
 | Sprache | Deutsch, Texte über i18n-Dateien, damit weitere Sprachen möglich sind. |

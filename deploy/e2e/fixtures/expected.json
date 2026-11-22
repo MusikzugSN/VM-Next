@@ -1,0 +1,186 @@
+{
+  "$comment": "Erzeugt von tools/src/generate-fixtures.mjs aus spec.json und den CSVs. Vor dem ersten Lauf von Hand gegenlesen (E-5).",
+  "imports": {
+    "3.1": {
+      "rows": 7,
+      "create": 7,
+      "link": 0,
+      "mergedInFile": 0,
+      "errors": 0,
+      "folders": {
+        "Konzertmappe": 7
+      },
+      "scoresAfter": 7
+    },
+    "3.2": {
+      "rows": 5,
+      "create": 3,
+      "link": 2,
+      "mergedInFile": 0,
+      "errors": 0,
+      "folders": {
+        "Grünes Marschbuch": 5
+      },
+      "scoresAfter": 10
+    }
+  },
+  "scores": {
+    "afterImports": 10,
+    "final": 11
+  },
+  "folderNumbers": {
+    "Festliche Intrade": "001 a",
+    "Heimatgrüße": "002",
+    "Am Ufer der Adria": "002 a",
+    "Waldzauber": "003",
+    "Auf zum Start": "004"
+  },
+  "sheets": {
+    "afterPhase3": 21,
+    "final": 23
+  },
+  "uploads": {
+    "musicianFinal": {
+      "approved": 2,
+      "rejected": 1,
+      "pending": 0
+    }
+  },
+  "downloads": {
+    "musiker-a": {
+      "folderZip": [
+        {
+          "name": "001 a – Festliche Intrade – Trompete 1 in B.pdf",
+          "title": "Festliche Intrade",
+          "voice": "Trompete 1 in B",
+          "pages": 12
+        },
+        {
+          "name": "002 – Heimatgrüße – Trompete 1 in B.pdf",
+          "title": "Heimatgrüße",
+          "voice": "Trompete 1 in B",
+          "pages": 3
+        },
+        {
+          "name": "002 a – Am Ufer der Adria – Trompete 1 in B.pdf",
+          "title": "Am Ufer der Adria",
+          "voice": "Trompete 1 in B",
+          "pages": 2
+        },
+        {
+          "name": "003 – Waldzauber – Trompete 1 in B.pdf",
+          "title": "Waldzauber",
+          "voice": "Trompete 1 in B",
+          "pages": 1
+        },
+        {
+          "name": "004 – Auf zum Start – Trompete 1 in B.pdf",
+          "title": "Auf zum Start",
+          "voice": "Trompete 1 in B",
+          "pages": 4
+        }
+      ],
+      "eventZip": [
+        {
+          "name": "01 – Auf zum Start – Trompete 1 in B.pdf",
+          "title": "Auf zum Start",
+          "voice": "Trompete 1 in B",
+          "pages": 4
+        },
+        {
+          "name": "02 – Festliche Intrade – Trompete 1 in B.pdf",
+          "title": "Festliche Intrade",
+          "voice": "Trompete 1 in B",
+          "pages": 12
+        },
+        {
+          "name": "03 – Am Ufer der Adria – Trompete 1 in B.pdf",
+          "title": "Am Ufer der Adria",
+          "voice": "Trompete 1 in B",
+          "pages": 2
+        },
+        {
+          "name": "04 – Heimatgrüße – Trompete 1 in B.pdf",
+          "title": "Heimatgrüße",
+          "voice": "Trompete 1 in B",
+          "pages": 3
+        },
+        {
+          "name": "05 – Waldzauber – Trompete 1 in B.pdf",
+          "title": "Waldzauber",
+          "voice": "Trompete 1 in B",
+          "pages": 1
+        }
+      ]
+    }
+  },
+  "printing": {
+    "folderPrint": {
+      "route": "print-service",
+      "totalPages": 24,
+      "pages": [
+        "Festliche Intrade · Trompete 1 in B · Seite 1/12",
+        "Festliche Intrade · Trompete 1 in B · Seite 2/12",
+        "Festliche Intrade · Trompete 1 in B · Seite 3/12",
+        "Festliche Intrade · Trompete 1 in B · Seite 4/12",
+        "Festliche Intrade · Trompete 1 in B · Seite 5/12",
+        "Festliche Intrade · Trompete 1 in B · Seite 6/12",
+        "Festliche Intrade · Trompete 1 in B · Seite 7/12",
+        "Festliche Intrade · Trompete 1 in B · Seite 8/12",
+        "Festliche Intrade · Trompete 1 in B · Seite 9/12",
+        "Festliche Intrade · Trompete 1 in B · Seite 10/12",
+        "Festliche Intrade · Trompete 1 in B · Seite 11/12",
+        "Festliche Intrade · Trompete 1 in B · Seite 12/12",
+        "Heimatgrüße · Trompete 1 in B · Seite 1/3",
+        "Heimatgrüße · Trompete 1 in B · Seite 2/3",
+        "Heimatgrüße · Trompete 1 in B · Seite 3/3",
+        null,
+        "Am Ufer der Adria · Trompete 1 in B · Seite 1/2",
+        "Am Ufer der Adria · Trompete 1 in B · Seite 2/2",
+        "Waldzauber · Trompete 1 in B · Seite 1/1",
+        null,
+        "Auf zum Start · Trompete 1 in B · Seite 1/4",
+        "Auf zum Start · Trompete 1 in B · Seite 2/4",
+        "Auf zum Start · Trompete 1 in B · Seite 3/4",
+        "Auf zum Start · Trompete 1 in B · Seite 4/4"
+      ]
+    },
+    "singlePrints": [
+      {
+        "user": "musiker-a",
+        "title": "Heimatgrüße",
+        "voice": "Trompete 1 in B",
+        "route": "browser",
+        "totalPages": 3,
+        "pages": [
+          "Heimatgrüße · Trompete 1 in B · Seite 1/3",
+          "Heimatgrüße · Trompete 1 in B · Seite 2/3",
+          "Heimatgrüße · Trompete 1 in B · Seite 3/3"
+        ]
+      },
+      {
+        "user": "musiker-b",
+        "title": "Auf zum Start",
+        "voice": "Horn 1 in F",
+        "route": "browser",
+        "totalPages": 1,
+        "pages": [
+          "Auf zum Start · Horn 1 in F · Seite 1/1"
+        ]
+      },
+      {
+        "user": "musiker-c",
+        "title": "Festliche Intrade",
+        "voice": "Klarinette 1 in B",
+        "route": "browser",
+        "totalPages": 3,
+        "pages": [
+          "Festliche Intrade · Klarinette 1 in B · Seite 1/3",
+          "Festliche Intrade · Klarinette 1 in B · Seite 2/3",
+          "Festliche Intrade · Klarinette 1 in B · Seite 3/3"
+        ]
+      }
+    ]
+  },
+  "warnings": []
+}

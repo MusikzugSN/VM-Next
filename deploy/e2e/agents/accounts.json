@@ -1,0 +1,11 @@
+{
+  "$comment": "Testzugänge des KI-Testlaufs (nur für deploy/e2e, keine echten Konten). Dieselben Werte stehen in keycloak/realm-verein.json.",
+  "keycloakAdmin": { "url": "https://auth.vm.test/admin/", "username": "kcadmin", "password": "kcadmin-e2e" },
+  "users": {
+    "admin": { "username": "admin", "password": "Admin-e2e-1", "firstName": "Alex", "lastName": "Admin", "email": "admin@vm.test" },
+    "notenwart": { "username": "notenwart", "password": "Notenwart-e2e-1", "firstName": "Nora", "lastName": "Notenwart", "email": "notenwart@vm.test" },
+    "musiker-a": { "username": "musiker-a", "password": "MusikerA-e2e-1", "firstName": "Anton", "lastName": "Trompete", "email": "musiker-a@vm.test" },
+    "musiker-b": { "username": "musiker-b", "password": "MusikerB-e2e-1", "firstName": "Bea", "lastName": "Horn", "email": "musiker-b@vm.test" },
+    "musiker-c": { "username": "musiker-c", "password": "MusikerC-e2e-1", "firstName": "Carla", "lastName": "Klarinette", "email": "musiker-c@vm.test" }
+  }
+}
