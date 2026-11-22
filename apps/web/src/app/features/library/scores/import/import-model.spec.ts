@@ -20,6 +20,19 @@ describe('CSV import mapping (N-19)', () => {
     expect(mapping).toEqual([col('folder', 'notenbücher'), col('new', 'Verwendung', 'multiselect')]);
   });
 
+  it('maps a remembered new field to the field the last import created', () => {
+    storeMapping(['Genre', 'Stil'], [col('new', 'Genre', 'select'), col('new', 'Epoche', 'select')]);
+    const epoche: FieldDefinition = { ...genre, id: '0190a000-0000-7000-8000-000000000002', name: 'epoche', position: 1 };
+    const mapping = initialMapping(['Genre', 'Stil'], [genre, epoche]);
+    expect(mapping.map((m) => m.target)).toEqual([`field:${genre.id}`, `field:${epoche.id}`]);
+    expect(mappingProblems(mapping, [genre, epoche])).not.toContain('newFieldTaken');
+  });
+
+  it('keeps a remembered new field while it does not exist yet', () => {
+    storeMapping(['Genre'], [col('new', 'Genre', 'select')]);
+    expect(initialMapping(['Genre'], [])).toEqual([col('new', 'Genre', 'select')]);
+  });
+
   it('forgets remembered custom fields that no longer exist', () => {
     storeMapping(['Genre'], [col('field:0190a000-0000-7000-8000-00000000dead')]);
     expect(initialMapping(['Genre'], [])[0].target).toBe('ignore');

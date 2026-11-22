@@ -15,6 +15,7 @@ import {
 import { TranslocoPipe } from '@jsverse/transloco';
 import type { PDFDocumentLoadingTask, PDFDocumentProxy, RenderTask } from 'pdfjs-dist';
 
+import { observeWidth } from '../../../shared/ui/observe-width';
 import { loadPdfJs, PDFJS_BASE } from '../../../shared/ui/pdf-viewer';
 import type { CropMargins, Rotation } from './review-model';
 
@@ -87,9 +88,7 @@ export class ReviewPreview {
       untracked(() => void this.render());
     });
     afterNextRender(() => {
-      const observer = new ResizeObserver(() => void this.render());
-      observer.observe(this.frame().nativeElement);
-      this.destroyRef.onDestroy(() => observer.disconnect());
+      this.destroyRef.onDestroy(observeWidth(this.frame().nativeElement, () => void this.render()));
       this.rendered = true;
       void this.render();
     });

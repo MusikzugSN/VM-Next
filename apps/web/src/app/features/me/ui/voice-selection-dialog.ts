@@ -3,7 +3,7 @@ import { TranslocoPipe, TranslocoService } from '@jsverse/transloco';
 import { PluralPipe } from '../../../core/i18n/plural.pipe';
 import { NgIcon, provideIcons } from '@ng-icons/core';
 import { lucideCheck, lucideSearch } from '@ng-icons/lucide';
-import { apiUrl, type VoiceOptionsResponse } from '@vm-web/shared';
+import { apiUrl } from '@vm-web/shared';
 import { firstValueFrom } from 'rxjs';
 
 import { ZardButtonComponent } from '@/shared/components/button';
@@ -14,24 +14,12 @@ import { ZardSonnerService } from '@/shared/components/sonner';
 import { ApiClient } from '../../../core/api/api-client';
 import { isApiProblem } from '../../../core/api/api-problem';
 import { VoiceContextStore } from '../../../core/voices/voice-context.store';
+import { filterVoiceGroups } from '../../../core/voices/voice-groups';
+
+export { filterVoiceGroups };
 
 /** API limit of `set-voices` (`voiceIds` max. 20). */
 export const MAX_PROFILE_VOICES = 20;
-
-type Group = VoiceOptionsResponse['groups'][number];
-
-/** Groups whose instrument or voice name contains the search text (case-insensitive). */
-export function filterVoiceGroups(groups: readonly Group[], search: string): Group[] {
-  const needle = search.trim().toLocaleLowerCase('de');
-  if (!needle) return [...groups];
-  return groups
-    .map((group) =>
-      group.instrument.name.toLocaleLowerCase('de').includes(needle)
-        ? group
-        : { ...group, voices: group.voices.filter((voice) => voice.name.toLocaleLowerCase('de').includes(needle)) },
-    )
-    .filter((group) => group.voices.length > 0);
-}
 
 /**
  * „Welche Stimmen spielst du?“ (M-1): voices grouped by instrument (N-6) as toggle chips

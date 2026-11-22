@@ -18,6 +18,8 @@ import type { PDFDocumentLoadingTask, PDFDocumentProxy, RenderTask } from 'pdfjs
 
 import { ZardButtonComponent } from '@/shared/components/button';
 
+import { observeWidth } from './observe-width';
+
 /** Where the pdf.js worker and its resources are served (copied by the build, see project.json). */
 export const PDFJS_BASE = '/pdfjs';
 
@@ -129,9 +131,7 @@ export class PdfViewer {
       untracked(() => void this.load(src));
     });
     afterNextRender(() => {
-      const observer = new ResizeObserver(() => void this.render());
-      observer.observe(this.frame().nativeElement);
-      this.destroyRef.onDestroy(() => observer.disconnect());
+      this.destroyRef.onDestroy(observeWidth(this.frame().nativeElement, () => void this.render()));
     });
     this.destroyRef.onDestroy(() => {
       this.renderTask?.cancel();

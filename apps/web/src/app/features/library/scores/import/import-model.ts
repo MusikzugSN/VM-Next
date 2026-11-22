@@ -93,17 +93,21 @@ export function storeMapping(headers: readonly string[], columns: readonly Colum
 /**
  * Initial mapping: the remembered target for this column name, else a custom field with the same
  * name, else a known header name, else „nicht importieren“. Each fixed field is used only once.
+ * A remembered „neues eigenes Feld“ that exists by now (created by the last import) maps to that field.
  */
 export function initialMapping(headers: readonly string[], fields: readonly FieldDefinition[]): ColumnMapping[] {
   const stored = loadStored();
   const used = new Set<ColumnTarget>();
   const fieldIds = new Set(fields.map((f) => `field:${f.id}`));
+  const fieldByName = (name: string | undefined) => fields.find((f) => f.name.toLowerCase() === (name ?? '').trim().toLowerCase());
   return headers.map((header) => {
     const key = header.toLowerCase();
     const remembered = stored[key];
-    const sameName = fields.find((f) => f.name.toLowerCase() === key);
+    const sameName = fieldByName(key);
+    const created = remembered?.target === 'new' ? fieldByName(remembered.newName) : undefined;
     let target: ColumnTarget = 'ignore';
-    if (remembered && (!remembered.target.startsWith('field:') || fieldIds.has(remembered.target))) target = remembered.target;
+    if (created) target = `field:${created.id}`;
+    else if (remembered && (!remembered.target.startsWith('field:') || fieldIds.has(remembered.target))) target = remembered.target;
     else if (sameName) target = `field:${sameName.id}`;
     else if (KNOWN_HEADERS[key]) target = KNOWN_HEADERS[key];
     if (target !== 'ignore' && target !== 'new' && used.has(target)) target = 'ignore';

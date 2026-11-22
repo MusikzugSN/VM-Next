@@ -164,6 +164,12 @@
       "allOwn": "Alle meine Stimmen",
       "override": "Aushilfe",
       "choose": "Stimmen wählen",
+      "other": "Andere Stimme …",
+      "standInTitle": "Andere Stimme anzeigen",
+      "standInText": "Zum Aushelfen: Mein Bereich zeigt dann die Noten dieser Stimme. Deine Stimmen im Profil bleiben unverändert.",
+      "search": "Stimme suchen",
+      "searchPlaceholder": "z. B. Trompete oder Horn",
+      "noMatch": "Keine Stimme gefunden.",
       "editProfile": "Eigene Stimmen im Profil ändern"
     }
   },
