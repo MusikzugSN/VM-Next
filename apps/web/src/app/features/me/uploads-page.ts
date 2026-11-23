@@ -5,7 +5,7 @@ import { NgIcon, provideIcons } from '@ng-icons/core';
 import { lucideUpload } from '@ng-icons/lucide';
 import { apiUrl, myUploadsResponseSchema, type MyUploadItem, type UploadStatus } from '@vm-web/shared';
 
-import { VmButton, VmCard } from '@vm-web/ui';
+import { VmButton, VmCard, VmTable } from '@vm-web/ui';
 
 import { UploadLauncher } from '../../core/actions/pending-features';
 import { onUploadCompleted } from '../../core/actions/on-upload';
@@ -19,7 +19,7 @@ import { UploadStatusBadge } from './ui/upload-status-badge';
 /** Meine Uploads (N-14): status of each own upload incl. the reason for a rejection. */
 @Component({
   selector: 'vm-me-uploads-page',
-  imports: [VmCard, DatePipe, NgIcon, TranslocoPipe, VmButton, ListState, UploadStatusBadge],
+  imports: [VmTable, VmCard, DatePipe, NgIcon, TranslocoPipe, VmButton, ListState, UploadStatusBadge],
   viewProviders: [provideIcons({ lucideUpload })],
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
@@ -66,8 +66,8 @@ import { UploadStatusBadge } from './ui/upload-status-badge';
       </ul>
     } @else if (list.items().length > 0) {
       <div vm-card class="overflow-x-auto">
-        <table class="w-full">
-          <thead class="bg-muted text-xs font-medium text-muted-foreground">
+        <table vm-table>
+          <thead>
             <tr>
               <th scope="col" class="w-28 px-4 py-3 text-start">{{ 'me.uploads.date' | transloco }}</th>
               <th scope="col" class="px-4 py-3 text-start">{{ 'terms.score' | transloco }}</th>
@@ -78,7 +78,7 @@ import { UploadStatusBadge } from './ui/upload-status-badge';
           </thead>
           <tbody>
             @for (entry of list.items(); track entry.id) {
-              <tr class="border-t align-top">
+              <tr class="align-top">
                 <td class="px-4 py-3 tabular-nums">{{ entry.uploadedAt | date: 'dd.MM.yyyy' }}</td>
                 <td class="px-4 py-3">{{ entry.score?.name ?? '–' }}</td>
                 <td class="px-4 py-3">{{ entry.voice?.name ?? '–' }}</td>
