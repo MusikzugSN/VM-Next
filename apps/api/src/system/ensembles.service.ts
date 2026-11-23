@@ -20,6 +20,7 @@ import { clubSettings, ensembleLineupVoices, ensembles, memberships, roles, user
 import { likePattern } from '../me/me.repository';
 import { lineupTemplateFile } from '../seed/defaults';
 import { importLineupTemplate, loadLineupTemplate } from '../seed/lineup-template';
+import { afterNameAndId } from '../common/pagination/keyset';
 
 type Tx = Parameters<Parameters<Database['transaction']>[0]>[0];
 type EnsembleRecord = typeof ensembles.$inferSelect;
@@ -75,7 +76,7 @@ export class EnsemblesService {
         and(
           eq(memberships.ensembleId, ensembleId),
           query.q ? sql`${users.name} ilike ${likePattern(query.q)}` : undefined,
-          cursor ? sql`(lower(${users.name}), ${users.id}) > (${cursor[0]}, ${cursor[1]}::uuid)` : undefined,
+          afterNameAndId(users.name, users.id, cursor),
         ),
       )
       .orderBy(sql`lower(${users.name})`, asc(users.id))

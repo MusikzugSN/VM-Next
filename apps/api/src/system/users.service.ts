@@ -15,6 +15,7 @@ import { httpUrlOrNull } from '../common/url';
 import { DATABASE, type Database } from '../db/database';
 import { ensembles, memberships, roles, users, userVoices, voices } from '../db/schema';
 import { likePattern } from '../me/me.repository';
+import { afterNameAndId } from '../common/pagination/keyset';
 
 type UserRecord = typeof users.$inferSelect;
 
@@ -33,7 +34,7 @@ export class UsersService {
           query.q ? sql`(${users.name} ilike ${likePattern(query.q)} or ${users.email} ilike ${likePattern(query.q)})` : undefined,
           query.status ? eq(users.status, query.status) : undefined,
           query.ensembleId ? sql`exists (select 1 from memberships m where m.user_id = ${users.id} and m.ensemble_id = ${query.ensembleId}::uuid)` : undefined,
-          cursor ? sql`(lower(${users.name}), ${users.id}) > (${cursor[0]}, ${cursor[1]}::uuid)` : undefined,
+          afterNameAndId(users.name, users.id, cursor),
         ),
       )
       .orderBy(sql`lower(${users.name})`, asc(users.id))

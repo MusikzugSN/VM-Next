@@ -6,6 +6,7 @@ import { activeEnsembleOptions } from '../common/ensemble-tree';
 import type { Database } from '../db/database';
 import { ensembles, scores } from '../db/schema';
 import { likePattern } from '../me/me.repository';
+import { afterNameAndId } from '../common/pagination/keyset';
 
 /** Non-archived ensembles in which the caller holds `permission` (incl. inherited, F-3), in tree order; 403 if none. */
 export async function ensembleOptions(db: Database, access: AccessContext, permission: Permission) {
@@ -45,7 +46,7 @@ export async function scoreCandidates(
     .where(
       and(
         sql`(${scores.title} ilike ${pattern} or ${scores.composer} ilike ${pattern})`,
-        cursor ? sql`(lower(${scores.title}), ${scores.id}) > (${cursor[0]}, ${cursor[1]}::uuid)` : undefined,
+        afterNameAndId(scores.title, scores.id, cursor),
       ),
     )
     .orderBy(sql`lower(${scores.title})`, asc(scores.id))

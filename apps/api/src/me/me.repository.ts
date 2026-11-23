@@ -22,6 +22,7 @@ import {
   voiceSubstitutes,
 } from '../db/schema';
 import type { SheetRow } from './sheet-resolution';
+import { afterNameAndId } from '../common/pagination/keyset';
 
 /** `( $1, $2, … )` for `in` lists; callers guarantee a non-empty list. */
 const list = (ids: readonly string[]): SQL => sql`(${sql.join(ids.map((id) => sql`${id}::uuid`), sql`, `)})`;
@@ -442,7 +443,7 @@ export class MeRepository {
         and(
           sql`${scores.id} in ${visibleScoreIds(ensembleIds)}`,
           ...this.scoreFilter(filter),
-          cursor ? sql`(lower(${scores.title}), ${scores.id}) > (${cursor[0]}, ${cursor[1]}::uuid)` : undefined,
+          afterNameAndId(scores.title, scores.id, cursor),
         ),
       )
       .orderBy(sql`lower(${scores.title})`, asc(scores.id))

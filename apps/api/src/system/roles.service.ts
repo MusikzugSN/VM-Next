@@ -22,6 +22,7 @@ import { isUniqueViolation } from '../db/db-errors';
 import { clubSettings, memberships, rolePermissions, roles } from '../db/schema';
 import { loadDefaultRoles, type DefaultRole } from '../seed/default-roles';
 import { rolesFile } from '../seed/defaults';
+import { afterNameAndId } from '../common/pagination/keyset';
 
 type Tx = Parameters<Parameters<Database['transaction']>[0]>[0];
 type RoleRecord = typeof roles.$inferSelect;
@@ -38,7 +39,7 @@ export class RolesService {
     const rows = await this.db
       .select({ role: roles, sortKey: sql<string>`lower(${roles.name})` })
       .from(roles)
-      .where(cursor ? sql`(lower(${roles.name}), ${roles.id}) > (${cursor[0]}, ${cursor[1]}::uuid)` : undefined)
+      .where(afterNameAndId(roles.name, roles.id, cursor))
       .orderBy(sql`lower(${roles.name})`, asc(roles.id))
       .limit(query.limit + 1);
     const page = rows.slice(0, query.limit).map((r) => r.role);
