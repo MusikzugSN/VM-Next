@@ -10,7 +10,7 @@ import {
   type UpdateDefaultsBody,
   type UpdatePrintBody,
 } from '@vm-web/shared';
-import { eq, sql } from 'drizzle-orm';
+import { eq } from 'drizzle-orm';
 import { readFile, rm } from 'node:fs/promises';
 import { activeEnsembleOptions } from '../common/ensemble-tree';
 import { uuidv7 } from '../common/ids/uuid-v7';
@@ -20,6 +20,7 @@ import { DATABASE, type Database } from '../db/database';
 import { clubSettings, ensembles, rolePermissions, roles } from '../db/schema';
 import { ClubSettingsRepository } from '../settings/club-settings.repository';
 import { FILE_STORAGE, type IFileStorage } from '../storage/file-storage';
+import { assertActiveEnsemble, assertRoleExists, roleOptions } from '../library/library-helpers';
 
 const BOM = new RegExp('^' + String.fromCharCode(0xfeff));
 
@@ -70,7 +71,7 @@ export class ConfigService {
   async defaultOptions(): Promise<ConfigDefaultOptionsResponse> {
     const [ensembleRows, roleRows] = await Promise.all([
       activeEnsembleOptions(this.db),
-      this.db.select({ id: roles.id, name: roles.name }).from(roles).orderBy(sql`lower(${roles.name})`),
+      roleOptions(this.db),
     ]);
     const club = await this.hasClubPermissions(roleRows.map((r) => r.id));
     return { ensembles: ensembleRows, roles: roleRows.map((r) => ({ ...r, hasClubPermissions: club.has(r.id) })) };
@@ -88,15 +89,8 @@ export class ConfigService {
 
   /** Defaults for new accounts (A-3); archived ensembles are refused. */
   async updateDefaults(body: UpdateDefaultsBody): Promise<void> {
-    if (body.defaultEnsembleId) {
-      const [e] = await this.db.select({ archivedAt: ensembles.archivedAt }).from(ensembles).where(eq(ensembles.id, body.defaultEnsembleId));
-      if (!e) throw ProblemException.notFound('Unknown ensemble');
-      if (e.archivedAt) throw ProblemException.validation([{ path: '/body/defaultEnsembleId', code: 'archived' }]);
-    }
-    if (body.defaultRoleId) {
-      const [r] = await this.db.select({ id: roles.id }).from(roles).where(eq(roles.id, body.defaultRoleId));
-      if (!r) throw ProblemException.notFound('Unknown role');
-    }
+    if (body.defaultEnsembleId) await assertActiveEnsemble(this.db, body.defaultEnsembleId, '/body/defaultEnsembleId');
+    if (body.defaultRoleId) await assertRoleExists(this.db, body.defaultRoleId);
     await this.update({ defaultEnsembleId: body.defaultEnsembleId, defaultRoleId: body.defaultRoleId });
   }
 

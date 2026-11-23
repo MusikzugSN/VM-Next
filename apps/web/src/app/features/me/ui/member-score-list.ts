@@ -8,11 +8,10 @@ import { APP_ROUTES, apiUrl, appPath, type MemberScoreRow, type MemberSheet } fr
 import { firstValueFrom } from 'rxjs';
 
 import { ZardButtonComponent } from '@/shared/components/button';
-import { ZardSonnerService } from '@/shared/components/sonner';
 
 import { PrintLauncher, UploadLauncher } from '../../../core/actions/pending-features';
 import { ApiClient } from '../../../core/api/api-client';
-import { isApiProblem } from '../../../core/api/api-problem';
+import { ActionRunner } from '../../../core/actions/action-runner';
 import { sheetPdfUrl } from '../../../core/api/urls';
 import { SessionStore } from '../../../core/auth/session.store';
 import { ViewportService } from '../../../core/layout/viewport';
@@ -20,7 +19,7 @@ import { saveBlob } from '../../../core/util/save-blob';
 import { VoiceContextStore } from '../../../core/voices/voice-context.store';
 import { SelectionBar } from '../../../shared/ui/selection-bar';
 import { StatusBadge } from '../../../shared/ui/status-badge';
-import { toggled } from '../../../core/util/sets';
+import { toggleSetItem } from '../../../core/util/sets';
 
 export type ScoreListRow = MemberScoreRow & { position?: number };
 
@@ -87,7 +86,7 @@ export class MemberScoreList {
   private readonly api = inject(ApiClient);
   private readonly printer = inject(PrintLauncher);
   private readonly voices = inject(VoiceContextStore);
-  private readonly sonner = inject(ZardSonnerService);
+  private readonly actions = inject(ActionRunner);
   private readonly transloco = inject(TranslocoService);
 
   /** Selected score ids; rows without a sheet („Stimme fehlt“) cannot be selected. */
@@ -97,7 +96,7 @@ export class MemberScoreList {
   protected readonly zipping = signal(false);
 
   protected toggle(scoreId: string): void {
-    this.selected.update((current) => toggled(current, scoreId));
+    this.selected.update((current) => toggleSetItem(current, scoreId));
   }
 
   protected toggleAll(): void {
@@ -117,23 +116,23 @@ export class MemberScoreList {
 
   protected async downloadZip(): Promise<void> {
     this.zipping.set(true);
-    try {
-      const zip = await firstValueFrom(
-        this.api.postBlob(apiUrl('me', 'selectionZip'), {
-          scoreIds: this.selectedIds(),
-          folderId: this.folderId() ?? undefined,
-          eventId: this.eventId() ?? undefined,
-          voiceIds: [...this.voices.overrideIds()],
-          substitutes: 'fallback',
-        }),
-      );
-      const title = this.listTitle() || this.transloco.translate('common.selection.title');
-      saveBlob(zip, `${title.replace(/[\\/:*?"<>|]+/g, ' ').trim()}.zip`);
-    } catch (error) {
-      this.sonner.error(this.transloco.translate(isApiProblem(error) ? error.messageKey : 'common.selection.zipFailed'));
-    } finally {
-      this.zipping.set(false);
-    }
+    await this.actions.run(
+      async () => {
+        const zip = await firstValueFrom(
+          this.api.postBlob(apiUrl('me', 'selectionZip'), {
+            scoreIds: this.selectedIds(),
+            folderId: this.folderId() ?? undefined,
+            eventId: this.eventId() ?? undefined,
+            voiceIds: [...this.voices.overrideIds()],
+            substitutes: 'fallback',
+          }),
+        );
+        const title = this.listTitle() || this.transloco.translate('common.selection.title');
+        saveBlob(zip, `${title.replace(/[\\/:*?"<>|]+/g, ' ').trim()}.zip`);
+      },
+      { fallbackKey: 'common.selection.zipFailed' },
+    );
+    this.zipping.set(false);
   }
 
   protected printSelection(): void {

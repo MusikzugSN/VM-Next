@@ -20,7 +20,9 @@ import { AppConfig } from '../config/app-config.service';
 import { DATABASE, type Database } from '../db/database';
 import { ensembles, events, scores, setlistEntries } from '../db/schema';
 import { assertActiveEnsemble, ensembleOptions, listEnsembles, scoreCandidates } from '../library/library-helpers';
-import { likePattern } from '../me/me.repository';
+import { assertNoDuplicates } from '../common/validation/id-list';
+import { replaceRows } from '../db/table-helpers';
+import { likePattern } from '../common/sql';
 
 const scoreCount = sql<number>`(select count(*)::int from setlist_entries x where x.event_id = ${events.id})`;
 
@@ -136,17 +138,13 @@ export class EventsService implements OnModuleInit {
 
   /** Replaces the whole setlist; order = playing order (N-16). Each score once. */
   async setSetlist(eventId: string, scoreIds: readonly string[]): Promise<void> {
-    const duplicates = scoreIds.flatMap((id, i) => (scoreIds.indexOf(id) !== i ? [{ path: `/body/scoreIds/${i}`, code: 'duplicate' }] : []));
-    if (duplicates.length) throw ProblemException.validation(duplicates);
+    assertNoDuplicates(scoreIds, '/body/scoreIds');
     await this.db.transaction(async (tx) => {
       if (scoreIds.length) {
         const found = await tx.select({ id: scores.id }).from(scores).where(inArray(scores.id, [...scoreIds]));
         if (found.length !== scoreIds.length) throw ProblemException.notFound('Unknown score');
       }
-      await tx.delete(setlistEntries).where(eq(setlistEntries.eventId, eventId));
-      if (scoreIds.length) {
-        await tx.insert(setlistEntries).values(scoreIds.map((scoreId, i) => ({ eventId, scoreId, position: i + 1 })));
-      }
+      await replaceRows(tx, setlistEntries, eq(setlistEntries.eventId, eventId), scoreIds.map((scoreId, i) => ({ eventId, scoreId, position: i + 1 })));
       await tx.update(events).set({ updatedAt: new Date() }).where(eq(events.id, eventId));
     });
   }

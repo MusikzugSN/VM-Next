@@ -1,17 +1,17 @@
-import { sameMembers, toggled } from './sets';
+import { sameMembers, toggleSetItem } from './sets';
 
-describe('toggled', () => {
+describe('toggleSetItem', () => {
   it('adds at the end and removes, without changing the original', () => {
     const original = new Set(['a', 'b']);
-    expect([...toggled(original, 'c')]).toEqual(['a', 'b', 'c']);
-    expect([...toggled(original, 'a')]).toEqual(['b']);
+    expect([...toggleSetItem(original, 'c')]).toEqual(['a', 'b', 'c']);
+    expect([...toggleSetItem(original, 'a')]).toEqual(['b']);
     expect([...original]).toEqual(['a', 'b']);
   });
 
   it('does not add to a full set, but still removes', () => {
     const full = new Set(['a', 'b']);
-    expect([...toggled(full, 'c', 2)]).toEqual(['a', 'b']);
-    expect([...toggled(full, 'a', 2)]).toEqual(['b']);
+    expect([...toggleSetItem(full, 'c', 2)]).toEqual(['a', 'b']);
+    expect([...toggleSetItem(full, 'a', 2)]).toEqual(['b']);
   });
 });
 

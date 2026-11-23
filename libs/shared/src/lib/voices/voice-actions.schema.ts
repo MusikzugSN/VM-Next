@@ -23,9 +23,12 @@ export type CreateVoiceResponse = z.infer<typeof createVoiceResponseSchema>;
 export const updateVoiceBodySchema = createVoiceBodySchema;
 export type UpdateVoiceBody = z.infer<typeof updateVoiceBodySchema>;
 
+/** Most substitute voices of a voice. */
+export const MAX_SUBSTITUTES = 10;
+
 /** POST voices/voices/:voiceId/set-substitutes → 204. Ordered, without the voice itself, no duplicates (N-9). */
 export const setSubstitutesBodySchema = z.object({
-  substituteVoiceIds: z.array(idSchema).max(10),
+  substituteVoiceIds: z.array(idSchema).max(MAX_SUBSTITUTES),
 });
 export type SetSubstitutesBody = z.infer<typeof setSubstitutesBodySchema>;
 

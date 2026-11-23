@@ -3,7 +3,7 @@ import { sql, type SQL } from 'drizzle-orm';
 import { ProblemException } from '../common/problem-details/problem.exception';
 import { scores } from '../db/schema';
 import type { FieldDef } from './custom-fields';
-import { likePattern } from '../me/me.repository';
+import { likePattern } from '../common/sql';
 
 type Kind = 'text' | 'number' | 'date' | 'boolean' | 'select' | 'multiselect' | 'completeness';
 

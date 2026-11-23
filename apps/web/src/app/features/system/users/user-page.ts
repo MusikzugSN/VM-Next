@@ -5,8 +5,7 @@ import { Router, RouterLink } from '@angular/router';
 import { TranslocoPipe } from '@jsverse/transloco';
 import { NgIcon, provideIcons } from '@ng-icons/core';
 import { lucideCheck, lucideChevronLeft, lucideLock, lucideLockOpen, lucidePlus, lucideTrash2, lucideX } from '@ng-icons/lucide';
-import { APP_ROUTES, apiUrl, userAssignmentOptionsResponseSchema, userDetailsResponseSchema } from '@vm-web/shared';
-import { firstValueFrom } from 'rxjs';
+import { MAX_PROFILE_VOICES, APP_ROUTES, apiUrl, userAssignmentOptionsResponseSchema, userDetailsResponseSchema } from '@vm-web/shared';
 
 import { ZardButtonComponent } from '@/shared/components/button';
 import { ZardNativeSelectDirective } from '@/shared/components/native-select';
@@ -22,7 +21,8 @@ import { ToggleSwitch } from '../../../shared/ui/toggle-switch';
 import { UserStatusBadge } from '../ui/user-status-badge';
 import { TreeLabelPipe } from '../../../shared/ui/tree-label.pipe';
 import { usePageName } from '../../../core/layout/page';
-import { sameMembers, toggled } from '../../../core/util/sets';
+import { sameMembers, toggleSetItem } from '../../../core/util/sets';
+import { selectOr, valueOr } from '../../../core/util/resource-value';
 
 /** Benutzer-Detail (S-1, A-5, R-1, R-6): roles per ensemble, voices, admin flag, block and delete. */
 @Component({
@@ -57,11 +57,11 @@ export class UserPage {
   protected readonly options = rxResource({
     stream: () => this.api.get(apiUrl('system', 'userAssignmentOptions'), userAssignmentOptionsResponseSchema),
   });
-  protected readonly user = computed(() => (this.details.hasValue() ? this.details.value() : null));
+  protected readonly user = computed(() => valueOr(this.details, null));
   /** Ensembles the person is not member of yet, for „Ensemble hinzufügen“. */
   protected readonly freeEnsembles = computed(() => {
     const taken = new Set(this.user()?.memberships.map((m) => m.ensemble.id) ?? []);
-    return (this.options.hasValue() ? this.options.value().ensembles : []).filter((e) => !taken.has(e.id));
+    return (selectOr(this.options, (v) => v.ensembles, [])).filter((e) => !taken.has(e.id));
   });
 
   protected readonly newEnsembleId = signal('');
@@ -82,14 +82,12 @@ export class UserPage {
     });
   }
 
-  protected initialsOf(name: string): string {
-    return initials(name);
-  }
+  protected readonly initialsOf = initials;
 
   protected async setRole(ensembleId: string, roleId: string): Promise<boolean> {
     if (!roleId) return false;
-    const done = await this.actions.run(
-      () => firstValueFrom(this.api.postVoid(apiUrl('system', 'setMembership', { userId: this.userId() }), { ensembleId, roleId })),
+    const done = await this.actions.runOnce(
+      () => this.api.postVoid(apiUrl('system', 'setMembership', { userId: this.userId() }), { ensembleId, roleId }),
       { success: { key: 'system.user.roleSaved' } },
     );
     if (done) this.changed();
@@ -108,28 +106,28 @@ export class UserPage {
   }
 
   protected async removeMembership(ensembleId: string, name: string): Promise<void> {
-    const done = await this.actions.run(
-      () => firstValueFrom(this.api.postVoid(apiUrl('system', 'removeMembership', { userId: this.userId() }), { ensembleId })),
+    const done = await this.actions.runOnce(
+      () => this.api.postVoid(apiUrl('system', 'removeMembership', { userId: this.userId() }), { ensembleId }),
       { success: { key: 'system.user.membershipRemoved', params: { name } } },
     );
     if (done) this.changed();
   }
 
   protected toggleVoice(id: string): void {
-    this.selectedVoices.update((current) => toggled(current, id, 20));
+    this.selectedVoices.update((current) => toggleSetItem(current, id, MAX_PROFILE_VOICES));
   }
 
   protected async saveVoices(): Promise<void> {
-    const done = await this.actions.run(
-      () => firstValueFrom(this.api.postVoid(apiUrl('system', 'setUserVoices', { userId: this.userId() }), { voiceIds: [...this.selectedVoices()] })),
+    const done = await this.actions.runOnce(
+      () => this.api.postVoid(apiUrl('system', 'setUserVoices', { userId: this.userId() }), { voiceIds: [...this.selectedVoices()] }),
       { success: { key: 'system.user.voicesSaved' } },
     );
     if (done) this.details.reload();
   }
 
   protected async setAdmin(isAdmin: boolean): Promise<void> {
-    const done = await this.actions.run(
-      () => firstValueFrom(this.api.postVoid(apiUrl('system', 'setAdmin', { userId: this.userId() }), { isAdmin })),
+    const done = await this.actions.runOnce(
+      () => this.api.postVoid(apiUrl('system', 'setAdmin', { userId: this.userId() }), { isAdmin }),
       { success: { key: isAdmin ? 'system.user.adminOn' : 'system.user.adminOff' } },
     );
     if (done) this.changed();
@@ -138,7 +136,7 @@ export class UserPage {
   protected async setBlocked(block: boolean): Promise<void> {
     const name = this.user()?.name ?? '';
     const route = block ? 'blockUser' : 'unblockUser';
-    const done = await this.actions.run(() => firstValueFrom(this.api.postVoid(apiUrl('system', route, { userId: this.userId() }))), {
+    const done = await this.actions.runOnce(() => this.api.postVoid(apiUrl('system', route, { userId: this.userId() })), {
       success: { key: block ? 'system.user.blockedDone' : 'system.user.unblockedDone', params: { name } },
     });
     if (done) this.details.reload();
@@ -146,8 +144,7 @@ export class UserPage {
 
   protected async remove(): Promise<void> {
     const name = this.user()?.name ?? '';
-    if (!(await this.confirm.confirmDelete('system.user.deleteTitle', 'system.user.deleteText', { name }))) return;
-    const done = await this.actions.run(() => firstValueFrom(this.api.postVoid(apiUrl('system', 'deleteUser', { userId: this.userId() }))), {
+    const done = await this.confirm.confirmedDelete('system.user.deleteTitle', 'system.user.deleteText', { name }, () => this.api.postVoid(apiUrl('system', 'deleteUser', { userId: this.userId() })), {
       success: { key: 'system.user.deleted', params: { name } },
     });
     if (done) void this.router.navigateByUrl(this.usersPath);
