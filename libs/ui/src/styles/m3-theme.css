@@ -3,6 +3,10 @@
  * Tokennamen folgen den System-Variablen von Angular Material (--mat-sys-*). Angular Material selbst
  * ist nicht installiert; die Werte kommen aus der VM-Web Design Guideline.
  * Abweichungen vom Schema: docs/design-findings.md, Abschnitt „Abweichungen vom --mat-sys-Schema“.
+ *
+ * Darkmode (laut Anforderungen „später“): Nur die Farbrollen brauchen zweite Werte, zum Beispiel
+ * `--mat-sys-surface: light-dark(#ffffff, #18181b);`, dazu `color-scheme: light dark`. Komponenten und
+ * Seiten nutzen ausschließlich diese Rollen und brauchen dafür keine `dark:`-Klassen.
  */
 :root {
   color-scheme: light;

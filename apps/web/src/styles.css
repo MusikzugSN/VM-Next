@@ -12,8 +12,6 @@
 @source '../../../libs/ui/src';
 @plugin "tailwindcss-animate";
 
-@custom-variant dark (&:is(.dark *));
-
 @theme inline {
   --font-sans: var(--mat-sys-body-medium-font);
   --font-mono: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;

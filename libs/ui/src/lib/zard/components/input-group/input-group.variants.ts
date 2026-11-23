@@ -11,7 +11,6 @@ export const inputGroupVariants = cva(
     'has-[[data-slot=input-group-control]:focus-visible]:border-ring has-[[data-slot=input-group-control]:focus-visible]:ring-3 has-[[data-slot=input-group-control]:focus-visible]:ring-ring/50',
     'has-[[data-slot][aria-invalid=true]]:border-destructive has-[[data-slot][aria-invalid=true]]:ring-3 has-[[data-slot][aria-invalid=true]]:ring-destructive/20',
     'has-[>[data-align=block-end]]:h-auto has-[>[data-align=block-end]]:flex-col has-[>[data-align=block-start]]:h-auto has-[>[data-align=block-start]]:flex-col has-[>textarea]:h-auto',
-    'dark:bg-input/30 dark:has-[[data-slot=input-group-control]:disabled]:bg-input/80 dark:has-[[data-slot][aria-invalid=true]]:ring-destructive/40',
     'has-[>[data-align=block-end]]:[&>input]:pt-3 has-[>[data-align=block-start]]:[&>input]:pb-3',
     'has-[>[data-align=inline-end]]:[&>input]:pe-1.5 has-[>[data-align=inline-start]]:[&>input]:ps-1.5',
     // Input/textarea overrides when used as input-group-control
@@ -44,7 +43,7 @@ export const inputGroupButtonVariants = cva(
     'inline-flex cursor-pointer items-center justify-center gap-2 rounded-lg border border-transparent bg-clip-padding whitespace-nowrap',
     'text-sm font-medium shadow-none transition-all outline-none select-none',
     '',
-    'aria-invalid:border-destructive aria-invalid:ring-destructive/20 aria-invalid:ring-3 dark:aria-invalid:border-destructive/50 dark:aria-invalid:ring-destructive/40',
+    'aria-invalid:border-destructive aria-invalid:ring-destructive/20 aria-invalid:ring-3',
     'disabled:pointer-events-none disabled:cursor-not-allowed disabled:opacity-50',
     "shrink-0 [&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*='size-'])]:size-4",
     'active:not-aria-[haspopup]:translate-y-px',
@@ -54,13 +53,13 @@ export const inputGroupButtonVariants = cva(
       zVariant: {
         default: 'bg-primary text-primary-foreground hover:bg-primary/80',
         destructive:
-          'bg-destructive/10 hover:bg-destructive/20 dark:bg-destructive/20 text-destructive focus-visible:border-destructive/40 dark:hover:bg-destructive/30',
+          'bg-destructive/10 hover:bg-destructive/20 text-destructive focus-visible:border-destructive/40',
         outline:
-          'border-border bg-background hover:bg-muted hover:text-foreground dark:bg-input/30 dark:border-input dark:hover:bg-input/50 aria-expanded:bg-muted aria-expanded:text-foreground',
+          'border-border bg-background hover:bg-muted hover:text-foreground aria-expanded:bg-muted aria-expanded:text-foreground',
         secondary:
           'bg-secondary text-secondary-foreground hover:bg-secondary/80 aria-expanded:bg-secondary aria-expanded:text-secondary-foreground',
         ghost:
-          'hover:bg-muted hover:text-foreground dark:hover:bg-muted/50 aria-expanded:bg-muted aria-expanded:text-foreground',
+          'hover:bg-muted hover:text-foreground aria-expanded:bg-muted aria-expanded:text-foreground',
         link: 'text-primary underline-offset-4 hover:underline',
       },
       zSize: {
