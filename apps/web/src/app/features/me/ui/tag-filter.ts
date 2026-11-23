@@ -4,6 +4,7 @@ import { TranslocoPipe } from '@jsverse/transloco';
 import { NgIcon, provideIcons } from '@ng-icons/core';
 import { lucideSlidersHorizontal, lucideX } from '@ng-icons/lucide';
 import { apiUrl, myTagsResponseSchema } from '@vm-web/shared';
+import { VmBadgeCount } from '@vm-web/ui';
 
 import { ZardDropdownImports } from '@vm-web/ui/zard/components/dropdown/dropdown.imports';
 
@@ -28,7 +29,7 @@ export function decodeTagFilter(value: string | undefined): TagFilterValue {
  */
 @Component({
   selector: 'vm-tag-filter',
-  imports: [NgIcon, TranslocoPipe, ZardDropdownImports],
+  imports: [VmBadgeCount, NgIcon, TranslocoPipe, ZardDropdownImports],
   viewProviders: [provideIcons({ lucideSlidersHorizontal, lucideX })],
   changeDetection: ChangeDetectionStrategy.OnPush,
   host: { class: 'contents' },
@@ -42,7 +43,7 @@ export function decodeTagFilter(value: string | undefined): TagFilterValue {
     >
       <ng-icon name="lucideSlidersHorizontal" aria-hidden="true" />
       @if (value()) {
-        <span class="absolute -top-1.5 -right-1.5 flex size-4 items-center justify-center rounded-full bg-primary text-[10px] font-medium text-primary-foreground">1</span>
+        <span vm-badge-count>1</span>
         <span class="sr-only">{{ 'me.filter.active' | transloco }}</span>
       }
     </button>

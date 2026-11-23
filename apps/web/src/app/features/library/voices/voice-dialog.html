@@ -30,7 +30,7 @@
         @if (instrument()) {
           <span class="font-medium">{{ instrument() }}</span>
           @if (isNewInstrument()) {
-            <span class="rounded-sm bg-brass-soft px-1.5 py-0.5 text-xs font-medium text-brass-ink">{{ 'library.voices.newInstrument' | transloco }}</span>
+            <span vm-badge tone="tertiary">{{ 'library.voices.newInstrument' | transloco }}</span>
           }
         } @else {
           <span class="text-muted-foreground">{{ 'library.voices.instrumentFromName' | transloco }}</span>
