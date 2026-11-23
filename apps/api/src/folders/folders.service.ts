@@ -17,10 +17,10 @@ import { naturalSortKey } from '../common/natural-sort';
 import { decodeCursor, toPage } from '../common/pagination/cursor';
 import { ProblemException } from '../common/problem-details/problem.exception';
 import { DATABASE, type Database } from '../db/database';
-import { isUniqueViolation } from '../db/db-errors';
+import { withNameTaken } from '../db/db-errors';
 import { ensembles, folderEntries, folders, scores } from '../db/schema';
 import { assertActiveEnsemble, ensembleOptions, listEnsembles, scoreCandidates } from '../library/library-helpers';
-import { likePattern } from '../me/me.repository';
+import { likePattern } from '../common/sql';
 
 const scoreCount = sql<number>`(select count(*)::int from folder_entries x where x.folder_id = ${folders.id})`;
 
@@ -139,12 +139,12 @@ export class FoldersService implements OnModuleInit {
   async create(body: CreateFolderBody): Promise<{ id: string }> {
     await assertActiveEnsemble(this.db, body.ensembleId);
     const id = uuidv7();
-    await this.unique(() => this.db.insert(folders).values({ id, ensembleId: body.ensembleId, name: body.name, showInMyArea: body.showInMyArea }));
+    await withNameTaken(() => this.db.insert(folders).values({ id, ensembleId: body.ensembleId, name: body.name, showInMyArea: body.showInMyArea }));
     return { id };
   }
 
   async rename(folderId: string, name: string): Promise<void> {
-    await this.unique(() => this.touch(folderId, { name }));
+    await withNameTaken(() => this.touch(folderId, { name }));
   }
 
   async setVisibility(folderId: string, showInMyArea: boolean): Promise<void> {
@@ -158,12 +158,12 @@ export class FoldersService implements OnModuleInit {
       .from(folderEntries)
       .where(and(eq(folderEntries.folderId, folderId), eq(folderEntries.scoreId, scoreId)));
     if (existing) throw ProblemException.conflict('conflict', 'Score already in folder');
-    await this.unique(() => this.db.insert(folderEntries).values({ folderId, scoreId, number, numberSortKey: naturalSortKey(number) }));
+    await withNameTaken(() => this.db.insert(folderEntries).values({ folderId, scoreId, number, numberSortKey: naturalSortKey(number) }));
     await this.touch(folderId, {});
   }
 
   async setScoreNumber(folderId: string, scoreId: string, number: string): Promise<void> {
-    const updated = await this.unique(() =>
+    const updated = await withNameTaken(() =>
       this.db
         .update(folderEntries)
         .set({ number, numberSortKey: naturalSortKey(number) })
@@ -188,9 +188,9 @@ export class FoldersService implements OnModuleInit {
   }
 
   /** Highest purely numeric number + 1, `1` for an empty folder. */
-  private async suggestedNumber(folderId: string): Promise<string | null> {
-    const [row] = await this.db.execute<{ max: string | null; n: number }>(sql`
-      select max(number::bigint)::text as max, count(*)::int as n from folder_entries
+  private async suggestedNumber(folderId: string): Promise<string> {
+    const [row] = await this.db.execute<{ max: string | null }>(sql`
+      select max(number::bigint)::text as max from folder_entries
        where folder_id = ${folderId}::uuid and number ~ '^[0-9]{1,15}$'`).then((r) => r.rows);
     if (!row?.max) return '1';
     return String(BigInt(row.max) + BigInt(1));
@@ -204,14 +204,5 @@ export class FoldersService implements OnModuleInit {
   private async touch(folderId: string, set: Partial<typeof folders.$inferInsert>): Promise<void> {
     const [row] = await this.db.update(folders).set({ ...set, updatedAt: new Date() }).where(eq(folders.id, folderId)).returning({ id: folders.id });
     if (!row) throw ProblemException.notFound();
-  }
-
-  private async unique<T>(write: () => Promise<T>): Promise<T> {
-    try {
-      return await write();
-    } catch (error) {
-      if (isUniqueViolation(error)) throw ProblemException.conflict('name-taken');
-      throw error;
-    }
   }
 }

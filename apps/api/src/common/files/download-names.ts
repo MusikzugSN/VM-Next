@@ -1,3 +1,6 @@
+import { StreamableFile } from '@nestjs/common';
+import type { Readable } from 'node:stream';
+
 const MAX_BASE_LENGTH = 150;
 const SEPARATOR = ' – ';
 
@@ -48,4 +51,9 @@ export function contentDisposition(type: 'inline' | 'attachment', fileName: stri
     .replace(/["\\]/g, '_');
   const encoded = encodeURIComponent(fileName).replace(/['()*]/g, (c) => `%${c.charCodeAt(0).toString(16).toUpperCase()}`);
   return `${type}; filename="${ascii || 'download'}"; filename*=UTF-8''${encoded}`;
+}
+
+/** A PDF as response; `StreamableFile` takes buffers and streams alike. */
+export function pdfFile(body: Uint8Array | Readable, disposition: 'inline' | 'attachment', fileName: string): StreamableFile {
+  return new StreamableFile(body as Readable, { type: 'application/pdf', disposition: contentDisposition(disposition, fileName) });
 }

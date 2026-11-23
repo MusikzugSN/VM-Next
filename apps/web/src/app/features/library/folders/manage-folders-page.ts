@@ -13,7 +13,6 @@ import {
   folderListResponseSchema,
   type FolderListItem,
 } from '@vm-web/shared';
-import { firstValueFrom } from 'rxjs';
 
 import { ZardButtonComponent } from '@/shared/components/button';
 import { ZardNativeSelectDirective } from '@/shared/components/native-select';
@@ -29,6 +28,7 @@ import { ListState } from '../../../shared/ui/list-state';
 import { SearchField } from '../../../shared/ui/search-field';
 import { ToggleSwitch } from '../../../shared/ui/toggle-switch';
 import { CreateInEnsembleDialog, type CreateInEnsemble } from '../ui/create-in-ensemble-dialog';
+import { ensemblesWith } from '../ui/ensembles-with';
 
 /** Mappen verwalten (N-15): folders per ensemble, visibility in Mein Bereich, create and delete. */
 @Component({
@@ -69,9 +69,7 @@ export class ManageFoldersPage {
   });
   protected readonly canCreate = computed(() => this.createOptions.hasValue() && this.createOptions.value().items.length > 0);
   /** Ensembles for the filter: those the person is member of with folder.view (from the session). */
-  protected readonly filterOptions = computed(() =>
-    (this.session.access()?.permissions.ensembles ?? []).filter((e) => this.session.can('folder.view', e.ensemble.id)).map((e) => e.ensemble),
-  );
+  protected readonly filterOptions = computed(() => ensemblesWith(this.session, 'folder.view'));
 
   protected readonly list = cursorList({
     params: () => ({ ensembleId: this.ensembleId() || undefined, q: this.query().trim() || undefined }),
@@ -95,11 +93,9 @@ export class ManageFoldersPage {
   }
 
   protected readonly create = async (input: CreateInEnsemble): Promise<boolean> => {
-    const done = await this.actions.run(
+    const done = await this.actions.runOnce(
       () =>
-        firstValueFrom(
-          this.api.post(apiUrl('folders', 'createFolder'), { ensembleId: input.ensembleId, name: input.name, showInMyArea: input.show }, createdResponseSchema),
-        ),
+        this.api.post(apiUrl('folders', 'createFolder'), { ensembleId: input.ensembleId, name: input.name, showInMyArea: input.show }, createdResponseSchema),
       { success: { key: 'library.folders.created', params: { name: input.name } } },
     );
     if (done) void this.router.navigateByUrl(appPath(APP_ROUTES.library.folder, { folderId: done.value.id }));
@@ -107,16 +103,15 @@ export class ManageFoldersPage {
   };
 
   protected async setVisibility(folder: FolderListItem, show: boolean): Promise<void> {
-    const done = await this.actions.run(
-      () => firstValueFrom(this.api.postVoid(apiUrl('folders', 'setVisibility', { folderId: folder.id }), { showInMyArea: show })),
+    const done = await this.actions.runOnce(
+      () => this.api.postVoid(apiUrl('folders', 'setVisibility', { folderId: folder.id }), { showInMyArea: show }),
       { success: { key: show ? 'library.folders.shown' : 'library.folders.hidden', params: { name: folder.name } } },
     );
     if (done) this.list.reload();
   }
 
   protected async remove(folder: FolderListItem): Promise<void> {
-    if (!(await this.confirm.confirmDelete('library.folders.deleteTitle', 'library.folders.deleteText', { name: folder.name }))) return;
-    const done = await this.actions.run(() => firstValueFrom(this.api.postVoid(apiUrl('folders', 'deleteFolder', { folderId: folder.id }))), {
+    const done = await this.confirm.confirmedDelete('library.folders.deleteTitle', 'library.folders.deleteText', { name: folder.name }, () => this.api.postVoid(apiUrl('folders', 'deleteFolder', { folderId: folder.id })), {
       success: { key: 'library.folders.deleted', params: { name: folder.name } },
     });
     if (done) this.list.reload();

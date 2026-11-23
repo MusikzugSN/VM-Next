@@ -3,7 +3,7 @@ import type { CreateFieldBody, FieldDefinitionsResponse, UpdateFieldBody } from 
 import { asc, eq, sql } from 'drizzle-orm';
 import { uuidv7 } from '../common/ids/uuid-v7';
 import { ProblemException } from '../common/problem-details/problem.exception';
-import { isUniqueViolation } from '../db/db-errors';
+import { withNameTaken } from '../db/db-errors';
 import { fieldDefinitions, fieldOptions, scores } from '../db/schema';
 import { pruneValues, type FieldDef } from './custom-fields';
 import { ScoresRepository } from './scores.repository';
@@ -23,7 +23,7 @@ export class FieldsService {
     this.checkOptions(body.type, body.options);
     if (await this.repo.fieldNameTaken(body.name)) throw ProblemException.conflict('name-taken');
     const id = uuidv7();
-    await this.unique(() =>
+    await withNameTaken(() =>
       this.repo.db.transaction(async (tx) => {
         const [{ next }] = await tx.select({ next: sql<number>`coalesce(max(${fieldDefinitions.position}) + 1, 0)::int` }).from(fieldDefinitions);
         await tx.insert(fieldDefinitions).values({ id, name: body.name, type: body.type, required: body.required, position: next });
@@ -50,7 +50,7 @@ export class FieldsService {
     }
     if (await this.repo.fieldNameTaken(body.name, fieldId)) throw ProblemException.conflict('name-taken');
 
-    await this.unique(() =>
+    await withNameTaken(() =>
       this.repo.db.transaction(async (tx) => {
         await tx.update(fieldDefinitions).set({ name: body.name, required: body.required }).where(eq(fieldDefinitions.id, fieldId));
         const options = body.options.map((o, position) => ({ id: o.id ?? uuidv7(), label: o.label, position }));
@@ -107,15 +107,6 @@ export class FieldsService {
     }
     if (WITH_OPTIONS.has(type) && !options.length) {
       throw ProblemException.validation([{ path: '/body/options', code: 'too_small' }]);
-    }
-  }
-
-  private async unique<T>(write: () => Promise<T>): Promise<T> {
-    try {
-      return await write();
-    } catch (error) {
-      if (isUniqueViolation(error)) throw ProblemException.conflict('name-taken');
-      throw error;
     }
   }
 }

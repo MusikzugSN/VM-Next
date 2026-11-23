@@ -15,7 +15,7 @@ import {
 } from '@vm-web/shared';
 import type { AccessContext } from '../access/access-context';
 import { CurrentAccess, RequirePermission } from '../access/decorators';
-import { contentDisposition } from '../common/files/download-names';
+import { pdfFile } from '../common/files/download-names';
 import { ResponseSchema } from '../common/validation/zod-response.interceptor';
 import { ZodValidationPipe as Zod } from '../common/validation/zod-validation.pipe';
 import { ReviewService } from './review.service';
@@ -44,7 +44,7 @@ export class ReviewController {
   @Get(R.uploadPdf.path)
   async pdf(@Param(new Zod(uploadParamsSchema)) p: UploadParams): Promise<StreamableFile> {
     const { stream, fileName } = await this.review.originalFile(p.uploadId);
-    return new StreamableFile(stream, { type: 'application/pdf', disposition: contentDisposition('inline', fileName) });
+    return pdfFile(stream, 'inline', fileName);
   }
 
   @Post(R.approve.path)

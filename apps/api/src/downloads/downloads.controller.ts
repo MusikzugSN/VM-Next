@@ -18,7 +18,7 @@ import {
 import type { Readable } from 'node:stream';
 import type { AccessContext } from '../access/access-context';
 import { CurrentAccess } from '../access/decorators';
-import { contentDisposition } from '../common/files/download-names';
+import { contentDisposition, pdfFile } from '../common/files/download-names';
 import { ResponseSchema } from '../common/validation/zod-response.interceptor';
 import { ZodValidationPipe as Zod } from '../common/validation/zod-validation.pipe';
 import { DownloadsService } from './downloads.service';
@@ -40,7 +40,7 @@ export class DownloadsController {
     @Query(new Zod(sheetPdfQuerySchema)) q: SheetPdfQuery,
   ): Promise<StreamableFile> {
     const file = await this.downloads.sheet(access, p.sheetId, q.folderId);
-    return new StreamableFile(file.body, { type: 'application/pdf', disposition: contentDisposition(q.disposition, file.fileName) });
+    return pdfFile(file.body, q.disposition, file.fileName);
   }
 
   @Get(ME.folderZip.path)
@@ -91,6 +91,6 @@ export class PrintController {
   @Get(PRINT.printDocument.path)
   async document(@CurrentAccess() access: AccessContext, @Query(new Zod(printDocumentQuerySchema)) q: PrintQuery): Promise<StreamableFile> {
     const file = await this.downloads.printDocument(access, q);
-    return new StreamableFile(file.body, { type: 'application/pdf', disposition: contentDisposition('inline', file.fileName) });
+    return pdfFile(file.body, 'inline', file.fileName);
   }
 }

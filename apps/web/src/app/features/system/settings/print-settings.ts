@@ -1,7 +1,6 @@
 import { ChangeDetectionStrategy, Component, effect, inject, input, output, signal, untracked } from '@angular/core';
 import { TranslocoPipe } from '@jsverse/transloco';
 import { apiUrl, updatePrintBodySchema, type ConfigResponse } from '@vm-web/shared';
-import { firstValueFrom } from 'rxjs';
 
 import { ZardButtonComponent } from '@/shared/components/button';
 import { ZardInputComponent } from '@/shared/components/input';
@@ -86,7 +85,7 @@ export class PrintSettings {
       this.error.set(parsed.error.issues[0]?.path[0] === 'publicBaseUrl' ? 'publicBaseUrl' : 'pageLimit');
       return;
     }
-    const done = await this.actions.run(() => firstValueFrom(this.api.postVoid(apiUrl('system', 'updatePrint'), parsed.data)), {
+    const done = await this.actions.runOnce(() => this.api.postVoid(apiUrl('system', 'updatePrint'), parsed.data), {
       success: { key: 'system.settings.saved' },
     });
     if (done) this.changed.emit();

@@ -195,7 +195,6 @@ export class ScoresRepository {
       .orderBy(asc(ensembleLineupVoices.position));
   }
 
-  /** Non-archived ensembles that have a lineup. */
   /** Active ensembles with a lineup, in tree order (F-3). */
   async ensemblesWithLineup(): Promise<EnsembleOption[]> {
     const rows = await this.db
