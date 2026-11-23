@@ -1,4 +1,4 @@
-# Refactoring: Übersicht aller Findings
+| 22 | gemergt| 16 | gemergt| 11 | gemergt| 10 | gemergt| 06 | gemergt| 05 | gemergt| 04 | gemergt| 02 | gemergt| 01 | gemergt# Refactoring: Übersicht aller Findings
 
 Stand: 23.11.2026, Basis `feat/api-mvp` (`1a28bf6`). Dieser Lauf behandelt nur Code-Qualität. CSS, Tailwind-Klassen, visuelles Template-Markup und Theming bleiben unverändert, sie gehören zum Design-Lauf (`docs/design-findings.md`).
 
@@ -26,13 +26,13 @@ Die PRs zweigen alle von `feat/api-mvp` ab und sind einzeln reviewbar. Bis Thema
 
 ## Status des Laufs
 
-Alle offenen Umbau-PRs sind einzeln gegen `feat/api-mvp` lokal geprüft (Lint, Typecheck, Tests mit PostgreSQL, Production-Build). Die GitHub-CI lief nicht, weil `ci.yml` PRs auf `feat/api-mvp` nicht auslöst. Die Docker-Jobs der CI liefen ebenfalls nicht.
+Alle Umbau-PRs wurden einzeln gegen ihren Abzweigpunkt von `feat/api-mvp` lokal geprüft (Lint, Typecheck, Tests mit PostgreSQL, Production-Build). Die GitHub-CI lief nicht, weil `ci.yml` PRs auf `feat/api-mvp` nicht auslöst. Die Docker-Jobs der CI liefen ebenfalls nicht.
 
 | Nr. | Status | PR | Anmerkung |
 |---|---|---|---|
 | 01 | offen | [#3](https://github.com/MusikzugSN/VM-Next/pull/3) | |
 | 02 | offen | [#4](https://github.com/MusikzugSN/VM-Next/pull/4) | |
-| 03 | offen | [#5](https://github.com/MusikzugSN/VM-Next/pull/5) | Konflikt nach 02 |
+| 03 | offen | [#5](https://github.com/MusikzugSN/VM-Next/pull/5) | Konflikt |
 | 04 | offen | [#6](https://github.com/MusikzugSN/VM-Next/pull/6) | |
 | 05 | offen | [#7](https://github.com/MusikzugSN/VM-Next/pull/7) | |
 | 06 | offen | [#8](https://github.com/MusikzugSN/VM-Next/pull/8) | |
@@ -66,7 +66,7 @@ Alle offenen Umbau-PRs sind einzeln gegen `feat/api-mvp` lokal geprüft (Lint, T
 
 ### Merge-Reihenfolge und Konflikte
 
-Jeder PR zweigt von `feat/api-mvp` ab und lässt sich für sich allein mergen. Werden sie nacheinander in Nummernreihenfolge gemergt, entstehen bei den oben markierten 15 PRs Konflikte, weil mehrere Themen dieselben Zeilen ändern. Das Ergebnis stammt aus einer lokalen Simulation, in der konfliktbehaftete PRs übersprungen wurden. Nach dem Auflösen eines PRs kann sich die Liste der folgenden daher noch ändern. Die betroffenen PRs müssen nach dem Merge ihrer Vorgänger auf den neuen Stand von `feat/api-mvp` gebracht und erneut geprüft werden.
+Stand 23.11.2026, `feat/api-mvp` auf `c17e82f`: 9 PRs sind gemergt, 6 sind laut GitHub konfliktfrei (23, 25, 26, 27, 29, 32), 14 haben Konflikte mit dem aktuellen Branch (03, 07, 08, 09, 12, 13, 14, 15, 17, 18, 19, 20, 21, 28). Die Checks der offenen PRs liefen gegen den Stand `1a28bf6`. Vor dem Merge müssen sie auf den aktuellen Stand gebracht und erneut geprüft werden, auch die konfliktfreien.
 
 ## Übersicht
 
