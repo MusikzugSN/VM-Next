@@ -116,15 +116,15 @@
       @if (canUseFolders()) {
         <div class="grid gap-3 md:grid-cols-2">
           @if (!hasFolderColumn()) {
-            <label class="flex flex-col gap-1.5">
-              <span class="font-medium">{{ 'library.import.fixedFolder' | transloco }}</span>
+            <label vm-field>
+              <span vm-field-label>{{ 'library.import.fixedFolder' | transloco }}</span>
               <input vm-input [value]="fixedFolder()" (input)="setFixedFolder($any($event.target).value)" maxlength="100" />
               <span class="text-[13px] text-muted-foreground">{{ 'library.import.fixedFolderHint' | transloco }}</span>
             </label>
           }
           @if (withFolder()) {
-            <label class="flex flex-col gap-1.5">
-              <span class="font-medium">{{ 'library.import.folderEnsemble' | transloco }}</span>
+            <label vm-field>
+              <span vm-field-label>{{ 'library.import.folderEnsemble' | transloco }}</span>
               <select vm-select (change)="setEnsemble($any($event.target).value)">
                 <option value="">{{ 'library.import.chooseEnsemble' | transloco }}</option>
                 @for (ensemble of ensembleItems(); track ensemble.id) {
@@ -190,8 +190,8 @@
           }
         </ul>
 
-        <label class="flex flex-col gap-1.5 md:w-64">
-          <span class="font-medium">{{ 'library.import.show' | transloco }}</span>
+        <label vm-field class="md:w-64">
+          <span vm-field-label>{{ 'library.import.show' | transloco }}</span>
           <select vm-select (change)="rowFilter.set($any($event.target).value)">
             <option value="all" [selected]="rowFilter() === 'all'">{{ 'library.import.filter.all' | transloco }}</option>
             <option value="issues" [selected]="rowFilter() === 'issues'">{{ 'library.import.filter.issues' | transloco }}</option>

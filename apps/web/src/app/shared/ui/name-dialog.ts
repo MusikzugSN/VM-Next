@@ -1,6 +1,6 @@
 import { ChangeDetectionStrategy, Component, effect, input, model, signal, untracked } from '@angular/core';
 import { TranslocoPipe } from '@jsverse/transloco';
-import { VmInput } from '@vm-web/ui';
+import { VmField, VmFieldLabel, VmInput } from '@vm-web/ui';
 
 
 import { FormDialog, runDialogSave } from './form-dialog';
@@ -14,7 +14,7 @@ export const NAME_MAX = 100;
  */
 @Component({
   selector: 'vm-name-dialog',
-  imports: [TranslocoPipe, VmInput, FormDialog],
+  imports: [VmField, VmFieldLabel, TranslocoPipe, VmInput, FormDialog],
   changeDetection: ChangeDetectionStrategy.OnPush,
   // The dialog renders in an overlay; its host must not take up space (or a gap) in the page.
   host: { style: 'display: contents' },
@@ -28,8 +28,8 @@ export const NAME_MAX = 100;
       [busy]="busy()"
       (submitted)="submit()"
     >
-      <label class="flex flex-col gap-1.5">
-        <span class="font-medium">{{ labelKey() | transloco }}</span>
+      <label vm-field>
+        <span vm-field-label>{{ labelKey() | transloco }}</span>
         <input vm-input cdkFocusInitial type="text" required [maxLength]="max" [value]="name()" (input)="name.set($any($event.target).value)" />
       </label>
     </vm-form-dialog>

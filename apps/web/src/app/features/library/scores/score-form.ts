@@ -4,7 +4,7 @@ import { NgIcon, provideIcons } from '@ng-icons/core';
 import { lucidePlus } from '@ng-icons/lucide';
 import { apiUrl, createdResponseSchema, type FieldDefinition } from '@vm-web/shared';
 
-import { VmButton, VmInput, VmSelect } from '@vm-web/ui';
+import { VmButton, VmField, VmFieldError, VmFieldLabel, VmInput, VmSelect } from '@vm-web/ui';
 
 import { ActionRunner } from '../../../core/actions/action-runner';
 import { ApiClient } from '../../../core/api/api-client';
@@ -18,7 +18,7 @@ import type { ScoreFormErrors, ScoreFormInput } from './score-form-model';
  */
 @Component({
   selector: 'vm-score-form',
-  imports: [NgIcon, TranslocoPipe, VmButton, VmInput, VmSelect, FieldDialog],
+  imports: [VmField, VmFieldLabel, VmFieldError, NgIcon, TranslocoPipe, VmButton, VmInput, VmSelect, FieldDialog],
   viewProviders: [provideIcons({ lucidePlus })],
   changeDetection: ChangeDetectionStrategy.OnPush,
   templateUrl: './score-form.html',

@@ -1,7 +1,7 @@
 import { ChangeDetectionStrategy, Component, computed, effect, input, model, signal, untracked } from '@angular/core';
 import { TranslocoPipe } from '@jsverse/transloco';
 import type { Ref } from '@vm-web/shared';
-import { VmInput, VmSelect } from '@vm-web/ui';
+import { VmField, VmFieldLabel, VmInput, VmSelect } from '@vm-web/ui';
 
 
 import { FormDialog, runDialogSave } from '../../../shared/ui/form-dialog';
@@ -20,24 +20,24 @@ export interface CreateInEnsemble {
 /** Dialog „Mappe anlegen“ / „Event anlegen“ in one of the allowed ensembles (N-15). */
 @Component({
   selector: 'vm-create-in-ensemble-dialog',
-  imports: [ToggleField, TreeLabelPipe, TranslocoPipe, VmInput, VmSelect, FormDialog],
+  imports: [VmField, VmFieldLabel, ToggleField, TreeLabelPipe, TranslocoPipe, VmInput, VmSelect, FormDialog],
   changeDetection: ChangeDetectionStrategy.OnPush,
   // The dialog renders in an overlay; its host must not take up space (or a gap) in the page.
   host: { style: 'display: contents' },
   template: `
     <vm-form-dialog [(open)]="open" [titleKey]="titleKey()" submitKey="common.create" [canSubmit]="valid()" [busy]="busy()" (submitted)="submit()">
-      <label class="flex flex-col gap-1.5">
-        <span class="font-medium">{{ 'library.common.name' | transloco }} *</span>
+      <label vm-field>
+        <span vm-field-label>{{ 'library.common.name' | transloco }} *</span>
         <input vm-input cdkFocusInitial type="text" [maxLength]="max" [value]="name()" (input)="name.set($any($event.target).value)" />
       </label>
       @if (withDate()) {
-        <label class="flex flex-col gap-1.5">
-          <span class="font-medium">{{ 'library.events.date' | transloco }} *</span>
+        <label vm-field>
+          <span vm-field-label>{{ 'library.events.date' | transloco }} *</span>
           <input vm-input type="date" [value]="date()" (input)="date.set($any($event.target).value)" />
         </label>
       }
-      <label class="flex flex-col gap-1.5">
-          <span class="font-medium">{{ 'terms.ensemble' | transloco }} *</span>
+      <label vm-field>
+          <span vm-field-label>{{ 'terms.ensemble' | transloco }} *</span>
           <select vm-select [value]="ensembleId()" (change)="ensembleId.set($any($event.target).value)">
             @for (ensemble of ensembles(); track ensemble.id) {
               <option [value]="ensemble.id" [selected]="ensemble.id === ensembleId()">{{ ensemble | treeLabel }}</option>

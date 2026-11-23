@@ -2,7 +2,7 @@ import { Component, signal } from '@angular/core';
 import { TestBed } from '@angular/core/testing';
 import { FormsModule } from '@angular/forms';
 
-import { VmInput, VmSelect, VmTextarea } from '@vm-web/ui';
+import { VmField, VmFieldError, VmFieldLabel, VmInput, VmSelect, VmTextarea } from '@vm-web/ui';
 
 @Component({
   imports: [FormsModule, VmInput, VmTextarea, VmSelect],
@@ -68,5 +68,37 @@ describe('vm-input, vm-textarea und vm-select', () => {
       expect(field.className).toContain('border-outline');
       expect(field.className).toContain('aria-invalid:border-error');
     }
+  });
+});
+
+@Component({
+  imports: [VmField, VmFieldLabel, VmFieldError, VmInput],
+  template: `
+    <label vm-field class="md:w-64">
+      <span vm-field-label>Titel</span>
+      <input vm-input />
+      <span vm-field-error id="err">Pflichtfeld</span>
+    </label>
+  `,
+})
+class FieldHost {}
+
+describe('vm-field', () => {
+  it('stapelt Label, Feld und Fehler und behält eigene Klassen', async () => {
+    const fixture = TestBed.createComponent(FieldHost);
+    await fixture.whenStable();
+    const label = (fixture.nativeElement as HTMLElement).querySelector('label');
+    expect(label?.className).toContain('flex-col');
+    expect(label?.className).toContain('md:w-64');
+    expect(label?.querySelector('span[vm-field-label]')?.className).toContain('text-label-large');
+  });
+
+  it('zeigt Fehler mit Icon und Text', async () => {
+    const fixture = TestBed.createComponent(FieldHost);
+    await fixture.whenStable();
+    const error = (fixture.nativeElement as HTMLElement).querySelector('#err');
+    expect(error?.querySelector('ng-icon')).not.toBeNull();
+    expect(error?.textContent).toContain('Pflichtfeld');
+    expect(error?.className).toContain('text-error');
   });
 });

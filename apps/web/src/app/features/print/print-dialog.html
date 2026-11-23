@@ -152,8 +152,8 @@
                 {{ 'print.routeService' | transloco: { pages: 'print.pages' | tPlural: p.totalPages } }}
               </p>
               @if (printers().length > 1) {
-                <label class="flex flex-col gap-1.5 text-foreground">
-                  <span class="font-medium">{{ 'print.printer' | transloco }}</span>
+                <label vm-field class="text-foreground">
+                  <span vm-field-label>{{ 'print.printer' | transloco }}</span>
                   <select vm-select [value]="printerId() ?? ''" (change)="printerId.set($any($event.target).value || null)">
                     @for (printer of printers(); track printer.id) {
                       <option [value]="printer.id" [selected]="printer.id === printerId()">

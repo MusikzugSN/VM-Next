@@ -15,7 +15,7 @@ import {
 } from '@vm-web/shared';
 import { catchError, of } from 'rxjs';
 
-import { VmButton, VmInput, VmSelect } from '@vm-web/ui';
+import { VmButton, VmField, VmFieldLabel, VmInput, VmSelect } from '@vm-web/ui';
 
 import { ActionRunner } from '../../../../core/actions/action-runner';
 import { ApiClient } from '../../../../core/api/api-client';
@@ -46,7 +46,7 @@ type RowFilter = 'all' | 'issues' | 'matches';
  */
 @Component({
   selector: 'vm-score-import-page',
-  imports: [RouterLink, NgIcon, TranslocoPipe, PluralPipe, TreeLabelPipe, VmButton, VmInput, VmSelect],
+  imports: [VmField, VmFieldLabel, RouterLink, NgIcon, TranslocoPipe, PluralPipe, TreeLabelPipe, VmButton, VmInput, VmSelect],
   viewProviders: [provideIcons({ lucideUpload, lucideFileSpreadsheet, lucideCircleAlert, lucideTriangleAlert })],
   changeDetection: ChangeDetectionStrategy.OnPush,
   templateUrl: './score-import-page.html',

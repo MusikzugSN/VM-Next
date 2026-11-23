@@ -3,7 +3,7 @@ import { TranslocoPipe } from '@jsverse/transloco';
 import { NgIcon, provideIcons } from '@ng-icons/core';
 import { lucideX } from '@ng-icons/lucide';
 
-import { VmButton, VmIconButton } from '@vm-web/ui';
+import { VmIconButton } from '@vm-web/ui';
 
 import { PluralPipe } from '../../core/i18n/plural.pipe';
 
@@ -14,7 +14,7 @@ import { PluralPipe } from '../../core/i18n/plural.pipe';
  */
 @Component({
   selector: 'vm-selection-bar',
-  imports: [NgIcon, TranslocoPipe, PluralPipe, VmButton, VmIconButton],
+  imports: [NgIcon, TranslocoPipe, PluralPipe, VmIconButton],
   viewProviders: [provideIcons({ lucideX })],
   changeDetection: ChangeDetectionStrategy.OnPush,
   host: { style: 'display: contents' },

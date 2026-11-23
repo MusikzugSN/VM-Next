@@ -185,8 +185,8 @@
           </div>
         }
 
-        <label class="flex flex-col gap-1.5">
-          <span class="font-medium">{{ 'review.reason' | transloco }}</span>
+        <label vm-field>
+          <span vm-field-label>{{ 'review.reason' | transloco }}</span>
           <textarea
             #reasonField
             vm-textarea
@@ -199,7 +199,7 @@
             [attr.aria-describedby]="reasonMissing() ? 'rv-reason-err' : null"
           ></textarea>
           @if (reasonMissing()) {
-            <span id="rv-reason-err" class="text-destructive-ink">{{ 'review.reasonRequired' | transloco }}</span>
+            <span vm-field-error id="rv-reason-err">{{ 'review.reasonRequired' | transloco }}</span>
           }
         </label>
 

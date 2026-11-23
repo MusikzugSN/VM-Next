@@ -6,7 +6,7 @@ import { lucideCheck, lucideSearch } from '@ng-icons/lucide';
 import { MAX_PROFILE_VOICES, apiUrl } from '@vm-web/shared';
 import { firstValueFrom } from 'rxjs';
 
-import { VmButton, VmInput } from '@vm-web/ui';
+import { VmButton, VmField, VmFieldLabel, VmInput } from '@vm-web/ui';
 import { ZardDialogImports } from '@vm-web/ui/zard/components/dialog/dialog.imports';
 
 import { ApiClient } from '../../../core/api/api-client';
@@ -25,7 +25,7 @@ export { filterVoiceGroups };
  */
 @Component({
   selector: 'vm-voice-selection-dialog',
-  imports: [PluralPipe, NgIcon, TranslocoPipe, VmButton, ZardDialogImports, VmInput],
+  imports: [VmField, VmFieldLabel, PluralPipe, NgIcon, TranslocoPipe, VmButton, ZardDialogImports, VmInput],
   viewProviders: [provideIcons({ lucideCheck, lucideSearch })],
   changeDetection: ChangeDetectionStrategy.OnPush,
   // The dialog renders in an overlay; its host must not take up space (or a gap) in the page.
@@ -38,8 +38,8 @@ export { filterVoiceGroups };
       </z-dialog-header>
 
       <div class="flex min-h-0 flex-1 flex-col gap-5 overflow-y-auto md:max-h-[60dvh] md:flex-none">
-        <label class="flex flex-col gap-1.5">
-          <span class="font-medium">{{ 'me.voices.search' | transloco }}</span>
+        <label vm-field>
+          <span vm-field-label>{{ 'me.voices.search' | transloco }}</span>
           <span class="relative">
             <ng-icon name="lucideSearch" class="absolute top-1/2 left-3 -translate-y-1/2 text-muted-foreground" aria-hidden="true" />
             <input
