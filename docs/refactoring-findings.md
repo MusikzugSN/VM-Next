@@ -24,6 +24,50 @@ Die Umbau-PRs werden deshalb lokal mit denselben Schritten wie der CI-Job `check
 
 Die PRs zweigen alle von `feat/api-mvp` ab und sind einzeln reviewbar. Bis Thema 01 gemergt ist, bleibt der bekannte Lint-Fehler in `vm-e2e-tools` auf den anderen Branches bestehen. Dort gilt: keine neuen Lint-Fehler. Themen, die dieselben Dateien berühren (vor allem 05 bis 10), können beim Mergen kleine Konflikte erzeugen, wenn sie nicht in Nummernreihenfolge gemergt werden.
 
+## Status des Laufs
+
+Alle offenen Umbau-PRs sind einzeln gegen `feat/api-mvp` lokal geprüft (Lint, Typecheck, Tests mit PostgreSQL, Production-Build). Die GitHub-CI lief nicht, weil `ci.yml` PRs auf `feat/api-mvp` nicht auslöst. Die Docker-Jobs der CI liefen ebenfalls nicht.
+
+| Nr. | Status | PR | Anmerkung |
+|---|---|---|---|
+| 01 | offen | [#3](https://github.com/MusikzugSN/VM-Next/pull/3) | |
+| 02 | offen | [#4](https://github.com/MusikzugSN/VM-Next/pull/4) | |
+| 03 | offen | [#5](https://github.com/MusikzugSN/VM-Next/pull/5) | Konflikt nach 02 |
+| 04 | offen | [#6](https://github.com/MusikzugSN/VM-Next/pull/6) | |
+| 05 | offen | [#7](https://github.com/MusikzugSN/VM-Next/pull/7) | |
+| 06 | offen | [#8](https://github.com/MusikzugSN/VM-Next/pull/8) | |
+| 07 | offen | [#9](https://github.com/MusikzugSN/VM-Next/pull/9) | Konflikt |
+| 08 | offen | [#10](https://github.com/MusikzugSN/VM-Next/pull/10) | Konflikt; `actions.send` statt `post`/`postVoid` |
+| 09 | offen | [#11](https://github.com/MusikzugSN/VM-Next/pull/11) | Konflikt |
+| 10 | offen | [#12](https://github.com/MusikzugSN/VM-Next/pull/12) | |
+| 11 | offen | [#13](https://github.com/MusikzugSN/VM-Next/pull/13) | |
+| 12 | offen | [#14](https://github.com/MusikzugSN/VM-Next/pull/14) | Konflikt; ohne `score-import` und Filter in Schleifen |
+| 13 | offen | [#15](https://github.com/MusikzugSN/VM-Next/pull/15) | Konflikt |
+| 14 | offen | [#16](https://github.com/MusikzugSN/VM-Next/pull/16) | Konflikt |
+| 15 | offen | [#17](https://github.com/MusikzugSN/VM-Next/pull/17) | Konflikt |
+| 16 | offen, reduziert | [#18](https://github.com/MusikzugSN/VM-Next/pull/18) | Ohne `ZParam`/`ZQuery`/`ZBody`: Decorators können die Typen nicht ableiten |
+| 17 | offen, reduziert | [#19](https://github.com/MusikzugSN/VM-Next/pull/19) | Konflikt; nur Listen nach Name und ID |
+| 18 | offen | [#20](https://github.com/MusikzugSN/VM-Next/pull/20) | Konflikt |
+| 19 | offen | [#21](https://github.com/MusikzugSN/VM-Next/pull/21) | Konflikt |
+| 20 | offen | [#22](https://github.com/MusikzugSN/VM-Next/pull/22) | Konflikt |
+| 21 | offen | [#23](https://github.com/MusikzugSN/VM-Next/pull/23) | Konflikt |
+| 22 | offen | [#24](https://github.com/MusikzugSN/VM-Next/pull/24) | |
+| 23 | offen, reduziert | [#25](https://github.com/MusikzugSN/VM-Next/pull/25) | Nur der Ensemble-Filter |
+| 24 | verworfen | – | Nach 08 bis 10 bleibt nur endpunktspezifischer Code |
+| 25 | offen, reduziert | [#26](https://github.com/MusikzugSN/VM-Next/pull/26) | Nur pdf.js-Ressourcen; Renderlogik ist ungetestet und enthält B-14, B-15 |
+| 26 | offen | [#27](https://github.com/MusikzugSN/VM-Next/pull/27) | |
+| 27 | offen, reduziert | [#28](https://github.com/MusikzugSN/VM-Next/pull/28) | Nur Lesen mit 404; `storeOne` wartet auf B-04, B-05 |
+| 28 | offen, reduziert | [#29](https://github.com/MusikzugSN/VM-Next/pull/29) | Konflikt; ohne `isHttpUrl` und `contextEnsemble` |
+| 29 | offen | [#30](https://github.com/MusikzugSN/VM-Next/pull/30) | |
+| 30 | verworfen | – | Eine neue Abhängigkeit lohnt sich für wenige klare Einzeiler nicht |
+| 31 | verworfen | – | `linkedSignal` ändert das Timing der `dirty`-Zustände, also das Verhalten |
+| 32 | offen | [#31](https://github.com/MusikzugSN/VM-Next/pull/31) | |
+| 33 | verworfen | – | Die beiden URL-Quellen unterscheiden sich in Zeitpunkt und Form |
+
+### Merge-Reihenfolge und Konflikte
+
+Jeder PR zweigt von `feat/api-mvp` ab und lässt sich für sich allein mergen. Werden sie nacheinander in Nummernreihenfolge gemergt, entstehen bei den oben markierten 15 PRs Konflikte, weil mehrere Themen dieselben Zeilen ändern. Das Ergebnis stammt aus einer lokalen Simulation, in der konfliktbehaftete PRs übersprungen wurden. Nach dem Auflösen eines PRs kann sich die Liste der folgenden daher noch ändern. Die betroffenen PRs müssen nach dem Merge ihrer Vorgänger auf den neuen Stand von `feat/api-mvp` gebracht und erneut geprüft werden.
+
 ## Übersicht
 
 | Nr. | Titel | Priorität | Kategorie | Aufwand | Lib |
