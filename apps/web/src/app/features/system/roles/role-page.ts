@@ -85,12 +85,10 @@ export class RolePage {
   }
 
   protected async save(): Promise<void> {
-    this.saving.set(true);
     const done = await this.actions.run(
       () => firstValueFrom(this.api.postVoid(apiUrl('system', 'setPermissions', { roleId: this.roleId() }), { permissions: [...this.selected()] })),
-      { success: { key: 'system.role.saved' } },
+      { busy: this.saving, success: { key: 'system.role.saved' } },
     );
-    this.saving.set(false);
     if (done) this.changed();
   }
 

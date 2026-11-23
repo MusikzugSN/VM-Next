@@ -187,11 +187,10 @@ export class ClubSettings {
       this.focusInvalid(this.formRef().nativeElement);
       return;
     }
-    this.saving.set(true);
     const done = await this.actions.run(() => firstValueFrom(this.api.postVoid(apiUrl('system', 'updateClub'), parsed.data)), {
+      busy: this.saving,
       success: { key: 'system.settings.saved' },
     });
-    this.saving.set(false);
     if (done) this.afterChange();
   }
 
@@ -204,11 +203,10 @@ export class ClubSettings {
     }
     const form = new FormData();
     form.append(LOGO_FILE_FIELD, file, file.name);
-    this.uploading.set(true);
     const done = await this.actions.run(() => firstValueFrom(this.http.post(apiUrl('system', 'uploadLogo'), form)), {
+      busy: this.uploading,
       success: { key: 'system.settings.club.logoUploaded' },
     });
-    this.uploading.set(false);
     if (done) this.afterChange();
   }
 

@@ -105,12 +105,11 @@ export class ScoreSearchSelect {
   protected async create(): Promise<void> {
     const title = this.query().trim().slice(0, SCORE_TITLE_MAX);
     if (!title) return;
-    this.creating.set(true);
     const body = { title, composer: null, arranger: null, publisher: null, publisherNumber: null, durationSeconds: null };
     const done = await this.actions.run(() => firstValueFrom(this.api.post(apiUrl('scores', 'createScore'), body, createdResponseSchema)), {
+      busy: this.creating,
       success: { key: 'upload.scoreCreated', params: { title } },
     });
-    this.creating.set(false);
     if (done) {
       this.search.set('');
       this.changed.emit({ id: done.value.id, title });
