@@ -14,7 +14,7 @@ import type { AccessContext } from '../access/access-context';
 import { uuidv7 } from '../common/ids/uuid-v7';
 import { decodeCursor, encodeCursor } from '../common/pagination/cursor';
 import { ProblemException } from '../common/problem-details/problem.exception';
-import { DATABASE, type Database } from '../db/database';
+import { DATABASE, type Database, type Tx } from '../db/database';
 import { scores, sheets, uploads, users, voices } from '../db/schema';
 import { FILE_STORAGE, type IFileStorage } from '../storage/file-storage';
 import { streamToBuffer } from '../storage/stream-utils';
@@ -22,7 +22,6 @@ import { buildSheetPdf } from './pdf-tools';
 import { sheetKey } from './uploads.service';
 import { readOrNotFound } from '../storage/read-or-not-found';
 
-type Tx = Parameters<Parameters<Database['transaction']>[0]>[0];
 
 const uploader = alias(users, 'uploader');
 

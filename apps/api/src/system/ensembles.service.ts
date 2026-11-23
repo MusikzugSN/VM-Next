@@ -14,14 +14,13 @@ import { uuidv7 } from '../common/ids/uuid-v7';
 import { decodeCursor, encodeCursor } from '../common/pagination/cursor';
 import { ProblemException } from '../common/problem-details/problem.exception';
 import { httpUrlOrNull } from '../common/url';
-import { DATABASE, type Database } from '../db/database';
+import { DATABASE, type Database, type Tx } from '../db/database';
 import { withNameTaken } from '../db/db-errors';
 import { clubSettings, ensembleLineupVoices, ensembles, memberships, roles, users, userVoices, voices } from '../db/schema';
 import { likePattern } from '../common/sql';
 import { lineupTemplateFile } from '../seed/defaults';
 import { importLineupTemplate, loadLineupTemplate } from '../seed/lineup-template';
 
-type Tx = Parameters<Parameters<Database['transaction']>[0]>[0];
 type EnsembleRecord = typeof ensembles.$inferSelect;
 
 /** Ensembles as a tree with lineup (S-2, F-3, N-4, N-8). */

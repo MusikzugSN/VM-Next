@@ -1,4 +1,4 @@
-import { Inject, Injectable, Logger } from '@nestjs/common';
+import { Inject, Injectable } from '@nestjs/common';
 import {
   uploadSheetsMetaSchema,
   type Page,
@@ -37,8 +37,6 @@ export const sheetKey = (id: string) => `sheets/${id}.pdf`;
 /** Upload dialog (N-10, N-11, M-9, F-2, F-11). */
 @Injectable()
 export class UploadsService {
-  private readonly logger = new Logger('Uploads');
-
   constructor(
     @Inject(DATABASE) private readonly db: Database,
     @Inject(MeRepository) private readonly me: MeRepository,
