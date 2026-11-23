@@ -56,6 +56,7 @@ import {
 } from './score-query';
 import { PrintLauncher } from '../../../core/actions/pending-features';
 import { SelectionBar } from '../../../shared/ui/selection-bar';
+import { ignoreStorageErrors, readStoredStrings } from '../../../core/util/stored';
 import { toggleSetItem } from '../../../core/util/sets';
 
 const HIDDEN_COLUMNS_KEY = 'vmweb.scoreTable.hiddenColumns';
@@ -264,19 +265,10 @@ export class ScoresPage {
 }
 
 function readHidden(): Set<string> {
-  try {
-    const raw = localStorage.getItem(HIDDEN_COLUMNS_KEY);
-    const parsed: unknown = raw ? JSON.parse(raw) : [];
-    return new Set(Array.isArray(parsed) ? parsed.filter((x): x is string => typeof x === 'string') : []);
-  } catch {
-    return new Set();
-  }
+  return new Set(readStoredStrings(() => localStorage, HIDDEN_COLUMNS_KEY));
 }
 
+/** With blocked storage the choice lasts until reload. */
 function writeHidden(hidden: ReadonlySet<string>): void {
-  try {
-    localStorage.setItem(HIDDEN_COLUMNS_KEY, JSON.stringify([...hidden]));
-  } catch {
-    // Storage blocked: the choice lasts until reload.
-  }
+  ignoreStorageErrors(() => localStorage.setItem(HIDDEN_COLUMNS_KEY, JSON.stringify([...hidden])));
 }
