@@ -27,8 +27,7 @@ import {
 } from '@vm-web/shared';
 import { map, tap } from 'rxjs';
 
-import { VmBadgeCount, VmButton, VmCard, VmCheckbox, VmIconButton } from '@vm-web/ui';
-import { ZardDropdownImports } from '@vm-web/ui/zard/components/dropdown/dropdown.imports';
+import { VmBadgeCount, VmButton, VmCard, VmCheckbox, VmIconButton, VmMenuImports } from '@vm-web/ui';
 
 import { ConfirmService } from '../../../core/actions/action-runner';
 import { ApiClient } from '../../../core/api/api-client';
@@ -78,7 +77,7 @@ interface Column {
     TranslocoPipe,
     PluralPipe,
     VmButton, VmIconButton,
-    ZardDropdownImports,
+    VmMenuImports,
     SearchField,
     ListState,
     CompletenessBadge,

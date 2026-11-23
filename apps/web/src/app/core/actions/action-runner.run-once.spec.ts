@@ -1,8 +1,8 @@
 import { TestBed } from '@angular/core/testing';
 import { TranslocoService } from '@jsverse/transloco';
 import { of, throwError } from 'rxjs';
+import { VmToastService } from '@vm-web/ui';
 
-import { ZardSonnerService } from '@vm-web/ui/zard/components/sonner';
 
 import { ActionRunner } from './action-runner';
 
@@ -14,7 +14,7 @@ describe('ActionRunner.runOnce', () => {
     vi.clearAllMocks();
     TestBed.configureTestingModule({
       providers: [
-        { provide: ZardSonnerService, useValue: sonner },
+        { provide: VmToastService, useValue: sonner },
         { provide: TranslocoService, useValue: { translate: (key: string) => key } },
       ],
     });

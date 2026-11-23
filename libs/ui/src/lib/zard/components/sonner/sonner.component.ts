@@ -26,10 +26,10 @@ export type ZardSonnerPosition =
   'top-left' | 'top-center' | 'top-right' | 'bottom-left' | 'bottom-center' | 'bottom-right';
 
 const DEFAULT_STYLE: Record<string, string> = {
-  '--normal-bg': 'var(--mat-sys-surface-container-lowest)',
-  '--normal-text': 'var(--mat-sys-on-surface)',
-  '--normal-border': 'var(--mat-sys-outline-variant)',
-  '--border-radius': 'var(--radius)',
+  '--normal-bg': 'var(--mat-sys-inverse-surface)',
+  '--normal-text': 'var(--mat-sys-inverse-on-surface)',
+  '--normal-border': 'transparent',
+  '--border-radius': 'var(--mat-sys-corner-extra-small)',
 };
 
 const DEFAULT_TOAST_OPTIONS: ToasterProps['toastOptions'] = {
@@ -39,7 +39,7 @@ const DEFAULT_TOAST_OPTIONS: ToasterProps['toastOptions'] = {
 };
 
 @Component({
-  selector: 'z-sonner',
+  selector: 'z-sonner, vm-toaster',
   imports: [NgIcon, NgxSonnerToaster],
   template: `
     <ngx-sonner-toaster
@@ -68,7 +68,8 @@ const DEFAULT_TOAST_OPTIONS: ToasterProps['toastOptions'] = {
      * fixed positioned, so the host must be a zero-sized, invisible anchor that
      * never paints or captures pointer events.
      */
-    z-sonner[popover] {
+    z-sonner[popover],
+    vm-toaster[popover] {
       position: fixed;
       inset: auto;
       display: block;

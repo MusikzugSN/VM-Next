@@ -16,8 +16,7 @@ import {
   type MemberSheet,
 } from '@vm-web/shared';
 
-import { VmButton, VmCard, VmSheetImports } from '@vm-web/ui';
-import { ZardDropdownImports } from '@vm-web/ui/zard/components/dropdown/dropdown.imports';
+import { VmButton, VmCard, VmMenuImports, VmSheetImports } from '@vm-web/ui';
 
 import { PrintLauncher, UploadLauncher } from '../../core/actions/pending-features';
 import { ApiClient } from '../../core/api/api-client';
@@ -42,7 +41,7 @@ import { valueOr } from '../../core/util/resource-value';
     NgIcon,
     TranslocoPipe,
     VmButton,
-    ZardDropdownImports,
+    VmMenuImports,
     VmSheetImports,
     PdfViewer,
     StatusBadge,

@@ -133,24 +133,24 @@
           }
           <button
             type="button"
-            z-dropdown
+            vm-menu-trigger
             [zDropdownMenu]="tagMenu"
             class="inline-flex h-control items-center gap-1.5 rounded-md border border-dashed border-input px-3 font-medium xl:h-control-compact"
           >
             <ng-icon name="lucidePlus" aria-hidden="true" />{{ 'me.score.addTag' | transloco }}
           </button>
         </div>
-        <z-dropdown-menu-content #tagMenu="zDropdownMenuContent" class="w-56">
+        <vm-menu-content #tagMenu="zDropdownMenuContent" class="w-56">
           @for (tag of addableTags(); track tag.id) {
-            <button type="button" z-dropdown-menu-item (click)="addTag(tag.id)">{{ tag.name }}</button>
+            <button type="button" vm-menu-item (click)="addTag(tag.id)">{{ tag.name }}</button>
           }
           @if (addableTags().length) {
-            <z-dropdown-menu-separator />
+            <vm-menu-separator />
           }
-          <button type="button" z-dropdown-menu-item (click)="creatingTag.set(true)">
+          <button type="button" vm-menu-item (click)="creatingTag.set(true)">
             <ng-icon name="lucidePlus" aria-hidden="true" />{{ 'me.tags.create' | transloco }}
           </button>
-        </z-dropdown-menu-content>
+        </vm-menu-content>
       </div>
     </div>
   </ng-template>

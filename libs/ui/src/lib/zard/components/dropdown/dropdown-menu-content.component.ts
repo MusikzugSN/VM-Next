@@ -18,7 +18,7 @@ import { dropdownContentVariants } from '@vm-web/ui/zard/components/dropdown/dro
 import { mergeClasses } from '@vm-web/ui/zard/utils/merge-classes';
 
 @Component({
-  selector: 'z-dropdown-menu-content',
+  selector: 'z-dropdown-menu-content, vm-menu-content',
   template: `
     <ng-template #contentTemplate>
       <div

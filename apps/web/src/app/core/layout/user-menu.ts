@@ -5,8 +5,8 @@ import { TranslocoPipe } from '@jsverse/transloco';
 import { NgIcon, provideIcons } from '@ng-icons/core';
 import { lucideLogOut, lucideUser } from '@ng-icons/lucide';
 import { APP_ROUTES } from '@vm-web/shared';
+import { VmMenuImports } from '@vm-web/ui';
 
-import { ZardDropdownImports } from '@vm-web/ui/zard/components/dropdown/dropdown.imports';
 
 import { SessionStore } from '../auth/session.store';
 import { initials } from '../branding/branding.store';
@@ -14,7 +14,7 @@ import { initials } from '../branding/branding.store';
 /** Person, own roles and „Abmelden“; in the sidebar (desktop) or as avatar in the header. */
 @Component({
   selector: 'vm-user-menu',
-  imports: [NgIcon, NgTemplateOutlet, RouterLink, TranslocoPipe, ZardDropdownImports],
+  imports: [NgIcon, NgTemplateOutlet, RouterLink, TranslocoPipe, VmMenuImports],
   viewProviders: [provideIcons({ lucideUser, lucideLogOut })],
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
@@ -22,7 +22,7 @@ import { initials } from '../branding/branding.store';
       @if (variant() === 'sidebar') {
         <button
           type="button"
-          z-dropdown
+          vm-menu-trigger
           [zDropdownMenu]="menu"
           [attr.aria-label]="'shell.userMenu' | transloco: { name: user.name }"
           class="flex w-full items-center gap-2 rounded-md p-2 text-start hover:bg-accent"
@@ -38,7 +38,7 @@ import { initials } from '../branding/branding.store';
       } @else {
         <button
           type="button"
-          z-dropdown
+          vm-menu-trigger
           [zDropdownMenu]="menu"
           [attr.aria-label]="'shell.userMenu' | transloco: { name: user.name }"
           class="flex size-control items-center justify-center rounded-full"
@@ -59,19 +59,19 @@ import { initials } from '../branding/branding.store';
         }
       </ng-template>
 
-      <z-dropdown-menu-content #menu="zDropdownMenuContent" [zSide]="variant() === 'sidebar' ? 'top' : 'bottom'" zAlign="end" class="w-56">
-        <z-dropdown-menu-label>
+      <vm-menu-content #menu="zDropdownMenuContent" [zSide]="variant() === 'sidebar' ? 'top' : 'bottom'" zAlign="end" class="w-56">
+        <vm-menu-label>
           <span class="block truncate">{{ user.name }}</span>
           @if (user.email) {
             <span class="block truncate text-xs font-normal text-muted-foreground">{{ user.email }}</span>
           }
-        </z-dropdown-menu-label>
-        <z-dropdown-menu-separator />
-        <a z-dropdown-menu-item [routerLink]="profilePath"><ng-icon name="lucideUser" aria-hidden="true" />{{ 'nav.me.profile' | transloco }}</a>
-        <button type="button" z-dropdown-menu-item (click)="logout()">
+        </vm-menu-label>
+        <vm-menu-separator />
+        <a vm-menu-item [routerLink]="profilePath"><ng-icon name="lucideUser" aria-hidden="true" />{{ 'nav.me.profile' | transloco }}</a>
+        <button type="button" vm-menu-item (click)="logout()">
           <ng-icon name="lucideLogOut" aria-hidden="true" />{{ 'common.logout' | transloco }}
         </button>
-      </z-dropdown-menu-content>
+      </vm-menu-content>
     }
   `,
 })
