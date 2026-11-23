@@ -15,7 +15,7 @@ import { decodeCursor, encodeCursor } from '../common/pagination/cursor';
 import { ProblemException } from '../common/problem-details/problem.exception';
 import { httpUrlOrNull } from '../common/url';
 import { DATABASE, type Database } from '../db/database';
-import { isUniqueViolation } from '../db/db-errors';
+import { withNameTaken } from '../db/db-errors';
 import { clubSettings, ensembleLineupVoices, ensembles, memberships, roles, users, userVoices, voices } from '../db/schema';
 import { likePattern } from '../me/me.repository';
 import { lineupTemplateFile } from '../seed/defaults';
@@ -107,7 +107,7 @@ export class EnsemblesService {
     if (parent.archivedAt) throw ProblemException.validation([{ path: '/body/parentId', code: 'archived' }]);
     const template = body.applyLineupTemplate ? await loadLineupTemplate(lineupTemplateFile()) : undefined;
     const id = uuidv7();
-    await this.unique(() =>
+    await withNameTaken(() =>
       this.db.transaction(async (tx) => {
         await tx.insert(ensembles).values({ id, parentId: body.parentId, name: body.name });
         if (template) await setLineup(tx, id, (await importLineupTemplate(tx, template)).lineupVoiceIds);
@@ -119,7 +119,7 @@ export class EnsemblesService {
   /** The root may be renamed too (H-4). Names are unique among siblings. */
   async rename(ensembleId: string, name: string): Promise<void> {
     await this.ensemble(ensembleId);
-    await this.unique(() => this.db.update(ensembles).set({ name, updatedAt: new Date() }).where(eq(ensembles.id, ensembleId)));
+    await withNameTaken(() => this.db.update(ensembles).set({ name, updatedAt: new Date() }).where(eq(ensembles.id, ensembleId)));
   }
 
   /** Moves an ensemble in the tree (F-3); never the root, never below itself. */
@@ -129,7 +129,7 @@ export class EnsemblesService {
     await this.ensemble(parentId, 'Unknown parent');
     const all = await this.db.select({ id: ensembles.id, parentId: ensembles.parentId }).from(ensembles);
     if (descendantsOf(ensembleId, all).has(parentId) || parentId === ensembleId) throw ProblemException.conflict('invalid-hierarchy');
-    await this.unique(() => this.db.update(ensembles).set({ parentId, updatedAt: new Date() }).where(eq(ensembles.id, ensembleId)));
+    await withNameTaken(() => this.db.update(ensembles).set({ parentId, updatedAt: new Date() }).where(eq(ensembles.id, ensembleId)));
   }
 
   /** Not the root, not the default ensemble, not with active sub-ensembles (S-2). */
@@ -223,15 +223,6 @@ export class EnsemblesService {
     const [row] = await this.db.select().from(ensembles).where(eq(ensembles.id, id));
     if (!row) throw ProblemException.notFound(detail);
     return row;
-  }
-
-  private async unique<T>(write: () => Promise<T>): Promise<T> {
-    try {
-      return await write();
-    } catch (error) {
-      if (isUniqueViolation(error)) throw ProblemException.conflict('name-taken');
-      throw error;
-    }
   }
 }
 
