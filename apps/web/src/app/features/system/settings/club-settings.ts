@@ -5,15 +5,13 @@ import { NgIcon, provideIcons } from '@ng-icons/core';
 import { lucideImageUp, lucideTrash2 } from '@ng-icons/lucide';
 import { apiUrl, LOGO_FILE_FIELD, LOGO_MAX_BYTES, LOGO_MIME_TYPES, updateClubBodySchema, type ConfigResponse } from '@vm-web/shared';
 
-import { VmButton, VmCard, VmField, VmFieldError, VmFieldLabel, VmInput, VmTextarea } from '@vm-web/ui';
+import { VmButton, VmCard, VmField, VmFieldError, VmFieldLabel, VmInput, VmSwitch, VmTextarea } from '@vm-web/ui';
 import { ZardSonnerService } from '@vm-web/ui/zard/components/sonner';
 
 import { ActionRunner } from '../../../core/actions/action-runner';
 import { ApiClient } from '../../../core/api/api-client';
 import { BrandingStore } from '../../../core/branding/branding.store';
 import { focusFirstInvalid } from '../../../core/util/focus-invalid';
-import { ToggleSwitch } from '../../../shared/ui/toggle-switch';
-
 interface ClubForm {
   clubName: string;
   imprintUrl: string;
@@ -26,7 +24,7 @@ type ClubErrors = Partial<Record<keyof ClubForm, string>>;
 /** Tab „Verein & Anmeldung“ (S-4, A-2, F-12): name, legal links, login banner, logo. */
 @Component({
   selector: 'vm-club-settings',
-  imports: [VmCard, VmField, VmFieldLabel, VmFieldError, NgIcon, TranslocoPipe, VmButton, VmInput, VmTextarea, ToggleSwitch],
+  imports: [VmSwitch, VmCard, VmField, VmFieldLabel, VmFieldError, NgIcon, TranslocoPipe, VmButton, VmInput, VmTextarea],
   viewProviders: [provideIcons({ lucideImageUp, lucideTrash2 })],
   changeDetection: ChangeDetectionStrategy.OnPush,
   host: { class: 'flex flex-col gap-6' },
@@ -81,7 +79,7 @@ type ClubErrors = Partial<Record<keyof ClubForm, string>>;
           <span class="font-medium">{{ 'system.settings.club.autoRedirect' | transloco }}</span>
           <p class="text-muted-foreground">{{ 'system.settings.club.autoRedirectHint' | transloco }}</p>
         </div>
-        <vm-toggle-switch
+        <vm-switch
           [checked]="form().loginAutoRedirect"
           [label]="'system.settings.club.autoRedirect' | transloco"
           [disabled]="readonly()"

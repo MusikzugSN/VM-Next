@@ -7,7 +7,7 @@ import { NgIcon, provideIcons } from '@ng-icons/core';
 import { lucideCheck, lucideChevronLeft, lucideLock, lucideLockOpen, lucidePlus, lucideTrash2, lucideX } from '@ng-icons/lucide';
 import { MAX_PROFILE_VOICES, APP_ROUTES, apiUrl, userAssignmentOptionsResponseSchema, userDetailsResponseSchema } from '@vm-web/shared';
 
-import { VmButton, VmCard, VmField, VmFieldLabel, VmIconButton, VmSelect } from '@vm-web/ui';
+import { VmButton, VmCard, VmField, VmFieldLabel, VmIconButton, VmSelect, VmSwitch } from '@vm-web/ui';
 
 import { ActionRunner, ConfirmService } from '../../../core/actions/action-runner';
 import { ApiClient } from '../../../core/api/api-client';
@@ -16,7 +16,6 @@ import { initials } from '../../../core/branding/branding.store';
 import { VoiceContextStore } from '../../../core/voices/voice-context.store';
 import { FormDialog, runDialogSave } from '../../../shared/ui/form-dialog';
 import { PageProblem } from '../../../shared/ui/page-problem';
-import { ToggleSwitch } from '../../../shared/ui/toggle-switch';
 import { UserStatusBadge } from '../ui/user-status-badge';
 import { TreeLabelPipe } from '../../../shared/ui/tree-label.pipe';
 import { usePageName } from '../../../core/layout/page';
@@ -26,7 +25,7 @@ import { selectOr, valueOr } from '../../../core/util/resource-value';
 /** Benutzer-Detail (S-1, A-5, R-1, R-6): roles per ensemble, voices, admin flag, block and delete. */
 @Component({
   selector: 'vm-system-user-page',
-  imports: [VmCard, VmField, VmFieldLabel, TreeLabelPipe, DatePipe, RouterLink, NgIcon, TranslocoPipe, VmButton, VmIconButton, VmSelect, PageProblem, ToggleSwitch, UserStatusBadge, FormDialog],
+  imports: [VmSwitch, VmCard, VmField, VmFieldLabel, TreeLabelPipe, DatePipe, RouterLink, NgIcon, TranslocoPipe, VmButton, VmIconButton, VmSelect, PageProblem, UserStatusBadge, FormDialog],
   viewProviders: [provideIcons({ lucideChevronLeft, lucidePlus, lucideX, lucideCheck, lucideLock, lucideLockOpen, lucideTrash2 })],
   changeDetection: ChangeDetectionStrategy.OnPush,
   templateUrl: './user-page.html',

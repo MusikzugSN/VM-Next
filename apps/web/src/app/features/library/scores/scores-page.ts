@@ -27,7 +27,7 @@ import {
 } from '@vm-web/shared';
 import { map, tap } from 'rxjs';
 
-import { VmButton, VmCard, VmIconButton } from '@vm-web/ui';
+import { VmButton, VmCard, VmCheckbox, VmIconButton } from '@vm-web/ui';
 import { ZardDropdownImports } from '@vm-web/ui/zard/components/dropdown/dropdown.imports';
 
 import { ConfirmService } from '../../../core/actions/action-runner';
@@ -72,7 +72,7 @@ interface Column {
 /** Stücke (N-1, N-3, N-4): table with fixed and custom fields, search, filter, sort, completeness, export. */
 @Component({
   selector: 'vm-library-scores-page',
-  imports: [VmCard, 
+  imports: [VmCheckbox, VmCard, 
     RouterLink,
     NgIcon,
     TranslocoPipe,

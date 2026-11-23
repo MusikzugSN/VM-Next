@@ -90,7 +90,7 @@
         <span class="font-medium">{{ 'system.user.admin' | transloco }}</span>
         <p class="text-muted-foreground">{{ (u.canBeDemoted ? 'system.user.adminHint' : 'system.user.lastAdmin') | transloco }}</p>
       </div>
-      <vm-toggle-switch
+      <vm-switch
         [checked]="u.isAdmin"
         [label]="'system.user.admin' | transloco"
         [disabled]="!canEdit() || (u.isAdmin && !u.canBeDemoted)"

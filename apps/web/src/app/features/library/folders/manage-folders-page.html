@@ -42,7 +42,7 @@
           <span class="text-base font-semibold">{{ folder.name }}</span>
           <span class="text-muted-foreground">{{ 'library.folders.scoreCount' | tPlural: folder.scoreCount }} · {{ folder.ensemble.name }}</span>
         </a>
-        <vm-toggle-switch [checked]="folder.showInMyArea" [label]="visibilityLabel(folder)" [disabled]="!canEdit(folder)" (toggled)="setVisibility(folder, $event)" />
+        <vm-switch [checked]="folder.showInMyArea" [label]="visibilityLabel(folder)" [disabled]="!canEdit(folder)" (toggled)="setVisibility(folder, $event)" />
       </li>
     }
   </ul>
@@ -66,7 +66,7 @@
             <td class="px-4 py-3 text-end tabular-nums">{{ folder.scoreCount }}</td>
             <td class="px-4 py-2">
               <span class="inline-flex items-center gap-2">
-                <vm-toggle-switch [checked]="folder.showInMyArea" [label]="visibilityLabel(folder)" [disabled]="!canEdit(folder)" (toggled)="setVisibility(folder, $event)" />
+                <vm-switch [checked]="folder.showInMyArea" [label]="visibilityLabel(folder)" [disabled]="!canEdit(folder)" (toggled)="setVisibility(folder, $event)" />
                 <span class="text-muted-foreground">{{ (folder.showInMyArea ? 'library.common.visible' : 'library.common.hiddenState') | transloco }}</span>
               </span>
             </td>

@@ -17,13 +17,12 @@ import {
 } from '@vm-web/shared';
 import { firstValueFrom, map, type Observable } from 'rxjs';
 
-import { VmButton, VmCard, VmField, VmFieldLabel, VmIconButton, VmInput } from '@vm-web/ui';
+import { VmButton, VmCard, VmField, VmFieldLabel, VmIconButton, VmInput, VmSwitch } from '@vm-web/ui';
 
 import { ActionRunner, ConfirmService } from '../../../core/actions/action-runner';
 import { ApiClient } from '../../../core/api/api-client';
 import { SessionStore } from '../../../core/auth/session.store';
 import { PageProblem } from '../../../shared/ui/page-problem';
-import { ToggleSwitch } from '../../../shared/ui/toggle-switch';
 import { FormDialog } from '../../../shared/ui/form-dialog';
 import { ScorePicker, type CandidatePage, type PickedScore } from '../ui/score-picker';
 import { moveItem } from '../../../core/util/move-item';
@@ -38,7 +37,7 @@ type Item = Pick<SetlistEntry, 'scoreId' | 'title' | 'composer'>;
 /** Event bearbeiten (N-15, N-16): date, name, visibility and the setlist in playing order. */
 @Component({
   selector: 'vm-library-edit-event-page',
-  imports: [VmCard, VmField, VmFieldLabel, 
+  imports: [VmSwitch, VmCard, VmField, VmFieldLabel, 
     FormDialog,
     CdkDropList,
     CdkDrag,
@@ -49,7 +48,6 @@ type Item = Pick<SetlistEntry, 'scoreId' | 'title' | 'composer'>;
     VmButton, VmIconButton,
     VmInput,
     PageProblem,
-    ToggleSwitch,
     ScorePicker,
   ],
   viewProviders: [provideIcons({ lucidePrinter, lucideChevronLeft, lucideGripVertical, lucideArrowUp, lucideArrowDown, lucideX, lucidePlus, lucideTrash2 })],

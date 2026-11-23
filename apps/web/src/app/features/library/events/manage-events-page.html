@@ -63,7 +63,7 @@
           <span class="text-base font-semibold">{{ event.name }}</span>
           <span class="text-muted-foreground">{{ event.date | date: 'EE dd.MM.yyyy' }} · {{ 'library.folders.scoreCount' | tPlural: event.scoreCount }}</span>
         </a>
-        <vm-toggle-switch [checked]="event.showInMyArea" [label]="visibilityLabel(event)" [disabled]="!canEdit(event)" (toggled)="setVisibility(event, $event)" />
+        <vm-switch [checked]="event.showInMyArea" [label]="visibilityLabel(event)" [disabled]="!canEdit(event)" (toggled)="setVisibility(event, $event)" />
       </li>
     }
   </ul>
@@ -89,7 +89,7 @@
             <td class="px-4 py-3 text-end tabular-nums">{{ event.scoreCount }}</td>
             <td class="px-4 py-2">
               <span class="inline-flex items-center gap-2">
-                <vm-toggle-switch [checked]="event.showInMyArea" [label]="visibilityLabel(event)" [disabled]="!canEdit(event)" (toggled)="setVisibility(event, $event)" />
+                <vm-switch [checked]="event.showInMyArea" [label]="visibilityLabel(event)" [disabled]="!canEdit(event)" (toggled)="setVisibility(event, $event)" />
                 <span class="text-muted-foreground">{{ (event.showInMyArea ? 'library.common.visible' : 'library.common.hiddenState') | transloco }}</span>
               </span>
             </td>

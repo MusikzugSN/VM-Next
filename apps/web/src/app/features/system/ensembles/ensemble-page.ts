@@ -17,7 +17,7 @@ import {
 } from '@vm-web/shared';
 import { of } from 'rxjs';
 
-import { VmButton, VmCard, VmField, VmFieldLabel, VmSelect } from '@vm-web/ui';
+import { VmButton, VmCard, VmCheckbox, VmField, VmFieldLabel, VmSelect } from '@vm-web/ui';
 
 import { ActionRunner, ConfirmService } from '../../../core/actions/action-runner';
 import { ApiClient } from '../../../core/api/api-client';
@@ -43,7 +43,7 @@ const TABS: readonly EnsembleTab[] = ['details', 'lineup', 'members', 'print'];
 /** Ensemble (S-2, F-3, N-8): Stammdaten · Besetzung · Mitglieder (tab in `?tab=`). */
 @Component({
   selector: 'vm-system-ensemble-page',
-  imports: [VmCard, VmField, VmFieldLabel, TreeLabelPipe, DatePipe, RouterLink, NgIcon, TranslocoPipe, PluralPipe, VmButton, VmSelect, ListState, NameDialog, PageProblem, SearchField, PrintRulesTab],
+  imports: [VmCheckbox, VmCard, VmField, VmFieldLabel, TreeLabelPipe, DatePipe, RouterLink, NgIcon, TranslocoPipe, PluralPipe, VmButton, VmSelect, ListState, NameDialog, PageProblem, SearchField, PrintRulesTab],
   viewProviders: [provideIcons({ lucideChevronLeft, lucideWandSparkles })],
   changeDetection: ChangeDetectionStrategy.OnPush,
   templateUrl: './ensemble-page.html',

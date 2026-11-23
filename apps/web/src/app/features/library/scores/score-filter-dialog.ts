@@ -3,7 +3,7 @@ import { ChangeDetectionStrategy, Component, effect, inject, input, model, outpu
 import { TranslocoPipe } from '@jsverse/transloco';
 import type { FieldDefinition } from '@vm-web/shared';
 
-import { VmButton, VmDialogImports, VmField, VmFieldLabel, VmInput, VmSelect } from '@vm-web/ui';
+import { VmButton, VmCheckbox, VmDialogImports, VmField, VmFieldLabel, VmInput, VmSelect } from '@vm-web/ui';
 
 import { ViewportService } from '../../../core/layout/viewport';
 import { LibraryOptions } from '../library-options';
@@ -30,7 +30,7 @@ export interface ScoreFilterResult {
  */
 @Component({
   selector: 'vm-score-filter-dialog',
-  imports: [VmField, VmFieldLabel, TreeLabelPipe, NgTemplateOutlet, TranslocoPipe, VmButton, VmDialogImports, VmInput, VmSelect],
+  imports: [VmCheckbox, VmField, VmFieldLabel, TreeLabelPipe, NgTemplateOutlet, TranslocoPipe, VmButton, VmDialogImports, VmInput, VmSelect],
   changeDetection: ChangeDetectionStrategy.OnPush,
   // The dialog renders in an overlay; its host must not take up space (or a gap) in the page.
   host: { style: 'display: contents' },

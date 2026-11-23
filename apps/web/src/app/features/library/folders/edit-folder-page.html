@@ -53,7 +53,7 @@
         <span id="lbl-show" class="font-medium">{{ 'library.common.showInMyArea' | transloco }}</span>
         <p class="text-muted-foreground">{{ 'library.folder.showHint' | transloco: { ensemble: folder.ensemble.name } }}</p>
       </div>
-      <vm-toggle-switch [checked]="folder.showInMyArea" [label]="visibilityLabel()" [disabled]="!canEdit()" (toggled)="setVisibility($event)" />
+      <vm-switch [checked]="folder.showInMyArea" [label]="visibilityLabel()" [disabled]="!canEdit()" (toggled)="setVisibility($event)" />
     </div>
   </section>
 

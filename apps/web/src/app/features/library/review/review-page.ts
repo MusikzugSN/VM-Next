@@ -26,7 +26,7 @@ import {
 } from '@vm-web/shared';
 import { tap } from 'rxjs';
 
-import { VmButton, VmField, VmFieldError, VmFieldLabel, VmIconButton, VmTextarea } from '@vm-web/ui';
+import { VmButton, VmCheckbox, VmField, VmFieldError, VmFieldLabel, VmIconButton, VmTextarea } from '@vm-web/ui';
 
 import { ActionRunner } from '../../../core/actions/action-runner';
 import { onUploadCompleted } from '../../../core/actions/on-upload';
@@ -54,7 +54,7 @@ const ZOOM_STEPS = [0.5, 0.75, 1, 1.25, 1.5, 2];
  */
 @Component({
   selector: 'vm-library-review-page',
-  imports: [VmField, VmFieldLabel, VmFieldError, 
+  imports: [VmCheckbox, VmField, VmFieldLabel, VmFieldError, 
     DatePipe,
     RouterLink,
     NgIcon,
