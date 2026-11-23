@@ -16,7 +16,7 @@ export const nativeSelectVariants = cva(
     'bg-no-repeat bg-size-[1rem] bg-position-[right_0.625rem_center] rtl:bg-position-[left_0.625rem_center]',
     CHEVRON_LIGHT,
     CHEVRON_DARK,
-    'focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/50',
+    '',
     'disabled:pointer-events-none disabled:cursor-not-allowed disabled:opacity-50',
     'aria-invalid:border-destructive aria-invalid:ring-3 aria-invalid:ring-destructive/20',
     'dark:bg-input/30 dark:scheme-dark dark:hover:bg-input/50 dark:aria-invalid:border-destructive/50 dark:aria-invalid:ring-destructive/40',

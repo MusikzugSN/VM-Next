@@ -187,15 +187,20 @@
 }
 
 /*
- * Fokus immer sichtbar: 2 px `ring`, 2 px Abstand (WCAG 2.2, Design Guideline).
+ * Fokus immer sichtbar (WCAG 2.4.7, 2.4.11). Einzige Quelle für den Fokusring.
  * Bewusst außerhalb jeder @layer: ungeschichtete Regeln haben Vorrang vor Tailwind-Utilities,
- * so gilt der Ring auch für Zard-Komponenten mit `outline-none`. Deren halbtransparenter
- * Ring-Schatten wird abgeschaltet, damit es nur einen Fokusring gibt.
+ * so gilt der Ring auch für Komponenten mit `outline-none`.
  */
 :focus-visible {
-  outline: 2px solid var(--mat-sys-primary);
-  outline-offset: 2px;
-  --tw-ring-shadow: 0 0 #0000;
+  outline: var(--mat-sys-focus-indicator-thickness) solid var(--mat-sys-focus-indicator-color);
+  outline-offset: var(--mat-sys-focus-indicator-outer-offset);
+}
+
+/* M3-Textfelder: Der Ring liegt auf dem Rahmen, statt einen zweiten Rahmen zu zeichnen. */
+input[vm-input]:focus-visible,
+textarea[vm-textarea]:focus-visible,
+select[vm-select]:focus-visible {
+  outline-offset: -1px;
 }
 
 /* Größen-Tokens als Tailwind-Werte: h-control, min-h-target, gap-spacing-lg, w-sidebar, max-w-content … */
@@ -227,7 +232,7 @@
 
 @layer base {
   * {
-    @apply border-border outline-ring/50;
+    @apply border-border;
   }
   html {
     font-size: 16px;

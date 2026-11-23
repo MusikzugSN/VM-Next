@@ -37,7 +37,7 @@ export const tabButtonVariants = cva([
   'text-foreground/60 transition-all cursor-pointer',
   'group-data-[orientation=vertical]/tabs:w-full group-data-[orientation=vertical]/tabs:justify-start',
   'hover:text-foreground',
-  'focus-visible:border-ring focus-visible:ring-[3px] focus-visible:ring-ring/50 focus-visible:outline-1 focus-visible:outline-ring',
+  'focus-visible:outline-1 focus-visible:outline-ring',
   'disabled:pointer-events-none disabled:opacity-50',
   "[&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*='size-'])]:size-4",
   'dark:text-muted-foreground dark:hover:text-foreground',

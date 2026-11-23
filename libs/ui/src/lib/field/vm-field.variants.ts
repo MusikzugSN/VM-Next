@@ -1,6 +1,6 @@
 /** M3 Outlined Text Field: Rahmen `outline`, Fokus 2 px `primary`, Fehler 2 px `error`. */
 const outlined =
-  'w-full min-w-0 rounded-extra-small border border-outline bg-transparent text-body-large text-on-surface transition-colors outline-none placeholder:text-on-surface-variant hover:border-on-surface focus-visible:border-primary focus-visible:inset-ring-1 focus-visible:inset-ring-primary aria-invalid:border-error aria-invalid:inset-ring-1 aria-invalid:inset-ring-error disabled:cursor-not-allowed disabled:border-on-surface/12 disabled:text-on-surface/38 md:text-body-medium';
+  'w-full min-w-0 rounded-extra-small border border-outline bg-transparent text-body-large text-on-surface transition-colors outline-none placeholder:text-on-surface-variant hover:border-on-surface focus-visible:border-primary aria-invalid:border-error aria-invalid:inset-ring-1 aria-invalid:inset-ring-error disabled:cursor-not-allowed disabled:border-on-surface/12 disabled:text-on-surface/38 md:text-body-medium';
 
 export const vmInputClasses = `${outlined} h-control px-spacing-md py-spacing-xs file:inline-flex file:h-6 file:border-0 file:bg-transparent file:text-label-large file:text-on-surface xl:h-control-compact`;
 
