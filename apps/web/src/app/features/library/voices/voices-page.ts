@@ -74,8 +74,7 @@ export class VoicesPage {
   }
 
   protected async remove(voice: Voice): Promise<void> {
-    if (!(await this.confirm.confirmDelete('library.voices.deleteTitle', 'library.voices.deleteText', { name: voice.name }))) return;
-    const done = await this.actions.run(() => firstValueFrom(this.api.postVoid(apiUrl('voices', 'deleteVoice', { voiceId: voice.id }))), {
+    const done = await this.confirm.confirmedDelete('library.voices.deleteTitle', 'library.voices.deleteText', { name: voice.name }, () => firstValueFrom(this.api.postVoid(apiUrl('voices', 'deleteVoice', { voiceId: voice.id }))), {
       success: { key: 'library.voices.deleted', params: { name: voice.name } },
     });
     if (done) this.list.reload();

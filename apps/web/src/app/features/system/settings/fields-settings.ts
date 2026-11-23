@@ -125,8 +125,7 @@ export class FieldsSettings {
   }
 
   protected async remove(field: FieldDefinition): Promise<void> {
-    if (!(await this.confirm.confirmDelete('system.settings.fields.deleteTitle', 'system.settings.fields.deleteText', { name: field.name }))) return;
-    const done = await this.actions.run(() => firstValueFrom(this.api.postVoid(apiUrl('scores', 'deleteField', { fieldId: field.id }))), {
+    const done = await this.confirm.confirmedDelete('system.settings.fields.deleteTitle', 'system.settings.fields.deleteText', { name: field.name }, () => firstValueFrom(this.api.postVoid(apiUrl('scores', 'deleteField', { fieldId: field.id }))), {
       success: { key: 'system.settings.fields.deleted', params: { name: field.name } },
     });
     if (done) this.fields.reload();

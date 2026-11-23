@@ -113,8 +113,7 @@ export class RolePage {
   protected async remove(): Promise<void> {
     const role = this.role();
     if (!role) return;
-    if (!(await this.confirm.confirmDelete('system.role.deleteTitle', 'system.role.deleteText', { name: role.name }))) return;
-    const done = await this.actions.run(() => firstValueFrom(this.api.postVoid(apiUrl('system', 'deleteRole', { roleId: this.roleId() }))), {
+    const done = await this.confirm.confirmedDelete('system.role.deleteTitle', 'system.role.deleteText', { name: role.name }, () => firstValueFrom(this.api.postVoid(apiUrl('system', 'deleteRole', { roleId: this.roleId() }))), {
       success: { key: 'system.role.deleted', params: { name: role.name } },
     });
     if (done) void this.router.navigateByUrl(this.listPath);

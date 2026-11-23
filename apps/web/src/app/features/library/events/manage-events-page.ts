@@ -124,8 +124,7 @@ export class ManageEventsPage {
   }
 
   protected async remove(event: EventListItem): Promise<void> {
-    if (!(await this.confirm.confirmDelete('library.events.deleteTitle', 'library.events.deleteText', { name: event.name }))) return;
-    const done = await this.actions.run(() => firstValueFrom(this.api.postVoid(apiUrl('events', 'deleteEvent', { eventId: event.id }))), {
+    const done = await this.confirm.confirmedDelete('library.events.deleteTitle', 'library.events.deleteText', { name: event.name }, () => firstValueFrom(this.api.postVoid(apiUrl('events', 'deleteEvent', { eventId: event.id }))), {
       success: { key: 'library.events.deleted', params: { name: event.name } },
     });
     if (done) this.list.reload();

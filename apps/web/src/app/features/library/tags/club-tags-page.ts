@@ -124,8 +124,7 @@ export class ClubTagsPage {
   };
 
   protected async remove(tag: ClubTagItem): Promise<void> {
-    if (!(await this.confirm.confirmDelete('library.tags.deleteTitle', 'library.tags.deleteText', { name: tag.name, count: tag.scoreCount }))) return;
-    const done = await this.actions.run(() => firstValueFrom(this.api.postVoid(apiUrl('tags', 'deleteTag', { tagId: tag.id }))), {
+    const done = await this.confirm.confirmedDelete('library.tags.deleteTitle', 'library.tags.deleteText', { name: tag.name, count: tag.scoreCount }, () => firstValueFrom(this.api.postVoid(apiUrl('tags', 'deleteTag', { tagId: tag.id }))), {
       success: { key: 'library.tags.deleted', params: { name: tag.name } },
     });
     if (done) this.changed();

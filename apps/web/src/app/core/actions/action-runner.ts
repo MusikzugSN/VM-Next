@@ -44,11 +44,24 @@ export class ActionRunner {
 @Injectable({ providedIn: 'root' })
 export class ConfirmService {
   private readonly alerts = inject(ZardAlertDialogService);
+  private readonly actions = inject(ActionRunner);
   private readonly transloco = inject(TranslocoService);
 
   /** Resolves `true` when the person confirms. */
   confirmDelete(titleKey: string, textKey: string, params: Record<string, unknown> = {}): Promise<boolean> {
     return this.confirm(titleKey, textKey, params, 'common.delete');
+  }
+
+  /** Asks first, then runs the deletion; `undefined` when cancelled or failed. */
+  async confirmedDelete<T>(
+    titleKey: string,
+    textKey: string,
+    params: Record<string, unknown>,
+    action: () => Promise<T>,
+    options: RunOptions = {},
+  ): Promise<{ value: T } | undefined> {
+    if (!(await this.confirmDelete(titleKey, textKey, params))) return undefined;
+    return this.actions.run(action, options);
   }
 
   /** Like `confirmDelete`, with an own button text (e.g. „Zurücksetzen“, „Übernehmen“). */

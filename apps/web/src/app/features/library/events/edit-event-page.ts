@@ -191,8 +191,7 @@ export class EditEventPage {
 
   protected async deleteEvent(): Promise<void> {
     const name = this.details.hasValue() ? this.details.value().name : '';
-    if (!(await this.confirm.confirmDelete('library.events.deleteTitle', 'library.events.deleteText', { name }))) return;
-    const done = await this.actions.run(() => firstValueFrom(this.api.postVoid(apiUrl('events', 'deleteEvent', { eventId: this.eventId() }))), {
+    const done = await this.confirm.confirmedDelete('library.events.deleteTitle', 'library.events.deleteText', { name }, () => firstValueFrom(this.api.postVoid(apiUrl('events', 'deleteEvent', { eventId: this.eventId() }))), {
       success: { key: 'library.events.deleted', params: { name } },
     });
     if (done) void this.router.navigateByUrl(this.eventsPath);
