@@ -74,7 +74,7 @@ export const drawerFooterVariants = cva('mt-auto flex shrink-0 flex-col gap-2 p-
 
 /** Mask classes handed to the CDK overlay backdrop. */
 export const DRAWER_BACKDROP_CLASSES = [
-  'bg-black/30',
+  'bg-scrim/32',
   'supports-backdrop-filter:backdrop-blur-sm',
   'transition-opacity',
   'duration-450',
