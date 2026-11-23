@@ -5,7 +5,7 @@ import { NgIcon, provideIcons } from '@ng-icons/core';
 import { lucideTriangleAlert } from '@ng-icons/lucide';
 import { apiUrl, configDefaultOptionsResponseSchema, type ConfigResponse } from '@vm-web/shared';
 
-import { VmButton, VmField, VmFieldLabel, VmSelect } from '@vm-web/ui';
+import { VmButton, VmCard, VmField, VmFieldLabel, VmSelect } from '@vm-web/ui';
 
 import { ActionRunner } from '../../../core/actions/action-runner';
 import { ApiClient } from '../../../core/api/api-client';
@@ -14,11 +14,11 @@ import { TreeLabelPipe } from '../../../shared/ui/tree-label.pipe';
 /** Tab „Standardwerte“ (A-3): ensemble and role of new accounts; warning if that role has club permissions (B-1). */
 @Component({
   selector: 'vm-defaults-settings',
-  imports: [VmField, VmFieldLabel, TreeLabelPipe, NgIcon, TranslocoPipe, VmButton, VmSelect],
+  imports: [VmCard, VmField, VmFieldLabel, TreeLabelPipe, NgIcon, TranslocoPipe, VmButton, VmSelect],
   viewProviders: [provideIcons({ lucideTriangleAlert })],
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
-    <form class="flex flex-col gap-4 rounded-lg border bg-card p-4 shadow-sm md:p-6" (submit)="$event.preventDefault(); save()">
+    <form vm-card class="flex flex-col gap-4 p-4 md:p-6" (submit)="$event.preventDefault(); save()">
       <div>
         <h2 class="text-lg font-semibold">{{ 'system.settings.defaults.title' | transloco }}</h2>
         <p class="text-muted-foreground">{{ 'system.settings.defaults.hint' | transloco }}</p>

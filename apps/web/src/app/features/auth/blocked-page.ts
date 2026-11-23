@@ -5,7 +5,7 @@ import { NgIcon, provideIcons } from '@ng-icons/core';
 import { lucideLock, lucideLogIn } from '@ng-icons/lucide';
 import { APP_ROUTES } from '@vm-web/shared';
 
-import { VmButton } from '@vm-web/ui';
+import { VmButton, VmCard } from '@vm-web/ui';
 
 import { BrandingStore } from '../../core/branding/branding.store';
 import { ClubLogo } from '../../core/branding/club-logo';
@@ -17,7 +17,7 @@ import { LegalLinks } from './legal-links';
  */
 @Component({
   selector: 'vm-blocked-page',
-  imports: [RouterLink, TranslocoPipe, NgIcon, VmButton, ClubLogo, LegalLinks],
+  imports: [VmCard, RouterLink, TranslocoPipe, NgIcon, VmButton, ClubLogo, LegalLinks],
   viewProviders: [provideIcons({ lucideLock, lucideLogIn })],
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
@@ -27,7 +27,7 @@ import { LegalLinks } from './legal-links';
         <span class="font-semibold">{{ clubName() }}</span>
       </header>
       <main class="flex flex-1 items-start justify-center p-4 md:items-center md:p-8">
-        <section class="flex w-full max-w-dialog-md flex-col gap-6 rounded-lg border bg-card p-6 shadow-sm md:p-8">
+        <section vm-card class="flex w-full max-w-dialog-md flex-col gap-6 p-6 md:p-8">
           <span class="flex size-12 items-center justify-center rounded-full bg-destructive-soft text-destructive-ink">
             <ng-icon name="lucideLock" size="var(--mat-sys-icon-size-md)" aria-hidden="true" />
           </span>

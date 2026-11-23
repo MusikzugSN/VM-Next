@@ -23,7 +23,7 @@
     </div>
   </div>
 
-  <form aria-labelledby="h-event" class="flex flex-col gap-4 rounded-lg border bg-card p-4 shadow-sm md:p-6" novalidate (submit)="$event.preventDefault(); saveDetails()">
+  <form aria-labelledby="h-event" vm-card class="flex flex-col gap-4 p-4 md:p-6" novalidate (submit)="$event.preventDefault(); saveDetails()">
     <h2 id="h-event" class="text-lg font-semibold">{{ 'terms.event' | transloco }}</h2>
     <fieldset class="grid gap-4 md:grid-cols-2" [disabled]="!canEdit()">
       <label vm-field>
@@ -72,7 +72,7 @@
     <p class="sr-only" aria-live="polite">{{ announcement() }}</p>
 
     @if (items().length) {
-      <ol cdkDropList [cdkDropListDisabled]="!canEdit()" (cdkDropListDropped)="drop($event)" class="overflow-hidden rounded-lg border bg-card shadow-sm">
+      <ol cdkDropList [cdkDropListDisabled]="!canEdit()" (cdkDropListDropped)="drop($event)" vm-card class="overflow-hidden">
         @for (item of items(); track item.scoreId; let i = $index, first = $first, last = $last) {
           <li cdkDrag class="flex items-center gap-2 bg-card px-3 py-2.5" [class.border-t]="!first">
             @if (canEdit()) {

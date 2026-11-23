@@ -14,7 +14,7 @@ import {
   type EnsembleListItem,
 } from '@vm-web/shared';
 
-import { VmButton, VmField, VmFieldLabel, VmInput, VmSelect } from '@vm-web/ui';
+import { VmButton, VmCard, VmField, VmFieldLabel, VmInput, VmSelect } from '@vm-web/ui';
 
 import { ActionRunner } from '../../../core/actions/action-runner';
 import { ApiClient } from '../../../core/api/api-client';
@@ -32,7 +32,7 @@ import { selectOr } from '../../../core/util/resource-value';
 /** Ensembles (S-2, F-3): the tree in pre-order, create below a parent, archive and restore. */
 @Component({
   selector: 'vm-system-ensembles-page',
-  imports: [VmField, VmFieldLabel, ToggleField, TreeLabelPipe, RouterLink, NgIcon, TranslocoPipe, PluralPipe, VmButton, VmInput, VmSelect, ListState, ToggleSwitch, FormDialog],
+  imports: [VmCard, VmField, VmFieldLabel, ToggleField, TreeLabelPipe, RouterLink, NgIcon, TranslocoPipe, PluralPipe, VmButton, VmInput, VmSelect, ListState, ToggleSwitch, FormDialog],
   viewProviders: [provideIcons({ lucidePlus, lucideArchive, lucideArchiveRestore })],
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
@@ -76,7 +76,7 @@ import { selectOr } from '../../../core/util/resource-value';
       <span aria-hidden="true">{{ 'system.ensembles.showArchived' | transloco }}</span>
     </div>
 
-    <ul class="overflow-hidden rounded-lg border bg-card shadow-sm" [class.hidden]="list.items().length === 0">
+    <ul vm-card class="overflow-hidden" [class.hidden]="list.items().length === 0">
       @for (e of list.items(); track e.id; let first = $first) {
         <li class="flex items-start gap-2 px-4 py-3 md:items-center" [class.border-t]="!first" [class.opacity-60]="e.archived">
           <span class="flex min-w-0 flex-1 flex-col md:flex-row md:items-center md:gap-3" [style.padding-inline-start.rem]="e.depth * 1.25">

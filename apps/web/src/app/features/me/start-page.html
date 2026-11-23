@@ -22,8 +22,7 @@
       @for (event of events.value().items; track event.id) {
         <li>
           <a
-            [routerLink]="eventLink(event.id)"
-            class="flex items-center gap-3 rounded-lg border bg-card p-4 text-foreground no-underline shadow-sm hover:bg-accent md:flex-col md:items-start md:p-4"
+            [routerLink]="eventLink(event.id)" vm-card class="flex items-center gap-3 p-4 text-foreground no-underline hover:bg-accent md:flex-col md:items-start md:p-4"
           >
             <vm-event-date [date]="event.date" />
             <span class="flex min-w-0 flex-col">
@@ -46,7 +45,7 @@
     <a [routerLink]="routes.folders" class="py-3 font-medium md:py-0">{{ 'me.start.allFolders' | transloco }}</a>
   </div>
   @if (folders.hasValue() && folders.value().items.length > 0) {
-    <ul class="overflow-hidden rounded-lg border bg-card shadow-sm">
+    <ul vm-card class="overflow-hidden">
       @for (folder of folders.value().items; track folder.id; let last = $last) {
         <li [class.border-b]="!last">
           <a [routerLink]="folderLink(folder.id)" class="flex min-h-14 items-center gap-3 px-4 py-2 text-foreground no-underline hover:bg-accent">
@@ -73,7 +72,7 @@
     <a [routerLink]="routes.uploads" class="py-3 font-medium md:py-0">{{ 'me.start.allUploads' | transloco }}</a>
   </div>
   @if (myUploads.hasValue() && myUploads.value().items.length > 0) {
-    <ul class="overflow-hidden rounded-lg border bg-card shadow-sm">
+    <ul vm-card class="overflow-hidden">
       @for (entry of myUploads.value().items; track entry.id; let last = $last) {
         <li class="flex flex-col gap-1.5 px-4 py-3 md:flex-row md:items-center md:gap-3" [class.border-b]="!last">
           <span class="flex min-w-0 flex-1 flex-col">

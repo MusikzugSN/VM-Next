@@ -16,7 +16,7 @@ import {
   type MemberSheet,
 } from '@vm-web/shared';
 
-import { VmButton, VmSheetImports } from '@vm-web/ui';
+import { VmButton, VmCard, VmSheetImports } from '@vm-web/ui';
 import { ZardDropdownImports } from '@vm-web/ui/zard/components/dropdown/dropdown.imports';
 
 import { PrintLauncher, UploadLauncher } from '../../core/actions/pending-features';
@@ -36,7 +36,7 @@ import { valueOr } from '../../core/util/resource-value';
 /** Stück in Mein Bereich (M-3, M-6, M-8, M-9): PDF preview of the own voice, download, print, personal tags. */
 @Component({
   selector: 'vm-me-score-page',
-  imports: [PluralPipe, 
+  imports: [VmCard, PluralPipe, 
     NgTemplateOutlet,
     RouterLink,
     NgIcon,

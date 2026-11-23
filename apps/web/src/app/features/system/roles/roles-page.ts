@@ -5,7 +5,7 @@ import { NgIcon, provideIcons } from '@ng-icons/core';
 import { lucidePlus, lucideRotateCcw, lucideTriangleAlert } from '@ng-icons/lucide';
 import { APP_ROUTES, apiUrl, appPath, createdResponseSchema, resetDefaultsResponseSchema, roleListResponseSchema, type RoleListItem } from '@vm-web/shared';
 
-import { VmButton } from '@vm-web/ui';
+import { VmButton, VmCard } from '@vm-web/ui';
 
 import { ActionRunner, ConfirmService } from '../../../core/actions/action-runner';
 import { ApiClient } from '../../../core/api/api-client';
@@ -18,7 +18,7 @@ import { NameDialog } from '../../../shared/ui/name-dialog';
 /** Rollen (S-3, R-5): list with badges, create, reset all default roles. */
 @Component({
   selector: 'vm-system-roles-page',
-  imports: [RouterLink, NgIcon, TranslocoPipe, PluralPipe, VmButton, ListState, NameDialog],
+  imports: [VmCard, RouterLink, NgIcon, TranslocoPipe, PluralPipe, VmButton, ListState, NameDialog],
   viewProviders: [provideIcons({ lucidePlus, lucideRotateCcw, lucideTriangleAlert })],
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
@@ -43,7 +43,7 @@ import { NameDialog } from '../../../shared/ui/name-dialog';
 
     <vm-name-dialog [(open)]="creating" titleKey="system.roles.create" labelKey="system.roles.newRole" [save]="create" />
 
-    <ul class="overflow-hidden rounded-lg border bg-card shadow-sm" [class.hidden]="list.items().length === 0">
+    <ul vm-card class="overflow-hidden" [class.hidden]="list.items().length === 0">
       @for (role of list.items(); track role.id; let first = $first) {
         <li class="flex flex-col gap-1 px-4 py-3 md:flex-row md:items-center md:gap-3" [class.border-t]="!first">
           <a [routerLink]="link(role)" class="font-medium">{{ role.name }}</a>

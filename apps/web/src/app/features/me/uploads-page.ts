@@ -5,7 +5,7 @@ import { NgIcon, provideIcons } from '@ng-icons/core';
 import { lucideUpload } from '@ng-icons/lucide';
 import { apiUrl, myUploadsResponseSchema, type MyUploadItem, type UploadStatus } from '@vm-web/shared';
 
-import { VmButton } from '@vm-web/ui';
+import { VmButton, VmCard } from '@vm-web/ui';
 
 import { UploadLauncher } from '../../core/actions/pending-features';
 import { onUploadCompleted } from '../../core/actions/on-upload';
@@ -19,7 +19,7 @@ import { UploadStatusBadge } from './ui/upload-status-badge';
 /** Meine Uploads (N-14): status of each own upload incl. the reason for a rejection. */
 @Component({
   selector: 'vm-me-uploads-page',
-  imports: [DatePipe, NgIcon, TranslocoPipe, VmButton, ListState, UploadStatusBadge],
+  imports: [VmCard, DatePipe, NgIcon, TranslocoPipe, VmButton, ListState, UploadStatusBadge],
   viewProviders: [provideIcons({ lucideUpload })],
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
@@ -52,7 +52,7 @@ import { UploadStatusBadge } from './ui/upload-status-badge';
     @if (viewport.isMobile()) {
       <ul class="flex flex-col gap-2">
         @for (entry of list.items(); track entry.id) {
-          <li class="flex flex-col gap-1.5 rounded-lg border bg-card p-4 shadow-sm">
+          <li vm-card class="flex flex-col gap-1.5 p-4">
             <span class="text-base font-medium">{{ title(entry) }}</span>
             <span class="flex items-center gap-2">
               <vm-upload-status-badge [status]="entry.status" />
@@ -65,7 +65,7 @@ import { UploadStatusBadge } from './ui/upload-status-badge';
         }
       </ul>
     } @else if (list.items().length > 0) {
-      <div class="overflow-x-auto rounded-lg border bg-card shadow-sm">
+      <div vm-card class="overflow-x-auto">
         <table class="w-full">
           <thead class="bg-muted text-xs font-medium text-muted-foreground">
             <tr>

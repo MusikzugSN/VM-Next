@@ -6,6 +6,7 @@ import { PluralPipe } from '../../core/i18n/plural.pipe';
 import { NgIcon, provideIcons } from '@ng-icons/core';
 import { lucideChevronRight } from '@ng-icons/lucide';
 import { APP_ROUTES, apiUrl, appPath, archivedEventsResponseSchema, upcomingEventsResponseSchema } from '@vm-web/shared';
+import { VmCard } from '@vm-web/ui';
 
 import { ApiClient } from '../../core/api/api-client';
 import { cursorList } from '../../core/api/cursor-list';
@@ -17,7 +18,7 @@ export type EventsTab = 'upcoming' | 'archive';
 /** Events (M-5): tabs „Kommende“ and „Archiv“ as query parameter `?tab=archive`. */
 @Component({
   selector: 'vm-me-events-page',
-  imports: [PluralPipe, DatePipe, RouterLink, NgIcon, TranslocoPipe, EventDate, ListState],
+  imports: [VmCard, PluralPipe, DatePipe, RouterLink, NgIcon, TranslocoPipe, EventDate, ListState],
   viewProviders: [provideIcons({ lucideChevronRight })],
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
@@ -44,8 +45,7 @@ export type EventsTab = 'upcoming' | 'archive';
       @for (event of list.items(); track event.id) {
         <li>
           <a
-            [routerLink]="link(event.id)"
-            class="flex items-center gap-3 rounded-lg border bg-card p-4 text-foreground no-underline shadow-sm hover:bg-accent md:p-4"
+            [routerLink]="link(event.id)" vm-card class="flex items-center gap-3 p-4 text-foreground no-underline hover:bg-accent md:p-4"
           >
             <vm-event-date [date]="event.date" />
             <span class="flex min-w-0 flex-1 flex-col">

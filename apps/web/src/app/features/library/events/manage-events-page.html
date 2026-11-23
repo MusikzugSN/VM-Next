@@ -58,7 +58,7 @@
 @if (viewport.isMobile()) {
   <ul class="flex flex-col gap-2">
     @for (event of list.items(); track event.id) {
-      <li class="flex items-center gap-3 rounded-lg border bg-card p-4 shadow-sm">
+      <li vm-card class="flex items-center gap-3 p-4">
         <a [routerLink]="link(event)" class="flex min-w-0 flex-1 flex-col text-foreground no-underline">
           <span class="text-base font-semibold">{{ event.name }}</span>
           <span class="text-muted-foreground">{{ event.date | date: 'EE dd.MM.yyyy' }} · {{ 'library.folders.scoreCount' | tPlural: event.scoreCount }}</span>
@@ -68,7 +68,7 @@
     }
   </ul>
 } @else if (list.items().length > 0) {
-  <div class="overflow-x-auto rounded-lg border bg-card shadow-sm">
+  <div vm-card class="overflow-x-auto">
     <table class="w-full">
       <thead class="bg-muted text-xs font-medium text-muted-foreground">
         <tr>

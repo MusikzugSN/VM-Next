@@ -15,3 +15,4 @@ export {
   VmSheetImports,
   VmSheetTitle,
 } from './lib/dialog/vm-dialog';
+export { VmCard, type VmCardVariant } from './lib/card/vm-card';

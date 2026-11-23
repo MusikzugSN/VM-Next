@@ -1,7 +1,7 @@
 @if (viewport.isMobile()) {
   <ul class="flex flex-col gap-2">
     @for (item of items(); track item.row.scoreId) {
-      <li class="flex items-center gap-3 rounded-lg border bg-card py-3 ps-3 pe-2 shadow-sm">
+      <li vm-card class="flex items-center gap-3 py-3 ps-3 pe-2">
         <label class="-ms-1 flex size-control shrink-0 items-center justify-center self-start">
           <input
               type="checkbox"
@@ -64,7 +64,7 @@
     }
   </ul>
 } @else {
-  <div class="overflow-x-auto rounded-lg border bg-card shadow-sm">
+  <div vm-card class="overflow-x-auto">
     <table class="w-full text-start">
       <thead class="bg-muted text-xs font-medium text-muted-foreground">
         <tr>

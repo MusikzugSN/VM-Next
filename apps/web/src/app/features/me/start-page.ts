@@ -15,7 +15,7 @@ import {
   upcomingEventsResponseSchema,
 } from '@vm-web/shared';
 
-import { VmButton } from '@vm-web/ui';
+import { VmButton, VmCard } from '@vm-web/ui';
 
 import { onUploadCompleted } from '../../core/actions/on-upload';
 import { UploadLauncher } from '../../core/actions/pending-features';
@@ -31,7 +31,7 @@ const POSTPONED_KEY = 'vmweb.voiceSelectionPostponed';
 /** Start of Mein Bereich (M-1, M-2, M-5, N-14): upcoming events, folders, own uploads. */
 @Component({
   selector: 'vm-me-start-page',
-  imports: [PluralPipe, 
+  imports: [VmCard, PluralPipe, 
     DatePipe,
     RouterLink,
     NgIcon,

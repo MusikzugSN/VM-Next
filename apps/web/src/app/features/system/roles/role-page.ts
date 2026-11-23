@@ -6,7 +6,7 @@ import { NgIcon, provideIcons } from '@ng-icons/core';
 import { lucideChevronLeft, lucideRotateCcw, lucideTrash2, lucideTriangleAlert } from '@ng-icons/lucide';
 import { APP_ROUTES, apiUrl, permissionCatalogResponseSchema, permissionScope, roleDetailsResponseSchema, type Permission } from '@vm-web/shared';
 
-import { VmButton } from '@vm-web/ui';
+import { VmButton, VmCard } from '@vm-web/ui';
 
 import { ActionRunner, ConfirmService } from '../../../core/actions/action-runner';
 import { ApiClient } from '../../../core/api/api-client';
@@ -22,7 +22,7 @@ import { valueOr } from '../../../core/util/resource-value';
 /** Rolle (S-3, R-3, R-7): permission matrix (areas × actions) plus single permissions. */
 @Component({
   selector: 'vm-system-role-page',
-  imports: [RouterLink, NgIcon, TranslocoPipe, PluralPipe, VmButton, NameDialog, PageProblem],
+  imports: [VmCard, RouterLink, NgIcon, TranslocoPipe, PluralPipe, VmButton, NameDialog, PageProblem],
   viewProviders: [provideIcons({ lucideChevronLeft, lucideRotateCcw, lucideTrash2, lucideTriangleAlert })],
   changeDetection: ChangeDetectionStrategy.OnPush,
   templateUrl: './role-page.html',

@@ -5,7 +5,7 @@ import { NgIcon, provideIcons } from '@ng-icons/core';
 import { lucideArrowDown, lucideArrowUp, lucidePencil, lucidePlus, lucideTrash2 } from '@ng-icons/lucide';
 import { apiUrl, voiceListResponseSchema, type VoiceListResponse } from '@vm-web/shared';
 
-import { VmButton, VmIconButton } from '@vm-web/ui';
+import { VmButton, VmCard, VmIconButton } from '@vm-web/ui';
 
 import { ActionRunner, ConfirmService } from '../../../core/actions/action-runner';
 import { ApiClient } from '../../../core/api/api-client';
@@ -31,7 +31,7 @@ export function filterVoiceList(groups: readonly Group[], search: string): Group
 /** Stimmen & Instrumente (N-6, N-7, N-9, F-16): one list grouped by instrument with substitutes. */
 @Component({
   selector: 'vm-library-voices-page',
-  imports: [NgIcon, TranslocoPipe, PluralPipe, VmButton, VmIconButton, NameDialog, PageProblem, SearchField, VoiceDialog],
+  imports: [VmCard, NgIcon, TranslocoPipe, PluralPipe, VmButton, VmIconButton, NameDialog, PageProblem, SearchField, VoiceDialog],
   viewProviders: [provideIcons({ lucidePlus, lucidePencil, lucideTrash2, lucideArrowUp, lucideArrowDown })],
   changeDetection: ChangeDetectionStrategy.OnPush,
   templateUrl: './voices-page.html',

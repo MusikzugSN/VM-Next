@@ -5,7 +5,7 @@ import { NgIcon, provideIcons } from '@ng-icons/core';
 import { lucideArrowDown, lucideArrowUp, lucidePencil, lucidePlus, lucideTrash2 } from '@ng-icons/lucide';
 import { apiUrl, createdResponseSchema, fieldDefinitionsResponseSchema, type FieldDefinition } from '@vm-web/shared';
 
-import { VmButton, VmIconButton } from '@vm-web/ui';
+import { VmButton, VmCard, VmIconButton } from '@vm-web/ui';
 
 import { ActionRunner, ConfirmService } from '../../../core/actions/action-runner';
 import { ApiClient } from '../../../core/api/api-client';
@@ -18,7 +18,7 @@ import { selectOr } from '../../../core/util/resource-value';
 /** Tab „Eigene Felder“ (N-2, N-3): custom score fields in display order; create and edit in a dialog. */
 @Component({
   selector: 'vm-fields-settings',
-  imports: [NgIcon, TranslocoPipe, VmButton, VmIconButton, PageProblem, FieldDialog],
+  imports: [VmCard, NgIcon, TranslocoPipe, VmButton, VmIconButton, PageProblem, FieldDialog],
   viewProviders: [provideIcons({ lucideArrowUp, lucideArrowDown, lucidePencil, lucidePlus, lucideTrash2 })],
   changeDetection: ChangeDetectionStrategy.OnPush,
   host: { class: 'flex flex-col gap-4' },
@@ -37,7 +37,7 @@ import { selectOr } from '../../../core/util/resource-value';
     } @else if (items().length === 0 && fields.hasValue()) {
       <p class="rounded-lg border border-dashed p-8 text-center text-muted-foreground">{{ 'system.settings.fields.empty' | transloco }}</p>
     } @else {
-      <ul class="overflow-hidden rounded-lg border bg-card shadow-sm">
+      <ul vm-card class="overflow-hidden">
         @for (field of items(); track field.id; let first = $first, last = $last, i = $index) {
           <li class="flex flex-col gap-2 px-4 py-3 md:flex-row md:items-center" [class.border-t]="!first">
             <span class="flex min-w-0 flex-1 flex-col">
