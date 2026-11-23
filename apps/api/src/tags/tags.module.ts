@@ -23,7 +23,7 @@ import { ZodValidationPipe as Zod } from '../common/validation/zod-validation.pi
 import { DATABASE, type Database } from '../db/database';
 import { isUniqueViolation } from '../db/db-errors';
 import { clubTags } from '../db/schema';
-import { likePattern } from '../me/me.repository';
+import { likePattern } from '../common/sql';
 
 /** Club tags, maintained by librarians (N-17); separate from personal tags (M-8). */
 @Injectable()

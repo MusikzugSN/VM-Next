@@ -6,7 +6,7 @@ import { ProblemException } from '../common/problem-details/problem.exception';
 import { DATABASE, type Database } from '../db/database';
 import { isUniqueViolation } from '../db/db-errors';
 import { ensembleLineupVoices, instruments, sheets, uploads, userVoices, voices, voiceSubstitutes } from '../db/schema';
-import { likePattern } from '../me/me.repository';
+import { escapeLike, likePattern } from '../common/sql';
 
 type Tx = Parameters<Parameters<Database['transaction']>[0]>[0];
 
@@ -51,7 +51,7 @@ export class VoicesService {
 
   /** Max. 20 instruments, prefix matches first (N-7). */
   async instrumentSuggestions(q: string): Promise<InstrumentSuggestionsResponse> {
-    const prefix = `${q.replace(/[\\%_]/g, (c) => `\\${c}`)}%`;
+    const prefix = `${escapeLike(q)}%`;
     const items = await this.db
       .select({ id: instruments.id, name: instruments.name })
       .from(instruments)

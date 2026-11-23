@@ -20,7 +20,7 @@ import { AppConfig } from '../config/app-config.service';
 import { DATABASE, type Database } from '../db/database';
 import { ensembles, events, scores, setlistEntries } from '../db/schema';
 import { assertActiveEnsemble, ensembleOptions, listEnsembles, scoreCandidates } from '../library/library-helpers';
-import { likePattern } from '../me/me.repository';
+import { likePattern } from '../common/sql';
 
 const scoreCount = sql<number>`(select count(*)::int from setlist_entries x where x.event_id = ${events.id})`;
 

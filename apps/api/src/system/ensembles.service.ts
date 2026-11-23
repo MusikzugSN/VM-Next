@@ -17,7 +17,7 @@ import { httpUrlOrNull } from '../common/url';
 import { DATABASE, type Database } from '../db/database';
 import { isUniqueViolation } from '../db/db-errors';
 import { clubSettings, ensembleLineupVoices, ensembles, memberships, roles, users, userVoices, voices } from '../db/schema';
-import { likePattern } from '../me/me.repository';
+import { likePattern } from '../common/sql';
 import { lineupTemplateFile } from '../seed/defaults';
 import { importLineupTemplate, loadLineupTemplate } from '../seed/lineup-template';
 
