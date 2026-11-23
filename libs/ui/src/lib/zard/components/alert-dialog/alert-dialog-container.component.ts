@@ -16,7 +16,7 @@ import {
 
 import type { ClassValue } from 'clsx';
 
-import { ZardButtonComponent } from '@vm-web/ui/zard/components/button/button.component';
+import { VmButton } from '@vm-web/ui/button/vm-button';
 import { noopFn } from '@vm-web/ui/zard/utils/noop';
 
 import { ZardAlertDialogHost } from './alert-dialog-host';
@@ -74,7 +74,7 @@ export class ZardAlertDialogOptions<T> {
   selector: 'z-alert-dialog-container',
   imports: [
     NgTemplateOutlet,
-    ZardButtonComponent,
+    VmButton,
     ZardAlertDialogPanelComponent,
     ZardAlertDialogHeaderComponent,
     ZardAlertDialogMediaComponent,
@@ -118,8 +118,8 @@ export class ZardAlertDialogOptions<T> {
           <button
             type="button"
             data-testid="z-alert-cancel-button"
-            z-button
-            zType="outline"
+            vm-button
+            variant="text"
             (click)="cancelTriggered.emit()"
           >
             {{ config.zCancelText || 'Cancel' }}
@@ -129,8 +129,8 @@ export class ZardAlertDialogOptions<T> {
           <button
             type="button"
             data-testid="z-alert-ok-button"
-            z-button
-            [zType]="config.zOkDestructive ? 'destructive' : 'default'"
+            vm-button
+            [variant]="config.zOkDestructive ? 'danger' : 'filled'"
             [zDisabled]="config.zOkDisabled"
             (click)="okTriggered.emit()"
           >

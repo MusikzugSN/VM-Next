@@ -6,8 +6,7 @@ import { lucideCheck, lucideSearch } from '@ng-icons/lucide';
 import { MAX_PROFILE_VOICES, apiUrl } from '@vm-web/shared';
 import { firstValueFrom } from 'rxjs';
 
-import { VmButton, VmField, VmFieldLabel, VmInput } from '@vm-web/ui';
-import { ZardDialogImports } from '@vm-web/ui/zard/components/dialog/dialog.imports';
+import { VmButton, VmDialogImports, VmField, VmFieldLabel, VmInput } from '@vm-web/ui';
 
 import { ApiClient } from '../../../core/api/api-client';
 import { ActionRunner } from '../../../core/actions/action-runner';
@@ -25,17 +24,17 @@ export { filterVoiceGroups };
  */
 @Component({
   selector: 'vm-voice-selection-dialog',
-  imports: [VmField, VmFieldLabel, PluralPipe, NgIcon, TranslocoPipe, VmButton, ZardDialogImports, VmInput],
+  imports: [VmField, VmFieldLabel, PluralPipe, NgIcon, TranslocoPipe, VmButton, VmDialogImports, VmInput],
   viewProviders: [provideIcons({ lucideCheck, lucideSearch })],
   changeDetection: ChangeDetectionStrategy.OnPush,
   // The dialog renders in an overlay; its host must not take up space (or a gap) in the page.
   host: { style: 'display: contents' },
   template: `
-    <z-dialog [(zVisible)]="open" zWidth="560px">
-      <z-dialog-header>
-        <h2 z-dialog-title>{{ 'me.voices.title' | transloco }}</h2>
-        <p z-dialog-description>{{ 'me.voices.text' | transloco }}</p>
-      </z-dialog-header>
+    <vm-dialog [(zVisible)]="open" zWidth="560px">
+      <vm-dialog-header>
+        <h2 vm-dialog-title>{{ 'me.voices.title' | transloco }}</h2>
+        <p vm-dialog-description>{{ 'me.voices.text' | transloco }}</p>
+      </vm-dialog-header>
 
       <div class="flex min-h-0 flex-1 flex-col gap-5 overflow-y-auto md:max-h-[60dvh] md:flex-none">
         <label vm-field>
@@ -78,14 +77,14 @@ export { filterVoiceGroups };
         }
       </div>
 
-      <z-dialog-footer class="flex-col-reverse items-stretch gap-2 md:flex-row md:items-center">
+      <vm-dialog-footer class="flex-col-reverse items-stretch gap-2 md:flex-row md:items-center">
         <span class="text-muted-foreground md:me-auto" aria-live="polite">{{ 'me.voices.count' | tPlural: selected().size }}</span>
         <button vm-button variant="tonal" type="button" (click)="later()">{{ 'me.voices.later' | transloco }}</button>
         <button vm-button type="button" [zLoading]="saving()" [zDisabled]="selected().size === 0 || saving()" (click)="save()">
           {{ 'common.save' | transloco }}
         </button>
-      </z-dialog-footer>
-    </z-dialog>
+      </vm-dialog-footer>
+    </vm-dialog>
   `,
 })
 export class VoiceSelectionDialog {

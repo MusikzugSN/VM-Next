@@ -7,8 +7,8 @@ import { NgIcon, provideIcons } from '@ng-icons/core';
 import { lucideCalendar, lucideFolderOpen, lucideHouse, lucideMenu, lucideUser } from '@ng-icons/lucide';
 import { APP_ROUTES } from '@vm-web/shared';
 import { filter, skip } from 'rxjs';
+import { VmSheetImports } from '@vm-web/ui';
 
-import { ZardSheetImports } from '@vm-web/ui/zard/components/sheet/sheet.imports';
 import { ZardSonnerComponent } from '@vm-web/ui/zard/components/sonner';
 
 import { PrintDialog } from '../../features/print/print-dialog';
@@ -35,7 +35,7 @@ import { VoiceSwitcher } from './voice-switcher';
     RouterLink,
     NgIcon,
     TranslocoPipe,
-    ZardSheetImports,
+    VmSheetImports,
     ClubLogo,
     NavList,
     UserMenu,

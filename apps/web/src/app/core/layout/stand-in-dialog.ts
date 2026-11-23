@@ -3,8 +3,7 @@ import { TranslocoPipe } from '@jsverse/transloco';
 import { NgIcon, provideIcons } from '@ng-icons/core';
 import { lucideCheck, lucideSearch } from '@ng-icons/lucide';
 
-import { VmButton, VmField, VmFieldLabel, VmInput } from '@vm-web/ui';
-import { ZardDialogImports } from '@vm-web/ui/zard/components/dialog/dialog.imports';
+import { VmButton, VmDialogImports, VmField, VmFieldLabel, VmInput } from '@vm-web/ui';
 
 import { VoiceContextStore } from '../voices/voice-context.store';
 import { filterVoiceGroups } from '../voices/voice-groups';
@@ -15,17 +14,17 @@ import { filterVoiceGroups } from '../voices/voice-groups';
  */
 @Component({
   selector: 'vm-stand-in-dialog',
-  imports: [VmField, VmFieldLabel, NgIcon, TranslocoPipe, VmButton, ZardDialogImports, VmInput],
+  imports: [VmField, VmFieldLabel, NgIcon, TranslocoPipe, VmButton, VmDialogImports, VmInput],
   viewProviders: [provideIcons({ lucideCheck, lucideSearch })],
   changeDetection: ChangeDetectionStrategy.OnPush,
   // The dialog renders in an overlay; its host must not take up space in the header.
   host: { style: 'display: contents' },
   template: `
-    <z-dialog [(zVisible)]="open" zWidth="560px">
-      <z-dialog-header>
-        <h2 z-dialog-title>{{ 'shell.voice.standInTitle' | transloco }}</h2>
-        <p z-dialog-description>{{ 'shell.voice.standInText' | transloco }}</p>
-      </z-dialog-header>
+    <vm-dialog [(zVisible)]="open" zWidth="560px">
+      <vm-dialog-header>
+        <h2 vm-dialog-title>{{ 'shell.voice.standInTitle' | transloco }}</h2>
+        <p vm-dialog-description>{{ 'shell.voice.standInText' | transloco }}</p>
+      </vm-dialog-header>
 
       <div class="flex min-h-0 flex-1 flex-col gap-5 overflow-y-auto md:max-h-[60dvh] md:flex-none">
         <label vm-field>
@@ -68,10 +67,10 @@ import { filterVoiceGroups } from '../voices/voice-groups';
         }
       </div>
 
-      <z-dialog-footer>
+      <vm-dialog-footer>
         <button vm-button variant="tonal" type="button" (click)="open.set(false)">{{ 'common.cancel' | transloco }}</button>
-      </z-dialog-footer>
-    </z-dialog>
+      </vm-dialog-footer>
+    </vm-dialog>
   `,
 })
 export class StandInDialog {

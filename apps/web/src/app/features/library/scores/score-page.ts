@@ -16,8 +16,7 @@ import {
   type ScoreCompletenessResponse,
 } from '@vm-web/shared';
 
-import { VmButton, VmIconButton, VmSelect } from '@vm-web/ui';
-import { ZardDialogImports } from '@vm-web/ui/zard/components/dialog/dialog.imports';
+import { VmButton, VmDialogImports, VmIconButton, VmSelect } from '@vm-web/ui';
 
 import { ActionRunner, ConfirmService } from '../../../core/actions/action-runner';
 import { fieldProblemHandler } from '../../../core/actions/field-problem-handler';
@@ -71,7 +70,7 @@ export function groupCompleteness(
     TranslocoPipe,
     PluralPipe,
     VmButton, VmIconButton,
-    ZardDialogImports,
+    VmDialogImports,
     VmSelect,
     PdfViewer,
     StatusBadge,

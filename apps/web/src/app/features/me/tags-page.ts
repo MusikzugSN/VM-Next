@@ -15,8 +15,7 @@ import {
 } from '@vm-web/shared';
 import { of } from 'rxjs';
 
-import { ZardAlertDialogService } from '@vm-web/ui/zard/components/alert-dialog';
-import { VmButton, VmInput } from '@vm-web/ui';
+import { VmButton, VmConfirmDialogService, VmInput } from '@vm-web/ui';
 
 import { ApiClient } from '../../core/api/api-client';
 import { ActionRunner } from '../../core/actions/action-runner';
@@ -45,7 +44,7 @@ export class TagsPage {
   private readonly voices = inject(VoiceContextStore);
   private readonly router = inject(Router);
   private readonly actions = inject(ActionRunner);
-  private readonly alerts = inject(ZardAlertDialogService);
+  private readonly alerts = inject(VmConfirmDialogService);
   private readonly transloco = inject(TranslocoService);
 
   /** Route parameter and route data (`kind`). */

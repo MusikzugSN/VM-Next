@@ -1,8 +1,8 @@
 import { inject, Injectable } from '@angular/core';
 import { TranslocoService } from '@jsverse/transloco';
 import { firstValueFrom, type Observable } from 'rxjs';
+import { VmConfirmDialogService } from '@vm-web/ui';
 
-import { ZardAlertDialogService } from '@vm-web/ui/zard/components/alert-dialog';
 import { ZardSonnerService } from '@vm-web/ui/zard/components/sonner';
 
 import { isApiProblem } from '../api/api-problem';
@@ -56,7 +56,7 @@ export class ActionRunner {
 /** Confirmation for actions that cannot be undone (Design Guideline: only those get a dialog). */
 @Injectable({ providedIn: 'root' })
 export class ConfirmService {
-  private readonly alerts = inject(ZardAlertDialogService);
+  private readonly alerts = inject(VmConfirmDialogService);
   private readonly actions = inject(ActionRunner);
   private readonly transloco = inject(TranslocoService);
 

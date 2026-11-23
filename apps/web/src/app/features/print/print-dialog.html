@@ -1,14 +1,14 @@
-<z-dialog [(zVisible)]="open" zWidth="40rem" [zMaskClosable]="!busy()">
+<vm-dialog [(zVisible)]="open" zWidth="40rem" [zMaskClosable]="!busy()">
   @if (request(); as req) {
-    <z-dialog-header>
-      <h2 z-dialog-title>{{ 'print.title.' + req.scope | transloco }}</h2>
-      <p z-dialog-description>
+    <vm-dialog-header>
+      <h2 vm-dialog-title>{{ 'print.title.' + req.scope | transloco }}</h2>
+      <p vm-dialog-description>
         {{ req.title }}
         @if (current(); as p) {
           · {{ 'print.pages' | tPlural: p.totalPages }}
         }
       </p>
-    </z-dialog-header>
+    </vm-dialog-header>
 
     <div class="flex min-h-0 flex-1 flex-col gap-6 overflow-y-auto md:max-h-[65dvh] md:flex-none">
       @if (req.scope === 'folder' || req.scope === 'event') {
@@ -192,7 +192,7 @@
       }
     </div>
 
-    <z-dialog-footer>
+    <vm-dialog-footer>
       <button vm-button variant="tonal" type="button" (click)="open.set(false)">{{ 'common.cancel' | transloco }}</button>
       @if (action() === 'device' && canShare) {
         <button vm-button variant="outlined" type="button" [zDisabled]="busy()" (click)="share()">
@@ -203,6 +203,6 @@
         <ng-icon [name]="action() === 'device' ? 'lucideExternalLink' : 'lucidePrinter'" aria-hidden="true" />
         {{ (action() ? 'print.actions.' + action() : 'common.print') | transloco }}
       </button>
-    </z-dialog-footer>
+    </vm-dialog-footer>
   }
-</z-dialog>
+</vm-dialog>

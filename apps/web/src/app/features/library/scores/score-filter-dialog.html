@@ -1,8 +1,8 @@
-<z-dialog [(zVisible)]="open" zWidth="480px">
-  <z-dialog-header>
-    <h2 z-dialog-title>{{ 'common.filter' | transloco }}</h2>
-    <p z-dialog-description>{{ 'library.filter.intro' | transloco }}</p>
-  </z-dialog-header>
+<vm-dialog [(zVisible)]="open" zWidth="480px">
+  <vm-dialog-header>
+    <h2 vm-dialog-title>{{ 'common.filter' | transloco }}</h2>
+    <p vm-dialog-description>{{ 'library.filter.intro' | transloco }}</p>
+  </vm-dialog-header>
 
   <div class="flex min-h-0 flex-1 flex-col gap-5 overflow-y-auto md:max-h-[60dvh] md:flex-none">
     <label vm-field>
@@ -127,8 +127,8 @@
     </fieldset>
   </ng-template>
 
-  <z-dialog-footer class="flex-col-reverse gap-2 md:flex-row">
+  <vm-dialog-footer class="flex-col-reverse gap-2 md:flex-row">
     <button vm-button variant="text" type="button" (click)="reset()">{{ 'library.filter.reset' | transloco }}</button>
     <button vm-button type="button" (click)="apply()">{{ 'library.filter.apply' | transloco }}</button>
-  </z-dialog-footer>
-</z-dialog>
+  </vm-dialog-footer>
+</vm-dialog>
