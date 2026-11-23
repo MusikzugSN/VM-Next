@@ -5,6 +5,7 @@ import { asc, eq } from 'drizzle-orm';
 import { ProblemException } from '../common/problem-details/problem.exception';
 import { DATABASE, type Database } from '../db/database';
 import { ensemblePrintRules, ensembles } from '../db/schema';
+import { appendTo } from '../common/collections';
 
 /** Rules in effect and where they come from; `source: null` = shipped default. */
 export interface EffectiveRules {
@@ -70,7 +71,7 @@ export class PrintRulesService {
       this.db.select().from(ensemblePrintRules).orderBy(asc(ensemblePrintRules.ensembleId), asc(ensemblePrintRules.fromPages)),
     ]);
     const rules = new Map<string, PrintRule[]>();
-    for (const row of rows) rules.set(row.ensembleId, [...(rules.get(row.ensembleId) ?? []), { fromPages: row.fromPages, mode: row.mode }]);
+    for (const row of rows) appendTo(rules, row.ensembleId, { fromPages: row.fromPages, mode: row.mode });
     return { nodes: new Map(nodes.map((n) => [n.id, n])), rules, rootId: nodes.find((n) => n.isRoot)?.id ?? null };
   }
 

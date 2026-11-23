@@ -5,7 +5,6 @@ import { TranslocoPipe } from '@jsverse/transloco';
 import { NgIcon, provideIcons } from '@ng-icons/core';
 import { lucideChevronLeft, lucideRotateCcw, lucideTrash2, lucideTriangleAlert } from '@ng-icons/lucide';
 import { APP_ROUTES, apiUrl, permissionCatalogResponseSchema, permissionScope, roleDetailsResponseSchema, type Permission } from '@vm-web/shared';
-import { firstValueFrom } from 'rxjs';
 
 import { ZardButtonComponent } from '@/shared/components/button';
 
@@ -17,6 +16,8 @@ import { NameDialog } from '../../../shared/ui/name-dialog';
 import { PageProblem } from '../../../shared/ui/page-problem';
 import { permissionKey, withDependencies } from './permission-labels';
 import { usePageName } from '../../../core/layout/page';
+import { sameMembers } from '../../../core/util/sets';
+import { valueOr } from '../../../core/util/resource-value';
 
 /** Rolle (S-3, R-3, R-7): permission matrix (areas × actions) plus single permissions. */
 @Component({
@@ -51,13 +52,13 @@ export class RolePage {
   protected readonly catalog = rxResource({
     stream: () => this.api.get(apiUrl('system', 'permissionCatalog'), permissionCatalogResponseSchema),
   });
-  protected readonly role = computed(() => (this.details.hasValue() ? this.details.value() : null));
+  protected readonly role = computed(() => valueOr(this.details, null));
 
   protected readonly selected = signal<ReadonlySet<Permission>>(new Set());
   protected readonly dirty = computed(() => {
     const saved = new Set(this.role()?.permissions ?? []);
     const chosen = this.selected();
-    return saved.size !== chosen.size || [...chosen].some((p) => !saved.has(p));
+    return !sameMembers(saved, chosen);
   });
   /** Live warning while editing (B-1): the role would grant club-wide permissions. */
   protected readonly grantsClub = computed(() => [...this.selected()].some((p) => permissionScope(p) === 'club'));
@@ -84,17 +85,15 @@ export class RolePage {
   }
 
   protected async save(): Promise<void> {
-    this.saving.set(true);
-    const done = await this.actions.run(
-      () => firstValueFrom(this.api.postVoid(apiUrl('system', 'setPermissions', { roleId: this.roleId() }), { permissions: [...this.selected()] })),
-      { success: { key: 'system.role.saved' } },
+    const done = await this.actions.runOnce(
+      () => this.api.postVoid(apiUrl('system', 'setPermissions', { roleId: this.roleId() }), { permissions: [...this.selected()] }),
+      { busy: this.saving, success: { key: 'system.role.saved' } },
     );
-    this.saving.set(false);
     if (done) this.changed();
   }
 
   protected readonly rename = async (name: string): Promise<boolean> => {
-    const done = await this.actions.run(() => firstValueFrom(this.api.postVoid(apiUrl('system', 'renameRole', { roleId: this.roleId() }), { name })), {
+    const done = await this.actions.runOnce(() => this.api.postVoid(apiUrl('system', 'renameRole', { roleId: this.roleId() }), { name }), {
       success: { key: 'system.role.renamed', params: { name } },
     });
     if (done) this.details.reload();
@@ -104,7 +103,7 @@ export class RolePage {
   protected async reset(): Promise<void> {
     const name = this.role()?.name ?? '';
     if (!(await this.confirm.confirm('system.role.resetTitle', 'system.role.resetText', { name }, 'system.roles.resetOk'))) return;
-    const done = await this.actions.run(() => firstValueFrom(this.api.postVoid(apiUrl('system', 'resetRole', { roleId: this.roleId() }))), {
+    const done = await this.actions.runOnce(() => this.api.postVoid(apiUrl('system', 'resetRole', { roleId: this.roleId() })), {
       success: { key: 'system.role.resetDone', params: { name } },
     });
     if (done) this.changed();
@@ -113,8 +112,7 @@ export class RolePage {
   protected async remove(): Promise<void> {
     const role = this.role();
     if (!role) return;
-    if (!(await this.confirm.confirmDelete('system.role.deleteTitle', 'system.role.deleteText', { name: role.name }))) return;
-    const done = await this.actions.run(() => firstValueFrom(this.api.postVoid(apiUrl('system', 'deleteRole', { roleId: this.roleId() }))), {
+    const done = await this.confirm.confirmedDelete('system.role.deleteTitle', 'system.role.deleteText', { name: role.name }, () => this.api.postVoid(apiUrl('system', 'deleteRole', { roleId: this.roleId() })), {
       success: { key: 'system.role.deleted', params: { name: role.name } },
     });
     if (done) void this.router.navigateByUrl(this.listPath);

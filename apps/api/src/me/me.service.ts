@@ -26,6 +26,7 @@ import { httpUrlOrNull } from '../common/url';
 import { AppConfig } from '../config/app-config.service';
 import { MeRepository, type EventRow, type ScoreFilter, type ScoreListRow } from './me.repository';
 import { defaultPageCount, relevantVoiceIds, resolveSheets, type VoiceSelection } from './sheet-resolution';
+import { assertKnownIds } from '../common/validation/id-list';
 
 export interface ActiveVoices extends VoiceSelection {
   profile: VoiceRef[];
@@ -51,10 +52,7 @@ export class MeService {
     if (isOverride) {
       const unique = [...new Set(overrideIds)];
       const found = new Map((await this.repo.voicesByIds(unique)).map((v) => [v.id, v]));
-      const unknown = unique.map((id, i) => [id, i] as const).filter(([id]) => !found.has(id));
-      if (unknown.length) {
-        throw ProblemException.validation(unknown.map(([, i]) => ({ path: `/query/voiceId/${i}`, code: 'unknown_voice' })));
-      }
+      assertKnownIds(unique, found, '/query/voiceId', 'unknown_voice');
       active = unique.map((id) => found.get(id) as VoiceRef);
     }
     const substitutesOf = await this.repo.substitutesOf(active.map((v) => v.id));
@@ -84,10 +82,7 @@ export class MeService {
   async setProfileVoices(voiceIds: readonly string[], userId: string): Promise<void> {
     const unique = [...new Set(voiceIds)];
     const found = new Set((await this.repo.voicesByIds(unique)).map((v) => v.id));
-    const unknown = voiceIds.map((id, i) => [id, i] as const).filter(([id]) => !found.has(id));
-    if (unknown.length) {
-      throw ProblemException.validation(unknown.map(([, i]) => ({ path: `/body/voiceIds/${i}`, code: 'unknown_voice' })));
-    }
+    assertKnownIds(voiceIds, found, '/body/voiceIds', 'unknown_voice');
     await this.repo.replaceProfileVoices(userId, unique);
   }
 

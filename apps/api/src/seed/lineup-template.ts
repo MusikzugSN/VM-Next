@@ -2,8 +2,9 @@ import { asc, eq, inArray, sql } from 'drizzle-orm';
 import { readFile } from 'node:fs/promises';
 import { z } from 'zod';
 import { uuidv7 } from '../common/ids/uuid-v7';
-import type { Database } from '../db/database';
+import type { Database, Tx } from '../db/database';
 import { instruments, voices, voiceSubstitutes } from '../db/schema';
+import { nextPosition } from '../db/table-helpers';
 
 /** Format of `defaults/lineup.default.json` (N-8). Voices with `lineup: false` exist but are not part of the lineup. */
 export const lineupTemplateSchema = z
@@ -36,7 +37,6 @@ export async function loadLineupTemplate(path: string): Promise<LineupTemplate> 
   return lineupTemplateSchema.parse(JSON.parse(await readFile(path, 'utf8')));
 }
 
-type Tx = Parameters<Parameters<Database['transaction']>[0]>[0];
 
 /**
  * Creates missing instruments and voices of the template (matched case-insensitively by name) and
@@ -52,8 +52,7 @@ export async function importLineupTemplate(
   const voiceIdByName = new Map<string, string>();
   const lineupVoiceIds: string[] = [];
 
-  const [{ next }] = await tx.select({ next: sql<number>`coalesce(max(${instruments.position}) + 1, 0)::int` }).from(instruments);
-  let instrumentPosition = next;
+  let instrumentPosition = await nextPosition(tx, instruments.position);
 
   for (const inst of template.instruments) {
     const [existing] = await tx.select({ id: instruments.id }).from(instruments).where(sql`lower(${instruments.name}) = lower(${inst.name})`);

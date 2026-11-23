@@ -21,7 +21,14 @@ import { ZardButtonComponent } from '@/shared/components/button';
 import { observeWidth } from './observe-width';
 
 /** Where the pdf.js worker and its resources are served (copied by the build, see project.json). */
-export const PDFJS_BASE = '/pdfjs';
+const PDFJS_BASE = '/pdfjs';
+
+/** The runtime files of pdf.js; part of every `getDocument` call. */
+export const PDFJS_ASSETS = {
+  wasmUrl: `${PDFJS_BASE}/wasm/`,
+  standardFontDataUrl: `${PDFJS_BASE}/standard_fonts/`,
+  cMapUrl: `${PDFJS_BASE}/cmaps/`,
+};
 
 type PdfJs = typeof import('pdfjs-dist');
 let pdfjs: Promise<PdfJs> | undefined;
@@ -158,9 +165,7 @@ export class PdfViewer {
       const task = lib.getDocument({
         url: src,
         withCredentials: true,
-        wasmUrl: `${PDFJS_BASE}/wasm/`,
-        standardFontDataUrl: `${PDFJS_BASE}/standard_fonts/`,
-        cMapUrl: `${PDFJS_BASE}/cmaps/`,
+        ...PDFJS_ASSETS,
       });
       this.task = task;
       const doc = await task.promise;

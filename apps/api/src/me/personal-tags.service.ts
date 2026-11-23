@@ -2,7 +2,7 @@ import { Inject, Injectable } from '@nestjs/common';
 import type { AccessContext } from '../access/access-context';
 import { uuidv7 } from '../common/ids/uuid-v7';
 import { ProblemException } from '../common/problem-details/problem.exception';
-import { isUniqueViolation } from '../db/db-errors';
+import { withNameTaken } from '../db/db-errors';
 import { MeRepository } from './me.repository';
 
 /** Personal tags: everyone may create them, only their owner sees them (M-8, F-2). */
@@ -13,14 +13,14 @@ export class PersonalTagsService {
   async create(userId: string, name: string): Promise<{ id: string }> {
     if (await this.repo.personalTagNameTaken(userId, name)) throw ProblemException.conflict('name-taken');
     const id = uuidv7();
-    await nameTakenOnRace(() => this.repo.insertPersonalTag(id, userId, name));
+    await withNameTaken(() => this.repo.insertPersonalTag(id, userId, name));
     return { id };
   }
 
   async rename(userId: string, tagId: string, name: string): Promise<void> {
     await this.ownTag(userId, tagId);
     if (await this.repo.personalTagNameTaken(userId, name, tagId)) throw ProblemException.conflict('name-taken');
-    await nameTakenOnRace(() => this.repo.renamePersonalTag(tagId, name));
+    await withNameTaken(() => this.repo.renamePersonalTag(tagId, name));
   }
 
   async delete(userId: string, tagId: string): Promise<void> {
@@ -44,15 +44,5 @@ export class PersonalTagsService {
   /** Foreign tags behave like missing ones (404). */
   private async ownTag(userId: string, tagId: string): Promise<void> {
     if (!(await this.repo.personalTagOf(userId, tagId))) throw ProblemException.notFound();
-  }
-}
-
-/** The unique index decides when two requests create the same name at once. */
-async function nameTakenOnRace(write: () => Promise<void>): Promise<void> {
-  try {
-    await write();
-  } catch (error) {
-    if (isUniqueViolation(error)) throw ProblemException.conflict('name-taken');
-    throw error;
   }
 }

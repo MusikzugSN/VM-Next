@@ -19,7 +19,7 @@ export function withDependencies(current: ReadonlySet<Permission>, permission: P
   const view = `${area}.view` as Permission;
   if (on) {
     next.add(permission);
-    if (action !== 'view' && isKnown(view)) next.add(view);
+    if (action !== 'view' && VIEW_PERMISSIONS.has(view)) next.add(view);
   } else {
     next.delete(permission);
     if (action === 'view') {
@@ -30,7 +30,3 @@ export function withDependencies(current: ReadonlySet<Permission>, permission: P
 }
 
 const VIEW_PERMISSIONS = new Set(['score', 'voice', 'tag', 'folder', 'event', 'user', 'role', 'ensemble', 'config'].map((a) => `${a}.view`));
-
-function isKnown(permission: string): boolean {
-  return VIEW_PERMISSIONS.has(permission);
-}
