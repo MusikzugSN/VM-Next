@@ -71,7 +71,7 @@
           {{ chip.text }}
           <button
             type="button"
-            class="flex size-8 items-center justify-center"
+            class="relative flex size-8 items-center justify-center rounded-full after:absolute after:-inset-1.5 hover:bg-on-primary-container/8 xl:after:inset-0"
             [attr.aria-label]="'library.filter.remove' | transloco: { name: chip.text }"
             (click)="removeChip(chip.index)"
           >
@@ -133,7 +133,7 @@
                     <ng-icon name="lucideArrowDown" size="var(--mat-sys-icon-size-xs)" aria-hidden="true" />
                   }
                   @default {
-                    <ng-icon name="lucideChevronsUpDown" size="var(--mat-sys-icon-size-xs)" class="opacity-50" aria-hidden="true" />
+                    <ng-icon name="lucideChevronsUpDown" size="var(--mat-sys-icon-size-xs)" aria-hidden="true" />
                   }
                 }
               </button>

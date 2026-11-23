@@ -55,7 +55,7 @@
                   @for (action of catalog.value().actions; track action) {
                     <td class="px-2 py-1 text-center">
                       @if (cell(row.permissions, action); as p) {
-                        <label class="inline-flex size-control items-center justify-center xl:size-8">
+                        <label class="inline-flex size-control items-center justify-center xl:size-target-compact">
                           <input vm-checkbox
                             type="checkbox"
                             [checked]="has(p)"

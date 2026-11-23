@@ -77,7 +77,7 @@ import { selectOr } from '../../../core/util/resource-value';
 
     <ul vm-card class="overflow-hidden" [class.hidden]="list.items().length === 0">
       @for (e of list.items(); track e.id; let first = $first) {
-        <li class="flex items-start gap-2 px-4 py-3 md:items-center" [class.border-t]="!first" [class.opacity-60]="e.archived">
+        <li class="flex items-start gap-2 px-4 py-3 md:items-center" [class.border-t]="!first" [class.bg-surface-container-low]="e.archived">
           <span class="flex min-w-0 flex-1 flex-col md:flex-row md:items-center md:gap-3" [style.padding-inline-start.rem]="e.depth * 1.25">
             <a [routerLink]="link(e)" class="font-medium">{{ e.name }}</a>
             <span class="flex flex-wrap gap-1.5 text-body-medium text-muted-foreground">
