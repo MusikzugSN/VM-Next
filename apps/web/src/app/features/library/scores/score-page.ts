@@ -21,11 +21,11 @@ import { ZardDialogImports } from '@/shared/components/dialog/dialog.imports';
 import { ZardNativeSelectDirective } from '@/shared/components/native-select';
 
 import { ActionRunner, ConfirmService } from '../../../core/actions/action-runner';
+import { fieldProblemHandler } from '../../../core/actions/field-problem-handler';
 import { focusFirstInvalid } from '../../../core/util/focus-invalid';
 import { onUploadCompleted } from '../../../core/actions/on-upload';
 import { UploadLauncher } from '../../../core/actions/pending-features';
 import { ApiClient } from '../../../core/api/api-client';
-import { isApiProblem } from '../../../core/api/api-problem';
 import { withQuery } from '../../../core/api/urls';
 import { SessionStore } from '../../../core/auth/session.store';
 import { PluralPipe } from '../../../core/i18n/plural.pipe';
@@ -40,6 +40,7 @@ import { formatDuration } from './score-query';
 import { TreeLabelPipe } from '../../../shared/ui/tree-label.pipe';
 import { usePageName } from '../../../core/layout/page';
 import { PrintLauncher } from '../../../core/actions/pending-features';
+import { selectOr } from '../../../core/util/resource-value';
 
 export type ScoreTab = 'details' | 'voices' | 'folders';
 
@@ -86,7 +87,7 @@ export function groupCompleteness(
 export class LibraryScorePage {
   private readonly printer = inject(PrintLauncher);
   /** Breadcrumb and document title show the loaded element's name. */
-  private readonly pageName = usePageName(() => this.details.hasValue() ? this.details.value().title : null);
+  private readonly pageName = usePageName(() => selectOr(this.details, (v) => v.title, null));
   private readonly api = inject(ApiClient);
   private readonly actions = inject(ActionRunner);
   private readonly confirm = inject(ConfirmService);
@@ -138,12 +139,12 @@ export class LibraryScorePage {
 
   protected readonly groups = computed(() => {
     if (!this.completeness.hasValue()) return [];
-    const names = new Map((this.voiceOptions.hasValue() ? this.voiceOptions.value().groups : []).map((g) => [g.instrument.id, g.instrument.name]));
+    const names = new Map((selectOr(this.voiceOptions, (v) => v.groups, [])).map((g) => [g.instrument.id, g.instrument.name]));
     return groupCompleteness(this.completeness.value(), names);
   });
   /** Sheet id → page count for „2 Seiten“ in the voice list. */
   protected readonly sheetPages = computed(
-    () => new Map((this.sheets.hasValue() ? this.sheets.value().items : []).map((s) => [s.sheetId, s] as const)),
+    () => new Map((selectOr(this.sheets, (v) => v.items, [])).map((s) => [s.sheetId, s] as const)),
   );
 
   protected readonly form = signal<ScoreFormInput | null>(null);
@@ -182,7 +183,7 @@ export class LibraryScorePage {
   }
 
   protected upload(voiceId?: string): void {
-    this.uploads.open({ scoreId: this.scoreId(), scoreTitle: this.details.hasValue() ? this.details.value().title : undefined, voiceId });
+    this.uploads.open({ scoreId: this.scoreId(), scoreTitle: selectOr(this.details, (v) => v.title, undefined), voiceId });
   }
 
   protected showSheet(sheetId: string, title: string): void {
@@ -196,7 +197,7 @@ export class LibraryScorePage {
 
   protected async deleteSheet(sheetId: string, voiceName: string): Promise<void> {
     if (!(await this.confirm.confirmDelete('library.score.deleteSheetTitle', 'library.score.deleteSheetText', { voice: voiceName }))) return;
-    const done = await this.actions.send(() => this.api.postVoid(apiUrl('scores', 'deleteSheet', { sheetId })), {
+    const done = await this.actions.runOnce(() => this.api.postVoid(apiUrl('scores', 'deleteSheet', { sheetId })), {
       success: { key: 'library.score.sheetDeleted', params: { voice: voiceName } },
     });
     if (done) {
@@ -214,29 +215,21 @@ export class LibraryScorePage {
       this.focusInvalid();
       return;
     }
-    this.saving.set(true);
-    const done = await this.actions.send(
+    const done = await this.actions.runOnce(
       () => this.api.postVoid(apiUrl('scores', 'updateScoreDetails', { scoreId: this.scoreId() }), body),
       {
+        busy: this.saving,
         success: { key: 'library.form.saved' },
-        onProblem: (problem) => {
-          if (isApiProblem(problem) && problem.code === 'validation-failed') {
-            this.errors.set(problem.fieldErrors());
-            this.focusInvalid();
-            return true;
-          }
-          return false;
-        },
+        onProblem: fieldProblemHandler(this.errors, this.focusInvalid),
       },
     );
-    this.saving.set(false);
     if (done) this.details.reload();
   }
 
   protected async remove(): Promise<void> {
-    const title = this.details.hasValue() ? this.details.value().title : '';
+    const title = selectOr(this.details, (v) => v.title, '');
     if (!(await this.confirm.confirmDelete('library.scores.deleteTitle', 'library.scores.deleteText', { title }))) return;
-    const done = await this.actions.send(() => this.api.postVoid(apiUrl('scores', 'deleteScore', { scoreId: this.scoreId() })), {
+    const done = await this.actions.runOnce(() => this.api.postVoid(apiUrl('scores', 'deleteScore', { scoreId: this.scoreId() })), {
       success: { key: 'library.scores.deleted', params: { title } },
     });
     if (done) void this.router.navigateByUrl(APP_ROUTES.library.scores);
@@ -244,6 +237,6 @@ export class LibraryScorePage {
 
   /** Druckdialog (D-1) for the whole score; the voices come from the voice switch. */
   protected print(): void {
-    this.printer.open({ scope: 'score', id: this.scoreId(), title: this.details.hasValue() ? this.details.value().title : '' });
+    this.printer.open({ scope: 'score', id: this.scoreId(), title: selectOr(this.details, (v) => v.title, '') });
   }
 }

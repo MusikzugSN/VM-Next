@@ -12,6 +12,7 @@ import { ApiClient } from '../../../core/api/api-client';
 import { SessionStore } from '../../../core/auth/session.store';
 import { PageProblem } from '../../../shared/ui/page-problem';
 import { FieldDialog, type FieldDialogValue } from '../../library/ui/field-dialog';
+import { selectOr } from '../../../core/util/resource-value';
 
 /** Tab „Eigene Felder“ (N-2, N-3): custom score fields in display order; create and edit in a dialog. */
 @Component({
@@ -82,7 +83,7 @@ export class FieldsSettings {
   protected readonly fields = rxResource({
     stream: () => this.api.get(apiUrl('scores', 'fieldDefinitions'), fieldDefinitionsResponseSchema),
   });
-  protected readonly items = computed(() => (this.fields.hasValue() ? this.fields.value().items : []));
+  protected readonly items = computed(() => selectOr(this.fields, (v) => v.items, []));
 
   protected readonly dialogOpen = signal(false);
   /** Field in the dialog, `null` for a new one. */
@@ -100,12 +101,12 @@ export class FieldsSettings {
   protected readonly save = async (value: FieldDialogValue): Promise<boolean> => {
     const field = this.editing();
     const done = field
-      ? await this.actions.send(
+      ? await this.actions.runOnce(
           () =>
             this.api.postVoid(apiUrl('scores', 'updateField', { fieldId: field.id }), { name: value.name, required: value.required, options: value.options }),
           { success: { key: 'system.settings.saved' } },
         )
-      : await this.actions.send(() => this.api.post(apiUrl('scores', 'createField'), value, createdResponseSchema), {
+      : await this.actions.runOnce(() => this.api.post(apiUrl('scores', 'createField'), value, createdResponseSchema), {
           success: { key: 'system.settings.fields.created', params: { name: value.name } },
         });
     if (done) this.fields.reload();
@@ -117,13 +118,13 @@ export class FieldsSettings {
     const target = index + delta;
     if (target < 0 || target >= ids.length) return;
     [ids[index], ids[target]] = [ids[target], ids[index]];
-    const done = await this.actions.send(() => this.api.postVoid(apiUrl('scores', 'reorderFields'), { fieldIds: ids }));
+    const done = await this.actions.runOnce(() => this.api.postVoid(apiUrl('scores', 'reorderFields'), { fieldIds: ids }));
     if (done) this.fields.reload();
   }
 
   protected async remove(field: FieldDefinition): Promise<void> {
     if (!(await this.confirm.confirmDelete('system.settings.fields.deleteTitle', 'system.settings.fields.deleteText', { name: field.name }))) return;
-    const done = await this.actions.send(() => this.api.postVoid(apiUrl('scores', 'deleteField', { fieldId: field.id })), {
+    const done = await this.actions.runOnce(() => this.api.postVoid(apiUrl('scores', 'deleteField', { fieldId: field.id })), {
       success: { key: 'system.settings.fields.deleted', params: { name: field.name } },
     });
     if (done) this.fields.reload();

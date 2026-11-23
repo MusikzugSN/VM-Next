@@ -29,6 +29,7 @@ import { NAME_MAX } from '../../../shared/ui/name-dialog';
 import { ToggleSwitch } from '../../../shared/ui/toggle-switch';
 import { TreeLabelPipe } from '../../../shared/ui/tree-label.pipe';
 import { ToggleField } from '../../../shared/ui/toggle-field';
+import { selectOr } from '../../../core/util/resource-value';
 
 /** Ensembles (S-2, F-3): the tree in pre-order, create below a parent, archive and restore. */
 @Component({
@@ -136,7 +137,7 @@ export class EnsemblesPage {
   private readonly options = rxResource({
     stream: () => this.api.get(apiUrl('system', 'userAssignmentOptions'), userAssignmentOptionsResponseSchema),
   });
-  protected readonly parents = computed(() => (this.options.hasValue() ? this.options.value().ensembles : []));
+  protected readonly parents = computed(() => selectOr(this.options, (v) => v.ensembles, []));
 
   protected link(e: EnsembleListItem): string {
     return appPath(APP_ROUTES.system.ensemble, { ensembleId: e.id });
@@ -156,7 +157,7 @@ export class EnsemblesPage {
   }
 
   private async save(name: string): Promise<boolean> {
-    const done = await this.actions.send(
+    const done = await this.actions.runOnce(
       () =>
         this.api.post(apiUrl('system', 'createEnsemble'), { name, parentId: this.newParentId(), applyLineupTemplate: this.applyTemplate() }, createdResponseSchema),
       { success: { key: 'system.ensembles.created', params: { name } } },
@@ -167,7 +168,7 @@ export class EnsemblesPage {
 
   protected async setArchived(e: EnsembleListItem, archive: boolean): Promise<void> {
     const route = archive ? 'archiveEnsemble' : 'unarchiveEnsemble';
-    const done = await this.actions.send(() => this.api.postVoid(apiUrl('system', route, { ensembleId: e.id })), {
+    const done = await this.actions.runOnce(() => this.api.postVoid(apiUrl('system', route, { ensembleId: e.id })), {
       success: { key: archive ? 'system.ensembles.archivedDone' : 'system.ensembles.unarchivedDone', params: { name: e.name } },
     });
     if (done) this.changed();

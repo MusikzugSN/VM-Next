@@ -91,7 +91,7 @@ export class DefaultsSettings {
   }
 
   protected async save(): Promise<void> {
-    const done = await this.actions.send(
+    const done = await this.actions.runOnce(
       () => this.api.postVoid(apiUrl('system', 'updateDefaults'), { defaultEnsembleId: this.ensembleId() || null, defaultRoleId: this.roleId() || null }),
       { success: { key: 'system.settings.saved' } },
     );

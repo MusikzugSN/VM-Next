@@ -257,7 +257,7 @@ export class ScoresPage {
 
   protected async remove(row: ScoreTableRow): Promise<void> {
     if (!(await this.confirm.confirmDelete('library.scores.deleteTitle', 'library.scores.deleteText', { title: row.title }))) return;
-    const done = await this.actions.send(() => this.api.postVoid(apiUrl('scores', 'deleteScore', { scoreId: row.id })), {
+    const done = await this.actions.runOnce(() => this.api.postVoid(apiUrl('scores', 'deleteScore', { scoreId: row.id })), {
       success: { key: 'library.scores.deleted', params: { title: row.title } },
     });
     if (done) this.list.reload();

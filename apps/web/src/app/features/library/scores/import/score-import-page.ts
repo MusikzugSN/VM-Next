@@ -38,6 +38,7 @@ import {
   type ColumnMapping,
   type ColumnTarget,
 } from './import-model';
+import { selectOr } from '../../../../core/util/resource-value';
 
 type RowFilter = 'all' | 'issues' | 'matches';
 
@@ -80,7 +81,7 @@ export class ScoreImportPage {
   protected readonly ensembles = rxResource({
     stream: () => this.api.get(apiUrl('folders', 'ensembleOptions'), ensembleOptionsResponseSchema).pipe(catchError(() => of({ items: [] }))),
   });
-  protected readonly ensembleItems = computed(() => (this.ensembles.hasValue() ? this.ensembles.value().items : []));
+  protected readonly ensembleItems = computed(() => selectOr(this.ensembles, (v) => v.items, []));
   protected readonly canUseFolders = computed(() => this.ensembleItems().length > 0);
 
   protected readonly problems = computed(() => mappingProblems(this.columns(), this.options.fields()));
@@ -179,7 +180,7 @@ export class ScoreImportPage {
     if (!table || !this.ready()) return;
     this.busy.set('preview');
     const body = buildImportBody(table, this.settings(), this.rowActions(), true);
-    const done = await this.actions.send(() => this.api.post(apiUrl('scores', 'importScores'), body, scoreImportResponseSchema));
+    const done = await this.actions.runOnce(() => this.api.post(apiUrl('scores', 'importScores'), body, scoreImportResponseSchema));
     this.busy.set(null);
     if (done) {
       this.preview.set(done.value);
@@ -192,7 +193,7 @@ export class ScoreImportPage {
     if (!table || !this.preview()) return;
     this.busy.set('import');
     const body = buildImportBody(table, this.settings(), this.rowActions(), false);
-    const done = await this.actions.send(() => this.api.post(apiUrl('scores', 'importScores'), body, scoreImportResponseSchema), {
+    const done = await this.actions.runOnce(() => this.api.post(apiUrl('scores', 'importScores'), body, scoreImportResponseSchema), {
       success: { key: 'library.import.done' },
     });
     this.busy.set(null);

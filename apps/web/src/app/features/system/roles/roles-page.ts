@@ -88,7 +88,7 @@ export class RolesPage {
   }
 
   protected readonly create = async (name: string): Promise<boolean> => {
-    const done = await this.actions.send(
+    const done = await this.actions.runOnce(
       () => this.api.post(apiUrl('system', 'createRole'), { name, permissions: [] }, createdResponseSchema),
       { success: { key: 'system.roles.created', params: { name } } },
     );
@@ -99,7 +99,7 @@ export class RolesPage {
 
   protected async resetAll(): Promise<void> {
     if (!(await this.confirm.confirm('system.roles.resetAllTitle', 'system.roles.resetAllText', {}, 'system.roles.resetOk'))) return;
-    const done = await this.actions.send(() => this.api.post(apiUrl('system', 'resetAllRoles'), {}, resetDefaultsResponseSchema));
+    const done = await this.actions.runOnce(() => this.api.post(apiUrl('system', 'resetAllRoles'), {}, resetDefaultsResponseSchema));
     if (!done) return;
     this.actions.notify('system.roles.resetAllDone', { ...done.value });
     this.list.reload();

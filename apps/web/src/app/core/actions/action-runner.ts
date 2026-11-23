@@ -12,6 +12,10 @@ export interface RunOptions {
   success?: { key: string; params?: Record<string, unknown> };
   /** Called with the problem instead of the toast, e.g. to show field errors in a form. */
   onProblem?: (problem: unknown) => boolean | void;
+  /** Flag that is `true` while the action runs, e.g. to disable the save button. */
+  busy?: { set(value: boolean): void };
+  /** i18n key of the toast for failures that are not API problems (default `errors.unknown`). */
+  fallbackKey?: string;
 }
 
 /**
@@ -29,19 +33,22 @@ export class ActionRunner {
   }
 
   async run<T>(action: () => Promise<T>, options: RunOptions = {}): Promise<{ value: T } | undefined> {
+    options.busy?.set(true);
     try {
       const value = await action();
       if (options.success) this.sonner.success(this.transloco.translate(options.success.key, options.success.params ?? {}));
       return { value };
     } catch (error) {
       if (options.onProblem?.(error) === true) return undefined;
-      this.sonner.error(this.transloco.translate(isApiProblem(error) ? error.messageKey : 'errors.unknown'));
+      this.sonner.error(this.transloco.translate(isApiProblem(error) ? error.messageKey : (options.fallbackKey ?? 'errors.unknown')));
       return undefined;
+    } finally {
+      options.busy?.set(false);
     }
   }
 
   /** `run` for a single API request; the request is only built inside the error handling. */
-  send<T>(request: () => Observable<T>, options: RunOptions = {}): Promise<{ value: T } | undefined> {
+  runOnce<T>(request: () => Observable<T>, options: RunOptions = {}): Promise<{ value: T } | undefined> {
     return this.run(() => firstValueFrom(request()), options);
   }
 }

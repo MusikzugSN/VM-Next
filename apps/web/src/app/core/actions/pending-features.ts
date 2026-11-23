@@ -22,22 +22,30 @@ export interface PrintRequest {
   eventId?: string;
 }
 
+/** Bridge to a dialog that lives in the app shell: pages request it, the dialog reads the request. */
+abstract class DialogLauncher<T extends object> {
+  /** Open request; `null` = dialog closed. */
+  readonly request = signal<T | null>(null);
+
+  open(request: T): void {
+    this.request.set({ ...request });
+  }
+
+  close(): void {
+    this.request.set(null);
+  }
+}
+
 /**
  * Opens the upload dialog (N-11) from anywhere; the dialog itself lives in the app shell.
  * `completed` counts finished uploads, so lists of the current page can reload.
  */
 @Injectable({ providedIn: 'root' })
-export class UploadLauncher {
-  /** Open request; `null` = dialog closed. */
-  readonly request = signal<UploadContext | null>(null);
+export class UploadLauncher extends DialogLauncher<UploadContext> {
   readonly completed = signal(0);
 
-  open(context: UploadContext = {}): void {
-    this.request.set({ ...context });
-  }
-
-  close(): void {
-    this.request.set(null);
+  override open(context: UploadContext = {}): void {
+    super.open(context);
   }
 
   /** Called by the dialog after a successful upload. */
@@ -48,15 +56,4 @@ export class UploadLauncher {
 
 /** Opens the print dialog (D-1) from anywhere; the dialog itself lives in the app shell. */
 @Injectable({ providedIn: 'root' })
-export class PrintLauncher {
-  /** Open request; `null` = dialog closed. */
-  readonly request = signal<PrintRequest | null>(null);
-
-  open(request: PrintRequest): void {
-    this.request.set({ ...request });
-  }
-
-  close(): void {
-    this.request.set(null);
-  }
-}
+export class PrintLauncher extends DialogLauncher<PrintRequest> {}

@@ -85,7 +85,7 @@ export class PrintSettings {
       this.error.set(parsed.error.issues[0]?.path[0] === 'publicBaseUrl' ? 'publicBaseUrl' : 'pageLimit');
       return;
     }
-    const done = await this.actions.send(() => this.api.postVoid(apiUrl('system', 'updatePrint'), parsed.data), {
+    const done = await this.actions.runOnce(() => this.api.postVoid(apiUrl('system', 'updatePrint'), parsed.data), {
       success: { key: 'system.settings.saved' },
     });
     if (done) this.changed.emit();

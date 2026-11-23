@@ -3,7 +3,7 @@ import { rxResource } from '@angular/core/rxjs-interop';
 import { TranslocoPipe } from '@jsverse/transloco';
 import { NgIcon, provideIcons } from '@ng-icons/core';
 import { lucidePlus, lucideSearch } from '@ng-icons/lucide';
-import { apiUrl, createdResponseSchema, scoreSearchResponseSchema, type ScoreSearchItem } from '@vm-web/shared';
+import { SCORE_TITLE_MAX, apiUrl, createdResponseSchema, scoreSearchResponseSchema, type ScoreSearchItem } from '@vm-web/shared';
 import { of } from 'rxjs';
 
 import { ZardInputComponent } from '@/shared/components/input';
@@ -103,14 +103,13 @@ export class ScoreSearchSelect {
 
   /** Creates a score with only the title (the rest is filled in later in the library). */
   protected async create(): Promise<void> {
-    const title = this.query().trim().slice(0, 200);
+    const title = this.query().trim().slice(0, SCORE_TITLE_MAX);
     if (!title) return;
-    this.creating.set(true);
     const body = { title, composer: null, arranger: null, publisher: null, publisherNumber: null, durationSeconds: null };
-    const done = await this.actions.send(() => this.api.post(apiUrl('scores', 'createScore'), body, createdResponseSchema), {
+    const done = await this.actions.runOnce(() => this.api.post(apiUrl('scores', 'createScore'), body, createdResponseSchema), {
+      busy: this.creating,
       success: { key: 'upload.scoreCreated', params: { title } },
     });
-    this.creating.set(false);
     if (done) {
       this.search.set('');
       this.changed.emit({ id: done.value.id, title });

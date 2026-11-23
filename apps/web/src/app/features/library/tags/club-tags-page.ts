@@ -107,7 +107,7 @@ export class ClubTagsPage {
   }
 
   protected readonly create = async (name: string): Promise<boolean> => {
-    const done = await this.actions.send(() => this.api.post(apiUrl('tags', 'createTag'), { name }, createdResponseSchema), {
+    const done = await this.actions.runOnce(() => this.api.post(apiUrl('tags', 'createTag'), { name }, createdResponseSchema), {
       success: { key: 'library.tags.created', params: { name } },
     });
     if (done) this.changed();
@@ -117,14 +117,14 @@ export class ClubTagsPage {
   protected readonly rename = async (name: string): Promise<boolean> => {
     const tag = this.renaming();
     if (!tag) return false;
-    const done = await this.actions.send(() => this.api.postVoid(apiUrl('tags', 'renameTag', { tagId: tag.id }), { name }));
+    const done = await this.actions.runOnce(() => this.api.postVoid(apiUrl('tags', 'renameTag', { tagId: tag.id }), { name }));
     if (done) this.changed();
     return !!done;
   };
 
   protected async remove(tag: ClubTagItem): Promise<void> {
     if (!(await this.confirm.confirmDelete('library.tags.deleteTitle', 'library.tags.deleteText', { name: tag.name, count: tag.scoreCount }))) return;
-    const done = await this.actions.send(() => this.api.postVoid(apiUrl('tags', 'deleteTag', { tagId: tag.id })), {
+    const done = await this.actions.runOnce(() => this.api.postVoid(apiUrl('tags', 'deleteTag', { tagId: tag.id })), {
       success: { key: 'library.tags.deleted', params: { name: tag.name } },
     });
     if (done) this.changed();
