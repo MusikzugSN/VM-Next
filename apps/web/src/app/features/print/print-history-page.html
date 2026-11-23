@@ -1,5 +1,5 @@
 <div>
-  <h1 class="text-2xl font-semibold">{{ 'nav.print.history' | transloco }}</h1>
+  <h1 class="text-headline-small">{{ 'nav.print.history' | transloco }}</h1>
   <p class="mt-2 text-muted-foreground">{{ 'print.history.introNoLimit' | transloco }}</p>
 </div>
 
@@ -28,13 +28,13 @@
           }
         </span>
       </div>
-      <h2 id="h-install" class="text-lg font-semibold">{{ 'print.history.installTitle' | transloco }}</h2>
+      <h2 id="h-install" class="text-title-large">{{ 'print.history.installTitle' | transloco }}</h2>
       <ol class="flex list-decimal flex-col gap-3 ps-5">
         <li>{{ 'print.history.steps.install' | transloco }}</li>
         <li class="flex flex-col gap-2">
           {{ 'print.history.steps.origin' | transloco }}
           <span class="flex flex-wrap items-center gap-2">
-            <code class="rounded-md bg-muted px-3 py-2 font-mono text-[13px]">{{ origin }}</code>
+            <code class="rounded-md bg-muted px-3 py-2 font-mono text-body-medium">{{ origin }}</code>
             <button vm-button variant="text" type="button" (click)="copyOrigin()">
               <ng-icon name="lucideCopy" aria-hidden="true" />{{ 'print.history.copy' | transloco }}
             </button>
@@ -60,14 +60,14 @@
         <li vm-card class="flex flex-col gap-2 p-4">
           <div class="flex items-start justify-between gap-2">
             <span class="flex flex-col">
-              <span class="text-xs text-muted-foreground">{{ 'print.history.kinds.' + job.source.kind | transloco }}</span>
+              <span class="text-body-small text-muted-foreground">{{ 'print.history.kinds.' + job.source.kind | transloco }}</span>
               <span class="font-semibold">{{ job.source.title }}</span>
             </span>
             <ng-container [ngTemplateOutlet]="statusBadge" [ngTemplateOutletContext]="{ $implicit: job }" />
           </div>
           <span class="text-muted-foreground">{{ voices(job) }} · {{ 'print.pages' | tPlural: job.pages }} · {{ job.createdAt | date: 'dd.MM., HH:mm' }}</span>
           @if (job.error) {
-            <span class="text-[13px] text-destructive-ink">{{ job.error }}</span>
+            <span class="text-body-medium text-destructive-ink">{{ job.error }}</span>
           }
           <ng-container [ngTemplateOutlet]="actions" [ngTemplateOutletContext]="{ $implicit: job }" />
         </li>
@@ -91,10 +91,10 @@
           @for (job of jobs(); track job.id) {
             <tr class="align-top">
               <td class="px-4 py-3">
-                <span class="block text-xs text-muted-foreground">{{ 'print.history.kinds.' + job.source.kind | transloco }}</span>
+                <span class="block text-body-small text-muted-foreground">{{ 'print.history.kinds.' + job.source.kind | transloco }}</span>
                 <span class="font-medium">{{ job.source.title }}</span>
                 @if (job.error) {
-                  <span class="mt-1 block text-[13px] text-destructive-ink">{{ job.error }}</span>
+                  <span class="mt-1 block text-body-medium text-destructive-ink">{{ job.error }}</span>
                 }
               </td>
               <td class="px-4 py-3">{{ voices(job) }}</td>
@@ -109,11 +109,11 @@
       </table>
     </div>
   }
-  <p class="text-[13px] text-muted-foreground">{{ 'print.history.keepHint' | transloco }}</p>
+  <p class="text-body-medium text-muted-foreground">{{ 'print.history.keepHint' | transloco }}</p>
 }
 
 <ng-template #statusBadge let-job>
-  <span class="inline-flex items-center rounded-sm px-2 py-0.5 text-xs font-medium whitespace-nowrap" [class]="statusClass($any(job).status)">
+  <span class="inline-flex items-center rounded-sm px-2 py-0.5 text-label-medium whitespace-nowrap" [class]="statusClass($any(job).status)">
     @if ($any(job).status === 'printing' && $any(job).printedPages !== null) {
       {{ 'print.history.progress' | transloco: { printed: $any(job).printedPages, pages: $any(job).pages } }}
     } @else {

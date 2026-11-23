@@ -31,7 +31,7 @@ import { initials } from '../branding/branding.store';
           <span class="flex min-w-0 flex-col">
             <span class="truncate font-medium">{{ user.name }}</span>
             @if (roleLine()) {
-              <span class="truncate text-xs text-muted-foreground">{{ roleLine() }}</span>
+              <span class="truncate text-body-small text-muted-foreground">{{ roleLine() }}</span>
             }
           </span>
         </button>
@@ -53,7 +53,7 @@ import { initials } from '../branding/branding.store';
         } @else {
           <span
             aria-hidden="true"
-            class="flex size-8 shrink-0 items-center justify-center rounded-full bg-primary-soft text-xs font-semibold text-primary"
+            class="flex size-8 shrink-0 items-center justify-center rounded-full bg-primary-soft text-label-medium text-primary font-semibold"
             >{{ userInitials() }}</span
           >
         }
@@ -63,7 +63,7 @@ import { initials } from '../branding/branding.store';
         <vm-menu-label>
           <span class="block truncate">{{ user.name }}</span>
           @if (user.email) {
-            <span class="block truncate text-xs font-normal text-muted-foreground">{{ user.email }}</span>
+            <span class="block truncate text-body-small text-muted-foreground">{{ user.email }}</span>
           }
         </vm-menu-label>
         <vm-menu-separator />

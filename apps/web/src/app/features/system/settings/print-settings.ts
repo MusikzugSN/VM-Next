@@ -14,7 +14,7 @@ import { ApiClient } from '../../../core/api/api-client';
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
     <form vm-card class="flex flex-col gap-4 p-4 md:p-6" novalidate (submit)="$event.preventDefault(); save()">
-      <h2 class="text-lg font-semibold">{{ 'system.settings.print.title' | transloco }}</h2>
+      <h2 class="text-title-large">{{ 'system.settings.print.title' | transloco }}</h2>
       <label vm-field class="md:w-60">
         <span vm-field-label>{{ 'system.settings.print.pageLimit' | transloco }}</span>
         <input
@@ -29,7 +29,7 @@ import { ApiClient } from '../../../core/api/api-client';
           [attr.aria-invalid]="error() === 'pageLimit'"
           aria-describedby="hint-pageLimit"
         />
-        <span id="hint-pageLimit" class="text-[13px]" [class]="error() === 'pageLimit' ? 'text-destructive-ink' : 'text-muted-foreground'">{{
+        <span id="hint-pageLimit" class="text-body-medium" [class]="error() === 'pageLimit' ? 'text-destructive-ink' : 'text-muted-foreground'">{{
           'system.settings.print.pageLimitHint' | transloco
         }}</span>
       </label>
@@ -46,7 +46,7 @@ import { ApiClient } from '../../../core/api/api-client';
           [attr.aria-invalid]="error() === 'publicBaseUrl'"
           aria-describedby="hint-baseUrl"
         />
-        <span id="hint-baseUrl" class="text-[13px]" [class]="error() === 'publicBaseUrl' ? 'text-destructive-ink' : 'text-muted-foreground'">{{
+        <span id="hint-baseUrl" class="text-body-medium" [class]="error() === 'publicBaseUrl' ? 'text-destructive-ink' : 'text-muted-foreground'">{{
           'system.settings.print.publicBaseUrlHint' | transloco
         }}</span>
       </label>

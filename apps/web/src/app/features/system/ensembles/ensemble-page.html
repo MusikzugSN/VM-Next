@@ -6,7 +6,7 @@
   <vm-page-problem [error]="details.error()" />
 } @else if (ensemble(); as e) {
   <div>
-    <h1 class="text-2xl font-semibold">{{ e.name }}</h1>
+    <h1 class="text-headline-small">{{ e.name }}</h1>
     <p class="mt-2 text-muted-foreground">
       {{ 'system.ensembles.memberCount' | tPlural: e.memberCount }} · {{ 'system.ensembles.lineupSize' | tPlural: e.lineupSize }}
       @if (e.archived) {
@@ -54,7 +54,7 @@
                 }
               </select>
             </label>
-            <p class="mt-1 text-[13px] text-muted-foreground">{{ 'system.ensemble.parentHint' | transloco }}</p>
+            <p class="mt-1 text-body-medium text-muted-foreground">{{ 'system.ensemble.parentHint' | transloco }}</p>
           } @else {
             <span class="text-muted-foreground">{{ 'system.ensemble.parent' | transloco }}</span>
             <p>{{ parentName() }}</p>
@@ -74,7 +74,7 @@
       <section aria-labelledby="h-lineup" vm-card class="flex flex-col gap-4 p-4 md:p-6">
         <div class="flex flex-col gap-2 md:flex-row md:items-start md:justify-between">
           <div>
-            <h2 id="h-lineup" class="text-lg font-semibold">{{ 'system.ensemble.tabLineup' | transloco }}</h2>
+            <h2 id="h-lineup" class="text-title-large">{{ 'system.ensemble.tabLineup' | transloco }}</h2>
             <p class="text-muted-foreground">{{ 'system.ensemble.lineupHint' | transloco }}</p>
           </div>
           @if (canEdit()) {
@@ -95,7 +95,7 @@
               <fieldset class="flex flex-col gap-1 rounded-md border p-4">
                 <legend class="px-1 font-semibold">{{ group.instrument.name }}</legend>
                 @if (canEdit() && group.voices.length > 1) {
-                  <button type="button" class="self-start text-[13px] font-medium text-primary" (click)="toggleInstrument(group.voices)">
+                  <button type="button" class="self-start text-label-large text-primary" (click)="toggleInstrument(group.voices)">
                     {{ (allOn(group.voices) ? 'system.ensemble.noneOf' : 'system.ensemble.allOf') | transloco: { name: group.instrument.name } }}
                   </button>
                 }
@@ -119,7 +119,7 @@
       <ul vm-card class="overflow-hidden" [class.hidden]="members.items().length === 0">
         @for (m of members.items(); track m.userId; let first = $first) {
           <li class="flex items-center gap-3 px-4 py-3" [class.border-t]="!first">
-            <span aria-hidden="true" class="flex size-8 shrink-0 items-center justify-center rounded-full bg-primary-soft text-xs font-semibold text-primary">{{
+            <span aria-hidden="true" class="flex size-8 shrink-0 items-center justify-center rounded-full bg-primary-soft text-label-medium text-primary font-semibold">{{
               initialsOf(m.name)
             }}</span>
             <span class="flex min-w-0 flex-1 flex-col">
@@ -128,7 +128,7 @@
               } @else {
                 <span class="font-medium">{{ m.name }}</span>
               }
-              <span class="truncate text-[13px] text-muted-foreground">
+              <span class="truncate text-body-medium text-muted-foreground">
                 {{ m.role.name }}
                 @for (v of m.voices; track v.id; let firstVoice = $first) {
                   {{ firstVoice ? ' · ' : ', ' }}{{ v.name }}
@@ -139,7 +139,7 @@
         }
       </ul>
       <vm-list-state [list]="members" emptyKey="system.ensemble.noMembers" />
-      <p class="text-[13px] text-muted-foreground">{{ 'system.ensemble.membersHint' | transloco }}</p>
+      <p class="text-body-medium text-muted-foreground">{{ 'system.ensemble.membersHint' | transloco }}</p>
     }
   }
 }

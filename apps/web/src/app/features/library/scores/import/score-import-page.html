@@ -1,6 +1,6 @@
 <div class="flex flex-col gap-6">
   <div>
-    <h1 class="text-2xl font-semibold">{{ 'library.import.title' | transloco }}</h1>
+    <h1 class="text-headline-small">{{ 'library.import.title' | transloco }}</h1>
     <p class="mt-2 max-w-3xl text-muted-foreground">{{ 'library.import.intro' | transloco }}</p>
   </div>
 
@@ -10,7 +10,7 @@
 
   <!-- 1 · Datei -->
   <section vm-card class="flex flex-col gap-3 p-4 md:p-6" aria-labelledby="import-file">
-    <h2 id="import-file" class="text-lg font-semibold">{{ 'library.import.step.file' | transloco }}</h2>
+    <h2 id="import-file" class="text-title-large">{{ 'library.import.step.file' | transloco }}</h2>
     <div class="flex flex-col gap-3 md:flex-row md:items-center">
       <input #picker type="file" class="sr-only" accept=".csv,text/csv" tabindex="-1" aria-hidden="true" (change)="onPick($event)" />
       <button vm-button variant="outlined" type="button" class="w-full md:w-auto" (click)="picker.click()">
@@ -36,13 +36,13 @@
     <!-- 2 · Zuordnung -->
     <section vm-card class="flex flex-col gap-4 p-4 md:p-6" aria-labelledby="import-mapping">
       <div>
-        <h2 id="import-mapping" class="text-lg font-semibold">{{ 'library.import.step.mapping' | transloco }}</h2>
+        <h2 id="import-mapping" class="text-title-large">{{ 'library.import.step.mapping' | transloco }}</h2>
         <p class="mt-1 text-muted-foreground">{{ 'library.import.mappingHint' | transloco }}</p>
       </div>
 
       <!-- Table on wide screens, stacked cards on phones: the target must stay reachable without side scrolling. -->
       <div class="rounded-md border">
-        <div class="hidden grid-cols-[minmax(0,12rem)_minmax(0,1fr)_18rem] gap-3 bg-muted px-3 py-2 text-xs font-medium text-muted-foreground md:grid" aria-hidden="true">
+        <div class="hidden grid-cols-[minmax(0,12rem)_minmax(0,1fr)_18rem] gap-3 bg-muted px-3 py-2 text-label-medium text-muted-foreground md:grid" aria-hidden="true">
           <span>{{ 'library.import.column' | transloco }}</span>
           <span>{{ 'library.import.examples' | transloco }}</span>
           <span>{{ 'library.import.target' | transloco }}</span>
@@ -52,7 +52,7 @@
             @let column = columns()[i];
             <li class="grid gap-2 border-t px-3 py-3 first:border-t-0 md:grid-cols-[minmax(0,12rem)_minmax(0,1fr)_18rem] md:gap-3 md:first:border-t" [class.bg-muted/40]="column.target === 'ignore'">
               <span class="font-medium break-words">{{ header }}</span>
-              <span class="min-w-0 text-[13px] text-muted-foreground">
+              <span class="min-w-0 text-body-medium text-muted-foreground">
                 <span class="sr-only">{{ 'library.import.examples' | transloco }}: </span>
                 @for (example of examplesOf(i); track example) {
                   <span class="me-1 mb-1 inline-block max-w-full truncate rounded-sm bg-muted px-1.5 py-0.5 align-top">{{ example }}</span>
@@ -119,7 +119,7 @@
             <label vm-field>
               <span vm-field-label>{{ 'library.import.fixedFolder' | transloco }}</span>
               <input vm-input [value]="fixedFolder()" (input)="setFixedFolder($any($event.target).value)" maxlength="100" />
-              <span class="text-[13px] text-muted-foreground">{{ 'library.import.fixedFolderHint' | transloco }}</span>
+              <span class="text-body-medium text-muted-foreground">{{ 'library.import.fixedFolderHint' | transloco }}</span>
             </label>
           }
           @if (withFolder()) {
@@ -131,7 +131,7 @@
                   <option [value]="ensemble.id" [selected]="ensemble.id === folderEnsembleId()">{{ ensemble | treeLabel }}</option>
                 }
               </select>
-              <span class="text-[13px] text-muted-foreground">{{ 'library.import.folderEnsembleHint' | transloco }}</span>
+              <span class="text-body-medium text-muted-foreground">{{ 'library.import.folderEnsembleHint' | transloco }}</span>
             </label>
           }
         </div>
@@ -166,11 +166,11 @@
     @if (preview(); as p) {
       <section vm-card class="flex flex-col gap-4 p-4 md:p-6" aria-labelledby="import-preview">
         <div>
-          <h2 id="import-preview" class="text-lg font-semibold">{{ 'library.import.step.preview' | transloco }}</h2>
+          <h2 id="import-preview" class="text-title-large">{{ 'library.import.step.preview' | transloco }}</h2>
           <p class="mt-1 text-muted-foreground">{{ 'library.import.previewHint' | transloco }}</p>
         </div>
 
-        <ul class="flex flex-wrap gap-2 text-[13px]" aria-label="{{ 'library.import.summary' | transloco }}">
+        <ul class="flex flex-wrap gap-2 text-body-medium" aria-label="{{ 'library.import.summary' | transloco }}">
           <li class="rounded-full bg-primary-soft px-3 py-1 text-primary">{{ 'library.import.count.create' | tPlural: p.summary.create }}</li>
           <li class="rounded-full bg-muted px-3 py-1">{{ 'library.import.count.link' | tPlural: p.summary.link }}</li>
           @if (p.summary.overwrite) {
@@ -201,7 +201,7 @@
 
         <!-- Like the mapping: grid rows on wide screens, cards on phones (the action stays usable). -->
         <div class="max-h-[60dvh] overflow-auto rounded-md border">
-          <div class="sticky top-0 z-10 hidden gap-3 bg-muted px-3 py-2 text-xs font-medium text-muted-foreground md:grid md:grid-cols-[3rem_minmax(0,1.4fr)_minmax(0,1fr)_minmax(0,0.8fr)_11rem]" aria-hidden="true">
+          <div class="sticky top-0 z-10 hidden gap-3 bg-muted px-3 py-2 text-label-medium text-muted-foreground md:grid md:grid-cols-[3rem_minmax(0,1.4fr)_minmax(0,1fr)_minmax(0,0.8fr)_11rem]" aria-hidden="true">
             <span class="text-end">{{ 'library.import.line' | transloco }}</span>
             <span>{{ 'library.fields.title' | transloco }}</span>
             <span>{{ 'library.import.match' | transloco }}</span>
@@ -211,13 +211,13 @@
           <ul>
             @for (row of shownRows(); track row.line) {
               <li class="grid gap-x-3 gap-y-1.5 border-t px-3 py-3 first:border-t-0 md:first:border-t md:grid-cols-[3rem_minmax(0,1.4fr)_minmax(0,1fr)_minmax(0,0.8fr)_11rem]" [class.bg-destructive-soft]="row.failed">
-                <span class="text-[13px] text-muted-foreground tabular-nums md:text-end">
+                <span class="text-body-medium text-muted-foreground tabular-nums md:text-end">
                   <span class="md:sr-only">{{ 'library.import.line' | transloco }} </span>{{ row.line }}
                 </span>
                 <div class="min-w-0">
                   <span class="font-medium break-words">{{ row.title || '–' }}</span>
                   @for (issue of row.issues; track $index) {
-                    <p class="mt-1 flex items-start gap-1.5 text-[13px]" [class]="issue.level === 'error' ? 'text-destructive-ink' : 'text-warning-ink'">
+                    <p class="mt-1 flex items-start gap-1.5 text-body-medium" [class]="issue.level === 'error' ? 'text-destructive-ink' : 'text-warning-ink'">
                       <ng-icon [name]="issue.level === 'error' ? 'lucideCircleAlert' : 'lucideTriangleAlert'" class="mt-0.5 shrink-0" aria-hidden="true" />
                       <span>
                         @if (targetLabel(issue.target); as label) {
@@ -230,7 +230,7 @@
                     </p>
                   }
                 </div>
-                <div class="min-w-0 text-[13px]">
+                <div class="min-w-0 text-body-medium">
                   <span class="text-muted-foreground md:sr-only">{{ 'library.import.match' | transloco }}: </span>
                   @if (row.match; as m) {
                     <span>{{ m.title }}</span>
@@ -238,13 +238,13 @@
                       <span class="text-muted-foreground"> · {{ m.composer }}</span>
                     }
                     @if (m.inFile) {
-                      <span class="ms-1 rounded-sm bg-primary-soft px-1.5 py-0.5 text-xs text-primary">{{ 'library.import.inFile' | transloco }}</span>
+                      <span class="ms-1 rounded-sm bg-primary-soft px-1.5 py-0.5 text-body-small text-primary">{{ 'library.import.inFile' | transloco }}</span>
                     }
                   } @else {
                     <span class="text-muted-foreground">{{ 'library.import.noMatch' | transloco }}</span>
                   }
                 </div>
-                <div class="min-w-0 text-[13px]">
+                <div class="min-w-0 text-body-medium">
                   @if (row.folder; as f) {
                     <span class="text-muted-foreground md:sr-only">{{ 'library.import.folder' | transloco }}: </span>
                     {{ f.name }}
@@ -252,13 +252,13 @@
                       <span class="font-medium"> · {{ f.number }}</span>
                     }
                     @if (f.isNew) {
-                      <span class="ms-1 rounded-sm bg-muted px-1.5 py-0.5 text-xs">{{ 'library.import.newFolder' | transloco }}</span>
+                      <span class="ms-1 rounded-sm bg-muted px-1.5 py-0.5 text-body-small">{{ 'library.import.newFolder' | transloco }}</span>
                     }
                   }
                 </div>
                 <div>
                   @if (row.failed) {
-                    <span class="text-[13px] text-destructive-ink">{{ 'library.import.notImported' | transloco }}</span>
+                    <span class="text-body-medium text-destructive-ink">{{ 'library.import.notImported' | transloco }}</span>
                   } @else {
                     <select
                       vm-select
@@ -291,7 +291,7 @@
 
   @if (result(); as r) {
     <section vm-card class="flex flex-col gap-3 p-4 md:p-6" aria-labelledby="import-result" role="status">
-      <h2 id="import-result" class="text-lg font-semibold">{{ 'library.import.resultTitle' | transloco }}</h2>
+      <h2 id="import-result" class="text-title-large">{{ 'library.import.resultTitle' | transloco }}</h2>
       <p>
         {{ 'library.import.count.create' | tPlural: r.summary.create }} · {{ 'library.import.count.link' | tPlural: r.summary.link }}
         @if (r.summary.overwrite) {

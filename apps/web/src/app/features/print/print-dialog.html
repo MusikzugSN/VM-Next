@@ -72,11 +72,11 @@
           }
         </div>
         <div class="flex flex-col gap-1.5 md:w-72">
-          <label for="print-add-voice" class="text-[13px] text-muted-foreground">{{ 'print.addVoice' | transloco }}</label>
+          <label for="print-add-voice" class="text-body-medium text-muted-foreground">{{ 'print.addVoice' | transloco }}</label>
           <vm-voice-select controlId="print-add-voice" [value]="null" (changed)="addVoice($event)" />
         </div>
         @if (!voiceIds().length) {
-          <p class="text-[13px] text-destructive-ink">{{ 'print.noVoice' | transloco }}</p>
+          <p class="text-body-medium text-destructive-ink">{{ 'print.noVoice' | transloco }}</p>
         }
       </fieldset>
 
@@ -93,7 +93,7 @@
         <div class="flex flex-col gap-0.5">
           <h3 id="print-how" class="font-medium">{{ 'print.how' | transloco }}</h3>
           @if (current(); as p) {
-            <p class="text-[13px] text-muted-foreground">
+            <p class="text-body-medium text-muted-foreground">
               {{ (p.rules.source ? 'print.rulesOf' : 'print.rulesDefault') | transloco: { name: p.rules.source?.name } }}
             </p>
           }
@@ -101,7 +101,7 @@
         @if (plan.error(); as error) {
           <p role="alert" class="rounded-md bg-destructive-soft p-4 text-destructive-ink">{{ $any(error).messageKey ?? 'errors.unknown' | transloco }}</p>
         } @else if (current(); as p) {
-          <ul class="flex flex-col rounded-md border text-[13px]">
+          <ul class="flex flex-col rounded-md border text-body-medium">
             @for (doc of p.documents; track doc.scoreId + doc.voice.id; let first = $first) {
               @let s = sheets(doc.sheets, doc.mode);
               <li class="flex items-start gap-3 px-4 py-2.5" [class.border-t]="!first">

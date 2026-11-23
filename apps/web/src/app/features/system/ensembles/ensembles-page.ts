@@ -37,7 +37,7 @@ import { selectOr } from '../../../core/util/resource-value';
   template: `
     <div class="flex flex-col gap-3 md:flex-row md:items-start md:justify-between">
       <div>
-        <h1 class="text-2xl font-semibold">{{ 'nav.system.ensembles' | transloco }}</h1>
+        <h1 class="text-headline-small">{{ 'nav.system.ensembles' | transloco }}</h1>
         <p class="mt-2 text-muted-foreground">{{ 'system.ensembles.intro' | transloco }}</p>
       </div>
       @if (canCreate()) {
@@ -80,15 +80,15 @@ import { selectOr } from '../../../core/util/resource-value';
         <li class="flex items-start gap-2 px-4 py-3 md:items-center" [class.border-t]="!first" [class.opacity-60]="e.archived">
           <span class="flex min-w-0 flex-1 flex-col md:flex-row md:items-center md:gap-3" [style.padding-inline-start.rem]="e.depth * 1.25">
             <a [routerLink]="link(e)" class="font-medium">{{ e.name }}</a>
-            <span class="flex flex-wrap gap-1.5 text-[13px] text-muted-foreground">
+            <span class="flex flex-wrap gap-1.5 text-body-medium text-muted-foreground">
               @if (e.isRoot) {
-                <span class="rounded-sm bg-muted px-1.5 py-0.5 text-xs">{{ 'system.ensembles.root' | transloco }}</span>
+                <span class="rounded-sm bg-muted px-1.5 py-0.5 text-body-small">{{ 'system.ensembles.root' | transloco }}</span>
               }
               @if (e.isDefault) {
-                <span class="rounded-sm bg-primary-soft px-1.5 py-0.5 text-xs text-primary">{{ 'system.ensembles.default' | transloco }}</span>
+                <span class="rounded-sm bg-primary-soft px-1.5 py-0.5 text-body-small text-primary">{{ 'system.ensembles.default' | transloco }}</span>
               }
               @if (e.archived) {
-                <span class="rounded-sm bg-muted px-1.5 py-0.5 text-xs">{{ 'system.ensembles.archived' | transloco }}</span>
+                <span class="rounded-sm bg-muted px-1.5 py-0.5 text-body-small">{{ 'system.ensembles.archived' | transloco }}</span>
               }
               <span>{{ 'system.ensembles.memberCount' | tPlural: e.memberCount }} · {{ 'system.ensembles.lineupSize' | tPlural: e.lineupSize }}</span>
             </span>

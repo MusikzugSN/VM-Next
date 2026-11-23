@@ -9,13 +9,13 @@
     @if (u.pictureUrl) {
       <img [src]="u.pictureUrl" alt="" class="size-14 rounded-full object-cover" />
     } @else {
-      <span aria-hidden="true" class="flex size-14 shrink-0 items-center justify-center rounded-full bg-primary-soft text-lg font-semibold text-primary">{{
+      <span aria-hidden="true" class="flex size-14 shrink-0 items-center justify-center rounded-full bg-primary-soft text-title-large text-primary">{{
         initialsOf(u.name)
       }}</span>
     }
     <div class="flex min-w-0 flex-col gap-1">
       <div class="flex flex-wrap items-center gap-2">
-        <h1 class="text-2xl font-semibold">{{ u.name }}</h1>
+        <h1 class="text-headline-small">{{ u.name }}</h1>
         <vm-user-status-badge [status]="u.status" />
       </div>
       <p class="text-muted-foreground">{{ u.email ?? '–' }} · {{ 'system.user.readOnlyHint' | transloco }}</p>
@@ -24,7 +24,7 @@
 
   <section aria-labelledby="h-memberships" vm-card class="flex flex-col gap-4 p-4 md:p-6">
     <div>
-      <h2 id="h-memberships" class="text-lg font-semibold">{{ 'system.users.memberships' | transloco }}</h2>
+      <h2 id="h-memberships" class="text-title-large">{{ 'system.users.memberships' | transloco }}</h2>
       <p class="text-muted-foreground">{{ 'system.user.membershipsHint' | transloco }}</p>
     </div>
     <ul class="flex flex-col">
@@ -82,7 +82,7 @@
             }
           </select>
         </label>
-        <p class="text-[13px] text-muted-foreground">{{ 'system.user.membershipsHint' | transloco }}</p>
+        <p class="text-body-medium text-muted-foreground">{{ 'system.user.membershipsHint' | transloco }}</p>
       </vm-form-dialog>
     }
     <div class="flex items-center justify-between gap-4 border-t pt-4">
@@ -102,7 +102,7 @@
   <section aria-labelledby="h-voices" vm-card class="flex flex-col gap-4 p-4 md:p-6">
     <div class="flex flex-col gap-2 md:flex-row md:items-start md:justify-between">
       <div>
-        <h2 id="h-voices" class="text-lg font-semibold">{{ 'system.user.voices' | transloco }}</h2>
+        <h2 id="h-voices" class="text-title-large">{{ 'system.user.voices' | transloco }}</h2>
         <p class="text-muted-foreground">{{ 'system.user.voicesHint' | transloco: { name: u.name } }}</p>
       </div>
       @if (canEdit()) {
@@ -112,7 +112,7 @@
     <div class="flex max-h-96 flex-col gap-3 overflow-y-auto">
       @for (group of voices.options(); track group.instrument.id) {
         <div role="group" [attr.aria-labelledby]="'uv-' + group.instrument.id" class="flex flex-col gap-1.5">
-          <span [id]="'uv-' + group.instrument.id" class="text-xs font-medium text-muted-foreground">{{ group.instrument.name }}</span>
+          <span [id]="'uv-' + group.instrument.id" class="text-label-medium text-muted-foreground">{{ group.instrument.name }}</span>
           <div class="flex flex-wrap gap-2">
             @for (voice of group.voices; track voice.id) {
               <button
@@ -136,7 +136,7 @@
   </section>
 
   <section aria-labelledby="h-account" vm-card class="flex flex-col gap-4 p-4 md:p-6">
-    <h2 id="h-account" class="text-lg font-semibold">{{ 'system.user.account' | transloco }}</h2>
+    <h2 id="h-account" class="text-title-large">{{ 'system.user.account' | transloco }}</h2>
     <dl class="grid grid-cols-[auto_1fr] gap-x-4 gap-y-1">
       <dt class="text-muted-foreground">{{ 'system.user.created' | transloco }}</dt>
       <dd>{{ u.createdAt | date: 'dd.MM.yyyy' }}</dd>
@@ -147,7 +147,7 @@
 
   @if ((canEdit() || canDelete()) && !isSelf()) {
     <section aria-labelledby="h-danger" class="flex flex-col gap-4 rounded-lg border border-destructive/40 p-4 md:p-6">
-      <h2 id="h-danger" class="text-lg font-semibold">{{ 'system.user.danger' | transloco }}</h2>
+      <h2 id="h-danger" class="text-title-large">{{ 'system.user.danger' | transloco }}</h2>
       @if (canEdit()) {
         <p class="text-muted-foreground">{{ 'system.user.blockHint' | transloco: { name: u.name } }}</p>
         @if (u.status === 'active') {

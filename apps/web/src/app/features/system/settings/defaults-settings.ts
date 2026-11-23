@@ -20,7 +20,7 @@ import { TreeLabelPipe } from '../../../shared/ui/tree-label.pipe';
   template: `
     <form vm-card class="flex flex-col gap-4 p-4 md:p-6" (submit)="$event.preventDefault(); save()">
       <div>
-        <h2 class="text-lg font-semibold">{{ 'system.settings.defaults.title' | transloco }}</h2>
+        <h2 class="text-title-large">{{ 'system.settings.defaults.title' | transloco }}</h2>
         <p class="text-muted-foreground">{{ 'system.settings.defaults.hint' | transloco }}</p>
       </div>
       @if (warning()) {
@@ -49,7 +49,7 @@ import { TreeLabelPipe } from '../../../shared/ui/tree-label.pipe';
           </select>
         </label>
       </div>
-      <p class="text-[13px] text-muted-foreground">{{ 'system.settings.defaults.noneHint' | transloco }}</p>
+      <p class="text-body-medium text-muted-foreground">{{ 'system.settings.defaults.noneHint' | transloco }}</p>
       @if (!readonly()) {
         <button vm-button type="submit" class="self-end" [zDisabled]="!dirty()">{{ 'common.save' | transloco }}</button>
       }

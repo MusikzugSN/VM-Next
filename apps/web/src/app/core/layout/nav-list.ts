@@ -58,7 +58,7 @@ import { canSee, isActive, NAV_SECTIONS } from './nav';
   template: `
     <nav [attr.aria-label]="'nav.label' | transloco" class="flex flex-col gap-0.5">
       @for (section of sections(); track section.labelKey; let first = $first) {
-        <h2 class="px-2 pb-1 text-xs font-medium text-muted-foreground" [class.pt-3]="!first">
+        <h2 class="px-2 pb-1 text-label-medium text-muted-foreground" [class.pt-3]="!first">
           {{ section.labelKey | transloco }}
         </h2>
         <ul class="flex flex-col gap-0.5">
@@ -77,7 +77,7 @@ import { canSee, isActive, NAV_SECTIONS } from './nav';
                 <span class="flex-1">{{ item.labelKey | transloco }}</span>
                 @if (item.badge === 'review' && reviewCount() > 0) {
                   <span
-                    class="min-w-5 rounded-full bg-primary px-1.5 text-center text-xs leading-5 font-medium text-primary-foreground tabular-nums"
+                    class="min-w-5 rounded-full bg-primary px-1.5 text-center text-label-medium leading-5 text-primary-foreground tabular-nums"
                   >
                     {{ reviewCount() }}
                     <span class="sr-only">{{ 'shell.pendingUploads' | transloco }}</span>

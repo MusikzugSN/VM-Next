@@ -43,14 +43,14 @@ export function loginErrorKey(code: string | undefined): string | null {
               <div class="h-px bg-primary/25"></div>
             }
           </div>
-          <p class="text-lg leading-6 font-semibold md:text-[32px] md:leading-10">
+          <p class="text-title-large leading-6 md:text-headline-large md:leading-10">
             {{ 'auth.login.welcome' | transloco: { club: clubName() } }}
           </p>
-          <p class="text-[15px] leading-[22px] whitespace-pre-line md:text-base md:leading-6">
+          <p class="text-body-large whitespace-pre-line md:text-body-large md:leading-6">
             {{ branding.branding()?.loginBanner ?? ('auth.login.defaultBanner' | transloco) }}
           </p>
         </div>
-        <p class="hidden text-[13px] md:block">{{ 'auth.login.tagline' | transloco }}</p>
+        <p class="hidden text-body-medium md:block">{{ 'auth.login.tagline' | transloco }}</p>
       </section>
     </ng-template>
 
@@ -65,7 +65,7 @@ export function loginErrorKey(code: string | undefined): string | null {
             <div class="flex flex-col items-center gap-4 text-center md:gap-6">
               <vm-club-logo [size]="logoSize()" [label]="'auth.login.logoLabel' | transloco: { club: clubName() }" />
               <div class="flex flex-col gap-1">
-                <h1 class="text-[22px] leading-7 font-semibold md:text-2xl md:leading-8">{{ clubName() }}</h1>
+                <h1 class="text-title-large leading-7 md:text-headline-small md:leading-8">{{ clubName() }}</h1>
                 <p class="hidden text-muted-foreground md:block">{{ 'auth.login.intro' | transloco }}</p>
               </div>
             </div>
@@ -84,7 +84,7 @@ export function loginErrorKey(code: string | undefined): string | null {
               <a vm-button [href]="loginHref()" class="w-full">
                 <ng-icon name="lucideLogIn" aria-hidden="true" />{{ 'auth.login.submit' | transloco }}
               </a>
-              <p class="flex items-start gap-2 text-start text-[13px] text-muted-foreground">
+              <p class="flex items-start gap-2 text-start text-body-medium text-muted-foreground">
                 <ng-icon name="lucideInfo" class="mt-0.5 shrink-0" aria-hidden="true" />{{ 'auth.login.redirectHint' | transloco }}
               </p>
             </div>

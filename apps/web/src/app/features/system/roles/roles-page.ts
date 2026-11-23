@@ -24,7 +24,7 @@ import { NameDialog } from '../../../shared/ui/name-dialog';
   template: `
     <div class="flex flex-col gap-3 md:flex-row md:items-start md:justify-between">
       <div>
-        <h1 class="text-2xl font-semibold">{{ 'nav.system.roles' | transloco }}</h1>
+        <h1 class="text-headline-small">{{ 'nav.system.roles' | transloco }}</h1>
         <p class="mt-2 text-muted-foreground">{{ 'system.roles.intro' | transloco }}</p>
       </div>
       <div class="flex flex-col gap-2 md:flex-row">
@@ -47,12 +47,12 @@ import { NameDialog } from '../../../shared/ui/name-dialog';
       @for (role of list.items(); track role.id; let first = $first) {
         <li class="flex flex-col gap-1 px-4 py-3 md:flex-row md:items-center md:gap-3" [class.border-t]="!first">
           <a [routerLink]="link(role)" class="font-medium">{{ role.name }}</a>
-          <span class="flex flex-1 flex-wrap items-center gap-1.5 text-[13px] text-muted-foreground">
+          <span class="flex flex-1 flex-wrap items-center gap-1.5 text-body-medium text-muted-foreground">
             @if (role.defaultKey) {
-              <span class="rounded-sm bg-muted px-1.5 py-0.5 text-xs">{{ 'system.roles.default' | transloco }}</span>
+              <span class="rounded-sm bg-muted px-1.5 py-0.5 text-body-small">{{ 'system.roles.default' | transloco }}</span>
             }
             @if (role.modifiedFromDefault) {
-              <span class="rounded-sm bg-warning-soft px-1.5 py-0.5 text-xs text-warning-ink">{{ 'system.roles.modified' | transloco }}</span>
+              <span class="rounded-sm bg-warning-soft px-1.5 py-0.5 text-body-small text-warning-ink">{{ 'system.roles.modified' | transloco }}</span>
             }
             @if (role.hasClubPermissions) {
               <span vm-badge tone="error">

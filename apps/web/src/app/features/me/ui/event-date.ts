@@ -9,8 +9,8 @@ import { ChangeDetectionStrategy, Component, input } from '@angular/core';
   host: { class: 'inline-flex shrink-0', 'aria-hidden': 'true' },
   template: `
     <span class="flex size-12 flex-col items-center justify-center rounded-md bg-primary-soft text-primary">
-      <span class="text-lg leading-[22px] font-semibold tabular-nums">{{ date() | date: 'd' }}</span>
-      <span class="text-xs font-medium">{{ date() | date: 'MMM' }}</span>
+      <span class="text-title-large tabular-nums">{{ date() | date: 'd' }}</span>
+      <span class="text-label-medium">{{ date() | date: 'MMM' }}</span>
     </span>
   `,
 })

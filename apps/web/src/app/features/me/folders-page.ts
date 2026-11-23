@@ -23,7 +23,7 @@ import { ListState } from '../../shared/ui/list-state';
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
     <div>
-      <h1 class="text-2xl font-semibold">{{ 'nav.me.folders' | transloco }}</h1>
+      <h1 class="text-headline-small">{{ 'nav.me.folders' | transloco }}</h1>
       @if (voiceNames()) {
         <p class="mt-2 text-muted-foreground">{{ 'me.folders.intro' | transloco: { voices: voiceNames() } }}</p>
       }
@@ -35,7 +35,7 @@ import { ListState } from '../../shared/ui/list-state';
           <li>
             <a [routerLink]="link(folder)" vm-card class="flex items-center gap-3 p-4 text-foreground no-underline">
               <span class="flex min-w-0 flex-1 flex-col gap-1">
-                <span class="text-base font-medium">{{ folder.name }}</span>
+                <span class="text-title-medium font-medium">{{ folder.name }}</span>
                 <span class="text-muted-foreground">
                   {{ 'me.common.scoreCount' | tPlural: folder.scoreCount }} · {{ folder.ensemble.name }}
                 </span>

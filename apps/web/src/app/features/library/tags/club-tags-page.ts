@@ -27,7 +27,7 @@ import { LibraryOptions } from '../library-options';
   template: `
     <div class="flex flex-col gap-3 md:flex-row md:items-start md:justify-between">
       <div>
-        <h1 class="text-2xl font-semibold">{{ 'nav.library.tags' | transloco }}</h1>
+        <h1 class="text-headline-small">{{ 'nav.library.tags' | transloco }}</h1>
         <p class="mt-2 text-muted-foreground">{{ 'library.tags.intro' | transloco }}</p>
       </div>
       @if (canCreate()) {
@@ -53,8 +53,8 @@ import { LibraryOptions } from '../library-options';
       @for (tag of list.items(); track tag.id; let first = $first) {
         <li class="flex flex-col gap-2 px-4 py-3 md:flex-row md:items-center" [class.border-t]="!first">
             <span class="flex min-w-0 flex-1 flex-col md:flex-row md:items-center md:gap-3">
-              <span class="text-base font-medium md:text-sm">{{ tag.name }}</span>
-              <span class="text-[13px] text-muted-foreground">{{ 'library.tags.scoreCount' | tPlural: tag.scoreCount }}</span>
+              <span class="text-title-medium md:text-label-large font-medium">{{ tag.name }}</span>
+              <span class="text-body-medium text-muted-foreground">{{ 'library.tags.scoreCount' | tPlural: tag.scoreCount }}</span>
             </span>
             <span class="flex gap-1">
               @if (canEdit()) {
@@ -73,7 +73,7 @@ import { LibraryOptions } from '../library-options';
     </ul>
     <vm-list-state [list]="list" emptyKey="library.tags.empty" />
 
-    <aside class="flex items-start gap-2 rounded-lg border p-4 text-[13px] text-muted-foreground">
+    <aside class="flex items-start gap-2 rounded-lg border p-4 text-body-medium text-muted-foreground">
       <ng-icon name="lucideLock" class="mt-0.5 shrink-0" aria-hidden="true" />
       <span>{{ 'library.tags.personalHint' | transloco }} <a [routerLink]="meTagsPath" class="font-medium">{{ 'library.tags.personalLink' | transloco }}</a></span>
     </aside>

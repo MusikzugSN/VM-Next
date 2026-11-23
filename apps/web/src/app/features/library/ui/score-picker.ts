@@ -57,7 +57,7 @@ export interface PickedScore {
                 }
               </span>
               @if (score.alreadyContained) {
-                <span class="text-xs text-muted-foreground">{{ 'library.picker.contained' | transloco }}</span>
+                <span class="text-body-small text-muted-foreground">{{ 'library.picker.contained' | transloco }}</span>
               } @else {
                 <button
                   vm-button

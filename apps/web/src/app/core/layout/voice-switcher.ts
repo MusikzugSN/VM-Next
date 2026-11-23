@@ -38,7 +38,7 @@ import { StandInDialog } from './stand-in-dialog';
         <ng-icon name="lucideMusic2" aria-hidden="true" class="shrink-0" />
         <span class="truncate">{{ label() }}</span>
         @if (store.isStandIn()) {
-          <span class="rounded-sm bg-background px-1 text-xs">{{ 'shell.voice.override' | transloco }}</span>
+          <span class="rounded-sm bg-background px-1 text-body-small">{{ 'shell.voice.override' | transloco }}</span>
         }
         <ng-icon name="lucideChevronDown" aria-hidden="true" class="shrink-0" />
       </button>

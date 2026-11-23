@@ -32,7 +32,7 @@ import { LegalLinks } from './legal-links';
             <ng-icon name="lucideLock" size="var(--mat-sys-icon-size-md)" aria-hidden="true" />
           </span>
           <div class="flex flex-col gap-2">
-            <h1 class="text-2xl font-semibold">{{ 'auth.blocked.title' | transloco }}</h1>
+            <h1 class="text-headline-small">{{ 'auth.blocked.title' | transloco }}</h1>
             <p class="text-muted-foreground">{{ 'auth.blocked.text' | transloco: { club: clubName() } }}</p>
           </div>
           <div class="flex flex-col gap-2 rounded-md border p-4">

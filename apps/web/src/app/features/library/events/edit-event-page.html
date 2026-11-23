@@ -8,7 +8,7 @@
   @let event = details.value();
   <div class="flex flex-col gap-3 md:flex-row md:items-start md:justify-between">
     <div>
-      <h1 class="text-2xl font-semibold">{{ 'pages.editEvent' | transloco }}</h1>
+      <h1 class="text-headline-small">{{ 'pages.editEvent' | transloco }}</h1>
       <p class="mt-2 text-muted-foreground">{{ event.name }} · {{ event.ensemble.name }} · {{ 'library.event.setlistCount' | transloco: { count: items().length } }}</p>
     </div>
     <div class="flex flex-col gap-2 md:flex-row">
@@ -24,7 +24,7 @@
   </div>
 
   <form aria-labelledby="h-event" vm-card class="flex flex-col gap-4 p-4 md:p-6" novalidate (submit)="$event.preventDefault(); saveDetails()">
-    <h2 id="h-event" class="text-lg font-semibold">{{ 'terms.event' | transloco }}</h2>
+    <h2 id="h-event" class="text-title-large">{{ 'terms.event' | transloco }}</h2>
     <fieldset class="grid gap-4 md:grid-cols-2" [disabled]="!canEdit()">
       <label vm-field>
         <span vm-field-label>{{ 'library.events.date' | transloco }} *</span>
@@ -53,7 +53,7 @@
   <section aria-labelledby="h-setlist" class="flex flex-col gap-4">
     <div class="flex flex-col gap-2 md:flex-row md:items-end md:justify-between">
       <div>
-        <h2 id="h-setlist" class="text-lg font-semibold">{{ 'library.event.setlist' | transloco: { count: items().length } }}</h2>
+        <h2 id="h-setlist" class="text-title-large">{{ 'library.event.setlist' | transloco: { count: items().length } }}</h2>
         @if (canEdit()) {
           <p class="text-muted-foreground">{{ 'library.event.orderHint' | transloco }}</p>
         }

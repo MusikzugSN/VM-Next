@@ -1,6 +1,6 @@
 <div class="flex flex-col gap-3 md:flex-row md:items-start md:justify-between">
   <div>
-    <h1 class="text-2xl font-semibold">{{ 'nav.library.folders' | transloco }}</h1>
+    <h1 class="text-headline-small">{{ 'nav.library.folders' | transloco }}</h1>
     <p class="mt-2 text-muted-foreground">{{ 'library.folders.intro' | transloco }}</p>
   </div>
   @if (canCreate()) {
@@ -39,7 +39,7 @@
     @for (folder of list.items(); track folder.id) {
       <li vm-card class="flex items-center gap-3 p-4">
         <a [routerLink]="link(folder)" class="flex min-w-0 flex-1 flex-col text-foreground no-underline">
-          <span class="text-base font-semibold">{{ folder.name }}</span>
+          <span class="text-title-medium">{{ folder.name }}</span>
           <span class="text-muted-foreground">{{ 'library.folders.scoreCount' | tPlural: folder.scoreCount }} · {{ folder.ensemble.name }}</span>
         </a>
         <vm-switch [checked]="folder.showInMyArea" [label]="visibilityLabel(folder)" [disabled]="!canEdit(folder)" (toggled)="setVisibility(folder, $event)" />

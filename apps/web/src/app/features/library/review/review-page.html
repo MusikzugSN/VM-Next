@@ -1,8 +1,8 @@
 <div class="flex flex-col gap-1">
-  <h1 class="text-2xl font-semibold">{{ 'nav.library.review' | transloco }}</h1>
+  <h1 class="text-headline-small">{{ 'nav.library.review' | transloco }}</h1>
   <p class="text-muted-foreground">{{ 'review.waiting' | tPlural: total() }}</p>
   @if (!viewport.isMobile()) {
-    <p class="text-[13px] text-muted-foreground">
+    <p class="text-body-medium text-muted-foreground">
       {{ 'review.shortcuts' | transloco }}
       <kbd class="rounded border border-input px-1 font-sans text-foreground">A</kbd> {{ 'review.keyApprove' | transloco }} ·
       <kbd class="rounded border border-input px-1 font-sans text-foreground">R</kbd> {{ 'review.keyReject' | transloco }} ·
@@ -26,7 +26,7 @@
       </button>
       <div class="flex-1 text-center">
         <p class="font-semibold tabular-nums">{{ position() ? ('review.position' | transloco: { position: position(), total: total() }) : '' }}</p>
-        <p class="text-xs text-muted-foreground">{{ 'review.inQueue' | transloco }}</p>
+        <p class="text-body-small text-muted-foreground">{{ 'review.inQueue' | transloco }}</p>
       </div>
       <button vm-icon-button variant="outlined" type="button" [zDisabled]="!upload()?.nextUploadId" (click)="openUpload(upload()?.nextUploadId)" [attr.aria-label]="'review.nextUpload' | transloco">
         <ng-icon name="lucideChevronRight" aria-hidden="true" />
@@ -65,8 +65,8 @@
                   [class.bg-primary-soft]="item.uploadId === uploadId()"
                 >
                   <span class="truncate font-medium">{{ item.score?.name ?? item.fileName }}</span>
-                  <span class="truncate text-xs text-muted-foreground">{{ item.voice?.name ?? ('review.noVoice' | transloco) }}</span>
-                  <span class="truncate text-xs text-muted-foreground">{{ item.uploadedBy?.name ?? '–' }} · {{ item.uploadedAt | date: 'dd.MM.' }}</span>
+                  <span class="truncate text-body-small text-muted-foreground">{{ item.voice?.name ?? ('review.noVoice' | transloco) }}</span>
+                  <span class="truncate text-body-small text-muted-foreground">{{ item.uploadedBy?.name ?? '–' }} · {{ item.uploadedAt | date: 'dd.MM.' }}</span>
                 </a>
               </li>
             }
@@ -75,7 +75,7 @@
             <button vm-button variant="text" type="button" class="m-2" (click)="queue.loadMore()">{{ 'common.loadMore' | transloco }}</button>
           }
         } @else {
-          <span class="py-2 text-xs font-medium text-muted-foreground tabular-nums">{{ position() ?? '–' }}/{{ total() }}</span>
+          <span class="py-2 text-label-medium text-muted-foreground tabular-nums">{{ position() ?? '–' }}/{{ total() }}</span>
         }
       </section>
     }
@@ -85,7 +85,7 @@
         <button vm-icon-button type="button" [zDisabled]="page() <= 1" (click)="goPage(-1)" [attr.aria-label]="'pdf.previous' | transloco">
           <ng-icon name="lucideChevronLeft" aria-hidden="true" />
         </button>
-        <span class="text-[13px] tabular-nums" aria-live="polite">{{ 'pdf.status' | transloco: { page: page(), count: pages().length } }}</span>
+        <span class="text-body-medium tabular-nums" aria-live="polite">{{ 'pdf.status' | transloco: { page: page(), count: pages().length } }}</span>
         <button vm-icon-button type="button" [zDisabled]="page() >= pages().length" (click)="goPage(1)" [attr.aria-label]="'pdf.next' | transloco">
           <ng-icon name="lucideChevronRight" aria-hidden="true" />
         </button>
@@ -98,7 +98,7 @@
           <button vm-icon-button type="button" [zDisabled]="zoomIndex() === 0" (click)="zoomBy(-1)" [attr.aria-label]="'review.zoomOut' | transloco">
             <ng-icon name="lucideZoomOut" aria-hidden="true" />
           </button>
-          <span class="w-12 text-center text-[13px] tabular-nums">{{ zoom() * 100 }} %</span>
+          <span class="w-12 text-center text-body-medium tabular-nums">{{ zoom() * 100 }} %</span>
           <button vm-icon-button type="button" [zDisabled]="zoomIndex() === 5" (click)="zoomBy(1)" [attr.aria-label]="'review.zoomIn' | transloco">
             <ng-icon name="lucideZoomIn" aria-hidden="true" />
           </button>
@@ -109,21 +109,21 @@
         <fieldset class="flex flex-wrap items-end gap-3 border-b bg-background px-4 py-3">
           <legend class="sr-only">{{ 'review.cropLegend' | transloco: { page: page() } }}</legend>
           @for (side of ['left', 'top', 'right', 'bottom']; track side) {
-            <label class="flex flex-col gap-1 text-xs">
+            <label class="flex flex-col gap-1 text-body-small">
               <span class="font-medium">{{ 'review.margin.' + side | transloco }}</span>
               <input
                 type="number"
                 min="0"
                 max="90"
                 step="1"
-                class="h-control w-20 rounded-md border border-input px-2 text-sm tabular-nums xl:h-control-compact"
+                class="h-control w-20 rounded-md border border-input px-2 text-body-medium tabular-nums xl:h-control-compact"
                 [value]="cropValue($any(side))"
                 (input)="setCrop($any(side), $any($event.target).value)"
               />
             </label>
           }
           <button vm-button variant="text" type="button" (click)="resetCrop()">{{ 'review.resetCrop' | transloco }}</button>
-          <p class="w-full text-xs text-muted-foreground">{{ 'review.cropHint' | transloco }}</p>
+          <p class="w-full text-body-small text-muted-foreground">{{ 'review.cropHint' | transloco }}</p>
         </fieldset>
       }
 
@@ -143,7 +143,7 @@
         <label class="flex min-h-target items-center gap-2 border-t px-3 xl:min-h-9">
           <input vm-checkbox type="checkbox" [checked]="p.keep" (change)="toggleKeep()" />
           {{ 'review.keepPage' | transloco: { page: page() } }}
-          <span class="text-xs text-muted-foreground">({{ 'review.keptCount' | transloco: { kept: keptPages(), total: pages().length } }})</span>
+          <span class="text-body-small text-muted-foreground">({{ 'review.keptCount' | transloco: { kept: keptPages(), total: pages().length } }})</span>
         </label>
       }
     </section>
@@ -151,7 +151,7 @@
     <section [attr.aria-label]="'review.assignment' | transloco" class="flex w-full shrink-0 flex-col gap-4 border-t p-4 md:w-80 md:border-s md:border-t-0">
       @if (upload(); as u) {
         <div class="flex items-center justify-between">
-          <h2 class="text-base font-semibold">{{ 'review.assignment' | transloco }}</h2>
+          <h2 class="text-title-medium">{{ 'review.assignment' | transloco }}</h2>
           <vm-status-badge [kind]="u.status" />
         </div>
         <div class="flex flex-col gap-1.5">
@@ -162,7 +162,7 @@
           <label class="font-medium" for="rv-voice">{{ 'terms.voice' | transloco }}</label>
           <vm-voice-select controlId="rv-voice" [value]="voiceId()" (changed)="voiceId.set($event)" />
         </div>
-        <dl class="grid grid-cols-[auto_1fr] gap-x-3 gap-y-1 text-[13px]">
+        <dl class="grid grid-cols-[auto_1fr] gap-x-3 gap-y-1 text-body-medium">
           <dt class="text-muted-foreground">{{ 'review.uploadedBy' | transloco }}</dt>
           <dd>{{ u.uploadedBy?.name ?? '–' }}, {{ u.uploadedAt | date: 'dd.MM.yyyy, HH:mm' }}</dd>
           <dt class="text-muted-foreground">{{ 'review.file' | transloco }}</dt>
@@ -180,7 +180,7 @@
                 {{ 'review.replace' | transloco }}
               </label>
             } @else {
-              <p class="text-[13px]">{{ 'review.replaceNotAllowed' | transloco }}</p>
+              <p class="text-body-medium">{{ 'review.replaceNotAllowed' | transloco }}</p>
             }
           </div>
         }

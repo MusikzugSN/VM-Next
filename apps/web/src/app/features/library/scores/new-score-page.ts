@@ -21,7 +21,7 @@ import { buildScoreBody, emptyScoreForm, type ScoreFormErrors, type ScoreFormInp
   template: `
     <form class="flex flex-col gap-6" novalidate (submit)="$event.preventDefault(); save()">
       <div>
-        <h1 class="text-2xl font-semibold">{{ 'pages.newScore' | transloco }}</h1>
+        <h1 class="text-headline-small">{{ 'pages.newScore' | transloco }}</h1>
         <p class="mt-2 text-muted-foreground">{{ 'library.form.requiredHint' | transloco }}</p>
       </div>
 

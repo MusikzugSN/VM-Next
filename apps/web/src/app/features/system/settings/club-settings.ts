@@ -29,7 +29,7 @@ type ClubErrors = Partial<Record<keyof ClubForm, string>>;
   host: { class: 'flex flex-col gap-6' },
   template: `
     <form #clubForm vm-card class="flex flex-col gap-4 p-4 md:p-6" novalidate (submit)="$event.preventDefault(); save()">
-      <h2 class="text-lg font-semibold">{{ 'system.settings.club.title' | transloco }}</h2>
+      <h2 class="text-title-large">{{ 'system.settings.club.title' | transloco }}</h2>
       <label vm-field>
         <span vm-field-label>{{ 'system.settings.club.clubName' | transloco }} *</span>
         <input
@@ -71,7 +71,7 @@ type ClubErrors = Partial<Record<keyof ClubForm, string>>;
       <label vm-field>
         <span vm-field-label>{{ 'system.settings.club.loginBanner' | transloco }}</span>
         <textarea vm-textarea rows="3" maxlength="2000" [readOnly]="readonly()" [value]="form().loginBanner" (input)="set('loginBanner', $any($event.target).value)"></textarea>
-        <span class="text-[13px] text-muted-foreground">{{ 'system.settings.club.loginBannerHint' | transloco }}</span>
+        <span class="text-body-medium text-muted-foreground">{{ 'system.settings.club.loginBannerHint' | transloco }}</span>
       </label>
       <div class="flex items-center justify-between gap-4">
         <div>
@@ -92,7 +92,7 @@ type ClubErrors = Partial<Record<keyof ClubForm, string>>;
 
     <section aria-labelledby="h-logo" vm-card class="flex flex-col gap-4 p-4 md:p-6">
       <div>
-        <h2 id="h-logo" class="text-lg font-semibold">{{ 'system.settings.club.logo' | transloco }}</h2>
+        <h2 id="h-logo" class="text-title-large">{{ 'system.settings.club.logo' | transloco }}</h2>
         <p class="text-muted-foreground">{{ 'system.settings.club.logoHint' | transloco }}</p>
       </div>
       <div class="flex flex-col gap-4 md:flex-row md:items-center">
@@ -100,7 +100,7 @@ type ClubErrors = Partial<Record<keyof ClubForm, string>>;
           @if (config().club.logoUrl; as url) {
             <img [src]="url" [alt]="'system.settings.club.logoPreview' | transloco" class="max-h-20 max-w-20 object-contain" />
           } @else {
-            <span class="text-2xl font-semibold text-muted-foreground" aria-hidden="true">{{ branding.initials() }}</span>
+            <span class="text-headline-small text-muted-foreground" aria-hidden="true">{{ branding.initials() }}</span>
           }
         </div>
         @if (!readonly()) {

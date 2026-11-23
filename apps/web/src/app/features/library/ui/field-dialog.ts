@@ -48,13 +48,13 @@ export interface FieldDialogValue {
             <option [value]="type" [selected]="type === draft().type">{{ 'terms.fieldTypes.' + type | transloco }}</option>
           }
         </select>
-        <span id="field-type-hint" class="text-xs text-muted-foreground">{{ 'fields.typeHint' | transloco }}</span>
+        <span id="field-type-hint" class="text-body-small text-muted-foreground">{{ 'fields.typeHint' | transloco }}</span>
       </label>
       @if (needsOptions()) {
         <label vm-field>
           <span vm-field-label>{{ 'fields.options' | transloco }} *</span>
           <textarea vm-textarea rows="5" [value]="draft().options" (input)="patch({ options: $any($event.target).value })" aria-describedby="field-options-hint"></textarea>
-          <span id="field-options-hint" class="text-xs text-muted-foreground">{{ 'fields.optionsHint' | transloco }}</span>
+          <span id="field-options-hint" class="text-body-small text-muted-foreground">{{ 'fields.optionsHint' | transloco }}</span>
         </label>
       }
       <vm-toggle-field [label]="'fields.required' | transloco" [hint]="'fields.requiredHint' | transloco" [checked]="draft().required" (toggled)="patch({ required: $event })" />

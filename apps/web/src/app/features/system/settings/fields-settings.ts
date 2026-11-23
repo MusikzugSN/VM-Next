@@ -42,7 +42,7 @@ import { selectOr } from '../../../core/util/resource-value';
           <li class="flex flex-col gap-2 px-4 py-3 md:flex-row md:items-center" [class.border-t]="!first">
             <span class="flex min-w-0 flex-1 flex-col">
               <span class="font-medium">{{ field.name }}{{ field.required ? ' *' : '' }}</span>
-              <span class="text-[13px] text-muted-foreground">
+              <span class="text-body-medium text-muted-foreground">
                 {{ 'terms.fieldTypes.' + field.type | transloco }}
                 @if (field.options.length) {
                   · {{ optionLabels(field) }}

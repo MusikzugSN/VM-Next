@@ -1,6 +1,6 @@
 <div class="flex flex-col gap-3 md:flex-row md:items-start md:justify-between md:gap-4">
   <div>
-    <h1 class="text-2xl font-semibold">{{ 'me.start.hello' | transloco: { name: firstName() } }}</h1>
+    <h1 class="text-headline-small">{{ 'me.start.hello' | transloco: { name: firstName() } }}</h1>
     @if (voiceNames()) {
       <p class="mt-2 text-muted-foreground">{{ 'me.start.intro' | transloco: { voices: voiceNames() } }}</p>
     }
@@ -14,7 +14,7 @@
 
 <section aria-labelledby="h-events" class="flex flex-col gap-4">
   <div class="flex items-center justify-between">
-    <h2 id="h-events" class="text-base font-semibold">{{ 'me.start.events' | transloco }}</h2>
+    <h2 id="h-events" class="text-title-medium">{{ 'me.start.events' | transloco }}</h2>
     <a [routerLink]="routes.events" class="py-3 font-medium md:py-0">{{ 'me.start.allEvents' | transloco }}</a>
   </div>
   @if (events.hasValue() && events.value().items.length > 0) {
@@ -26,7 +26,7 @@
           >
             <vm-event-date [date]="event.date" />
             <span class="flex min-w-0 flex-col">
-              <span class="text-base font-medium md:font-semibold">{{ event.name }}</span>
+              <span class="text-title-medium md:font-semibold font-medium">{{ event.name }}</span>
               <span class="text-muted-foreground">{{ event.date | date: 'EE dd.MM.yyyy' }}</span>
               <span class="text-muted-foreground">{{ 'me.common.scoreCount' | tPlural: event.scoreCount }}</span>
             </span>
@@ -41,7 +41,7 @@
 
 <section aria-labelledby="h-folders" class="flex flex-col gap-4">
   <div class="flex items-center justify-between">
-    <h2 id="h-folders" class="text-base font-semibold">{{ 'me.start.folders' | transloco }}</h2>
+    <h2 id="h-folders" class="text-title-medium">{{ 'me.start.folders' | transloco }}</h2>
     <a [routerLink]="routes.folders" class="py-3 font-medium md:py-0">{{ 'me.start.allFolders' | transloco }}</a>
   </div>
   @if (folders.hasValue() && folders.value().items.length > 0) {
@@ -68,7 +68,7 @@
 
 <section aria-labelledby="h-uploads" class="flex flex-col gap-4">
   <div class="flex items-center justify-between">
-    <h2 id="h-uploads" class="text-base font-semibold">{{ 'me.start.uploads' | transloco }}</h2>
+    <h2 id="h-uploads" class="text-title-medium">{{ 'me.start.uploads' | transloco }}</h2>
     <a [routerLink]="routes.uploads" class="py-3 font-medium md:py-0">{{ 'me.start.allUploads' | transloco }}</a>
   </div>
   @if (myUploads.hasValue() && myUploads.value().items.length > 0) {
