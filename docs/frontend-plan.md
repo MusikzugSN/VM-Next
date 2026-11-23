@@ -7,7 +7,8 @@ Stufenplan für das Angular-Frontend von VM-Web.
 - [Anforderungen](requirements.md), Abschnitt „Seiten & Unterseiten“
 - [API-Katalog](api.md)
 - Mockups: <https://claude.ai/artifact/1WwdmV83YPmcuAconCEUAr>. 36 Screens, jeweils für Desktop, Tablet und Mobil, gegliedert in die fünf Bereiche.
-- Design Guideline: <https://claude.ai/artifact/LDi95rWoEnHsFZeFaobAWS>. Enthält Tokens im shadcn-Schema, Glossar, Statusmuster und eigene Komponenten.
+- Design Guideline: <https://claude.ai/artifact/LDi95rWoEnHsFZeFaobAWS>. Enthält Glossar, Statusmuster und eigene Komponenten. Ihre Token-Namen stehen noch im shadcn-Schema.
+- [Design-System](design-system.md): maßgeblich für Tokens (`--mat-sys-*`) und `vm-*`-Bausteine im Code.
 
 **Arbeitsweise wie bei der API:**
 
@@ -20,7 +21,7 @@ Stufenplan für das Angular-Frontend von VM-Web.
 
 | Thema | Festlegung |
 | --- | --- |
-| Struktur | `apps/web/src/app/{core,shared,features/<bereich>}`. `core` enthält API-Client, Sitzung, Guards und Layout. `shared/ui` enthält die Zard-Komponenten und die eigenen fachlichen Komponenten. Jeder Bereich wird per Lazy Loading geladen (`loadChildren`). |
+| Struktur | `apps/web/src/app/{core,shared,features/<bereich>}`. `core` enthält API-Client, Sitzung, Guards und Layout. `libs/ui` enthält M3-Theme, Zard-Basis und die `vm-*`-Bausteine, `shared/ui` die fachlichen Komponenten. Jeder Bereich wird per Lazy Loading geladen (`loadChildren`). |
 | Zustand | Signals. Pro Seite ein kleiner Store (`signal` plus `resource`/`httpResource`), kein NgRx. |
 | API-Zugriff | URLs nur über `apiUrl(API_ROUTES…)` aus `@vm-web/shared`. Typen per `z.infer` aus den Shared-Schemas. Responses werden im Dev-Build mit Zod geprüft, im Prod-Build nicht (Bundle-Größe und Laufzeit). |
 | Routen | Englisch. Alle Pfade stehen als `APP_ROUTES` mit `appUrl()` in `@vm-web/shared` (`libs/shared/src/lib/app-routes.ts`), analog zu `API_ROUTES`. Das Angular-Routing, die Links und später die API (Weiterleitungen nach dem Login, Links in E-Mails o. Ä.) nutzen dieselben Konstanten. Tabelle siehe „Routen“. |
@@ -241,7 +242,7 @@ Diese Stufe ist die größte. Bei Bedarf teile ich sie in **3a** (Stücke, Stimm
 | Paket | Zweck |
 | --- | --- |
 | `tailwindcss` v4, `@tailwindcss/postcss` | Pflicht laut Anforderungen (Zard) |
-| Zard UI 1.12 (`zard-cli`, Komponenten als Quellcode in `apps/web/src/app/shared`) samt `class-variance-authority`, `clsx`, `tailwind-merge`, `@angular/cdk`, `ngx-sonner`, `@ng-icons/core` und `@ng-icons/lucide` | UI-Bibliothek. Das ältere npm-Paket `@ngzard/ui` nutzt `lucide-angular`, das Angular 22 nicht unterstützt. |
+| Zard UI 1.12 (`zard-cli`, Komponenten als Quellcode in `libs/ui/src/lib/zard`) samt `class-variance-authority`, `clsx`, `tailwind-merge`, `@angular/cdk`, `ngx-sonner`, `@ng-icons/core` und `@ng-icons/lucide` | UI-Bibliothek. Das ältere npm-Paket `@ngzard/ui` nutzt `lucide-angular`, das Angular 22 nicht unterstützt. |
 | `pdfjs-dist` | PDF-Vorschau (Anforderung); wird erst in Stufe 2 installiert |
 | `@jsverse/transloco` | i18n zur Laufzeit mit JSON-Dateien (siehe Frage 1) |
 | `@fontsource-variable/inter` | Schrift lokal statt über das Google-CDN (Datenschutz) |
