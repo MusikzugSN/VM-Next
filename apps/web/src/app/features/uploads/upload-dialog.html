@@ -19,7 +19,7 @@
       (dragleave)="dragging.set(false)"
       (drop)="onDrop($event)"
     >
-      <ng-icon name="lucideUpload" size="24" class="text-muted-foreground" aria-hidden="true" />
+      <ng-icon name="lucideUpload" size="var(--mat-sys-icon-size-lg)" class="text-muted-foreground" aria-hidden="true" />
       <p>
         {{ 'upload.drop' | transloco }}
         <label class="cursor-pointer font-medium text-primary underline-offset-4 hover:underline">

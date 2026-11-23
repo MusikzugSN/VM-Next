@@ -24,9 +24,39 @@ const M3_TYPE_ROLES = [
 
 const M3_CORNERS = ['none', 'extra-small', 'small', 'medium', 'large', 'extra-large', 'full'];
 const M3_LEVELS = ['level0', 'level1', 'level2', 'level3', 'level4', 'level5'];
+const M3_SIZES = [
+  'spacing-none',
+  'spacing-xxs',
+  'spacing-xs',
+  'spacing-sm',
+  'spacing-md',
+  'spacing-lg',
+  'spacing-xl',
+  'spacing-xxl',
+  'spacing-xxxl',
+  'control',
+  'control-compact',
+  'target',
+  'target-compact',
+  'icon-xs',
+  'icon-sm',
+  'icon-md',
+  'icon-lg',
+  'header',
+  'sidebar',
+];
+const M3_CONTAINERS = ['content', 'dialog-sm', 'dialog-md', 'dialog-lg'];
 
 const twMerge = extendTailwindMerge({
-  extend: { theme: { text: M3_TYPE_ROLES, radius: M3_CORNERS, shadow: M3_LEVELS } },
+  extend: {
+    theme: {
+      text: M3_TYPE_ROLES,
+      radius: M3_CORNERS,
+      shadow: M3_LEVELS,
+      spacing: M3_SIZES,
+      container: M3_CONTAINERS,
+    },
+  },
 });
 
 /** Merges CVA variants with a consumer's `class` input, last write winning. */

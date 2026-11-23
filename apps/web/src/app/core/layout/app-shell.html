@@ -51,12 +51,12 @@
       } @else {
         <button
           type="button"
-          class="flex size-11 shrink-0 items-center justify-center rounded-md hover:bg-accent"
+          class="flex size-control shrink-0 items-center justify-center rounded-md hover:bg-accent"
           [attr.aria-label]="'shell.openNavigation' | transloco"
           [attr.aria-expanded]="navOpen()"
           (click)="navOpen.set(true)"
         >
-          <ng-icon name="lucideMenu" size="20" aria-hidden="true" />
+          <ng-icon name="lucideMenu" size="var(--mat-sys-icon-size-md)" aria-hidden="true" />
         </button>
         @if (!viewport.isMobile()) {
           <vm-club-logo [size]="28" />
@@ -96,7 +96,7 @@
             [class.font-medium]="isActive(item, url())"
             class="flex flex-col items-center justify-center gap-1 text-xs text-muted-foreground no-underline"
           >
-            <ng-icon [name]="item.icon" size="20" aria-hidden="true" />
+            <ng-icon [name]="item.icon" size="var(--mat-sys-icon-size-md)" aria-hidden="true" />
             {{ item.labelKey | transloco }}
           </a>
         }

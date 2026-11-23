@@ -199,4 +199,29 @@
   --mat-sys-focus-state-layer-opacity: 0.12;
   --mat-sys-pressed-state-layer-opacity: 0.12;
   --mat-sys-dragged-state-layer-opacity: 0.16;
+
+  /* Größen (Erweiterung des Schemas, siehe docs/design-findings.md). Raster: 4 px */
+  --mat-sys-spacing-none: 0;
+  --mat-sys-spacing-xxs: 2px;
+  --mat-sys-spacing-xs: 4px;
+  --mat-sys-spacing-sm: 8px;
+  --mat-sys-spacing-md: 12px;
+  --mat-sys-spacing-lg: 16px;
+  --mat-sys-spacing-xl: 24px;
+  --mat-sys-spacing-xxl: 32px;
+  --mat-sys-spacing-xxxl: 48px;
+  --mat-sys-icon-size-xs: 14px;
+  --mat-sys-icon-size-sm: 16px;
+  --mat-sys-icon-size-md: 20px;
+  --mat-sys-icon-size-lg: 24px;
+  --mat-sys-control-height: 44px;
+  --mat-sys-control-height-compact: 36px;
+  --mat-sys-target-size: 44px;
+  --mat-sys-target-size-compact: 32px;
+  --mat-sys-header-height: 56px;
+  --mat-sys-sidebar-width: 256px;
+  --mat-sys-content-max-width: 1200px;
+  --mat-sys-dialog-width-sm: 360px;
+  --mat-sys-dialog-width-md: 480px;
+  --mat-sys-dialog-width-lg: 560px;
 }

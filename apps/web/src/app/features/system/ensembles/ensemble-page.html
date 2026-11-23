@@ -1,4 +1,4 @@
-<a [routerLink]="listPath" class="inline-flex min-h-11 items-center gap-1 self-start font-medium no-underline">
+<a [routerLink]="listPath" class="inline-flex min-h-target items-center gap-1 self-start font-medium no-underline">
   <ng-icon name="lucideChevronLeft" aria-hidden="true" />{{ 'system.ensembles.all' | transloco }}
 </a>
 
@@ -21,7 +21,7 @@
         [routerLink]="selfPath()"
         [queryParams]="{ tab: t.id === 'details' ? null : t.id }"
         [attr.aria-current]="current() === t.id ? 'page' : null"
-        class="-mb-px inline-flex min-h-11 items-center border-b-2 px-3 font-medium whitespace-nowrap no-underline"
+        class="-mb-px inline-flex min-h-target items-center border-b-2 px-3 font-medium whitespace-nowrap no-underline"
         [class]="current() === t.id ? 'border-primary text-primary' : 'border-transparent text-muted-foreground hover:text-foreground'"
         >{{ t.labelKey | transloco }}</a
       >
@@ -100,7 +100,7 @@
                   </button>
                 }
                 @for (voice of group.voices; track voice.id) {
-                  <label class="flex min-h-11 items-center gap-2 xl:min-h-8">
+                  <label class="flex min-h-target items-center gap-2 xl:min-h-target-compact">
                     <input type="checkbox" class="size-4 accent-primary" [disabled]="!canEdit()" [checked]="selected().has(voice.id)" (change)="toggleVoice(voice.id)" />
                     {{ voice.name }}
                   </label>

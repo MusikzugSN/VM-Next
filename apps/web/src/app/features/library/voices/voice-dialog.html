@@ -25,7 +25,7 @@
       </label>
 
       <!-- Instrument follows from the voice name (N-6); „Ändern“ opens the instrument chips. -->
-      <div id="voice-instrument" class="flex min-h-11 flex-wrap items-center gap-2 rounded-md bg-muted px-4 py-3 xl:min-h-9" aria-live="polite">
+      <div id="voice-instrument" class="flex min-h-target flex-wrap items-center gap-2 rounded-md bg-muted px-4 py-3 xl:min-h-9" aria-live="polite">
         <span class="text-muted-foreground">{{ 'library.voices.instrument' | transloco }}:</span>
         @if (instrument()) {
           <span class="font-medium">{{ instrument() }}</span>
@@ -60,7 +60,7 @@
                 role="radio"
                 [attr.aria-checked]="instrument() === option"
                 (click)="chooseInstrument(option)"
-                class="inline-flex h-11 items-center gap-1.5 rounded-md border px-3 font-medium xl:h-9"
+                class="inline-flex h-control items-center gap-1.5 rounded-md border px-3 font-medium xl:h-control-compact"
                 [class]="instrument() === option ? 'border-primary bg-primary-soft text-primary' : 'border-input bg-background'"
               >
                 @if (instrument() === option) {

@@ -12,7 +12,7 @@
         <ul [attr.aria-label]="'library.score.inFolders' | transloco" class="flex flex-wrap gap-2">
           @for (entry of folders.value().items; track entry.folder.id) {
             <li class="inline-flex items-center gap-1.5 rounded-md border bg-muted px-2.5 py-1 text-[13px] font-medium">
-              <ng-icon name="lucideFolderOpen" size="14" class="text-muted-foreground" aria-hidden="true" />
+              <ng-icon name="lucideFolderOpen" size="var(--mat-sys-icon-size-xs)" class="text-muted-foreground" aria-hidden="true" />
               {{ entry.folder.name }} <span aria-hidden="true" class="text-muted-foreground">·</span>
               <span class="font-semibold text-primary tabular-nums">{{ 'library.score.number' | transloco: { number: entry.number } }}</span>
             </li>
@@ -39,7 +39,7 @@
         [queryParams]="{ tab: t.id === 'details' ? null : t.id }"
         queryParamsHandling="merge"
         [attr.aria-current]="current() === t.id ? 'page' : null"
-        class="-mb-px inline-flex min-h-11 items-center border-b-2 px-3 font-medium whitespace-nowrap no-underline"
+        class="-mb-px inline-flex min-h-target items-center border-b-2 px-3 font-medium whitespace-nowrap no-underline"
         [class]="current() === t.id ? 'border-primary text-primary' : 'border-transparent text-muted-foreground hover:text-foreground'"
         >{{ t.labelKey | transloco }}</a
       >
@@ -137,7 +137,7 @@
               </h3>
               <ul class="flex flex-col">
                 @for (entry of group.voices; track entry.voice.id) {
-                  <li class="flex min-h-11 flex-wrap items-center gap-2 border-t py-1.5 first:border-t-0">
+                  <li class="flex min-h-target flex-wrap items-center gap-2 border-t py-1.5 first:border-t-0">
                     <span class="flex-1 font-medium">{{ entry.voice.name }}</span>
                     @switch (entry.status) {
                       @case ('present') {

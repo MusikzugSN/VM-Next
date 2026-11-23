@@ -1,4 +1,4 @@
-<a [routerLink]="listPath" class="inline-flex min-h-11 items-center gap-1 self-start font-medium no-underline">
+<a [routerLink]="listPath" class="inline-flex min-h-target items-center gap-1 self-start font-medium no-underline">
   <ng-icon name="lucideChevronLeft" aria-hidden="true" />{{ 'system.roles.all' | transloco }}
 </a>
 
@@ -55,7 +55,7 @@
                   @for (action of catalog.value().actions; track action) {
                     <td class="px-2 py-1 text-center">
                       @if (cell(row.permissions, action); as p) {
-                        <label class="inline-flex size-11 items-center justify-center xl:size-8">
+                        <label class="inline-flex size-control items-center justify-center xl:size-8">
                           <input
                             type="checkbox"
                             class="size-4 accent-primary"
@@ -81,7 +81,7 @@
       <fieldset class="flex flex-col gap-1 rounded-lg border bg-card p-4 shadow-sm">
         <legend class="px-1 text-lg font-semibold">{{ 'system.role.singles' | transloco }}</legend>
         @for (single of catalog.value().singles; track single.permission) {
-          <label class="flex min-h-11 items-center gap-3 xl:min-h-8">
+          <label class="flex min-h-target items-center gap-3 xl:min-h-target-compact">
             <input type="checkbox" class="size-4 accent-primary" [checked]="has(single.permission)" [disabled]="!canEdit()" (change)="toggle(single.permission, $any($event.target).checked)" />
             <span class="flex flex-col">
               <span>{{ key(single.permission) | transloco }}</span>

@@ -40,7 +40,7 @@ import { ListState } from '../../shared/ui/list-state';
                   {{ 'me.common.scoreCount' | tPlural: folder.scoreCount }} · {{ folder.ensemble.name }}
                 </span>
               </span>
-              <ng-icon name="lucideChevronRight" size="20" class="shrink-0 text-muted-foreground" aria-hidden="true" />
+              <ng-icon name="lucideChevronRight" size="var(--mat-sys-icon-size-md)" class="shrink-0 text-muted-foreground" aria-hidden="true" />
             </a>
           </li>
         }

@@ -14,11 +14,11 @@ import type { UserStatus } from '@vm-web/shared';
   template: `
     @if (status() === 'active') {
       <span class="inline-flex items-center gap-1 rounded-sm bg-success-soft px-2 py-0.5 text-xs font-medium text-success-ink">
-        <ng-icon name="lucideCircleCheck" size="14" aria-hidden="true" />{{ 'system.users.active' | transloco }}
+        <ng-icon name="lucideCircleCheck" size="var(--mat-sys-icon-size-xs)" aria-hidden="true" />{{ 'system.users.active' | transloco }}
       </span>
     } @else {
       <span class="inline-flex items-center gap-1 rounded-sm bg-destructive-soft px-2 py-0.5 text-xs font-medium text-destructive-ink">
-        <ng-icon name="lucideLock" size="14" aria-hidden="true" />{{ 'system.users.blocked' | transloco }}
+        <ng-icon name="lucideLock" size="var(--mat-sys-icon-size-xs)" aria-hidden="true" />{{ 'system.users.blocked' | transloco }}
       </span>
     }
   `,

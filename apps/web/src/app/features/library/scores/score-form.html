@@ -53,7 +53,7 @@
       <legend class="mb-1.5 font-medium">{{ 'nav.library.tags' | transloco }}</legend>
       <div class="flex flex-wrap gap-x-4">
         @for (tag of options.tags(); track tag.id) {
-          <label class="inline-flex min-h-11 items-center gap-2 xl:min-h-8">
+          <label class="inline-flex min-h-target items-center gap-2 xl:min-h-target-compact">
             <input type="checkbox" class="size-4 accent-primary" [checked]="value().tagIds.includes(tag.id)" (change)="toggleTag(tag.id, $any($event.target).checked)" />
             {{ tag.name }}
           </label>
@@ -76,7 +76,7 @@
       @let current = custom(field);
       @switch (field.type) {
         @case ('boolean') {
-          <label class="inline-flex min-h-11 items-center gap-2 self-end xl:min-h-9">
+          <label class="inline-flex min-h-target items-center gap-2 self-end xl:min-h-9">
             <input type="checkbox" class="size-4 accent-primary" [checked]="current === true" (change)="setCustom(field, $any($event.target).checked)" />
             <span class="font-medium">{{ field.name }}</span>
           </label>
@@ -86,7 +86,7 @@
             <legend class="mb-1.5 font-medium">{{ field.name }}{{ field.required ? ' *' : '' }}</legend>
             <div class="flex flex-wrap gap-x-4">
               @for (option of field.options; track option.id) {
-                <label class="inline-flex min-h-11 items-center gap-2 xl:min-h-8">
+                <label class="inline-flex min-h-target items-center gap-2 xl:min-h-target-compact">
                   <input type="checkbox" class="size-4 accent-primary" [checked]="hasOption(field, option.id)" (change)="toggleOption(field, option.id, $any($event.target).checked)" />
                   {{ option.label }}
                 </label>

@@ -38,7 +38,7 @@ const STYLES: Record<StatusKind, { tone: string; icon: string }> = {
   host: { class: 'inline-flex' },
   template: `
     <span class="inline-flex items-center gap-1 rounded-sm px-2 py-0.5 text-xs font-medium whitespace-nowrap {{ style().tone }}">
-      <ng-icon [name]="style().icon" size="14" aria-hidden="true" />
+      <ng-icon [name]="style().icon" size="var(--mat-sys-icon-size-xs)" aria-hidden="true" />
       {{ 'status.' + kind() | transloco: params() }}
     </span>
   `,

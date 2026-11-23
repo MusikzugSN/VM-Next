@@ -61,7 +61,7 @@ export function loginErrorKey(code: string | undefined): string | null {
 
       <section class="flex flex-1 flex-col md:w-[min(640px,50%)] md:flex-none md:p-8">
         <main class="flex flex-1 flex-col px-4 pt-12 pb-4 md:items-center md:justify-center md:p-0">
-          <div class="flex w-full flex-1 flex-col gap-6 md:max-w-[360px] md:flex-none md:items-center md:text-center">
+          <div class="flex w-full flex-1 flex-col gap-6 md:max-w-dialog-sm md:flex-none md:items-center md:text-center">
             <div class="flex flex-col items-center gap-4 text-center md:gap-6">
               <vm-club-logo [size]="logoSize()" [label]="'auth.login.logoLabel' | transloco: { club: clubName() }" />
               <div class="flex flex-col gap-1">

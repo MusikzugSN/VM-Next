@@ -197,13 +197,31 @@
   --tw-ring-shadow: 0 0 #0000;
 }
 
-/* Maße aus der Design Guideline (Größen-Tokens), als Tailwind-Werte nutzbar: h-touch, w-sidebar, max-w-content … */
-@theme {
-  --spacing-touch: 44px;
-  --spacing-control: 36px;
-  --spacing-header: 56px;
-  --spacing-sidebar: 256px;
-  --container-content: 1200px;
+/* Größen-Tokens als Tailwind-Werte: h-control, min-h-target, gap-spacing-lg, w-sidebar, max-w-content … */
+@theme inline {
+  --spacing-spacing-none: var(--mat-sys-spacing-none);
+  --spacing-spacing-xxs: var(--mat-sys-spacing-xxs);
+  --spacing-spacing-xs: var(--mat-sys-spacing-xs);
+  --spacing-spacing-sm: var(--mat-sys-spacing-sm);
+  --spacing-spacing-md: var(--mat-sys-spacing-md);
+  --spacing-spacing-lg: var(--mat-sys-spacing-lg);
+  --spacing-spacing-xl: var(--mat-sys-spacing-xl);
+  --spacing-spacing-xxl: var(--mat-sys-spacing-xxl);
+  --spacing-spacing-xxxl: var(--mat-sys-spacing-xxxl);
+  --spacing-control: var(--mat-sys-control-height);
+  --spacing-control-compact: var(--mat-sys-control-height-compact);
+  --spacing-target: var(--mat-sys-target-size);
+  --spacing-target-compact: var(--mat-sys-target-size-compact);
+  --spacing-icon-xs: var(--mat-sys-icon-size-xs);
+  --spacing-icon-sm: var(--mat-sys-icon-size-sm);
+  --spacing-icon-md: var(--mat-sys-icon-size-md);
+  --spacing-icon-lg: var(--mat-sys-icon-size-lg);
+  --spacing-header: var(--mat-sys-header-height);
+  --spacing-sidebar: var(--mat-sys-sidebar-width);
+  --container-content: var(--mat-sys-content-max-width);
+  --container-dialog-sm: var(--mat-sys-dialog-width-sm);
+  --container-dialog-md: var(--mat-sys-dialog-width-md);
+  --container-dialog-lg: var(--mat-sys-dialog-width-lg);
 }
 
 @layer base {
@@ -240,12 +258,12 @@
   #main > router-outlet + * {
     display: flex;
     flex-direction: column;
-    gap: 1.5rem;
+    gap: var(--mat-sys-spacing-xl);
     min-width: 0;
   }
   @media (width >= 48rem) {
     #main > router-outlet + * {
-      gap: 2rem;
+      gap: var(--mat-sys-spacing-xxl);
     }
   }
 }

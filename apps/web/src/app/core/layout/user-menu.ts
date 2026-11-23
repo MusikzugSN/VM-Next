@@ -41,7 +41,7 @@ import { initials } from '../branding/branding.store';
           z-dropdown
           [zDropdownMenu]="menu"
           [attr.aria-label]="'shell.userMenu' | transloco: { name: user.name }"
-          class="flex size-11 items-center justify-center rounded-full"
+          class="flex size-control items-center justify-center rounded-full"
         >
           <ng-container [ngTemplateOutlet]="avatar" />
         </button>
