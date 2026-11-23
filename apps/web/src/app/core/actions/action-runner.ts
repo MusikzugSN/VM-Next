@@ -2,8 +2,8 @@ import { inject, Injectable } from '@angular/core';
 import { TranslocoService } from '@jsverse/transloco';
 import { firstValueFrom, type Observable } from 'rxjs';
 
-import { ZardAlertDialogService } from '@/shared/components/alert-dialog';
-import { ZardSonnerService } from '@/shared/components/sonner';
+import { ZardAlertDialogService } from '@vm-web/ui/zard/components/alert-dialog';
+import { ZardSonnerService } from '@vm-web/ui/zard/components/sonner';
 
 import { isApiProblem } from '../api/api-problem';
 

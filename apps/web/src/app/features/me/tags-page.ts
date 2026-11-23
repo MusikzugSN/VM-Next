@@ -15,9 +15,9 @@ import {
 } from '@vm-web/shared';
 import { of } from 'rxjs';
 
-import { ZardAlertDialogService } from '@/shared/components/alert-dialog';
-import { ZardButtonComponent } from '@/shared/components/button';
-import { ZardInputComponent } from '@/shared/components/input';
+import { ZardAlertDialogService } from '@vm-web/ui/zard/components/alert-dialog';
+import { ZardButtonComponent } from '@vm-web/ui/zard/components/button';
+import { ZardInputComponent } from '@vm-web/ui/zard/components/input';
 
 import { ApiClient } from '../../core/api/api-client';
 import { ActionRunner } from '../../core/actions/action-runner';

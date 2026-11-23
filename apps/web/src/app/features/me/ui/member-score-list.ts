@@ -7,7 +7,7 @@ import { lucideDownload, lucideFileArchive, lucidePrinter, lucideUpload } from '
 import { APP_ROUTES, apiUrl, appPath, type MemberScoreRow, type MemberSheet } from '@vm-web/shared';
 import { firstValueFrom } from 'rxjs';
 
-import { ZardButtonComponent } from '@/shared/components/button';
+import { ZardButtonComponent } from '@vm-web/ui/zard/components/button';
 
 import { PrintLauncher, UploadLauncher } from '../../../core/actions/pending-features';
 import { ApiClient } from '../../../core/api/api-client';

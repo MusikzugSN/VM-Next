@@ -3,9 +3,9 @@ import { TranslocoPipe } from '@jsverse/transloco';
 import { NgIcon, provideIcons } from '@ng-icons/core';
 import { lucideCheck, lucideSearch } from '@ng-icons/lucide';
 
-import { ZardButtonComponent } from '@/shared/components/button';
-import { ZardDialogImports } from '@/shared/components/dialog/dialog.imports';
-import { ZardInputComponent } from '@/shared/components/input';
+import { ZardButtonComponent } from '@vm-web/ui/zard/components/button';
+import { ZardDialogImports } from '@vm-web/ui/zard/components/dialog/dialog.imports';
+import { ZardInputComponent } from '@vm-web/ui/zard/components/input';
 
 import { VoiceContextStore } from '../voices/voice-context.store';
 import { filterVoiceGroups } from '../voices/voice-groups';

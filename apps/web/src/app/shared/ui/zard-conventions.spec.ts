@@ -4,7 +4,7 @@ import { dirname, join, relative } from 'node:path';
 import { Component, signal } from '@angular/core';
 import { TestBed } from '@angular/core/testing';
 
-import { ZardButtonComponent } from '@/shared/components/button';
+import { ZardButtonComponent } from '@vm-web/ui/zard/components/button';
 
 function appRoot(): string {
   let dir = process.cwd();

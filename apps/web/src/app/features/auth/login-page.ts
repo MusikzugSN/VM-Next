@@ -5,7 +5,7 @@ import { NgIcon, provideIcons } from '@ng-icons/core';
 import { lucideCircleAlert, lucideInfo, lucideLogIn } from '@ng-icons/lucide';
 import { apiUrl, loginErrorCodeSchema, problemCodeSchema } from '@vm-web/shared';
 
-import { ZardButtonComponent } from '@/shared/components/button';
+import { ZardButtonComponent } from '@vm-web/ui/zard/components/button';
 
 import { safeReturnTo } from '../../core/auth/guards';
 import { BrandingStore } from '../../core/branding/branding.store';

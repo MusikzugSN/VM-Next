@@ -7,10 +7,10 @@ import { lucideCheck, lucideCircleAlert, lucideExternalLink, lucidePrinter, luci
 import { APP_ROUTES, PRINT_SERVICE_CONTRACT, apiUrl, printPlanResponseSchema, type PrintMode, type VoiceRef } from '@vm-web/shared';
 import { firstValueFrom, from } from 'rxjs';
 
-import { ZardButtonComponent } from '@/shared/components/button';
-import { ZardDialogImports } from '@/shared/components/dialog/dialog.imports';
-import { ZardNativeSelectDirective } from '@/shared/components/native-select';
-import { ZardSonnerService } from '@/shared/components/sonner';
+import { ZardButtonComponent } from '@vm-web/ui/zard/components/button';
+import { ZardDialogImports } from '@vm-web/ui/zard/components/dialog/dialog.imports';
+import { ZardNativeSelectDirective } from '@vm-web/ui/zard/components/native-select';
+import { ZardSonnerService } from '@vm-web/ui/zard/components/sonner';
 
 import { PrintLauncher, type PrintRequest } from '../../core/actions/pending-features';
 import { ApiClient } from '../../core/api/api-client';

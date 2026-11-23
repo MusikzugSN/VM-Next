@@ -6,7 +6,7 @@ import { NgIcon, provideIcons } from '@ng-icons/core';
 import { lucideChevronRight, lucideFileArchive } from '@ng-icons/lucide';
 import { APP_ROUTES, apiUrl, appPath, myFoldersResponseSchema, type MyFolderItem } from '@vm-web/shared';
 
-import { ZardButtonComponent } from '@/shared/components/button';
+import { ZardButtonComponent } from '@vm-web/ui/zard/components/button';
 
 import { ApiClient } from '../../core/api/api-client';
 import { cursorList } from '../../core/api/cursor-list';

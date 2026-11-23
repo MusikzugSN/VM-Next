@@ -15,8 +15,8 @@ import {
 } from '@vm-web/shared';
 import { type Observable } from 'rxjs';
 
-import { ZardButtonComponent } from '@/shared/components/button';
-import { ZardInputComponent } from '@/shared/components/input';
+import { ZardButtonComponent } from '@vm-web/ui/zard/components/button';
+import { ZardInputComponent } from '@vm-web/ui/zard/components/input';
 
 import { ActionRunner, ConfirmService } from '../../../core/actions/action-runner';
 import { ApiClient } from '../../../core/api/api-client';

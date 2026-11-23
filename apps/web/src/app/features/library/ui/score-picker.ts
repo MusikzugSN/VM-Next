@@ -6,8 +6,8 @@ import { lucidePlus } from '@ng-icons/lucide';
 import type { ScoreCandidate } from '@vm-web/shared';
 import { of, type Observable } from 'rxjs';
 
-import { ZardButtonComponent } from '@/shared/components/button';
-import { ZardInputComponent } from '@/shared/components/input';
+import { ZardButtonComponent } from '@vm-web/ui/zard/components/button';
+import { ZardInputComponent } from '@vm-web/ui/zard/components/input';
 
 import { debounced } from '../../../core/util/debounced';
 import { SearchField } from '../../../shared/ui/search-field';

@@ -1,7 +1,7 @@
 import { ChangeDetectionStrategy, Component, effect, input, model, signal, untracked } from '@angular/core';
 import { TranslocoPipe } from '@jsverse/transloco';
 
-import { ZardInputComponent } from '@/shared/components/input';
+import { ZardInputComponent } from '@vm-web/ui/zard/components/input';
 
 import { FormDialog, runDialogSave } from './form-dialog';
 

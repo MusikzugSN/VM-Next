@@ -1,7 +1,7 @@
 import { TestBed } from '@angular/core/testing';
 import { TranslocoService } from '@jsverse/transloco';
 
-import { ZardSonnerService } from '@/shared/components/sonner';
+import { ZardSonnerService } from '@vm-web/ui/zard/components/sonner';
 
 import { ApiProblem } from '../api/api-problem';
 import { ActionRunner } from './action-runner';

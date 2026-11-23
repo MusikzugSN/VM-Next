@@ -3,7 +3,7 @@ import { TranslocoPipe } from '@jsverse/transloco';
 import { NgIcon, provideIcons } from '@ng-icons/core';
 import { lucideSearch } from '@ng-icons/lucide';
 
-import { ZardInputComponent } from '@/shared/components/input';
+import { ZardInputComponent } from '@vm-web/ui/zard/components/input';
 
 /** Search field of the Design Guideline (Suchen & Filtern); the label can be visually hidden. */
 @Component({

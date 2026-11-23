@@ -5,8 +5,8 @@ import { NgIcon, provideIcons } from '@ng-icons/core';
 import { lucideTriangleAlert } from '@ng-icons/lucide';
 import { apiUrl, configDefaultOptionsResponseSchema, type ConfigResponse } from '@vm-web/shared';
 
-import { ZardButtonComponent } from '@/shared/components/button';
-import { ZardNativeSelectDirective } from '@/shared/components/native-select';
+import { ZardButtonComponent } from '@vm-web/ui/zard/components/button';
+import { ZardNativeSelectDirective } from '@vm-web/ui/zard/components/native-select';
 
 import { ActionRunner } from '../../../core/actions/action-runner';
 import { ApiClient } from '../../../core/api/api-client';

@@ -8,8 +8,8 @@ import { lucideCalendar, lucideFolderOpen, lucideHouse, lucideMenu, lucideUser }
 import { APP_ROUTES } from '@vm-web/shared';
 import { filter, skip } from 'rxjs';
 
-import { ZardSheetImports } from '@/shared/components/sheet/sheet.imports';
-import { ZardSonnerComponent } from '@/shared/components/sonner';
+import { ZardSheetImports } from '@vm-web/ui/zard/components/sheet/sheet.imports';
+import { ZardSonnerComponent } from '@vm-web/ui/zard/components/sonner';
 
 import { PrintDialog } from '../../features/print/print-dialog';
 import { UploadDialog } from '../../features/uploads/upload-dialog';

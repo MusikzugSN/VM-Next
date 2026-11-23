@@ -14,9 +14,9 @@ import {
 } from '@vm-web/shared';
 import { filter, firstValueFrom, last, map, tap } from 'rxjs';
 
-import { ZardButtonComponent } from '@/shared/components/button';
-import { ZardDialogImports } from '@/shared/components/dialog/dialog.imports';
-import { ZardSonnerService } from '@/shared/components/sonner';
+import { ZardButtonComponent } from '@vm-web/ui/zard/components/button';
+import { ZardDialogImports } from '@vm-web/ui/zard/components/dialog/dialog.imports';
+import { ZardSonnerService } from '@vm-web/ui/zard/components/sonner';
 
 import { UploadLauncher } from '../../core/actions/pending-features';
 import { ApiClient } from '../../core/api/api-client';

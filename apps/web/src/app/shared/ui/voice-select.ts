@@ -1,7 +1,7 @@
 import { ChangeDetectionStrategy, Component, inject, input, output } from '@angular/core';
 import { TranslocoPipe } from '@jsverse/transloco';
 
-import { ZardNativeSelectDirective } from '@/shared/components/native-select';
+import { ZardNativeSelectDirective } from '@vm-web/ui/zard/components/native-select';
 
 import { VoiceContextStore } from '../../core/voices/voice-context.store';
 

@@ -6,7 +6,7 @@ import { lucidePlus, lucideSearch } from '@ng-icons/lucide';
 import { SCORE_TITLE_MAX, apiUrl, createdResponseSchema, scoreSearchResponseSchema, type ScoreSearchItem } from '@vm-web/shared';
 import { of } from 'rxjs';
 
-import { ZardInputComponent } from '@/shared/components/input';
+import { ZardInputComponent } from '@vm-web/ui/zard/components/input';
 
 import { ActionRunner } from '../../core/actions/action-runner';
 import { ApiClient } from '../../core/api/api-client';

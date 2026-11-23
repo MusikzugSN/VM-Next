@@ -5,7 +5,7 @@ import { NgIcon, provideIcons } from '@ng-icons/core';
 import { lucideLogOut, lucideMusic2, lucidePencil } from '@ng-icons/lucide';
 import { apiUrl, profileResponseSchema } from '@vm-web/shared';
 
-import { ZardButtonComponent } from '@/shared/components/button';
+import { ZardButtonComponent } from '@vm-web/ui/zard/components/button';
 
 import { ApiClient } from '../../core/api/api-client';
 import { SessionStore } from '../../core/auth/session.store';

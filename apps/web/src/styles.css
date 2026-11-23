@@ -1,14 +1,15 @@
 /*
  * VM-Web – globale Styles.
- * Farben liegen als --mat-sys-* in theme/m3-theme.css. Die shadcn-Namen, die Zard nutzt, sind hier nur
+ * Farben liegen als --mat-sys-* in libs/ui/src/styles/m3-theme.css. Die shadcn-Namen, die Zard nutzt, sind hier nur
  * noch Tailwind-Aliase auf diese Rollen. Radien und Schatten aus der VM-Web Design Guideline.
  * Nur Lightmode; Darkmode ist laut Anforderungen „Später“.
  */
 @layer ng-icon, theme, base, components, utilities;
 @import 'tailwindcss';
 @import '@fontsource-variable/inter';
-@import './theme/m3-theme.css';
-@import './app/shared/core/css/zard';
+@import '../../../libs/ui/src/styles/m3-theme.css';
+@import '../../../libs/ui/src/lib/zard/core/css/zard';
+@source '../../../libs/ui/src';
 @plugin "tailwindcss-animate";
 
 @custom-variant dark (&:is(.dark *));

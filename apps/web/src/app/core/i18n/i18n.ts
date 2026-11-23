@@ -8,7 +8,7 @@ import {
 } from '@jsverse/transloco';
 import { firstValueFrom, type Observable } from 'rxjs';
 
-import { de_DE, provideZardI18n } from '@/shared/core';
+import { de_DE, provideZardI18n } from '@vm-web/ui/zard/core';
 
 /** Only language for now; further languages get their own folder under `public/translate/`. */
 export const DEFAULT_LANG = 'de-DE';

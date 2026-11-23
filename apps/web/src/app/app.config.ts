@@ -4,7 +4,7 @@ import localeDe from '@angular/common/locales/de';
 import { ApplicationConfig, LOCALE_ID, provideBrowserGlobalErrorListeners } from '@angular/core';
 import { provideRouter, TitleStrategy, withComponentInputBinding, withInMemoryScrolling } from '@angular/router';
 
-import { provideZard } from '@/shared/core/provider/providezard';
+import { provideZard } from '@vm-web/ui/zard/core/provider/providezard';
 
 import { appRoutes } from './app.routes';
 import { problemInterceptor } from './core/api/problem.interceptor';

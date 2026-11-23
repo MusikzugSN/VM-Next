@@ -7,8 +7,8 @@ import { NgIcon, provideIcons } from '@ng-icons/core';
 import { lucideChevronLeft, lucideFileArchive, lucidePrinter, lucideSearch, lucideX } from '@ng-icons/lucide';
 import { APP_ROUTES, apiUrl, myFolderOverviewResponseSchema, myFolderScoresResponseSchema } from '@vm-web/shared';
 
-import { ZardButtonComponent } from '@/shared/components/button';
-import { ZardInputComponent } from '@/shared/components/input';
+import { ZardButtonComponent } from '@vm-web/ui/zard/components/button';
+import { ZardInputComponent } from '@vm-web/ui/zard/components/input';
 
 import { PrintLauncher } from '../../core/actions/pending-features';
 import { ApiClient } from '../../core/api/api-client';

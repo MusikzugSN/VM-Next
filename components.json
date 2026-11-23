@@ -10,12 +10,12 @@
     "css": "apps/web/src/styles.css",
     "baseColor": "neutral"
   },
-  "baseUrl": "apps/web/src/app",
+  "baseUrl": "libs/ui/src/lib",
   "aliases": {
-    "components": "@/shared/components",
-    "utils": "@/shared/utils",
-    "core": "@/shared/core",
-    "services": "@/shared/services",
-    "blocks": "@/shared/blocks"
+    "components": "@vm-web/ui/zard/components",
+    "utils": "@vm-web/ui/zard/utils",
+    "core": "@vm-web/ui/zard/core",
+    "services": "@vm-web/ui/zard/services",
+    "blocks": "@vm-web/ui/zard/blocks"
   }
 }

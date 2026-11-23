@@ -7,7 +7,7 @@ import { NgIcon, provideIcons } from '@ng-icons/core';
 import { lucideInfo } from '@ng-icons/lucide';
 import { APP_ROUTES, apiUrl, appPath, userAssignmentOptionsResponseSchema, userTableResponseSchema, type UserRow, type UserStatus } from '@vm-web/shared';
 
-import { ZardNativeSelectDirective } from '@/shared/components/native-select';
+import { ZardNativeSelectDirective } from '@vm-web/ui/zard/components/native-select';
 
 import { ApiClient } from '../../../core/api/api-client';
 import { cursorList } from '../../../core/api/cursor-list';

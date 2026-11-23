@@ -17,8 +17,8 @@ import {
 } from '@vm-web/shared';
 import { of } from 'rxjs';
 
-import { ZardButtonComponent } from '@/shared/components/button';
-import { ZardNativeSelectDirective } from '@/shared/components/native-select';
+import { ZardButtonComponent } from '@vm-web/ui/zard/components/button';
+import { ZardNativeSelectDirective } from '@vm-web/ui/zard/components/native-select';
 
 import { ActionRunner, ConfirmService } from '../../../core/actions/action-runner';
 import { ApiClient } from '../../../core/api/api-client';

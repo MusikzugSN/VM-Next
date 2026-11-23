@@ -5,7 +5,7 @@ import { NgIcon, provideIcons } from '@ng-icons/core';
 import { lucideLock, lucideLogIn } from '@ng-icons/lucide';
 import { APP_ROUTES } from '@vm-web/shared';
 
-import { ZardButtonComponent } from '@/shared/components/button';
+import { ZardButtonComponent } from '@vm-web/ui/zard/components/button';
 
 import { BrandingStore } from '../../core/branding/branding.store';
 import { ClubLogo } from '../../core/branding/club-logo';

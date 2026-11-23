@@ -1,8 +1,8 @@
 import { ChangeDetectionStrategy, Component, input, model, output } from '@angular/core';
 import { TranslocoPipe } from '@jsverse/transloco';
 
-import { ZardButtonComponent } from '@/shared/components/button';
-import { ZardDialogImports } from '@/shared/components/dialog/dialog.imports';
+import { ZardButtonComponent } from '@vm-web/ui/zard/components/button';
+import { ZardDialogImports } from '@vm-web/ui/zard/components/dialog/dialog.imports';
 
 let nextId = 0;
 

@@ -26,8 +26,8 @@ import {
 } from '@vm-web/shared';
 import { tap } from 'rxjs';
 
-import { ZardButtonComponent } from '@/shared/components/button';
-import { ZardTextareaComponent } from '@/shared/components/textarea';
+import { ZardButtonComponent } from '@vm-web/ui/zard/components/button';
+import { ZardTextareaComponent } from '@vm-web/ui/zard/components/textarea';
 
 import { ActionRunner } from '../../../core/actions/action-runner';
 import { onUploadCompleted } from '../../../core/actions/on-upload';
