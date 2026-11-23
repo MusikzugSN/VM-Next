@@ -34,6 +34,7 @@ import { StatusBadge } from '../../shared/ui/status-badge';
 import { PageProblem } from '../../shared/ui/page-problem';
 import { NameDialog } from '../../shared/ui/name-dialog';
 import { usePageName } from '../../core/layout/page';
+import { valueOr } from '../../core/util/resource-value';
 
 /** Stück in Mein Bereich (M-3, M-6, M-8, M-9): PDF preview of the own voice, download, print, personal tags. */
 @Component({
@@ -85,7 +86,7 @@ export class ScorePage {
   });
   protected readonly myTags = rxResource({ stream: () => this.api.get(apiUrl('me', 'tags'), myTagsResponseSchema) });
 
-  protected readonly score = computed(() => (this.overview.hasValue() ? this.overview.value() : null));
+  protected readonly score = computed(() => valueOr(this.overview, null));
   /** The sheet in the preview; the first one (own voice first) unless another is chosen. */
   protected readonly sheet = linkedSignal<MemberSheet | null>(() => this.score()?.sheets[0] ?? null);
   protected readonly previewUrl = computed(() => {

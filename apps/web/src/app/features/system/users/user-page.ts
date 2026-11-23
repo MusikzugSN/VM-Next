@@ -22,6 +22,7 @@ import { ToggleSwitch } from '../../../shared/ui/toggle-switch';
 import { UserStatusBadge } from '../ui/user-status-badge';
 import { TreeLabelPipe } from '../../../shared/ui/tree-label.pipe';
 import { usePageName } from '../../../core/layout/page';
+import { selectOr, valueOr } from '../../../core/util/resource-value';
 
 /** Benutzer-Detail (S-1, A-5, R-1, R-6): roles per ensemble, voices, admin flag, block and delete. */
 @Component({
@@ -56,11 +57,11 @@ export class UserPage {
   protected readonly options = rxResource({
     stream: () => this.api.get(apiUrl('system', 'userAssignmentOptions'), userAssignmentOptionsResponseSchema),
   });
-  protected readonly user = computed(() => (this.details.hasValue() ? this.details.value() : null));
+  protected readonly user = computed(() => valueOr(this.details, null));
   /** Ensembles the person is not member of yet, for „Ensemble hinzufügen“. */
   protected readonly freeEnsembles = computed(() => {
     const taken = new Set(this.user()?.memberships.map((m) => m.ensemble.id) ?? []);
-    return (this.options.hasValue() ? this.options.value().ensembles : []).filter((e) => !taken.has(e.id));
+    return (selectOr(this.options, (v) => v.ensembles, [])).filter((e) => !taken.has(e.id));
   });
 
   protected readonly newEnsembleId = signal('');

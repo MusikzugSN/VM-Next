@@ -19,6 +19,7 @@ import { ListState } from '../../shared/ui/list-state';
 import { MemberScoreList } from './ui/member-score-list';
 import { PageProblem } from '../../shared/ui/page-problem';
 import { usePageName } from '../../core/layout/page';
+import { selectOr } from '../../core/util/resource-value';
 
 /** Event (M-5, M-6, M-7): setlist in playing order, ZIP and print. */
 @Component({
@@ -69,7 +70,7 @@ import { usePageName } from '../../core/layout/page';
 })
 export class EventPage {
   /** Breadcrumb and document title show the loaded element's name. */
-  private readonly pageName = usePageName(() => this.overview.hasValue() ? this.overview.value().name : null);
+  private readonly pageName = usePageName(() => selectOr(this.overview, (v) => v.name, null));
   private readonly api = inject(ApiClient);
   private readonly voices = inject(VoiceContextStore);
   private readonly printer = inject(PrintLauncher);
@@ -99,7 +100,7 @@ export class EventPage {
   protected readonly zip = computed(() => eventZipUrl(this.eventId(), this.voices.overrideIds()));
 
   protected print(): void {
-    const name = this.overview.hasValue() ? this.overview.value().name : '';
+    const name = selectOr(this.overview, (v) => v.name, '');
     this.printer.open({ scope: 'event', id: this.eventId(), title: name });
   }
 }

@@ -35,6 +35,7 @@ import { SearchField } from '../../../shared/ui/search-field';
 import { TreeLabelPipe } from '../../../shared/ui/tree-label.pipe';
 import { usePageName } from '../../../core/layout/page';
 import { PrintRulesTab } from './print-rules-tab';
+import { valueOr } from '../../../core/util/resource-value';
 
 type EnsembleTab = 'details' | 'lineup' | 'members' | 'print';
 const TABS: readonly EnsembleTab[] = ['details', 'lineup', 'members', 'print'];
@@ -76,7 +77,7 @@ export class EnsemblePage {
     params: () => this.ensembleId(),
     stream: ({ params }) => this.api.get(apiUrl('system', 'ensembleDetails', { ensembleId: params }), ensembleDetailsResponseSchema),
   });
-  protected readonly ensemble = computed(() => (this.details.hasValue() ? this.details.value() : null));
+  protected readonly ensemble = computed(() => valueOr(this.details, null));
   protected readonly selfPath = computed(() => appPath(APP_ROUTES.system.ensemble, { ensembleId: this.ensembleId() }));
 
   // Stammdaten

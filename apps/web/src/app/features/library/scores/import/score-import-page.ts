@@ -38,6 +38,7 @@ import {
   type ColumnMapping,
   type ColumnTarget,
 } from './import-model';
+import { selectOr } from '../../../../core/util/resource-value';
 
 type RowFilter = 'all' | 'issues' | 'matches';
 
@@ -80,7 +81,7 @@ export class ScoreImportPage {
   protected readonly ensembles = rxResource({
     stream: () => this.api.get(apiUrl('folders', 'ensembleOptions'), ensembleOptionsResponseSchema).pipe(catchError(() => of({ items: [] }))),
   });
-  protected readonly ensembleItems = computed(() => (this.ensembles.hasValue() ? this.ensembles.value().items : []));
+  protected readonly ensembleItems = computed(() => selectOr(this.ensembles, (v) => v.items, []));
   protected readonly canUseFolders = computed(() => this.ensembleItems().length > 0);
 
   protected readonly problems = computed(() => mappingProblems(this.columns(), this.options.fields()));

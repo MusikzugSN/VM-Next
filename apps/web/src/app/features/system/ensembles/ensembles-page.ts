@@ -30,6 +30,7 @@ import { NAME_MAX } from '../../../shared/ui/name-dialog';
 import { ToggleSwitch } from '../../../shared/ui/toggle-switch';
 import { TreeLabelPipe } from '../../../shared/ui/tree-label.pipe';
 import { ToggleField } from '../../../shared/ui/toggle-field';
+import { selectOr } from '../../../core/util/resource-value';
 
 /** Ensembles (S-2, F-3): the tree in pre-order, create below a parent, archive and restore. */
 @Component({
@@ -137,7 +138,7 @@ export class EnsemblesPage {
   private readonly options = rxResource({
     stream: () => this.api.get(apiUrl('system', 'userAssignmentOptions'), userAssignmentOptionsResponseSchema),
   });
-  protected readonly parents = computed(() => (this.options.hasValue() ? this.options.value().ensembles : []));
+  protected readonly parents = computed(() => selectOr(this.options, (v) => v.ensembles, []));
 
   protected link(e: EnsembleListItem): string {
     return appPath(APP_ROUTES.system.ensemble, { ensembleId: e.id });
