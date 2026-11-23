@@ -22,11 +22,11 @@ import { ZardDialogImports } from '@/shared/components/dialog/dialog.imports';
 import { ZardNativeSelectDirective } from '@/shared/components/native-select';
 
 import { ActionRunner, ConfirmService } from '../../../core/actions/action-runner';
+import { fieldProblemHandler } from '../../../core/actions/field-problem-handler';
 import { focusFirstInvalid } from '../../../core/util/focus-invalid';
 import { onUploadCompleted } from '../../../core/actions/on-upload';
 import { UploadLauncher } from '../../../core/actions/pending-features';
 import { ApiClient } from '../../../core/api/api-client';
-import { isApiProblem } from '../../../core/api/api-problem';
 import { withQuery } from '../../../core/api/urls';
 import { SessionStore } from '../../../core/auth/session.store';
 import { PluralPipe } from '../../../core/i18n/plural.pipe';
@@ -220,14 +220,7 @@ export class LibraryScorePage {
       () => firstValueFrom(this.api.postVoid(apiUrl('scores', 'updateScoreDetails', { scoreId: this.scoreId() }), body)),
       {
         success: { key: 'library.form.saved' },
-        onProblem: (problem) => {
-          if (isApiProblem(problem) && problem.code === 'validation-failed') {
-            this.errors.set(problem.fieldErrors());
-            this.focusInvalid();
-            return true;
-          }
-          return false;
-        },
+        onProblem: fieldProblemHandler(this.errors, this.focusInvalid),
       },
     );
     this.saving.set(false);
