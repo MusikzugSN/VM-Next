@@ -3,12 +3,11 @@ import type { CreateVoiceBody, CreateVoiceResponse, InstrumentSuggestionsRespons
 import { and, asc, eq, inArray, sql } from 'drizzle-orm';
 import { uuidv7 } from '../common/ids/uuid-v7';
 import { ProblemException } from '../common/problem-details/problem.exception';
-import { DATABASE, type Database } from '../db/database';
+import { DATABASE, type Database, type Tx } from '../db/database';
 import { isUniqueViolation } from '../db/db-errors';
 import { ensembleLineupVoices, instruments, sheets, uploads, userVoices, voices, voiceSubstitutes } from '../db/schema';
 import { likePattern } from '../me/me.repository';
 
-type Tx = Parameters<Parameters<Database['transaction']>[0]>[0];
 
 /** Voices and instruments: one list, instrument typed with autocomplete, ordered substitutes (N-6, N-7, N-9, F-16). */
 @Injectable()

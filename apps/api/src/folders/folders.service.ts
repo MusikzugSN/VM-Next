@@ -188,9 +188,9 @@ export class FoldersService implements OnModuleInit {
   }
 
   /** Highest purely numeric number + 1, `1` for an empty folder. */
-  private async suggestedNumber(folderId: string): Promise<string | null> {
-    const [row] = await this.db.execute<{ max: string | null; n: number }>(sql`
-      select max(number::bigint)::text as max, count(*)::int as n from folder_entries
+  private async suggestedNumber(folderId: string): Promise<string> {
+    const [row] = await this.db.execute<{ max: string | null }>(sql`
+      select max(number::bigint)::text as max from folder_entries
        where folder_id = ${folderId}::uuid and number ~ '^[0-9]{1,15}$'`).then((r) => r.rows);
     if (!row?.max) return '1';
     return String(BigInt(row.max) + BigInt(1));

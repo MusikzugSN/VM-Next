@@ -17,13 +17,12 @@ import { and, asc, eq, inArray, sql } from 'drizzle-orm';
 import { uuidv7 } from '../common/ids/uuid-v7';
 import { decodeCursor, toPage } from '../common/pagination/cursor';
 import { ProblemException } from '../common/problem-details/problem.exception';
-import { DATABASE, type Database } from '../db/database';
+import { DATABASE, type Database, type Tx } from '../db/database';
 import { isUniqueViolation } from '../db/db-errors';
 import { clubSettings, memberships, rolePermissions, roles } from '../db/schema';
 import { loadDefaultRoles, type DefaultRole } from '../seed/default-roles';
 import { rolesFile } from '../seed/defaults';
 
-type Tx = Parameters<Parameters<Database['transaction']>[0]>[0];
 type RoleRecord = typeof roles.$inferSelect;
 
 const sorted = (permissions: readonly string[]) => ALL_PERMISSIONS.filter((p) => permissions.includes(p));
