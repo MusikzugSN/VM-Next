@@ -16,6 +16,7 @@ import { FILE_STORAGE, type IFileStorage } from '../storage/file-storage';
 import { streamToBuffer } from '../storage/stream-utils';
 import { OutputService, type OutputPlan, type OutputScope } from './output.service';
 import { buildPrintPdf, layoutDocuments, printRoute } from './print-layout';
+import { readOrNotFound } from '../storage/read-or-not-found';
 
 export interface FileResult<T = Readable> {
   body: T;
@@ -141,10 +142,7 @@ export class DownloadsService {
   }
 
   private async read(fileKey: string): Promise<Readable> {
-    return this.storage.read(fileKey).catch(() => {
-      this.logger.error(`File ${fileKey} missing in storage`);
-      throw ProblemException.notFound();
-    });
+    return readOrNotFound(this.storage, fileKey, this.logger, `File ${fileKey} missing in storage`);
   }
 }
 

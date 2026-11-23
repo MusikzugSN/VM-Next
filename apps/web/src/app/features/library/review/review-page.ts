@@ -24,7 +24,7 @@ import {
   uploadDetailsResponseSchema,
   type ReviewQueueItem,
 } from '@vm-web/shared';
-import { firstValueFrom, tap } from 'rxjs';
+import { tap } from 'rxjs';
 
 import { ZardButtonComponent } from '@/shared/components/button';
 import { ZardTextareaComponent } from '@/shared/components/textarea';
@@ -45,6 +45,7 @@ import { StatusBadge } from '../../../shared/ui/status-badge';
 import { VoiceSelect } from '../../../shared/ui/voice-select';
 import { clampCrop, initialPages, isTypingTarget, NO_CROP, rotate, toTransforms, type CropMargins, type PageState } from './review-model';
 import { ReviewPreview } from './review-preview';
+import { valueOr } from '../../../core/util/resource-value';
 
 const ZOOM_STEPS = [0.5, 0.75, 1, 1.25, 1.5, 2];
 
@@ -109,7 +110,7 @@ export class ReviewPage {
     params: () => this.uploadId(),
     stream: ({ params }) => this.api.get(apiUrl('review', 'uploadDetails', { uploadId: params }), uploadDetailsResponseSchema),
   });
-  protected readonly upload = computed(() => (this.details.hasValue() ? this.details.value() : null));
+  protected readonly upload = computed(() => valueOr(this.details, null));
   protected readonly pdfUrl = computed(() => {
     const id = this.uploadId();
     return id ? apiUrl('review', 'uploadPdf', { uploadId: id }) : null;
@@ -212,15 +213,13 @@ export class ReviewPage {
     const voiceId = this.voiceId();
     if (!upload || !score || !voiceId || !this.canApprove()) return;
     this.busy.set(true);
-    const done = await this.actions.run(
+    const done = await this.actions.runOnce(
       () =>
-        firstValueFrom(
-          this.api.post(
+        this.api.post(
             apiUrl('review', 'approve', { uploadId: upload.uploadId }),
             { scoreId: score.id, voiceId, pages: toTransforms(this.pages()), replaceExisting: this.replaceExisting() },
             approveUploadResponseSchema,
           ),
-        ),
       {
         success: { key: 'review.approved', params: { name: upload.fileName } },
         onProblem: (problem) => {
@@ -244,11 +243,9 @@ export class ReviewPage {
       return;
     }
     this.busy.set(true);
-    const done = await this.actions.run(
+    const done = await this.actions.runOnce(
       () =>
-        firstValueFrom(
-          this.api.post(apiUrl('review', 'reject', { uploadId: upload.uploadId }), { reason: this.reason().trim() }, rejectUploadResponseSchema),
-        ),
+        this.api.post(apiUrl('review', 'reject', { uploadId: upload.uploadId }), { reason: this.reason().trim() }, rejectUploadResponseSchema),
       { success: { key: 'review.rejected', params: { name: upload.fileName } } },
     );
     this.busy.set(false);

@@ -2,7 +2,7 @@ import { Inject, Injectable, Logger, OnApplicationBootstrap } from '@nestjs/comm
 import { eq, sql } from 'drizzle-orm';
 import { lineupTemplateFile, rolesFile } from './defaults';
 import { uuidv7 } from '../common/ids/uuid-v7';
-import { DATABASE, type Database } from '../db/database';
+import { DATABASE, type Database, type Tx } from '../db/database';
 import { clubSettings, ensembles, rolePermissions, roles, systemState } from '../db/schema';
 import { loadDefaultRoles, type DefaultRole } from './default-roles';
 import { importLineupTemplate, loadLineupTemplate } from './lineup-template';
@@ -85,7 +85,6 @@ export class SeedService implements OnApplicationBootstrap {
   }
 }
 
-type Tx = Parameters<Parameters<Database['transaction']>[0]>[0];
 
 async function insertRole(tx: Tx, role: DefaultRole, now: Date): Promise<string> {
   const id = uuidv7();

@@ -68,23 +68,19 @@ export interface RequestAuth {
 
 export type AuthenticatedRequest = Request & { vmweb?: RequestAuth };
 
+/** Parameter decorator for a part of the request's auth; only on non-public routes. */
+const fromAuth = <T>(name: string, select: (auth: RequestAuth) => T) =>
+  createParamDecorator((_: unknown, ctx: ExecutionContext): T => {
+    const auth = ctx.switchToHttp().getRequest<AuthenticatedRequest>().vmweb;
+    if (!auth) throw new Error(`${name} used on a route without session`);
+    return select(auth);
+  });
+
 /** The caller's `AccessContext`; only on non-public routes (guaranteed by `SessionGuard`). */
-export const CurrentAccess = createParamDecorator((_: unknown, ctx: ExecutionContext): AccessContext => {
-  const auth = ctx.switchToHttp().getRequest<AuthenticatedRequest>().vmweb;
-  if (!auth) throw new Error('CurrentAccess used on a route without session');
-  return auth.access;
-});
+export const CurrentAccess = fromAuth<AccessContext>('CurrentAccess', (auth) => auth.access);
 
 /** The caller's account; only on non-public routes. */
-export const CurrentUser = createParamDecorator((_: unknown, ctx: ExecutionContext): AccessUser => {
-  const auth = ctx.switchToHttp().getRequest<AuthenticatedRequest>().vmweb;
-  if (!auth) throw new Error('CurrentUser used on a route without session');
-  return auth.user;
-});
+export const CurrentUser = fromAuth<AccessUser>('CurrentUser', (auth) => auth.user);
 
 /** The caller's session; only on non-public routes. */
-export const CurrentSession = createParamDecorator((_: unknown, ctx: ExecutionContext): SessionData => {
-  const auth = ctx.switchToHttp().getRequest<AuthenticatedRequest>().vmweb;
-  if (!auth) throw new Error('CurrentSession used on a route without session');
-  return auth.session;
-});
+export const CurrentSession = fromAuth<SessionData>('CurrentSession', (auth) => auth.session);

@@ -14,7 +14,6 @@ import {
   eventListResponseSchema,
   type EventListItem,
 } from '@vm-web/shared';
-import { firstValueFrom } from 'rxjs';
 
 import { ZardButtonComponent } from '@/shared/components/button';
 import { ZardNativeSelectDirective } from '@/shared/components/native-select';
@@ -30,6 +29,7 @@ import { ListState } from '../../../shared/ui/list-state';
 import { SearchField } from '../../../shared/ui/search-field';
 import { ToggleSwitch } from '../../../shared/ui/toggle-switch';
 import { CreateInEnsembleDialog, type CreateInEnsemble } from '../ui/create-in-ensemble-dialog';
+import { ensemblesWith } from '../ui/ensembles-with';
 
 /** Events verwalten (N-15): upcoming and past events per ensemble, visibility, create and delete. */
 @Component({
@@ -74,9 +74,7 @@ export class ManageEventsPage {
     stream: () => this.api.get(apiUrl('events', 'ensembleOptions'), ensembleOptionsResponseSchema),
   });
   protected readonly canCreate = computed(() => this.createOptions.hasValue() && this.createOptions.value().items.length > 0);
-  protected readonly filterOptions = computed(() =>
-    (this.session.access()?.permissions.ensembles ?? []).filter((e) => this.session.can('event.view', e.ensemble.id)).map((e) => e.ensemble),
-  );
+  protected readonly filterOptions = computed(() => ensemblesWith(this.session, 'event.view'));
 
   protected readonly list = cursorList({
     params: () => ({ period: this.period(), ensembleId: this.ensembleId() || undefined, q: this.query().trim() || undefined }),
@@ -100,15 +98,13 @@ export class ManageEventsPage {
   }
 
   protected readonly create = async (input: CreateInEnsemble): Promise<boolean> => {
-    const done = await this.actions.run(
+    const done = await this.actions.runOnce(
       () =>
-        firstValueFrom(
-          this.api.post(
+        this.api.post(
             apiUrl('events', 'createEvent'),
             { ensembleId: input.ensembleId, name: input.name, date: input.date, showInMyArea: input.show },
             createdResponseSchema,
           ),
-        ),
       { success: { key: 'library.events.created', params: { name: input.name } } },
     );
     if (done) void this.router.navigateByUrl(appPath(APP_ROUTES.library.event, { eventId: done.value.id }));
@@ -116,15 +112,15 @@ export class ManageEventsPage {
   };
 
   protected async setVisibility(event: EventListItem, show: boolean): Promise<void> {
-    const done = await this.actions.run(
-      () => firstValueFrom(this.api.postVoid(apiUrl('events', 'setVisibility', { eventId: event.id }), { showInMyArea: show })),
+    const done = await this.actions.runOnce(
+      () => this.api.postVoid(apiUrl('events', 'setVisibility', { eventId: event.id }), { showInMyArea: show }),
       { success: { key: show ? 'library.folders.shown' : 'library.folders.hidden', params: { name: event.name } } },
     );
     if (done) this.list.reload();
   }
 
   protected async remove(event: EventListItem): Promise<void> {
-    const done = await this.confirm.confirmedDelete('library.events.deleteTitle', 'library.events.deleteText', { name: event.name }, () => firstValueFrom(this.api.postVoid(apiUrl('events', 'deleteEvent', { eventId: event.id }))), {
+    const done = await this.confirm.confirmedDelete('library.events.deleteTitle', 'library.events.deleteText', { name: event.name }, () => this.api.postVoid(apiUrl('events', 'deleteEvent', { eventId: event.id })), {
       success: { key: 'library.events.deleted', params: { name: event.name } },
     });
     if (done) this.list.reload();

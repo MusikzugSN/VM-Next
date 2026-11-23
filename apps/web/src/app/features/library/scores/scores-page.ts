@@ -25,7 +25,7 @@ import {
   type ScoreColumn,
   type ScoreTableRow,
 } from '@vm-web/shared';
-import { firstValueFrom, map, tap } from 'rxjs';
+import { map, tap } from 'rxjs';
 
 import { ZardButtonComponent } from '@/shared/components/button';
 import { ZardDropdownImports } from '@/shared/components/dropdown/dropdown.imports';
@@ -255,7 +255,7 @@ export class ScoresPage {
   }
 
   protected async remove(row: ScoreTableRow): Promise<void> {
-    const done = await this.confirm.confirmedDelete('library.scores.deleteTitle', 'library.scores.deleteText', { title: row.title }, () => firstValueFrom(this.api.postVoid(apiUrl('scores', 'deleteScore', { scoreId: row.id }))), {
+    const done = await this.confirm.confirmedDelete('library.scores.deleteTitle', 'library.scores.deleteText', { title: row.title }, () => this.api.postVoid(apiUrl('scores', 'deleteScore', { scoreId: row.id })), {
       success: { key: 'library.scores.deleted', params: { title: row.title } },
     });
     if (done) this.list.reload();

@@ -4,7 +4,6 @@ import { TranslocoPipe, TranslocoService } from '@jsverse/transloco';
 import { NgIcon, provideIcons } from '@ng-icons/core';
 import { lucidePlus, lucideRotateCcw, lucideX } from '@ng-icons/lucide';
 import { apiUrl, ensemblePrintRulesResponseSchema, printRulesSchema, type PrintMode, type PrintRule } from '@vm-web/shared';
-import { firstValueFrom } from 'rxjs';
 
 import { ZardButtonComponent } from '@/shared/components/button';
 import { ZardInputComponent } from '@/shared/components/input';
@@ -14,6 +13,7 @@ import { ActionRunner } from '../../../core/actions/action-runner';
 import { ApiClient } from '../../../core/api/api-client';
 import { pluralKey } from '../../../core/i18n/plural.pipe';
 import { PageProblem } from '../../../shared/ui/page-problem';
+import { selectOr } from '../../../core/util/resource-value';
 
 /** Sheets for a page count under a mode, for the example column („3 Seiten → 2 Blätter“). */
 export function sheetsFor(pages: number, mode: PrintMode): number {
@@ -178,7 +178,7 @@ export class PrintRulesTab {
   protected readonly draft = signal<PrintRule[]>([]);
   protected readonly valid = computed(() => printRulesSchema.safeParse(this.draft()).success);
   protected readonly dirty = computed(() => {
-    const saved = this.data.hasValue() ? this.data.value().rules : [];
+    const saved = selectOr(this.data, (v) => v.rules, []);
     return JSON.stringify(saved) !== JSON.stringify(this.draft()) || (this.data.hasValue() && !this.data.value().own);
   });
 
@@ -235,15 +235,15 @@ export class PrintRulesTab {
   protected async save(): Promise<void> {
     const parsed = printRulesSchema.safeParse(this.draft());
     if (!parsed.success) return;
-    const done = await this.actions.run(
-      () => firstValueFrom(this.api.postVoid(apiUrl('system', 'setPrintRules', { ensembleId: this.ensembleId() }), { rules: parsed.data })),
+    const done = await this.actions.runOnce(
+      () => this.api.postVoid(apiUrl('system', 'setPrintRules', { ensembleId: this.ensembleId() }), { rules: parsed.data }),
       { success: { key: 'system.printRules.saved' } },
     );
     if (done) this.data.reload();
   }
 
   protected async reset(): Promise<void> {
-    const done = await this.actions.run(() => firstValueFrom(this.api.postVoid(apiUrl('system', 'resetPrintRules', { ensembleId: this.ensembleId() }))), {
+    const done = await this.actions.runOnce(() => this.api.postVoid(apiUrl('system', 'resetPrintRules', { ensembleId: this.ensembleId() })), {
       success: { key: 'system.printRules.resetDone' },
     });
     if (done) this.data.reload();

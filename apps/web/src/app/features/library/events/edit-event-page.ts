@@ -13,6 +13,7 @@ import {
   eventScoreCandidatesResponseSchema,
   setlistResponseSchema,
   type SetlistEntry,
+  MAX_SETLIST,
 } from '@vm-web/shared';
 import { firstValueFrom, map, type Observable } from 'rxjs';
 
@@ -29,9 +30,9 @@ import { ScorePicker, type CandidatePage, type PickedScore } from '../ui/score-p
 import { moveItem } from '../voices/voice-dialog';
 import { usePageName } from '../../../core/layout/page';
 import { PrintLauncher } from '../../../core/actions/pending-features';
+import { selectOr } from '../../../core/util/resource-value';
 
 /** API limit of `set-setlist`. */
-export const MAX_SETLIST = 200;
 
 type Item = Pick<SetlistEntry, 'scoreId' | 'title' | 'composer'>;
 
@@ -59,7 +60,7 @@ type Item = Pick<SetlistEntry, 'scoreId' | 'title' | 'composer'>;
 export class EditEventPage {
   private readonly printer = inject(PrintLauncher);
   /** Breadcrumb and document title show the loaded element's name. */
-  private readonly pageName = usePageName(() => this.details.hasValue() ? this.details.value().name : null);
+  private readonly pageName = usePageName(() => selectOr(this.details, (v) => v.name, null));
   private readonly api = inject(ApiClient);
   private readonly actions = inject(ActionRunner);
   private readonly confirm = inject(ConfirmService);
@@ -77,7 +78,7 @@ export class EditEventPage {
     params: () => this.eventId(),
     stream: ({ params }) => this.api.get(apiUrl('events', 'eventDetails', { eventId: params }), eventDetailsResponseSchema),
   });
-  protected readonly ensembleId = computed(() => (this.details.hasValue() ? this.details.value().ensemble.id : undefined));
+  protected readonly ensembleId = computed(() => selectOr(this.details, (v) => v.ensemble.id, undefined));
   protected readonly canEdit = computed(() => this.session.can('event.edit', this.ensembleId()));
   protected readonly canDelete = computed(() => this.session.can('event.delete', this.ensembleId()));
 
@@ -165,8 +166,8 @@ export class EditEventPage {
 
   protected async saveSetlist(): Promise<void> {
     const scoreIds = this.items().map((i) => i.scoreId);
-    const done = await this.actions.run(
-      () => firstValueFrom(this.api.postVoid(apiUrl('events', 'setSetlist', { eventId: this.eventId() }), { scoreIds })),
+    const done = await this.actions.runOnce(
+      () => this.api.postVoid(apiUrl('events', 'setSetlist', { eventId: this.eventId() }), { scoreIds }),
       { success: { key: 'library.event.setlistSaved' } },
     );
     if (done) this.saved.set(scoreIds);
@@ -175,23 +176,23 @@ export class EditEventPage {
   protected async saveDetails(): Promise<void> {
     const body = { name: this.name().trim(), date: this.date() };
     if (!body.name || !body.date) return;
-    const done = await this.actions.run(
-      () => firstValueFrom(this.api.postVoid(apiUrl('events', 'updateDetails', { eventId: this.eventId() }), body)),
+    const done = await this.actions.runOnce(
+      () => this.api.postVoid(apiUrl('events', 'updateDetails', { eventId: this.eventId() }), body),
       { success: { key: 'library.form.saved' } },
     );
     if (done) this.details.reload();
   }
 
   protected async setVisibility(show: boolean): Promise<void> {
-    const done = await this.actions.run(() =>
-      firstValueFrom(this.api.postVoid(apiUrl('events', 'setVisibility', { eventId: this.eventId() }), { showInMyArea: show })),
+    const done = await this.actions.runOnce(() =>
+      this.api.postVoid(apiUrl('events', 'setVisibility', { eventId: this.eventId() }), { showInMyArea: show }),
     );
     if (done) this.details.reload();
   }
 
   protected async deleteEvent(): Promise<void> {
-    const name = this.details.hasValue() ? this.details.value().name : '';
-    const done = await this.confirm.confirmedDelete('library.events.deleteTitle', 'library.events.deleteText', { name }, () => firstValueFrom(this.api.postVoid(apiUrl('events', 'deleteEvent', { eventId: this.eventId() }))), {
+    const name = selectOr(this.details, (v) => v.name, '');
+    const done = await this.confirm.confirmedDelete('library.events.deleteTitle', 'library.events.deleteText', { name }, () => this.api.postVoid(apiUrl('events', 'deleteEvent', { eventId: this.eventId() })), {
       success: { key: 'library.events.deleted', params: { name } },
     });
     if (done) void this.router.navigateByUrl(this.eventsPath);
@@ -226,6 +227,6 @@ export class EditEventPage {
 
   /** Druckdialog (D-1) for the whole event; the voices come from the voice switch. */
   protected print(): void {
-    this.printer.open({ scope: 'event', id: this.eventId(), title: this.details.hasValue() ? this.details.value().name : '' });
+    this.printer.open({ scope: 'event', id: this.eventId(), title: selectOr(this.details, (v) => v.name, '') });
   }
 }
