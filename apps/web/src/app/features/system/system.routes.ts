@@ -1,9 +1,9 @@
-import type { CanActivateFn, Route, Routes } from '@angular/router';
+import type { Routes } from '@angular/router';
 import { provideTranslocoScope } from '@jsverse/transloco';
-import { APP_ROUTES, childSegment, type AppPath } from '@vm-web/shared';
+import { APP_ROUTES, type AppPath } from '@vm-web/shared';
 
 import { requirePermission } from '../../core/auth/guards';
-import { page, type Crumb } from '../../core/layout/page';
+import { guardedPageFactory, type Crumb } from '../../core/layout/page';
 
 const r = APP_ROUTES.system;
 const section = { key: 'nav.system.section', path: r.users };
@@ -14,10 +14,7 @@ const parents: Partial<Record<AppPath, Crumb>> = {
   [r.role]: { key: 'nav.system.roles', path: r.roles },
 };
 
-function systemPage(path: AppPath, titleKey: string, guard: CanActivateFn, loadComponent: Route['loadComponent']): Route {
-  const meta = page(titleKey, section, parents[path]);
-  return { path: childSegment(path, r.root), canActivate: [guard], title: meta.title, data: meta.data, loadComponent };
-}
+const systemPage = guardedPageFactory(r.root, section, parents);
 
 /** Systemverwaltung (Stufe 5); texts in the `system` scope. */
 export const SYSTEM_ROUTES: Routes = [
