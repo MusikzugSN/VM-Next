@@ -113,7 +113,7 @@
                   <span class="text-muted-foreground">
                     {{ doc.voice.name }}
                     @if (doc.kind === 'substitute') {
-                      <span class="ms-1 rounded-sm bg-brass-soft px-1.5 py-0.5 text-xs font-medium text-brass-ink">{{ 'print.substitute' | transloco }}</span>
+                      <span vm-badge tone="tertiary" class="ms-1">{{ 'print.substitute' | transloco }}</span>
                     }
                   </span>
                 </span>
@@ -126,7 +126,7 @@
             @for (m of p.missing; track m.id) {
               <li class="flex items-center gap-3 border-t px-4 py-2.5">
                 <span class="flex-1 font-medium">{{ m.name }}</span>
-                <span class="inline-flex items-center gap-1 rounded-sm bg-destructive-soft px-2 py-0.5 text-xs font-medium text-destructive-ink">
+                <span vm-badge tone="error">
                   <ng-icon name="lucideCircleAlert" size="var(--mat-sys-icon-size-xs)" aria-hidden="true" />{{ 'print.missing' | transloco }}
                 </span>
               </li>

@@ -37,7 +37,7 @@
     >
       <ng-icon name="lucideSlidersHorizontal" aria-hidden="true" />
       @if (filterCount() > 0) {
-        <span class="absolute -top-1.5 -right-1.5 flex size-4 items-center justify-center rounded-full bg-primary text-[10px] font-medium text-primary-foreground">
+        <span vm-badge-count>
           {{ filterCount() }}
         </span>
         <span class="sr-only">{{ 'library.filter.active' | tPlural: filterCount() }}</span>

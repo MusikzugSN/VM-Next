@@ -10,7 +10,7 @@ import {
 } from '@vm-web/shared';
 import { firstValueFrom } from 'rxjs';
 
-import { VmButton, VmDialogImports, VmField, VmFieldError, VmFieldLabel, VmIconButton, VmInput, VmSelect } from '@vm-web/ui';
+import { VmBadge, VmButton, VmDialogImports, VmField, VmFieldError, VmFieldLabel, VmIconButton, VmInput, VmSelect } from '@vm-web/ui';
 
 import { ActionRunner } from '../../../core/actions/action-runner';
 import { fieldProblemHandler } from '../../../core/actions/field-problem-handler';
@@ -36,7 +36,7 @@ export interface VoiceDialogTarget {
  */
 @Component({
   selector: 'vm-voice-dialog',
-  imports: [VmField, VmFieldLabel, VmFieldError, NgIcon, TranslocoPipe, VmButton, VmIconButton, VmDialogImports, VmInput, VmSelect],
+  imports: [VmBadge, VmField, VmFieldLabel, VmFieldError, NgIcon, TranslocoPipe, VmButton, VmIconButton, VmDialogImports, VmInput, VmSelect],
   viewProviders: [provideIcons({ lucideArrowUp, lucideArrowDown, lucideX, lucideCheck })],
   changeDetection: ChangeDetectionStrategy.OnPush,
   // The dialog renders in an overlay; its host must not take up space (or a gap) in the page.

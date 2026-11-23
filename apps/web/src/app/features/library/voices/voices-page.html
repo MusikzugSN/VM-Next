@@ -58,7 +58,7 @@
                 @if (voice.substitutes.length) {
                   <span class="text-xs">{{ 'library.voices.substituteChain' | transloco }}</span>
                   @for (s of voice.substitutes; track s.id; let n = $index) {
-                    <span class="rounded-sm bg-brass-soft px-1.5 py-0.5 text-xs font-medium text-brass-ink">{{ n + 1 }}. {{ s.name }}</span>
+                    <span vm-badge tone="tertiary">{{ n + 1 }}. {{ s.name }}</span>
                   }
                 } @else {
                   <span class="text-xs">{{ 'library.voices.noSubstitutes' | transloco }}</span>

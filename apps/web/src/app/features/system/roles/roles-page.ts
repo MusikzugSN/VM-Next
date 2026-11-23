@@ -5,7 +5,7 @@ import { NgIcon, provideIcons } from '@ng-icons/core';
 import { lucidePlus, lucideRotateCcw, lucideTriangleAlert } from '@ng-icons/lucide';
 import { APP_ROUTES, apiUrl, appPath, createdResponseSchema, resetDefaultsResponseSchema, roleListResponseSchema, type RoleListItem } from '@vm-web/shared';
 
-import { VmButton, VmCard } from '@vm-web/ui';
+import { VmBadge, VmButton, VmCard } from '@vm-web/ui';
 
 import { ActionRunner, ConfirmService } from '../../../core/actions/action-runner';
 import { ApiClient } from '../../../core/api/api-client';
@@ -18,7 +18,7 @@ import { NameDialog } from '../../../shared/ui/name-dialog';
 /** Rollen (S-3, R-5): list with badges, create, reset all default roles. */
 @Component({
   selector: 'vm-system-roles-page',
-  imports: [VmCard, RouterLink, NgIcon, TranslocoPipe, PluralPipe, VmButton, ListState, NameDialog],
+  imports: [VmBadge, VmCard, RouterLink, NgIcon, TranslocoPipe, PluralPipe, VmButton, ListState, NameDialog],
   viewProviders: [provideIcons({ lucidePlus, lucideRotateCcw, lucideTriangleAlert })],
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
@@ -55,7 +55,7 @@ import { NameDialog } from '../../../shared/ui/name-dialog';
               <span class="rounded-sm bg-warning-soft px-1.5 py-0.5 text-xs text-warning-ink">{{ 'system.roles.modified' | transloco }}</span>
             }
             @if (role.hasClubPermissions) {
-              <span class="inline-flex items-center gap-1 rounded-sm bg-destructive-soft px-1.5 py-0.5 text-xs text-destructive-ink">
+              <span vm-badge tone="error">
                 <ng-icon name="lucideTriangleAlert" size="12" aria-hidden="true" />{{ 'system.roles.clubPermissions' | transloco }}
               </span>
             }
