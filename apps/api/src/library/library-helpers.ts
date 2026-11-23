@@ -4,6 +4,7 @@ import type { AccessContext } from '../access/access-context';
 import { ProblemException } from '../common/problem-details/problem.exception';
 import { activeEnsembleOptions } from '../common/ensemble-tree';
 import type { Database } from '../db/database';
+import { decodeCursor, toPage } from '../common/pagination/cursor';
 import { afterNameAndId } from '../common/pagination/keyset';
 import { ensembles, scores, roles } from '../db/schema';
 import { likePattern } from '../common/sql';
@@ -30,6 +31,17 @@ export async function assertRoleExists(db: Database, roleId: string): Promise<vo
 /** All roles by name, for selection lists. */
 export function roleOptions(db: Database): Promise<{ id: string; name: string }[]> {
   return db.select({ id: roles.id, name: roles.name }).from(roles).orderBy(sql`lower(${roles.name})`);
+}
+
+/** One page of score candidates for a folder or setlist. */
+export async function scoreCandidatePage(db: Database, query: { q: string; cursor?: string; limit: number }, containedSql: SQL<boolean>) {
+  const rows = await scoreCandidates(db, query.q, containedSql, decodeCursor(query.cursor, 2), query.limit);
+  return toPage(rows, query.limit, (r) => [r.sortKey, r.id], (r) => ({
+    id: r.id,
+    title: r.title,
+    composer: r.composer,
+    alreadyContained: r.alreadyContained,
+  }));
 }
 
 /**

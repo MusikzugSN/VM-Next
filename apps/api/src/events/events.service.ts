@@ -19,7 +19,7 @@ import { todayIn } from '../common/time/today';
 import { AppConfig } from '../config/app-config.service';
 import { DATABASE, type Database } from '../db/database';
 import { ensembles, events, scores, setlistEntries } from '../db/schema';
-import { assertActiveEnsemble, ensembleOptions, listEnsembles, scoreCandidates } from '../library/library-helpers';
+import { assertActiveEnsemble, ensembleOptions, listEnsembles, scoreCandidatePage } from '../library/library-helpers';
 import { assertNoDuplicates } from '../common/validation/id-list';
 import { replaceRows } from '../db/table-helpers';
 import { likePattern } from '../common/sql';
@@ -112,13 +112,7 @@ export class EventsService implements OnModuleInit {
 
   async candidates(eventId: string, query: { q: string; cursor?: string; limit: number }): Promise<EventScoreCandidatesResponse> {
     const contained = sql<boolean>`exists (select 1 from setlist_entries x where x.event_id = ${eventId}::uuid and x.score_id = ${scores.id})`;
-    const rows = await scoreCandidates(this.db, query.q, contained, decodeCursor(query.cursor, 2), query.limit);
-    return toPage(rows, query.limit, (r) => [r.sortKey, r.id], (r) => ({
-      id: r.id,
-      title: r.title,
-      composer: r.composer,
-      alreadyContained: r.alreadyContained,
-    }));
+    return scoreCandidatePage(this.db, query, contained);
   }
 
   async create(body: CreateEventBody): Promise<{ id: string }> {

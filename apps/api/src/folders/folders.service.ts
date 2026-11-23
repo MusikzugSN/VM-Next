@@ -19,7 +19,7 @@ import { ProblemException } from '../common/problem-details/problem.exception';
 import { DATABASE, type Database } from '../db/database';
 import { withNameTaken } from '../db/db-errors';
 import { ensembles, folderEntries, folders, scores } from '../db/schema';
-import { assertActiveEnsemble, ensembleOptions, listEnsembles, scoreCandidates } from '../library/library-helpers';
+import { assertActiveEnsemble, ensembleOptions, listEnsembles, scoreCandidatePage } from '../library/library-helpers';
 import { likePattern } from '../common/sql';
 
 const scoreCount = sql<number>`(select count(*)::int from folder_entries x where x.folder_id = ${folders.id})`;
@@ -126,13 +126,7 @@ export class FoldersService implements OnModuleInit {
 
   async candidates(folderId: string, query: { q: string; cursor?: string; limit: number }): Promise<FolderScoreCandidatesResponse> {
     const contained = sql<boolean>`exists (select 1 from folder_entries x where x.folder_id = ${folderId}::uuid and x.score_id = ${scores.id})`;
-    const rows = await scoreCandidates(this.db, query.q, contained, decodeCursor(query.cursor, 2), query.limit);
-    const page = toPage(rows, query.limit, (r) => [r.sortKey, r.id], (r) => ({
-      id: r.id,
-      title: r.title,
-      composer: r.composer,
-      alreadyContained: r.alreadyContained,
-    }));
+    const page = await scoreCandidatePage(this.db, query, contained);
     return { ...page, suggestedNumber: await this.suggestedNumber(folderId) };
   }
 
