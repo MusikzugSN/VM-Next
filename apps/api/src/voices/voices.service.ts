@@ -7,6 +7,7 @@ import { DATABASE, type Database } from '../db/database';
 import { isUniqueViolation } from '../db/db-errors';
 import { ensembleLineupVoices, instruments, sheets, uploads, userVoices, voices, voiceSubstitutes } from '../db/schema';
 import { likePattern } from '../me/me.repository';
+import { assertKnownIds } from '../common/validation/id-list';
 
 type Tx = Parameters<Parameters<Database['transaction']>[0]>[0];
 
@@ -101,8 +102,7 @@ export class VoicesService {
       const ids = [voiceId, ...substituteIds];
       const found = new Set((await tx.select({ id: voices.id }).from(voices).where(inArray(voices.id, ids))).map((v) => v.id));
       if (!found.has(voiceId)) throw ProblemException.notFound();
-      const unknown = substituteIds.map((id, i) => [id, i] as const).filter(([id]) => !found.has(id));
-      if (unknown.length) throw ProblemException.validation(unknown.map(([, i]) => ({ path: `/body/substituteVoiceIds/${i}`, code: 'unknown_voice' })));
+      assertKnownIds(substituteIds, found, '/body/substituteVoiceIds', 'unknown_voice');
       await tx.delete(voiceSubstitutes).where(eq(voiceSubstitutes.voiceId, voiceId));
       if (substituteIds.length) {
         await tx.insert(voiceSubstitutes).values(substituteIds.map((substituteVoiceId, position) => ({ voiceId, substituteVoiceId, position })));
