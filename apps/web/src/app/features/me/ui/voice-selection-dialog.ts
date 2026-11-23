@@ -61,7 +61,7 @@ export { filterVoiceGroups };
                   type="button"
                   [attr.aria-pressed]="selected().has(voice.id)"
                   (click)="toggle(voice.id)"
-                  class="inline-flex h-control items-center gap-1.5 rounded-md border px-3 font-medium xl:h-control-compact"
+                  class="inline-flex h-control items-center gap-1.5 rounded-full border px-3 font-medium xl:h-control-compact"
                   [class]="selected().has(voice.id) ? 'border-primary bg-primary-soft text-primary' : 'border-input bg-background'"
                 >
                   @if (selected().has(voice.id)) {

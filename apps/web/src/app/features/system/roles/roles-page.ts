@@ -49,10 +49,10 @@ import { NameDialog } from '../../../shared/ui/name-dialog';
           <a [routerLink]="link(role)" class="font-medium">{{ role.name }}</a>
           <span class="flex flex-1 flex-wrap items-center gap-1.5 text-body-medium text-muted-foreground">
             @if (role.defaultKey) {
-              <span class="rounded-sm bg-muted px-1.5 py-0.5 text-body-small">{{ 'system.roles.default' | transloco }}</span>
+              <span class="rounded-small bg-muted px-1.5 py-0.5 text-body-small">{{ 'system.roles.default' | transloco }}</span>
             }
             @if (role.modifiedFromDefault) {
-              <span class="rounded-sm bg-warning-soft px-1.5 py-0.5 text-body-small text-warning-ink">{{ 'system.roles.modified' | transloco }}</span>
+              <span class="rounded-small bg-warning-soft px-1.5 py-0.5 text-body-small text-warning-ink">{{ 'system.roles.modified' | transloco }}</span>
             }
             @if (role.hasClubPermissions) {
               <span vm-badge tone="error">

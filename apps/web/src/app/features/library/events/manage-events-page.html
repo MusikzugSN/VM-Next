@@ -20,11 +20,11 @@
   />
 }
 
-<nav [attr.aria-label]="'library.events.period' | transloco" class="inline-flex self-start rounded-lg bg-muted p-1">
+<nav [attr.aria-label]="'library.events.period' | transloco" class="inline-flex self-start rounded-medium bg-muted p-1">
   <a
     [routerLink]="eventsPath"
     [attr.aria-current]="period() === 'upcoming' ? 'page' : null"
-    class="inline-flex min-h-target items-center rounded-md px-4 font-medium text-foreground no-underline xl:min-h-target-compact"
+    class="inline-flex min-h-target items-center rounded-small px-4 font-medium text-foreground no-underline xl:min-h-target-compact"
     [class.bg-background]="period() === 'upcoming'"
     [class.shadow-sm]="period() === 'upcoming'"
     >{{ 'library.events.upcoming' | transloco }}</a
@@ -33,7 +33,7 @@
     [routerLink]="eventsPath"
     [queryParams]="{ tab: 'archive' }"
     [attr.aria-current]="period() === 'past' ? 'page' : null"
-    class="inline-flex min-h-target items-center rounded-md px-4 font-medium text-foreground no-underline xl:min-h-target-compact"
+    class="inline-flex min-h-target items-center rounded-small px-4 font-medium text-foreground no-underline xl:min-h-target-compact"
     [class.bg-background]="period() === 'past'"
     [class.shadow-sm]="period() === 'past'"
     >{{ 'library.events.archive' | transloco }}</a

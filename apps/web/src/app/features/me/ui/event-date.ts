@@ -8,7 +8,7 @@ import { ChangeDetectionStrategy, Component, input } from '@angular/core';
   changeDetection: ChangeDetectionStrategy.OnPush,
   host: { class: 'inline-flex shrink-0', 'aria-hidden': 'true' },
   template: `
-    <span class="flex size-12 flex-col items-center justify-center rounded-md bg-primary-soft text-primary">
+    <span class="flex size-12 flex-col items-center justify-center rounded-small bg-primary-soft text-primary">
       <span class="text-title-large tabular-nums">{{ date() | date: 'd' }}</span>
       <span class="text-label-medium">{{ date() | date: 'MMM' }}</span>
     </span>

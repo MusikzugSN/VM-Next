@@ -35,7 +35,7 @@ import { LegalLinks } from './legal-links';
             <h1 class="text-headline-small">{{ 'auth.blocked.title' | transloco }}</h1>
             <p class="text-muted-foreground">{{ 'auth.blocked.text' | transloco: { club: clubName() } }}</p>
           </div>
-          <div class="flex flex-col gap-2 rounded-md border p-4">
+          <div class="flex flex-col gap-2 rounded-small border p-4">
             <h2 class="font-semibold">{{ 'auth.blocked.contactTitle' | transloco }}</h2>
             <p class="text-muted-foreground">{{ 'auth.blocked.contactText' | transloco }}</p>
           </div>

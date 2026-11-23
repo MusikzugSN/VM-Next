@@ -21,7 +21,7 @@
                 role="radio"
                 [attr.aria-checked]="mode() === m"
                 (click)="mode.set($any(m))"
-                class="flex min-h-target items-center gap-2 rounded-md border px-3 text-start font-medium"
+                class="flex min-h-target items-center gap-2 rounded-small border px-3 text-start font-medium"
                 [class]="mode() === m ? 'border-primary bg-primary-soft text-primary' : 'border-input bg-background'"
               >
                 <span class="flex size-4 shrink-0 items-center justify-center rounded-full border" [class.border-primary]="mode() === m" aria-hidden="true">
@@ -34,7 +34,7 @@
             }
           </div>
           @if (mode() === 'selection') {
-            <ul class="flex max-h-56 flex-col overflow-y-auto rounded-md border" [attr.aria-label]="'print.selectScores' | transloco">
+            <ul class="flex max-h-56 flex-col overflow-y-auto rounded-small border" [attr.aria-label]="'print.selectScores' | transloco">
               @for (s of selectableScores(); track s.scoreId; let first = $first) {
                 <li [class.border-t]="!first">
                   <label class="flex min-h-target items-center gap-3 px-4 py-2 xl:min-h-9">
@@ -61,7 +61,7 @@
               type="button"
               [attr.aria-pressed]="voiceIds().includes(voice.id)"
               (click)="toggleVoice(voice.id)"
-              class="inline-flex h-control items-center gap-1.5 rounded-md border px-3 font-medium xl:h-control-compact"
+              class="inline-flex h-control items-center gap-1.5 rounded-full border px-3 font-medium xl:h-control-compact"
               [class]="voiceIds().includes(voice.id) ? 'border-primary bg-primary-soft text-primary' : 'border-input bg-background'"
             >
               @if (voiceIds().includes(voice.id)) {
@@ -99,9 +99,9 @@
           }
         </div>
         @if (plan.error(); as error) {
-          <p role="alert" class="rounded-md bg-destructive-soft p-4 text-destructive-ink">{{ $any(error).messageKey ?? 'errors.unknown' | transloco }}</p>
+          <p role="alert" class="rounded-small bg-destructive-soft p-4 text-destructive-ink">{{ $any(error).messageKey ?? 'errors.unknown' | transloco }}</p>
         } @else if (current(); as p) {
-          <ul class="flex flex-col rounded-md border text-body-medium">
+          <ul class="flex flex-col rounded-small border text-body-medium">
             @for (doc of p.documents; track doc.scoreId + doc.voice.id; let first = $first) {
               @let s = sheets(doc.sheets, doc.mode);
               <li class="flex items-start gap-3 px-4 py-2.5" [class.border-t]="!first">
@@ -140,13 +140,13 @@
       @if (current(); as p) {
         @switch (action()) {
           @case ('browser') {
-            <p role="note" class="flex items-start gap-2 rounded-md bg-primary-soft p-4 text-primary">
+            <p role="note" class="flex items-start gap-2 rounded-small bg-primary-soft p-4 text-primary">
               <ng-icon name="lucidePrinter" class="mt-0.5 shrink-0" aria-hidden="true" />
               {{ 'print.routeBrowser' | transloco: { pages: 'print.pages' | tPlural: p.totalPages, limit: p.pageLimit } }}
             </p>
           }
           @case ('service') {
-            <div class="flex flex-col gap-3 rounded-md bg-success-soft p-4 text-success-ink">
+            <div class="flex flex-col gap-3 rounded-small bg-success-soft p-4 text-success-ink">
               <p class="flex items-start gap-2">
                 <ng-icon name="lucideCheck" class="mt-0.5 shrink-0" aria-hidden="true" />
                 {{ 'print.routeService' | transloco: { pages: 'print.pages' | tPlural: p.totalPages } }}
@@ -166,7 +166,7 @@
             </div>
           }
           @case ('fallback') {
-            <div role="alert" class="flex flex-col gap-3 rounded-md bg-warning-soft p-4 text-warning-ink">
+            <div role="alert" class="flex flex-col gap-3 rounded-small bg-warning-soft p-4 text-warning-ink">
               <p class="flex items-start gap-2">
                 <ng-icon name="lucideTriangleAlert" class="mt-0.5 shrink-0" aria-hidden="true" />
                 <span>
@@ -183,7 +183,7 @@
             </div>
           }
           @case ('device') {
-            <p role="note" class="flex items-start gap-2 rounded-md bg-primary-soft p-4 text-primary">
+            <p role="note" class="flex items-start gap-2 rounded-small bg-primary-soft p-4 text-primary">
               <ng-icon name="lucidePrinter" class="mt-0.5 shrink-0" aria-hidden="true" />
               <span><strong class="font-semibold">{{ 'print.deviceTitle' | transloco }}</strong> {{ 'print.deviceText' | transloco }}</span>
             </p>

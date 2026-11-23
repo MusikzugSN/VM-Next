@@ -29,7 +29,7 @@ export interface ChosenScore {
   host: { class: 'flex flex-col gap-1.5' },
   template: `
     @if (value(); as chosen) {
-      <div class="flex min-h-target items-center gap-2 rounded-md border border-input px-3 xl:min-h-9">
+      <div class="flex min-h-target items-center gap-2 rounded-small border border-input px-3 xl:min-h-9">
         <span class="flex-1 truncate font-medium">{{ chosen.title }}</span>
         <button type="button" class="font-medium text-primary underline-offset-4 hover:underline" (click)="changed.emit(null)">
           {{ 'upload.change' | transloco }}
@@ -50,7 +50,7 @@ export interface ChosenScore {
         />
       </span>
       @if (query().trim()) {
-        <ul [id]="controlId() + '-hits'" class="flex flex-col rounded-md border" [attr.aria-label]="'upload.results' | transloco">
+        <ul [id]="controlId() + '-hits'" class="flex flex-col rounded-small border" [attr.aria-label]="'upload.results' | transloco">
           @if (hits.hasValue()) {
             @for (score of hits.value().items; track score.id; let first = $first) {
               <li [class.border-t]="!first">

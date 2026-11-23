@@ -57,7 +57,7 @@ export function ruleEnd(rules: readonly PrintRule[], index: number): number | nu
           }
         </div>
 
-        <p class="rounded-md bg-muted px-4 py-3 text-body-medium">
+        <p class="rounded-small bg-muted px-4 py-3 text-body-medium">
           @if (info.own) {
             {{ 'system.printRules.own' | transloco }}
           } @else if (info.inheritedFrom; as parent) {
@@ -67,7 +67,7 @@ export function ruleEnd(rules: readonly PrintRule[], index: number): number | nu
           }
         </p>
 
-        <div class="overflow-x-auto rounded-md border">
+        <div class="overflow-x-auto rounded-small border">
           <table vm-table>
             <thead>
               <tr>

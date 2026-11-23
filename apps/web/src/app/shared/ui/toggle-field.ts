@@ -14,7 +14,7 @@ import { VmSwitch } from '@vm-web/ui';
   template: `
     <!-- The switch is a <button role="switch"> inside vm-switch: a labelable element, so a click on the text toggles it. -->
     <!-- eslint-disable-next-line @angular-eslint/template/label-has-associated-control -->
-    <label class="flex cursor-pointer items-center justify-between gap-4 rounded-md border px-4 py-3" [class.opacity-60]="disabled()">
+    <label class="flex cursor-pointer items-center justify-between gap-4 rounded-small border px-4 py-3" [class.opacity-60]="disabled()">
       <span class="flex min-w-0 flex-col">
         <span class="font-medium">{{ label() }}</span>
         @if (hint(); as text) {

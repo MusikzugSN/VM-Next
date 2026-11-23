@@ -30,7 +30,7 @@
     <vm-search-field [(value)]="search" labelKey="library.scores.search" />
     <button
       type="button"
-      class="relative flex size-control shrink-0 items-center justify-center rounded-md border border-input bg-background shadow-sm hover:bg-accent xl:size-control-compact"
+      class="relative flex size-control shrink-0 items-center justify-center rounded-full border border-input bg-background hover:bg-accent xl:size-control-compact"
       [attr.aria-label]="'common.filter' | transloco"
       aria-haspopup="dialog"
       (click)="filterOpen.set(true)"
@@ -48,7 +48,7 @@
         type="button"
         vm-menu-trigger
         [zDropdownMenu]="columnMenu"
-        class="inline-flex h-control shrink-0 items-center gap-2 rounded-md border border-input bg-background px-3 font-medium shadow-sm hover:bg-accent xl:h-control-compact"
+        class="inline-flex h-control shrink-0 items-center gap-2 rounded-full border border-input bg-background px-3 font-medium hover:bg-accent xl:h-control-compact"
       >
         <ng-icon name="lucideColumns3" aria-hidden="true" />{{ 'library.scores.columns' | transloco: { shown: columns().length, total: allColumns().length } }}
       </button>
@@ -67,7 +67,7 @@
   @if (chips().length) {
     <div class="flex flex-wrap items-center gap-2">
       @for (chip of chips(); track chip.key) {
-        <span class="inline-flex items-center gap-1 rounded-sm bg-primary-soft py-0.5 ps-2 text-primary">
+        <span class="inline-flex items-center gap-1 rounded-small bg-primary-soft py-0.5 ps-2 text-primary">
           {{ chip.text }}
           <button
             type="button"
@@ -162,7 +162,7 @@
                     <div class="flex flex-wrap items-center gap-1.5">
                       <a [routerLink]="link(row)" class="font-medium">{{ row.title }}</a>
                       @for (tag of row.tags; track tag.id) {
-                        <span class="rounded-sm bg-muted px-1.5 py-0.5 text-body-small">{{ tag.name }}</span>
+                        <span class="rounded-small bg-muted px-1.5 py-0.5 text-body-small">{{ tag.name }}</span>
                       }
                     </div>
                   }

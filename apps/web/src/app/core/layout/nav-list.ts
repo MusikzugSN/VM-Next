@@ -71,7 +71,7 @@ import { canSee, isActive, NAV_SECTIONS } from './nav';
                 [class.text-primary]="isActive(item, url())"
                 [class.font-medium]="isActive(item, url())"
                 (click)="navigate.emit()"
-                class="flex h-control items-center gap-2 rounded-md px-2 text-foreground no-underline hover:bg-accent xl:h-control-compact"
+                class="flex h-control items-center gap-2 rounded-full px-2 text-foreground no-underline hover:bg-accent xl:h-control-compact"
               >
                 <ng-icon [name]="item.icon" size="var(--mat-sys-icon-size-md)" aria-hidden="true" />
                 <span class="flex-1">{{ item.labelKey | transloco }}</span>

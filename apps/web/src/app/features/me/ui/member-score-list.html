@@ -13,7 +13,7 @@
         </label>
         @if (numbering() !== 'none') {
           <span
-            class="flex size-control shrink-0 self-start items-center justify-center rounded-md bg-primary-soft text-title-medium text-primary tabular-nums"
+            class="flex size-control shrink-0 self-start items-center justify-center rounded-small bg-primary-soft text-title-medium text-primary tabular-nums"
             [attr.aria-label]="'me.list.numberLabel' | transloco: { number: item.number }"
             >{{ item.number }}</span
           >
@@ -100,7 +100,7 @@
             @if (numbering() !== 'none') {
               <td class="px-4 py-3">
                 <span
-                  class="flex size-10 items-center justify-center rounded-md bg-primary-soft text-title-medium text-primary tabular-nums"
+                  class="flex size-10 items-center justify-center rounded-small bg-primary-soft text-title-medium text-primary tabular-nums"
                   [attr.aria-label]="'me.list.numberLabel' | transloco: { number: item.number }"
                   >{{ item.number }}</span
                 >

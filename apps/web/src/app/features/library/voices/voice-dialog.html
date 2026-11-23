@@ -25,7 +25,7 @@
       </label>
 
       <!-- Instrument follows from the voice name (N-6); „Ändern“ opens the instrument chips. -->
-      <div id="voice-instrument" class="flex min-h-target flex-wrap items-center gap-2 rounded-md bg-muted px-4 py-3 xl:min-h-9" aria-live="polite">
+      <div id="voice-instrument" class="flex min-h-target flex-wrap items-center gap-2 rounded-small bg-muted px-4 py-3 xl:min-h-9" aria-live="polite">
         <span class="text-muted-foreground">{{ 'library.voices.instrument' | transloco }}:</span>
         @if (instrument()) {
           <span class="font-medium">{{ instrument() }}</span>
@@ -52,7 +52,7 @@
       }
 
       @if (choosing()) {
-        <div id="voice-instrument-choice" class="flex flex-col gap-3 rounded-md border p-4">
+        <div id="voice-instrument-choice" class="flex flex-col gap-3 rounded-small border p-4">
           <div role="radiogroup" [attr.aria-label]="'library.voices.instrument' | transloco" class="flex flex-wrap gap-2">
             @for (option of instrumentNames(); track option) {
               <button
@@ -60,7 +60,7 @@
                 role="radio"
                 [attr.aria-checked]="instrument() === option"
                 (click)="chooseInstrument(option)"
-                class="inline-flex h-control items-center gap-1.5 rounded-md border px-3 font-medium xl:h-control-compact"
+                class="inline-flex h-control items-center gap-1.5 rounded-full border px-3 font-medium xl:h-control-compact"
                 [class]="instrument() === option ? 'border-primary bg-primary-soft text-primary' : 'border-input bg-background'"
               >
                 @if (instrument() === option) {
@@ -91,7 +91,7 @@
       @if (substitutes().length) {
         <ol class="flex flex-col gap-1">
           @for (s of substitutes(); track s.id; let i = $index, first = $first, last = $last) {
-            <li class="flex items-center gap-1 rounded-md border px-3 py-2">
+            <li class="flex items-center gap-1 rounded-small border px-3 py-2">
               <span class="w-6 text-body-small text-muted-foreground tabular-nums">{{ i + 1 }}.</span>
               <span class="flex-1 font-medium">{{ s.name }}</span>
               <button vm-icon-button type="button" [zDisabled]="first" (click)="move(i, -1)" [attr.aria-label]="'common.moveUp' | transloco: { name: s.name }">

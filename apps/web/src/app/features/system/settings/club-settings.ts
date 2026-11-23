@@ -96,7 +96,7 @@ type ClubErrors = Partial<Record<keyof ClubForm, string>>;
         <p class="text-muted-foreground">{{ 'system.settings.club.logoHint' | transloco }}</p>
       </div>
       <div class="flex flex-col gap-4 md:flex-row md:items-center">
-        <div class="flex size-24 items-center justify-center rounded-lg border bg-background">
+        <div class="flex size-24 items-center justify-center rounded-medium border bg-background">
           @if (config().club.logoUrl; as url) {
             <img [src]="url" [alt]="'system.settings.club.logoPreview' | transloco" class="max-h-20 max-w-20 object-contain" />
           } @else {

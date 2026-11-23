@@ -14,7 +14,7 @@ import type { CompletenessSummary } from '@vm-web/shared';
   template: `
     @if (value().total > 0) {
       <span
-        class="inline-flex items-center gap-1 rounded-sm px-2 py-0.5 text-label-medium whitespace-nowrap tabular-nums"
+        class="inline-flex items-center gap-1 rounded-small px-2 py-0.5 text-label-medium whitespace-nowrap tabular-nums"
         [class]="complete() ? 'bg-success-soft text-success-ink' : 'bg-warning-soft text-warning-ink'"
         [attr.aria-label]="'library.completeness.label' | transloco: { present: value().present, total: value().total }"
       >

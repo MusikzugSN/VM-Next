@@ -19,7 +19,7 @@
     </div>
   } @else {
     <section aria-labelledby="h-install" vm-card class="flex flex-col gap-4 p-4 md:p-6">
-      <div role="status" class="flex items-start gap-2 rounded-md bg-warning-soft p-4 text-warning-ink">
+      <div role="status" class="flex items-start gap-2 rounded-small bg-warning-soft p-4 text-warning-ink">
         <ng-icon name="lucideTriangleAlert" class="mt-0.5 shrink-0" aria-hidden="true" />
         <span>
           <strong class="font-semibold">{{ (s.kind === 'offline' ? 'print.history.offline' : 'print.history.incompatible.' + s.reason) | transloco }}</strong>
@@ -34,7 +34,7 @@
         <li class="flex flex-col gap-2">
           {{ 'print.history.steps.origin' | transloco }}
           <span class="flex flex-wrap items-center gap-2">
-            <code class="rounded-md bg-muted px-3 py-2 font-mono text-body-medium">{{ origin }}</code>
+            <code class="rounded-small bg-muted px-3 py-2 font-mono text-body-medium">{{ origin }}</code>
             <button vm-button variant="text" type="button" (click)="copyOrigin()">
               <ng-icon name="lucideCopy" aria-hidden="true" />{{ 'print.history.copy' | transloco }}
             </button>
@@ -53,7 +53,7 @@
 
 @if (ready()) {
   @if (jobs().length === 0 && loaded()) {
-    <p class="rounded-lg border border-dashed p-8 text-center text-muted-foreground">{{ 'print.history.empty' | transloco }}</p>
+    <p class="rounded-medium border border-dashed p-8 text-center text-muted-foreground">{{ 'print.history.empty' | transloco }}</p>
   } @else if (viewport.isMobile()) {
     <ul class="flex flex-col gap-2">
       @for (job of jobs(); track job.id) {
@@ -113,7 +113,7 @@
 }
 
 <ng-template #statusBadge let-job>
-  <span class="inline-flex items-center rounded-sm px-2 py-0.5 text-label-medium whitespace-nowrap" [class]="statusClass($any(job).status)">
+  <span class="inline-flex items-center rounded-small px-2 py-0.5 text-label-medium whitespace-nowrap" [class]="statusClass($any(job).status)">
     @if ($any(job).status === 'printing' && $any(job).printedPages !== null) {
       {{ 'print.history.progress' | transloco: { printed: $any(job).printedPages, pages: $any(job).pages } }}
     } @else {

@@ -11,7 +11,7 @@
       @if (folders.hasValue() && folders.value().items.length) {
         <ul [attr.aria-label]="'library.score.inFolders' | transloco" class="flex flex-wrap gap-2">
           @for (entry of folders.value().items; track entry.folder.id) {
-            <li class="inline-flex items-center gap-1.5 rounded-md border bg-muted px-2.5 py-1 text-label-large">
+            <li class="inline-flex items-center gap-1.5 rounded-small border bg-muted px-2.5 py-1 text-label-large">
               <ng-icon name="lucideFolderOpen" size="var(--mat-sys-icon-size-xs)" class="text-muted-foreground" aria-hidden="true" />
               {{ entry.folder.name }} <span aria-hidden="true" class="text-muted-foreground">·</span>
               <span class="font-semibold text-primary tabular-nums">{{ 'library.score.number' | transloco: { number: entry.number } }}</span>
@@ -101,15 +101,15 @@
               </div>
             </div>
             <dl class="grid grid-cols-3 gap-2 text-center">
-              <div class="rounded-md bg-muted p-2">
+              <div class="rounded-small bg-muted p-2">
                 <dt class="text-body-small text-muted-foreground">{{ 'library.score.present' | transloco }}</dt>
                 <dd class="text-title-large tabular-nums">{{ c.summary.present }}</dd>
               </div>
-              <div class="rounded-md bg-muted p-2">
+              <div class="rounded-small bg-muted p-2">
                 <dt class="text-body-small text-muted-foreground">{{ 'library.score.substituted' | transloco }}</dt>
                 <dd class="text-title-large tabular-nums">{{ c.summary.substituted }}</dd>
               </div>
-              <div class="rounded-md bg-muted p-2">
+              <div class="rounded-small bg-muted p-2">
                 <dt class="text-body-small text-muted-foreground">{{ 'library.score.missing' | transloco }}</dt>
                 <dd class="text-title-large tabular-nums">{{ c.summary.total - c.summary.present - c.summary.substituted }}</dd>
               </div>
@@ -121,7 +121,7 @@
             <p class="text-muted-foreground">{{ 'library.score.noLineup' | transloco }}</p>
           }
           @if (sheets.hasValue() && sheets.value().pendingUploadCount > 0) {
-            <p class="rounded-md bg-warning-soft p-4 text-warning-ink">
+            <p class="rounded-small bg-warning-soft p-4 text-warning-ink">
               {{ 'library.score.pending' | tPlural: sheets.value().pendingUploadCount }}
               <a [routerLink]="reviewPath" class="font-medium">{{ 'nav.library.review' | transloco }}</a>
             </p>
@@ -226,7 +226,7 @@
         </div>
         <p class="text-muted-foreground">{{ 'library.score.foldersHint' | transloco }}</p>
       } @else if (folders.hasValue()) {
-        <p class="rounded-lg border border-dashed p-8 text-center text-muted-foreground">{{ 'library.score.noFolders' | transloco }}</p>
+        <p class="rounded-medium border border-dashed p-8 text-center text-muted-foreground">{{ 'library.score.noFolders' | transloco }}</p>
       }
     }
   }

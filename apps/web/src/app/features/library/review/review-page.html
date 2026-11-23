@@ -4,10 +4,10 @@
   @if (!viewport.isMobile()) {
     <p class="text-body-medium text-muted-foreground">
       {{ 'review.shortcuts' | transloco }}
-      <kbd class="rounded border border-input px-1 font-sans text-foreground">A</kbd> {{ 'review.keyApprove' | transloco }} ·
-      <kbd class="rounded border border-input px-1 font-sans text-foreground">R</kbd> {{ 'review.keyReject' | transloco }} ·
-      <kbd class="rounded border border-input px-1 font-sans text-foreground">←</kbd>
-      <kbd class="rounded border border-input px-1 font-sans text-foreground">→</kbd> {{ 'review.keyBrowse' | transloco }}
+      <kbd class="rounded-extra-small border border-input px-1 font-sans text-foreground">A</kbd> {{ 'review.keyApprove' | transloco }} ·
+      <kbd class="rounded-extra-small border border-input px-1 font-sans text-foreground">R</kbd> {{ 'review.keyReject' | transloco }} ·
+      <kbd class="rounded-extra-small border border-input px-1 font-sans text-foreground">←</kbd>
+      <kbd class="rounded-extra-small border border-input px-1 font-sans text-foreground">→</kbd> {{ 'review.keyBrowse' | transloco }}
     </p>
   }
 </div>
@@ -34,7 +34,7 @@
     </div>
   }
 
-  <div class="flex min-h-[70dvh] flex-col overflow-hidden rounded-lg border shadow-sm md:flex-row">
+  <div class="flex min-h-[70dvh] flex-col overflow-hidden rounded-medium border md:flex-row">
     @if (!viewport.isMobile()) {
       <section [attr.aria-label]="'review.queue' | transloco" class="flex shrink-0 flex-col border-e bg-sidebar" [class]="queueOpen() ? 'w-64' : 'w-14 items-center'">
         <div class="flex items-center gap-2 border-b p-2">
@@ -116,7 +116,7 @@
                 min="0"
                 max="90"
                 step="1"
-                class="h-control w-20 rounded-md border border-input px-2 text-body-medium tabular-nums xl:h-control-compact"
+                class="h-control w-20 rounded-small border border-input px-2 text-body-medium tabular-nums xl:h-control-compact"
                 [value]="cropValue($any(side))"
                 (input)="setCrop($any(side), $any($event.target).value)"
               />
@@ -172,7 +172,7 @@
         </dl>
 
         @if (needsReplace()) {
-          <div class="flex flex-col gap-2 rounded-md bg-warning-soft p-4 text-warning-ink">
+          <div class="flex flex-col gap-2 rounded-small bg-warning-soft p-4 text-warning-ink">
             <p>{{ 'review.exists' | transloco }}</p>
             @if (canReplace()) {
               <label class="inline-flex min-h-target items-center gap-2 xl:min-h-target-compact">

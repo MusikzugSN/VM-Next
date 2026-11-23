@@ -61,7 +61,7 @@ import { VoiceSelectionDialog } from './ui/voice-selection-dialog';
         @if (account.voices.length) {
           <ul class="flex flex-wrap gap-2">
             @for (voice of account.voices; track voice.id) {
-              <li class="inline-flex items-center gap-1.5 rounded-md border border-primary bg-primary-soft px-3 py-1.5 font-medium text-primary">
+              <li class="inline-flex items-center gap-1.5 rounded-small border border-primary bg-primary-soft px-3 py-1.5 font-medium text-primary">
                 <ng-icon name="lucideMusic2" aria-hidden="true" />{{ voice.name }}
               </li>
             }
