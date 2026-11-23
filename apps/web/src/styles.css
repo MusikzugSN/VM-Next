@@ -1,11 +1,13 @@
 /*
  * VM-Web – globale Styles.
- * Farben, Radien und Schatten aus der VM-Web Design Guideline (Token-Namen im shadcn-Schema, das Zard nutzt).
+ * Farben liegen als --mat-sys-* in theme/m3-theme.css. Die shadcn-Namen, die Zard nutzt, sind hier nur
+ * noch Tailwind-Aliase auf diese Rollen. Radien und Schatten aus der VM-Web Design Guideline.
  * Nur Lightmode; Darkmode ist laut Anforderungen „Später“.
  */
 @layer ng-icon, theme, base, components, utilities;
 @import 'tailwindcss';
 @import '@fontsource-variable/inter';
+@import './theme/m3-theme.css';
 @import './app/shared/core/css/zard';
 @plugin "tailwindcss-animate";
 
@@ -13,85 +15,41 @@
 
 :root {
   --radius: 10px; /* radius-lg; radius-md = 8px, radius-sm = 6px */
-
-  --background: #ffffff;
-  --foreground: #18181b;
-  --card: #ffffff;
-  --card-foreground: #18181b;
-  --popover: #ffffff;
-  --popover-foreground: #18181b;
-
-  --primary: #1f3a5f;
-  --primary-foreground: #ffffff;
-  --primary-soft: #e8eef6;
-
-  --brass: #c8963e;
-  --brass-soft: #faf3e6;
-  --brass-ink: #7a5418;
-
-  --secondary: #f4f4f5;
-  --secondary-foreground: #18181b;
-  --muted: #f4f4f5;
-  --muted-foreground: #63636b;
-  --accent: #f4f4f5;
-  --accent-foreground: #18181b;
-
-  --destructive: #dc2626;
-  --destructive-foreground: #ffffff;
-  --destructive-soft: #fef2f2;
-  --destructive-ink: #b91c1c;
-  --success-soft: #ecfdf3;
-  --success-ink: #15803d;
-  --warning-soft: #fff7e6;
-  --warning-ink: #92400e;
-
-  --border: #e4e4e7;
-  --input: #8a8a93;
-  --ring: #1f3a5f;
-
-  --sidebar: #fafafa;
-  --sidebar-foreground: #18181b;
-  --sidebar-primary: #1f3a5f;
-  --sidebar-primary-foreground: #ffffff;
-  --sidebar-accent: #e8eef6;
-  --sidebar-accent-foreground: #1f3a5f;
-  --sidebar-border: #e4e4e7;
-  --sidebar-ring: #1f3a5f;
 }
 
 @theme inline {
   --font-sans: 'Inter Variable', ui-sans-serif, system-ui, sans-serif;
   --font-mono: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
 
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --color-card: var(--card);
-  --color-card-foreground: var(--card-foreground);
-  --color-popover: var(--popover);
-  --color-popover-foreground: var(--popover-foreground);
-  --color-primary: var(--primary);
-  --color-primary-foreground: var(--primary-foreground);
-  --color-primary-soft: var(--primary-soft);
-  --color-brass: var(--brass);
-  --color-brass-soft: var(--brass-soft);
-  --color-brass-ink: var(--brass-ink);
-  --color-secondary: var(--secondary);
-  --color-secondary-foreground: var(--secondary-foreground);
-  --color-muted: var(--muted);
-  --color-muted-foreground: var(--muted-foreground);
-  --color-accent: var(--accent);
-  --color-accent-foreground: var(--accent-foreground);
-  --color-destructive: var(--destructive);
-  --color-destructive-foreground: var(--destructive-foreground);
-  --color-destructive-soft: var(--destructive-soft);
-  --color-destructive-ink: var(--destructive-ink);
-  --color-success-soft: var(--success-soft);
-  --color-success-ink: var(--success-ink);
-  --color-warning-soft: var(--warning-soft);
-  --color-warning-ink: var(--warning-ink);
-  --color-border: var(--border);
-  --color-input: var(--input);
-  --color-ring: var(--ring);
+  --color-background: var(--mat-sys-background);
+  --color-foreground: var(--mat-sys-on-surface);
+  --color-card: var(--mat-sys-surface-container-lowest);
+  --color-card-foreground: var(--mat-sys-on-surface);
+  --color-popover: var(--mat-sys-surface-container-lowest);
+  --color-popover-foreground: var(--mat-sys-on-surface);
+  --color-primary: var(--mat-sys-primary);
+  --color-primary-foreground: var(--mat-sys-on-primary);
+  --color-primary-soft: var(--mat-sys-primary-container);
+  --color-brass: var(--mat-sys-tertiary-fixed-dim);
+  --color-brass-soft: var(--mat-sys-tertiary-container);
+  --color-brass-ink: var(--mat-sys-on-tertiary-container);
+  --color-secondary: var(--mat-sys-surface-container);
+  --color-secondary-foreground: var(--mat-sys-on-surface);
+  --color-muted: var(--mat-sys-surface-container);
+  --color-muted-foreground: var(--mat-sys-on-surface-variant);
+  --color-accent: var(--mat-sys-surface-container);
+  --color-accent-foreground: var(--mat-sys-on-surface);
+  --color-destructive: var(--mat-sys-error);
+  --color-destructive-foreground: var(--mat-sys-on-error);
+  --color-destructive-soft: var(--mat-sys-error-container);
+  --color-destructive-ink: var(--mat-sys-on-error-container);
+  --color-success-soft: var(--mat-sys-success-container);
+  --color-success-ink: var(--mat-sys-on-success-container);
+  --color-warning-soft: var(--mat-sys-warning-container);
+  --color-warning-ink: var(--mat-sys-on-warning-container);
+  --color-border: var(--mat-sys-outline-variant);
+  --color-input: var(--mat-sys-outline);
+  --color-ring: var(--mat-sys-primary);
 
   --radius-sm: calc(var(--radius) - 4px);
   --radius-md: calc(var(--radius) - 2px);
@@ -101,14 +59,53 @@
   --shadow-sm: 0 1px 2px 0 rgba(24, 24, 27, 0.06);
   --shadow-lg: 0 10px 24px -6px rgba(24, 24, 27, 0.18);
 
-  --color-sidebar: var(--sidebar);
-  --color-sidebar-foreground: var(--sidebar-foreground);
-  --color-sidebar-primary: var(--sidebar-primary);
-  --color-sidebar-primary-foreground: var(--sidebar-primary-foreground);
-  --color-sidebar-accent: var(--sidebar-accent);
-  --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
-  --color-sidebar-border: var(--sidebar-border);
-  --color-sidebar-ring: var(--sidebar-ring);
+  --color-sidebar: var(--mat-sys-surface-container-low);
+  --color-sidebar-foreground: var(--mat-sys-on-surface);
+  --color-sidebar-primary: var(--mat-sys-primary);
+  --color-sidebar-primary-foreground: var(--mat-sys-on-primary);
+  --color-sidebar-accent: var(--mat-sys-primary-container);
+  --color-sidebar-accent-foreground: var(--mat-sys-on-primary-container);
+  --color-sidebar-border: var(--mat-sys-outline-variant);
+  --color-sidebar-ring: var(--mat-sys-primary);
+
+  /* M3-Farbrollen als Tailwind-Farben: bg-surface-container, text-on-surface-variant … */
+  --color-on-primary: var(--mat-sys-on-primary);
+  --color-primary-container: var(--mat-sys-primary-container);
+  --color-on-primary-container: var(--mat-sys-on-primary-container);
+  --color-inverse-primary: var(--mat-sys-inverse-primary);
+  --color-on-secondary: var(--mat-sys-on-secondary);
+  --color-secondary-container: var(--mat-sys-secondary-container);
+  --color-on-secondary-container: var(--mat-sys-on-secondary-container);
+  --color-tertiary: var(--mat-sys-tertiary);
+  --color-on-tertiary: var(--mat-sys-on-tertiary);
+  --color-tertiary-container: var(--mat-sys-tertiary-container);
+  --color-on-tertiary-container: var(--mat-sys-on-tertiary-container);
+  --color-tertiary-fixed-dim: var(--mat-sys-tertiary-fixed-dim);
+  --color-error: var(--mat-sys-error);
+  --color-on-error: var(--mat-sys-on-error);
+  --color-error-container: var(--mat-sys-error-container);
+  --color-on-error-container: var(--mat-sys-on-error-container);
+  --color-on-background: var(--mat-sys-on-background);
+  --color-surface: var(--mat-sys-surface);
+  --color-on-surface: var(--mat-sys-on-surface);
+  --color-surface-variant: var(--mat-sys-surface-variant);
+  --color-on-surface-variant: var(--mat-sys-on-surface-variant);
+  --color-surface-dim: var(--mat-sys-surface-dim);
+  --color-surface-bright: var(--mat-sys-surface-bright);
+  --color-surface-container-lowest: var(--mat-sys-surface-container-lowest);
+  --color-surface-container-low: var(--mat-sys-surface-container-low);
+  --color-surface-container: var(--mat-sys-surface-container);
+  --color-surface-container-high: var(--mat-sys-surface-container-high);
+  --color-surface-container-highest: var(--mat-sys-surface-container-highest);
+  --color-inverse-surface: var(--mat-sys-inverse-surface);
+  --color-inverse-on-surface: var(--mat-sys-inverse-on-surface);
+  --color-outline: var(--mat-sys-outline);
+  --color-outline-variant: var(--mat-sys-outline-variant);
+  --color-scrim: var(--mat-sys-scrim);
+  --color-success-container: var(--mat-sys-success-container);
+  --color-on-success-container: var(--mat-sys-on-success-container);
+  --color-warning-container: var(--mat-sys-warning-container);
+  --color-on-warning-container: var(--mat-sys-on-warning-container);
 }
 
 /*
@@ -118,7 +115,7 @@
  * Ring-Schatten wird abgeschaltet, damit es nur einen Fokusring gibt.
  */
 :focus-visible {
-  outline: 2px solid var(--ring);
+  outline: 2px solid var(--mat-sys-primary);
   outline-offset: 2px;
   --tw-ring-shadow: 0 0 #0000;
 }

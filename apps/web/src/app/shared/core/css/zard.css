@@ -20,7 +20,7 @@
  * It used to ship differently — a CLI constant literally named `windowsScrollbar`
  * wrote a bare, unscoped `::-webkit-scrollbar` rule into every project's global
  * stylesheet, restyling every scroll surface in the host app (not just zard's),
- * and repainting them on any `--muted` / `--muted-foreground` change. That constant
+ * and repainting them on any change of these color tokens. That constant
  * is gone; this utility is the scoped replacement a consumer applies deliberately.
  *
  * `scrollbar-width` / `scrollbar-color` are the standard CSS properties and the
@@ -32,7 +32,7 @@
  */
 @utility scrollbar-thin {
   scrollbar-width: thin;
-  scrollbar-color: var(--muted-foreground) var(--muted);
+  scrollbar-color: var(--mat-sys-on-surface-variant) var(--mat-sys-surface-container);
 
   &::-webkit-scrollbar {
     width: 6px;
@@ -40,13 +40,13 @@
   }
 
   &::-webkit-scrollbar-thumb {
-    background: var(--muted-foreground);
+    background: var(--mat-sys-on-surface-variant);
     border-radius: 5px;
   }
 
   &::-webkit-scrollbar-track {
     border-radius: 5px;
-    background: var(--muted);
+    background: var(--mat-sys-surface-container);
   }
 }
 
