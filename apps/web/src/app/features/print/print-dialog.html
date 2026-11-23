@@ -38,7 +38,7 @@
               @for (s of selectableScores(); track s.scoreId; let first = $first) {
                 <li [class.border-t]="!first">
                   <label class="flex min-h-target items-center gap-3 px-4 py-2 xl:min-h-9">
-                    <input type="checkbox" class="size-4 accent-primary" [checked]="selectedScores().has(s.scoreId)" (change)="toggleScore(s.scoreId)" />
+                    <input vm-checkbox type="checkbox" [checked]="selectedScores().has(s.scoreId)" (change)="toggleScore(s.scoreId)" />
                     @if (s.number) {
                       <span class="w-8 text-muted-foreground tabular-nums">{{ s.number }}</span>
                     }

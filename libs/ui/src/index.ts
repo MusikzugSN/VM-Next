@@ -16,3 +16,4 @@ export {
   VmSheetTitle,
 } from './lib/dialog/vm-dialog';
 export { VmCard, type VmCardVariant } from './lib/card/vm-card';
+export { VmCheckbox, VmSwitch } from './lib/switch/vm-switch';

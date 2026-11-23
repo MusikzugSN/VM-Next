@@ -17,7 +17,7 @@ import { NgIcon, provideIcons } from '@ng-icons/core';
 import { lucideCircleAlert, lucideScissors, lucideX } from '@ng-icons/lucide';
 import type { PDFDocumentProxy } from 'pdfjs-dist';
 
-import { VmButton } from '@vm-web/ui';
+import { VmButton, VmCheckbox } from '@vm-web/ui';
 
 import { SessionStore } from '../../core/auth/session.store';
 import { VoiceContextStore } from '../../core/voices/voice-context.store';
@@ -59,7 +59,7 @@ const PAGE_WIDTH = 560;
  */
 @Component({
   selector: 'vm-upload-split',
-  imports: [NgIcon, TranslocoPipe, PluralPipe, VmButton, ScoreSearchSelect, VoiceSelect],
+  imports: [VmCheckbox, NgIcon, TranslocoPipe, PluralPipe, VmButton, ScoreSearchSelect, VoiceSelect],
   viewProviders: [provideIcons({ lucideScissors, lucideX, lucideCircleAlert })],
   changeDetection: ChangeDetectionStrategy.OnPush,
   host: { class: 'flex min-h-0 flex-1 flex-col gap-4' },
@@ -131,7 +131,7 @@ const PAGE_WIDTH = 560;
               {{ 'upload.split.currentSection' | transloco: { from: c.from, to: c.to } }}
             </p>
             <label class="flex items-center gap-2">
-              <input type="checkbox" class="size-4 accent-primary" [checked]="c.section.skip" (change)="patch(c.section.start, { skip: $any($event.target).checked })" />
+              <input vm-checkbox type="checkbox" [checked]="c.section.skip" (change)="patch(c.section.start, { skip: $any($event.target).checked })" />
               {{ 'upload.split.skip' | transloco }}
             </label>
             @if (!c.section.skip) {

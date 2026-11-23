@@ -101,7 +101,7 @@
                 }
                 @for (voice of group.voices; track voice.id) {
                   <label class="flex min-h-target items-center gap-2 xl:min-h-target-compact">
-                    <input type="checkbox" class="size-4 accent-primary" [disabled]="!canEdit()" [checked]="selected().has(voice.id)" (change)="toggleVoice(voice.id)" />
+                    <input vm-checkbox type="checkbox" [disabled]="!canEdit()" [checked]="selected().has(voice.id)" (change)="toggleVoice(voice.id)" />
                     {{ voice.name }}
                   </label>
                 }

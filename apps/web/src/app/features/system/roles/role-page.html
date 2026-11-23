@@ -56,9 +56,8 @@
                     <td class="px-2 py-1 text-center">
                       @if (cell(row.permissions, action); as p) {
                         <label class="inline-flex size-control items-center justify-center xl:size-8">
-                          <input
+                          <input vm-checkbox
                             type="checkbox"
-                            class="size-4 accent-primary"
                             [checked]="has(p)"
                             [disabled]="!canEdit()"
                             (change)="toggle(p, $any($event.target).checked)"
@@ -82,7 +81,7 @@
         <legend class="px-1 text-lg font-semibold">{{ 'system.role.singles' | transloco }}</legend>
         @for (single of catalog.value().singles; track single.permission) {
           <label class="flex min-h-target items-center gap-3 xl:min-h-target-compact">
-            <input type="checkbox" class="size-4 accent-primary" [checked]="has(single.permission)" [disabled]="!canEdit()" (change)="toggle(single.permission, $any($event.target).checked)" />
+            <input vm-checkbox type="checkbox" [checked]="has(single.permission)" [disabled]="!canEdit()" (change)="toggle(single.permission, $any($event.target).checked)" />
             <span class="flex flex-col">
               <span>{{ key(single.permission) | transloco }}</span>
               <span class="text-xs text-muted-foreground">{{ 'system.permissions.scopes.' + single.scope | transloco }}</span>

@@ -15,7 +15,7 @@ import {
 } from '@vm-web/shared';
 import { type Observable } from 'rxjs';
 
-import { VmButton, VmCard, VmField, VmFieldError, VmFieldLabel, VmIconButton, VmInput } from '@vm-web/ui';
+import { VmButton, VmCard, VmField, VmFieldError, VmFieldLabel, VmIconButton, VmInput, VmSwitch } from '@vm-web/ui';
 
 import { ActionRunner, ConfirmService } from '../../../core/actions/action-runner';
 import { ApiClient } from '../../../core/api/api-client';
@@ -26,7 +26,6 @@ import { debounced } from '../../../core/util/debounced';
 import { ListState } from '../../../shared/ui/list-state';
 import { PageProblem } from '../../../shared/ui/page-problem';
 import { SearchField } from '../../../shared/ui/search-field';
-import { ToggleSwitch } from '../../../shared/ui/toggle-switch';
 import { FormDialog } from '../../../shared/ui/form-dialog';
 import { ScorePicker, type CandidatePage, type PickedScore } from '../ui/score-picker';
 import { usePageName } from '../../../core/layout/page';
@@ -36,7 +35,7 @@ import { selectOr } from '../../../core/util/resource-value';
 /** Mappe bearbeiten (N-5, N-15): name, visibility, scores with their own number in this folder. */
 @Component({
   selector: 'vm-library-edit-folder-page',
-  imports: [VmCard, VmField, VmFieldLabel, VmFieldError, 
+  imports: [VmSwitch, VmCard, VmField, VmFieldLabel, VmFieldError, 
     FormDialog,
     RouterLink,
     NgIcon,
@@ -47,7 +46,6 @@ import { selectOr } from '../../../core/util/resource-value';
     ListState,
     PageProblem,
     SearchField,
-    ToggleSwitch,
     ScorePicker,
   ],
   viewProviders: [provideIcons({ lucidePrinter, lucideChevronLeft, lucidePlus, lucideTrash2, lucideX })],

@@ -91,9 +91,8 @@
     @for (row of list.items(); track row.id) {
       <li vm-card class="flex items-center gap-1" [class.border-primary]="selected().has(row.id)">
         <label class="flex size-control shrink-0 items-center justify-center ms-2">
-          <input
+          <input vm-checkbox
             type="checkbox"
-            class="size-5 accent-primary"
             [checked]="selected().has(row.id)"
             (change)="toggle(row.id)"
             [attr.aria-label]="'common.selection.selectRow' | transloco: { title: row.title }"
@@ -115,9 +114,8 @@
       <thead class="bg-muted text-xs font-medium text-muted-foreground">
         <tr>
           <th scope="col" class="w-10 px-3 py-2.5">
-            <input
+            <input vm-checkbox
               type="checkbox"
-              class="size-4 accent-primary"
               [checked]="allSelected()"
               (change)="toggleAll()"
               [attr.aria-label]="'common.selection.selectAll' | transloco"
@@ -150,9 +148,8 @@
         @for (row of list.items(); track row.id) {
           <tr class="border-t" [class.bg-primary-soft]="selected().has(row.id)">
             <td class="px-3 py-3 align-top">
-              <input
+              <input vm-checkbox
               type="checkbox"
-              class="size-4 accent-primary"
               [checked]="selected().has(row.id)"
               (change)="toggle(row.id)"
               [attr.aria-label]="'common.selection.selectRow' | transloco: { title: row.title }"

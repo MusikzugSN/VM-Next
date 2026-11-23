@@ -7,7 +7,7 @@ import { lucideDownload, lucideFileArchive, lucidePrinter, lucideUpload } from '
 import { APP_ROUTES, apiUrl, appPath, type MemberScoreRow, type MemberSheet } from '@vm-web/shared';
 import { firstValueFrom } from 'rxjs';
 
-import { VmButton, VmCard, VmIconButton } from '@vm-web/ui';
+import { VmButton, VmCard, VmCheckbox, VmIconButton } from '@vm-web/ui';
 
 import { PrintLauncher, UploadLauncher } from '../../../core/actions/pending-features';
 import { ApiClient } from '../../../core/api/api-client';
@@ -48,7 +48,7 @@ export function displayNumber(value: string | number | null | undefined): string
  */
 @Component({
   selector: 'vm-member-score-list',
-  imports: [VmCard, PluralPipe, RouterLink, NgIcon, TranslocoPipe, VmButton, VmIconButton, StatusBadge, SelectionBar],
+  imports: [VmCheckbox, VmCard, PluralPipe, RouterLink, NgIcon, TranslocoPipe, VmButton, VmIconButton, StatusBadge, SelectionBar],
   viewProviders: [provideIcons({ lucideDownload, lucideUpload, lucideFileArchive, lucidePrinter })],
   changeDetection: ChangeDetectionStrategy.OnPush,
   templateUrl: './member-score-list.html',

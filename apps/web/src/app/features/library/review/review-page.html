@@ -141,7 +141,7 @@
 
       @if (current(); as p) {
         <label class="flex min-h-target items-center gap-2 border-t px-3 xl:min-h-9">
-          <input type="checkbox" class="size-4 accent-primary" [checked]="p.keep" (change)="toggleKeep()" />
+          <input vm-checkbox type="checkbox" [checked]="p.keep" (change)="toggleKeep()" />
           {{ 'review.keepPage' | transloco: { page: page() } }}
           <span class="text-xs text-muted-foreground">({{ 'review.keptCount' | transloco: { kept: keptPages(), total: pages().length } }})</span>
         </label>
@@ -176,7 +176,7 @@
             <p>{{ 'review.exists' | transloco }}</p>
             @if (canReplace()) {
               <label class="inline-flex min-h-target items-center gap-2 xl:min-h-target-compact">
-                <input type="checkbox" class="size-4 accent-primary" [checked]="replaceExisting()" (change)="replaceExisting.set($any($event.target).checked)" />
+                <input vm-checkbox type="checkbox" [checked]="replaceExisting()" (change)="replaceExisting.set($any($event.target).checked)" />
                 {{ 'review.replace' | transloco }}
               </label>
             } @else {

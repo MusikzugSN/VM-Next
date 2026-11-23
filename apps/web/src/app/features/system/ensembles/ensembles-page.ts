@@ -14,7 +14,7 @@ import {
   type EnsembleListItem,
 } from '@vm-web/shared';
 
-import { VmButton, VmCard, VmField, VmFieldLabel, VmInput, VmSelect } from '@vm-web/ui';
+import { VmButton, VmCard, VmField, VmFieldLabel, VmInput, VmSelect, VmSwitch } from '@vm-web/ui';
 
 import { ActionRunner } from '../../../core/actions/action-runner';
 import { ApiClient } from '../../../core/api/api-client';
@@ -24,7 +24,6 @@ import { PluralPipe } from '../../../core/i18n/plural.pipe';
 import { ListState } from '../../../shared/ui/list-state';
 import { FormDialog, runDialogSave } from '../../../shared/ui/form-dialog';
 import { NAME_MAX } from '../../../shared/ui/name-dialog';
-import { ToggleSwitch } from '../../../shared/ui/toggle-switch';
 import { TreeLabelPipe } from '../../../shared/ui/tree-label.pipe';
 import { ToggleField } from '../../../shared/ui/toggle-field';
 import { selectOr } from '../../../core/util/resource-value';
@@ -32,7 +31,7 @@ import { selectOr } from '../../../core/util/resource-value';
 /** Ensembles (S-2, F-3): the tree in pre-order, create below a parent, archive and restore. */
 @Component({
   selector: 'vm-system-ensembles-page',
-  imports: [VmCard, VmField, VmFieldLabel, ToggleField, TreeLabelPipe, RouterLink, NgIcon, TranslocoPipe, PluralPipe, VmButton, VmInput, VmSelect, ListState, ToggleSwitch, FormDialog],
+  imports: [VmSwitch, VmCard, VmField, VmFieldLabel, ToggleField, TreeLabelPipe, RouterLink, NgIcon, TranslocoPipe, PluralPipe, VmButton, VmInput, VmSelect, ListState, FormDialog],
   viewProviders: [provideIcons({ lucidePlus, lucideArchive, lucideArchiveRestore })],
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
@@ -72,7 +71,7 @@ import { selectOr } from '../../../core/util/resource-value';
     </vm-form-dialog>
 
     <div class="flex items-center gap-1">
-      <vm-toggle-switch [checked]="includeArchived()" [label]="'system.ensembles.showArchived' | transloco" (toggled)="includeArchived.set($event)" />
+      <vm-switch [checked]="includeArchived()" [label]="'system.ensembles.showArchived' | transloco" (toggled)="includeArchived.set($event)" />
       <span aria-hidden="true">{{ 'system.ensembles.showArchived' | transloco }}</span>
     </div>
 

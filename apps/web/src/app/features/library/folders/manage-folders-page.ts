@@ -14,7 +14,7 @@ import {
   type FolderListItem,
 } from '@vm-web/shared';
 
-import { VmButton, VmCard, VmField, VmFieldLabel, VmIconButton, VmSelect } from '@vm-web/ui';
+import { VmButton, VmCard, VmField, VmFieldLabel, VmIconButton, VmSelect, VmSwitch } from '@vm-web/ui';
 
 import { ActionRunner, ConfirmService } from '../../../core/actions/action-runner';
 import { ApiClient } from '../../../core/api/api-client';
@@ -25,14 +25,13 @@ import { ViewportService } from '../../../core/layout/viewport';
 import { debounced } from '../../../core/util/debounced';
 import { ListState } from '../../../shared/ui/list-state';
 import { SearchField } from '../../../shared/ui/search-field';
-import { ToggleSwitch } from '../../../shared/ui/toggle-switch';
 import { CreateInEnsembleDialog, type CreateInEnsemble } from '../ui/create-in-ensemble-dialog';
 import { ensemblesWith } from '../ui/ensembles-with';
 
 /** Mappen verwalten (N-15): folders per ensemble, visibility in Mein Bereich, create and delete. */
 @Component({
   selector: 'vm-library-manage-folders-page',
-  imports: [VmCard, VmField, VmFieldLabel, 
+  imports: [VmSwitch, VmCard, VmField, VmFieldLabel, 
     RouterLink,
     NgIcon,
     TranslocoPipe,
@@ -41,7 +40,6 @@ import { ensemblesWith } from '../ui/ensembles-with';
     VmSelect,
     ListState,
     SearchField,
-    ToggleSwitch,
     CreateInEnsembleDialog,
   ],
   viewProviders: [provideIcons({ lucidePlus, lucideTrash2 })],

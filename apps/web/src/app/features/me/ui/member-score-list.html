@@ -3,9 +3,8 @@
     @for (item of items(); track item.row.scoreId) {
       <li vm-card class="flex items-center gap-3 py-3 ps-3 pe-2">
         <label class="-ms-1 flex size-control shrink-0 items-center justify-center self-start">
-          <input
+          <input vm-checkbox
               type="checkbox"
-              class="size-5 accent-primary"
               [checked]="selected().has(item.row.scoreId)"
               [disabled]="item.missing"
               (change)="toggle(item.row.scoreId)"
@@ -69,9 +68,8 @@
       <thead class="bg-muted text-xs font-medium text-muted-foreground">
         <tr>
           <th scope="col" class="w-12 px-4 py-3">
-            <input
+            <input vm-checkbox
               type="checkbox"
-              class="size-4 accent-primary"
               [checked]="allSelected()"
               [disabled]="!selectable().length"
               (change)="toggleAll()"
@@ -91,9 +89,8 @@
         @for (item of items(); track item.row.scoreId) {
           <tr class="border-t" [class.bg-primary-soft]="selected().has(item.row.scoreId)">
             <td class="px-4 py-3">
-              <input
+              <input vm-checkbox
               type="checkbox"
-              class="size-4 accent-primary"
               [checked]="selected().has(item.row.scoreId)"
               [disabled]="item.missing"
               (change)="toggle(item.row.scoreId)"
