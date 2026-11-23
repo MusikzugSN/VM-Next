@@ -89,7 +89,7 @@
 @if (viewport.isMobile()) {
   <ul class="flex flex-col gap-2">
     @for (row of list.items(); track row.id) {
-      <li class="flex items-center gap-1 rounded-lg border bg-card shadow-sm" [class.border-primary]="selected().has(row.id)">
+      <li vm-card class="flex items-center gap-1" [class.border-primary]="selected().has(row.id)">
         <label class="flex size-control shrink-0 items-center justify-center ms-2">
           <input
             type="checkbox"
@@ -110,7 +110,7 @@
     }
   </ul>
 } @else if (list.items().length > 0) {
-  <div class="overflow-x-auto rounded-lg border bg-card shadow-sm">
+  <div vm-card class="overflow-x-auto">
     <table class="w-full">
       <thead class="bg-muted text-xs font-medium text-muted-foreground">
         <tr>

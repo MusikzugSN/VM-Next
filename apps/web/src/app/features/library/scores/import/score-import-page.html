@@ -9,7 +9,7 @@
   }
 
   <!-- 1 · Datei -->
-  <section class="flex flex-col gap-3 rounded-lg border bg-card p-4 shadow-sm md:p-6" aria-labelledby="import-file">
+  <section vm-card class="flex flex-col gap-3 p-4 md:p-6" aria-labelledby="import-file">
     <h2 id="import-file" class="text-lg font-semibold">{{ 'library.import.step.file' | transloco }}</h2>
     <div class="flex flex-col gap-3 md:flex-row md:items-center">
       <input #picker type="file" class="sr-only" accept=".csv,text/csv" tabindex="-1" aria-hidden="true" (change)="onPick($event)" />
@@ -34,7 +34,7 @@
 
   @if (table(); as t) {
     <!-- 2 · Zuordnung -->
-    <section class="flex flex-col gap-4 rounded-lg border bg-card p-4 shadow-sm md:p-6" aria-labelledby="import-mapping">
+    <section vm-card class="flex flex-col gap-4 p-4 md:p-6" aria-labelledby="import-mapping">
       <div>
         <h2 id="import-mapping" class="text-lg font-semibold">{{ 'library.import.step.mapping' | transloco }}</h2>
         <p class="mt-1 text-muted-foreground">{{ 'library.import.mappingHint' | transloco }}</p>
@@ -164,7 +164,7 @@
 
     <!-- 3 · Vorschau -->
     @if (preview(); as p) {
-      <section class="flex flex-col gap-4 rounded-lg border bg-card p-4 shadow-sm md:p-6" aria-labelledby="import-preview">
+      <section vm-card class="flex flex-col gap-4 p-4 md:p-6" aria-labelledby="import-preview">
         <div>
           <h2 id="import-preview" class="text-lg font-semibold">{{ 'library.import.step.preview' | transloco }}</h2>
           <p class="mt-1 text-muted-foreground">{{ 'library.import.previewHint' | transloco }}</p>
@@ -290,7 +290,7 @@
   }
 
   @if (result(); as r) {
-    <section class="flex flex-col gap-3 rounded-lg border bg-card p-4 shadow-sm md:p-6" aria-labelledby="import-result" role="status">
+    <section vm-card class="flex flex-col gap-3 p-4 md:p-6" aria-labelledby="import-result" role="status">
       <h2 id="import-result" class="text-lg font-semibold">{{ 'library.import.resultTitle' | transloco }}</h2>
       <p>
         {{ 'library.import.count.create' | tPlural: r.summary.create }} · {{ 'library.import.count.link' | tPlural: r.summary.link }}

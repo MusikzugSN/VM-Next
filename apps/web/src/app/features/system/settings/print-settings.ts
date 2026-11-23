@@ -2,7 +2,7 @@ import { ChangeDetectionStrategy, Component, effect, inject, input, output, sign
 import { TranslocoPipe } from '@jsverse/transloco';
 import { apiUrl, updatePrintBodySchema, type ConfigResponse } from '@vm-web/shared';
 
-import { VmButton, VmField, VmFieldLabel, VmInput } from '@vm-web/ui';
+import { VmButton, VmCard, VmField, VmFieldLabel, VmInput } from '@vm-web/ui';
 
 import { ActionRunner } from '../../../core/actions/action-runner';
 import { ApiClient } from '../../../core/api/api-client';
@@ -10,10 +10,10 @@ import { ApiClient } from '../../../core/api/api-client';
 /** Tab „Drucken“ (D-2, D-4): page limit of the browser print and the address the print service accepts. */
 @Component({
   selector: 'vm-print-settings',
-  imports: [VmField, VmFieldLabel, TranslocoPipe, VmButton, VmInput],
+  imports: [VmCard, VmField, VmFieldLabel, TranslocoPipe, VmButton, VmInput],
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
-    <form class="flex flex-col gap-4 rounded-lg border bg-card p-4 shadow-sm md:p-6" novalidate (submit)="$event.preventDefault(); save()">
+    <form vm-card class="flex flex-col gap-4 p-4 md:p-6" novalidate (submit)="$event.preventDefault(); save()">
       <h2 class="text-lg font-semibold">{{ 'system.settings.print.title' | transloco }}</h2>
       <label vm-field class="md:w-60">
         <span vm-field-label>{{ 'system.settings.print.pageLimit' | transloco }}</span>

@@ -5,7 +5,7 @@ import { NgIcon, provideIcons } from '@ng-icons/core';
 import { lucideImageUp, lucideTrash2 } from '@ng-icons/lucide';
 import { apiUrl, LOGO_FILE_FIELD, LOGO_MAX_BYTES, LOGO_MIME_TYPES, updateClubBodySchema, type ConfigResponse } from '@vm-web/shared';
 
-import { VmButton, VmField, VmFieldError, VmFieldLabel, VmInput, VmTextarea } from '@vm-web/ui';
+import { VmButton, VmCard, VmField, VmFieldError, VmFieldLabel, VmInput, VmTextarea } from '@vm-web/ui';
 import { ZardSonnerService } from '@vm-web/ui/zard/components/sonner';
 
 import { ActionRunner } from '../../../core/actions/action-runner';
@@ -26,12 +26,12 @@ type ClubErrors = Partial<Record<keyof ClubForm, string>>;
 /** Tab „Verein & Anmeldung“ (S-4, A-2, F-12): name, legal links, login banner, logo. */
 @Component({
   selector: 'vm-club-settings',
-  imports: [VmField, VmFieldLabel, VmFieldError, NgIcon, TranslocoPipe, VmButton, VmInput, VmTextarea, ToggleSwitch],
+  imports: [VmCard, VmField, VmFieldLabel, VmFieldError, NgIcon, TranslocoPipe, VmButton, VmInput, VmTextarea, ToggleSwitch],
   viewProviders: [provideIcons({ lucideImageUp, lucideTrash2 })],
   changeDetection: ChangeDetectionStrategy.OnPush,
   host: { class: 'flex flex-col gap-6' },
   template: `
-    <form #clubForm class="flex flex-col gap-4 rounded-lg border bg-card p-4 shadow-sm md:p-6" novalidate (submit)="$event.preventDefault(); save()">
+    <form #clubForm vm-card class="flex flex-col gap-4 p-4 md:p-6" novalidate (submit)="$event.preventDefault(); save()">
       <h2 class="text-lg font-semibold">{{ 'system.settings.club.title' | transloco }}</h2>
       <label vm-field>
         <span vm-field-label>{{ 'system.settings.club.clubName' | transloco }} *</span>
@@ -93,7 +93,7 @@ type ClubErrors = Partial<Record<keyof ClubForm, string>>;
       }
     </form>
 
-    <section aria-labelledby="h-logo" class="flex flex-col gap-4 rounded-lg border bg-card p-4 shadow-sm md:p-6">
+    <section aria-labelledby="h-logo" vm-card class="flex flex-col gap-4 p-4 md:p-6">
       <div>
         <h2 id="h-logo" class="text-lg font-semibold">{{ 'system.settings.club.logo' | transloco }}</h2>
         <p class="text-muted-foreground">{{ 'system.settings.club.logoHint' | transloco }}</p>

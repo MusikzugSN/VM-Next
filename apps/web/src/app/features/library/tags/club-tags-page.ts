@@ -5,7 +5,7 @@ import { NgIcon, provideIcons } from '@ng-icons/core';
 import { lucideLock, lucidePencil, lucidePlus, lucideTrash2 } from '@ng-icons/lucide';
 import { APP_ROUTES, apiUrl, clubTagListResponseSchema, createdResponseSchema, type ClubTagItem } from '@vm-web/shared';
 
-import { VmButton } from '@vm-web/ui';
+import { VmButton, VmCard } from '@vm-web/ui';
 
 import { ActionRunner, ConfirmService } from '../../../core/actions/action-runner';
 import { ApiClient } from '../../../core/api/api-client';
@@ -21,7 +21,7 @@ import { LibraryOptions } from '../library-options';
 /** Vereins-Tags (N-17): create, rename, delete; personal tags live in Mein Bereich. */
 @Component({
   selector: 'vm-library-club-tags-page',
-  imports: [RouterLink, NgIcon, TranslocoPipe, PluralPipe, VmButton, ListState, NameDialog, SearchField],
+  imports: [VmCard, RouterLink, NgIcon, TranslocoPipe, PluralPipe, VmButton, ListState, NameDialog, SearchField],
   viewProviders: [provideIcons({ lucidePlus, lucidePencil, lucideTrash2, lucideLock })],
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
@@ -49,7 +49,7 @@ import { LibraryOptions } from '../library-options';
 
     <vm-search-field [(value)]="search" labelKey="library.tags.search" />
 
-    <ul class="overflow-hidden rounded-lg border bg-card shadow-sm" [class.hidden]="list.items().length === 0">
+    <ul vm-card class="overflow-hidden" [class.hidden]="list.items().length === 0">
       @for (tag of list.items(); track tag.id; let first = $first) {
         <li class="flex flex-col gap-2 px-4 py-3 md:flex-row md:items-center" [class.border-t]="!first">
             <span class="flex min-w-0 flex-1 flex-col md:flex-row md:items-center md:gap-3">

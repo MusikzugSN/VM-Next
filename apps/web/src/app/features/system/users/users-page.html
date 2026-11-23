@@ -34,7 +34,7 @@
   <ul class="flex flex-col gap-2">
     @for (user of list.items(); track user.id) {
       <li>
-        <a [routerLink]="link(user)" class="flex items-center gap-3 rounded-lg border bg-card p-4 text-foreground no-underline shadow-sm">
+        <a [routerLink]="link(user)" vm-card class="flex items-center gap-3 p-4 text-foreground no-underline">
           <span aria-hidden="true" class="flex size-10 shrink-0 items-center justify-center rounded-full bg-primary-soft text-xs font-semibold text-primary">{{ initialsOf(user.name) }}</span>
           <span class="flex min-w-0 flex-1 flex-col">
             <span class="font-semibold">{{ user.name }}</span>
@@ -50,7 +50,7 @@
     }
   </ul>
 } @else if (list.items().length > 0) {
-  <div class="overflow-x-auto rounded-lg border bg-card shadow-sm">
+  <div vm-card class="overflow-x-auto">
     <table class="w-full">
       <thead class="bg-muted text-xs font-medium text-muted-foreground">
         <tr>

@@ -60,7 +60,7 @@
         </div>
       </vm-sheet>
     } @else {
-      <aside [attr.aria-label]="'me.score.details' | transloco" class="flex w-full flex-col gap-6 rounded-lg border bg-card p-4 shadow-sm xl:w-80 xl:shrink-0">
+      <aside [attr.aria-label]="'me.score.details' | transloco" vm-card class="flex w-full flex-col gap-6 p-4 xl:w-80 xl:shrink-0">
         <ng-container [ngTemplateOutlet]="aside" />
       </aside>
     }

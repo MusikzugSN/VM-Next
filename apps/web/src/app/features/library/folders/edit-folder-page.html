@@ -28,7 +28,7 @@
     </div>
   </div>
 
-  <section aria-labelledby="h-folder" class="flex flex-col gap-4 rounded-lg border bg-card p-4 shadow-sm md:p-6">
+  <section aria-labelledby="h-folder" vm-card class="flex flex-col gap-4 p-4 md:p-6">
     <h2 id="h-folder" class="text-lg font-semibold">{{ 'terms.folder' | transloco }}</h2>
     <div class="grid gap-4 md:grid-cols-2">
       <label vm-field>
@@ -68,7 +68,7 @@
     </div>
     <vm-search-field [(value)]="search" labelKey="library.folder.search" />
 
-    <ul class="overflow-hidden rounded-lg border bg-card shadow-sm" [class.hidden]="list.items().length === 0">
+    <ul vm-card class="overflow-hidden" [class.hidden]="list.items().length === 0">
       @for (entry of list.items(); track entry.scoreId; let first = $first) {
         <li class="flex flex-wrap items-center gap-3 px-4 py-3" [class.border-t]="!first">
           <label class="flex flex-col gap-1">

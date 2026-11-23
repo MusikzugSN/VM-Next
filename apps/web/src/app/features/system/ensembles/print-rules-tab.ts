@@ -5,7 +5,7 @@ import { NgIcon, provideIcons } from '@ng-icons/core';
 import { lucidePlus, lucideRotateCcw, lucideX } from '@ng-icons/lucide';
 import { apiUrl, ensemblePrintRulesResponseSchema, printRulesSchema, type PrintMode, type PrintRule } from '@vm-web/shared';
 
-import { VmButton, VmIconButton, VmInput, VmSelect } from '@vm-web/ui';
+import { VmButton, VmCard, VmIconButton, VmInput, VmSelect } from '@vm-web/ui';
 
 import { ActionRunner } from '../../../core/actions/action-runner';
 import { ApiClient } from '../../../core/api/api-client';
@@ -30,7 +30,7 @@ export function ruleEnd(rules: readonly PrintRule[], index: number): number | nu
  */
 @Component({
   selector: 'vm-print-rules-tab',
-  imports: [NgIcon, TranslocoPipe, VmButton, VmIconButton, VmInput, VmSelect, PageProblem],
+  imports: [VmCard, NgIcon, TranslocoPipe, VmButton, VmIconButton, VmInput, VmSelect, PageProblem],
   viewProviders: [provideIcons({ lucidePlus, lucideX, lucideRotateCcw })],
   changeDetection: ChangeDetectionStrategy.OnPush,
   host: { class: 'flex flex-col gap-4' },
@@ -39,7 +39,7 @@ export function ruleEnd(rules: readonly PrintRule[], index: number): number | nu
       <vm-page-problem [error]="data.error()" />
     } @else if (data.hasValue()) {
       @let info = data.value();
-      <section aria-labelledby="h-print-rules" class="flex flex-col gap-4 rounded-lg border bg-card p-4 shadow-sm md:p-6">
+      <section aria-labelledby="h-print-rules" vm-card class="flex flex-col gap-4 p-4 md:p-6">
         <div class="flex flex-col gap-2 md:flex-row md:items-start md:justify-between">
           <div>
             <h2 id="h-print-rules" class="text-lg font-semibold">{{ 'system.printRules.title' | transloco }}</h2>

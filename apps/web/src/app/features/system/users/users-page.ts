@@ -6,7 +6,7 @@ import { TranslocoPipe } from '@jsverse/transloco';
 import { NgIcon, provideIcons } from '@ng-icons/core';
 import { lucideInfo } from '@ng-icons/lucide';
 import { APP_ROUTES, apiUrl, appPath, userAssignmentOptionsResponseSchema, userTableResponseSchema, type UserRow, type UserStatus } from '@vm-web/shared';
-import { VmField, VmFieldLabel, VmSelect } from '@vm-web/ui';
+import { VmCard, VmField, VmFieldLabel, VmSelect } from '@vm-web/ui';
 
 
 import { ApiClient } from '../../../core/api/api-client';
@@ -22,7 +22,7 @@ import { TreeLabelPipe } from '../../../shared/ui/tree-label.pipe';
 /** Benutzer (S-1): everybody with a club account; accounts are created on first login (A-3). */
 @Component({
   selector: 'vm-system-users-page',
-  imports: [VmField, VmFieldLabel, TreeLabelPipe, DatePipe, RouterLink, NgIcon, TranslocoPipe, VmSelect, ListState, SearchField, UserStatusBadge],
+  imports: [VmCard, VmField, VmFieldLabel, TreeLabelPipe, DatePipe, RouterLink, NgIcon, TranslocoPipe, VmSelect, ListState, SearchField, UserStatusBadge],
   viewProviders: [provideIcons({ lucideInfo })],
   changeDetection: ChangeDetectionStrategy.OnPush,
   templateUrl: './users-page.html',

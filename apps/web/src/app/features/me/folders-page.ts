@@ -6,7 +6,7 @@ import { NgIcon, provideIcons } from '@ng-icons/core';
 import { lucideChevronRight, lucideFileArchive } from '@ng-icons/lucide';
 import { APP_ROUTES, apiUrl, appPath, myFoldersResponseSchema, type MyFolderItem } from '@vm-web/shared';
 
-import { VmIconButton } from '@vm-web/ui';
+import { VmCard, VmIconButton } from '@vm-web/ui';
 
 import { ApiClient } from '../../core/api/api-client';
 import { cursorList } from '../../core/api/cursor-list';
@@ -18,7 +18,7 @@ import { ListState } from '../../shared/ui/list-state';
 /** Mappen (R-2, M-4): folders released for Mein Bereich in the own ensembles. */
 @Component({
   selector: 'vm-me-folders-page',
-  imports: [PluralPipe, RouterLink, NgIcon, TranslocoPipe, VmIconButton, ListState],
+  imports: [VmCard, PluralPipe, RouterLink, NgIcon, TranslocoPipe, VmIconButton, ListState],
   viewProviders: [provideIcons({ lucideChevronRight, lucideFileArchive })],
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
@@ -33,7 +33,7 @@ import { ListState } from '../../shared/ui/list-state';
       <ul class="flex flex-col gap-2">
         @for (folder of list.items(); track folder.id) {
           <li>
-            <a [routerLink]="link(folder)" class="flex items-center gap-3 rounded-lg border bg-card p-4 text-foreground no-underline shadow-sm">
+            <a [routerLink]="link(folder)" vm-card class="flex items-center gap-3 p-4 text-foreground no-underline">
               <span class="flex min-w-0 flex-1 flex-col gap-1">
                 <span class="text-base font-medium">{{ folder.name }}</span>
                 <span class="text-muted-foreground">
@@ -46,7 +46,7 @@ import { ListState } from '../../shared/ui/list-state';
         }
       </ul>
     } @else if (list.items().length > 0) {
-      <div class="overflow-x-auto rounded-lg border bg-card shadow-sm">
+      <div vm-card class="overflow-x-auto">
         <table class="w-full">
           <thead class="bg-muted text-xs font-medium text-muted-foreground">
             <tr>
