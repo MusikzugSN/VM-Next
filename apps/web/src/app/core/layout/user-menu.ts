@@ -25,7 +25,7 @@ import { initials } from '../branding/branding.store';
           vm-menu-trigger
           [zDropdownMenu]="menu"
           [attr.aria-label]="'shell.userMenu' | transloco: { name: user.name }"
-          class="flex w-full items-center gap-2 rounded-small p-2 text-start hover:bg-accent"
+          class="flex w-full items-center gap-2 rounded-small p-2 text-start hover:bg-on-surface/8"
         >
           <ng-container [ngTemplateOutlet]="avatar" />
           <span class="flex min-w-0 flex-col">
