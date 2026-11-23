@@ -48,7 +48,5 @@ export class UsersPage {
     return appPath(APP_ROUTES.system.user, { userId: user.id });
   }
 
-  protected initialsOf(name: string): string {
-    return initials(name);
-  }
+  protected readonly initialsOf = initials;
 }

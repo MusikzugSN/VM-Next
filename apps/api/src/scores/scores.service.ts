@@ -13,7 +13,7 @@ import type {
   UpdateScoreDetailsBody,
   VoiceRef,
 } from '@vm-web/shared';
-import { sql, type SQL } from 'drizzle-orm';
+import type { SQL } from 'drizzle-orm';
 import type { Readable } from 'node:stream';
 import type { AccessContext } from '../access/access-context';
 import { CSV_BOM, csvLine } from '../common/files/csv';
@@ -21,14 +21,15 @@ import { sheetFileName } from '../common/files/download-names';
 import { uuidv7 } from '../common/ids/uuid-v7';
 import { decodeCursor, encodeCursor } from '../common/pagination/cursor';
 import { ProblemException } from '../common/problem-details/problem.exception';
-import { scores } from '../db/schema';
 import { MeRepository } from '../me/me.repository';
 import { ClubSettingsRepository } from '../settings/club-settings.repository';
 import { FILE_STORAGE, type IFileStorage } from '../storage/file-storage';
 import { completenessOf } from './completeness';
 import { displayValue, validateCustomValues, type FieldDef } from './custom-fields';
 import { afterCursor, buildFilters, buildSort, searchSql } from './score-query';
+import { hasClubTag } from '../common/sql';
 import { ScoresRepository, type ScoreRow } from './scores.repository';
+import { readOrNotFound } from '../storage/read-or-not-found';
 
 const EXPORT_MAX_ROWS = 10_000;
 
@@ -168,10 +169,7 @@ export class ScoresService {
   async sheetFile(sheetId: string): Promise<{ stream: Readable; fileName: string }> {
     const sheet = await this.repo.sheet(sheetId);
     if (!sheet) throw ProblemException.notFound();
-    const stream = await this.storage.read(sheet.fileKey).catch(() => {
-      this.logger.error(`File ${sheet.fileKey} of sheet ${sheetId} is missing in storage`);
-      throw ProblemException.notFound();
-    });
+    const stream = await readOrNotFound(this.storage, sheet.fileKey, this.logger, `File ${sheet.fileKey} of sheet ${sheetId} is missing in storage`);
     return { stream, fileName: sheetFileName({ title: sheet.title, voice: sheet.voiceName }) };
   }
 
@@ -198,7 +196,7 @@ export class ScoresService {
     const byId = new Map(fields.map((f) => [f.id, f]));
     const where: SQL[] = buildFilters(query.filter ?? [], byId, ensembleId);
     if (query.q) where.push(searchSql(query.q));
-    if (query.tagId) where.push(sql`exists (select 1 from score_club_tags x where x.score_id = ${scores.id} and x.tag_id = ${query.tagId}::uuid)`);
+    if (query.tagId) where.push(hasClubTag(query.tagId));
     return { where, plan: buildSort(query.sort, query.dir, byId, ensembleId) };
   }
 
@@ -262,7 +260,7 @@ function fixedOf(s: CreateScoreBody | ScoreRow) {
   };
 }
 
-/** Numeric sort values come from postgres as strings; booleans are kept as 0/1. */
+/** Numeric sort values come from postgres as strings; booleans become 'true'/'false'. */
 function cursorValue(value: string | number | boolean | null): string | number | null {
   if (typeof value === 'boolean') return value ? 'true' : 'false';
   return value;

@@ -22,12 +22,11 @@ import {
   voiceSubstitutes,
 } from '../db/schema';
 import type { SheetRow } from './sheet-resolution';
+import { appendTo } from '../common/collections';
+import { hasClubTag, likePattern } from '../common/sql';
 
 /** `( $1, $2, … )` for `in` lists; callers guarantee a non-empty list. */
 const list = (ids: readonly string[]): SQL => sql`(${sql.join(ids.map((id) => sql`${id}::uuid`), sql`, `)})`;
-
-/** `%q%` for ILIKE with `%`, `_` and `\` escaped. */
-export const likePattern = (q: string) => `%${q.replace(/[\\%_]/g, (c) => `\\${c}`)}%`;
 
 /** Score ids reachable through released folders and events of the given ensembles (R-2, N-15, F-6). */
 function visibleScoreIds(ensembleIds: readonly string[]): SQL {
@@ -81,6 +80,23 @@ const scoreCountOfFolder = sql<number>`(select count(*)::int from folder_entries
 const scoreCountOfEvent = sql<number>`(select count(*)::int from setlist_entries x where x.event_id = ${events.id})`;
 
 /** Read queries of Mein Bereich. Every method is scoped to the caller's member ensembles. */
+const eventColumns = {
+  id: events.id,
+  name: events.name,
+  date: events.date,
+  ensembleId: ensembles.id,
+  ensembleName: ensembles.name,
+  scoreCount: scoreCountOfEvent,
+};
+
+const folderColumns = {
+  id: folders.id,
+  name: folders.name,
+  ensembleId: ensembles.id,
+  ensembleName: ensembles.name,
+  scoreCount: scoreCountOfFolder,
+};
+
 @Injectable()
 export class MeRepository {
   constructor(@Inject(DATABASE) private readonly db: Database) {}
@@ -161,7 +177,7 @@ export class MeRepository {
       .innerJoin(voices, eq(voices.id, voiceSubstitutes.substituteVoiceId))
       .where(inArray(voiceSubstitutes.voiceId, [...voiceIds]))
       .orderBy(asc(voiceSubstitutes.voiceId), asc(voiceSubstitutes.position));
-    for (const { voiceId, ...ref } of rows) result.set(voiceId, [...(result.get(voiceId) ?? []), ref]);
+    for (const { voiceId, ...ref } of rows) appendTo(result, voiceId, ref);
     return result;
   }
 
@@ -206,7 +222,7 @@ export class MeRepository {
       .select({ scoreId: sheets.scoreId, sheetId: sheets.id, voiceId: sheets.voiceId, pageCount: sheets.pageCount })
       .from(sheets)
       .where(and(inArray(sheets.scoreId, [...scoreIds]), inArray(sheets.voiceId, [...voiceIds])));
-    for (const { scoreId, ...sheet } of rows) result.set(scoreId, [...(result.get(scoreId) ?? []), sheet]);
+    for (const { scoreId, ...sheet } of rows) appendTo(result, scoreId, sheet);
     return result;
   }
 
@@ -227,14 +243,7 @@ export class MeRepository {
         : sql`(${events.date}, ${events.id}) < (${cursor[0]}::date, ${cursor[1]}::uuid)`
       : undefined;
     return this.db
-      .select({
-        id: events.id,
-        name: events.name,
-        date: events.date,
-        ensembleId: ensembles.id,
-        ensembleName: ensembles.name,
-        scoreCount: scoreCountOfEvent,
-      })
+      .select(eventColumns)
       .from(events)
       .innerJoin(ensembles, eq(ensembles.id, events.ensembleId))
       .where(
@@ -253,14 +262,7 @@ export class MeRepository {
   async event(ensembleIds: readonly string[], eventId: string): Promise<EventRow | undefined> {
     if (!ensembleIds.length) return undefined;
     const [row] = await this.db
-      .select({
-        id: events.id,
-        name: events.name,
-        date: events.date,
-        ensembleId: ensembles.id,
-        ensembleName: ensembles.name,
-        scoreCount: scoreCountOfEvent,
-      })
+      .select(eventColumns)
       .from(events)
       .innerJoin(ensembles, eq(ensembles.id, events.ensembleId))
       .where(
@@ -305,11 +307,7 @@ export class MeRepository {
     if (!ensembleIds.length) return [];
     return this.db
       .select({
-        id: folders.id,
-        name: folders.name,
-        ensembleId: ensembles.id,
-        ensembleName: ensembles.name,
-        scoreCount: scoreCountOfFolder,
+        ...folderColumns,
         sortEnsemble: sql<string>`lower(${ensembles.name})`,
         sortName: sql<string>`lower(${folders.name})`,
       })
@@ -332,13 +330,7 @@ export class MeRepository {
   async folder(ensembleIds: readonly string[], folderId: string): Promise<FolderRow | undefined> {
     if (!ensembleIds.length) return undefined;
     const [row] = await this.db
-      .select({
-        id: folders.id,
-        name: folders.name,
-        ensembleId: ensembles.id,
-        ensembleName: ensembles.name,
-        scoreCount: scoreCountOfFolder,
-      })
+      .select(folderColumns)
       .from(folders)
       .innerJoin(ensembles, eq(ensembles.id, folders.ensembleId))
       .where(
@@ -523,7 +515,7 @@ export class MeRepository {
         ? sql`(${scores.title} ilike ${likePattern(filter.q)} or ${scores.composer} ilike ${likePattern(filter.q)})`
         : undefined,
       filter.clubTagId
-        ? sql`exists (select 1 from score_club_tags x where x.score_id = ${scores.id} and x.tag_id = ${filter.clubTagId}::uuid)`
+        ? hasClubTag(filter.clubTagId)
         : undefined,
       filter.personalTag
         ? sql`exists (select 1 from score_personal_tags x join personal_tags p on p.id = x.personal_tag_id

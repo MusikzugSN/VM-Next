@@ -21,6 +21,7 @@ import {
 } from '../db/schema';
 import type { FieldDef } from './custom-fields';
 import type { SortPlan } from './score-query';
+import { appendTo } from '../common/collections';
 
 export type ScoreRow = typeof scores.$inferSelect;
 
@@ -84,7 +85,7 @@ export class ScoresRepository {
       .innerJoin(clubTags, eq(clubTags.id, scoreClubTags.tagId))
       .where(inArray(scoreClubTags.scoreId, [...scoreIds]))
       .orderBy(sql`lower(${clubTags.name})`);
-    for (const { scoreId, ...tag } of rows) result.set(scoreId, [...(result.get(scoreId) ?? []), tag]);
+    for (const { scoreId, ...tag } of rows) appendTo(result, scoreId, tag);
     return result;
   }
 
@@ -194,7 +195,6 @@ export class ScoresRepository {
       .orderBy(asc(ensembleLineupVoices.position));
   }
 
-  /** Non-archived ensembles that have a lineup. */
   /** Active ensembles with a lineup, in tree order (F-3). */
   async ensemblesWithLineup(): Promise<EnsembleOption[]> {
     const rows = await this.db

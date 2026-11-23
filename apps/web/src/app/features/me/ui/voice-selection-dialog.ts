@@ -1,25 +1,23 @@
 import { ChangeDetectionStrategy, Component, computed, effect, inject, model, output, signal, untracked } from '@angular/core';
-import { TranslocoPipe, TranslocoService } from '@jsverse/transloco';
+import { TranslocoPipe } from '@jsverse/transloco';
 import { PluralPipe } from '../../../core/i18n/plural.pipe';
 import { NgIcon, provideIcons } from '@ng-icons/core';
 import { lucideCheck, lucideSearch } from '@ng-icons/lucide';
-import { apiUrl } from '@vm-web/shared';
+import { MAX_PROFILE_VOICES, apiUrl } from '@vm-web/shared';
 import { firstValueFrom } from 'rxjs';
 
 import { ZardButtonComponent } from '@/shared/components/button';
 import { ZardDialogImports } from '@/shared/components/dialog/dialog.imports';
 import { ZardInputComponent } from '@/shared/components/input';
-import { ZardSonnerService } from '@/shared/components/sonner';
 
 import { ApiClient } from '../../../core/api/api-client';
-import { isApiProblem } from '../../../core/api/api-problem';
+import { ActionRunner } from '../../../core/actions/action-runner';
 import { VoiceContextStore } from '../../../core/voices/voice-context.store';
 import { filterVoiceGroups } from '../../../core/voices/voice-groups';
 
 export { filterVoiceGroups };
 
 /** API limit of `set-voices` (`voiceIds` max. 20). */
-export const MAX_PROFILE_VOICES = 20;
 
 /**
  * „Welche Stimmen spielst du?“ (M-1): voices grouped by instrument (N-6) as toggle chips
@@ -93,8 +91,7 @@ export const MAX_PROFILE_VOICES = 20;
 export class VoiceSelectionDialog {
   private readonly api = inject(ApiClient);
   private readonly voices = inject(VoiceContextStore);
-  private readonly sonner = inject(ZardSonnerService);
-  private readonly transloco = inject(TranslocoService);
+  private readonly actions = inject(ActionRunner);
 
   readonly open = model(false);
   /** „Später“: the dialog does not reopen on its own in this tab. */
@@ -133,16 +130,13 @@ export class VoiceSelectionDialog {
 
   protected async save(): Promise<void> {
     this.saving.set(true);
-    try {
+    await this.actions.run(async () => {
       await firstValueFrom(this.api.postVoid(apiUrl('me', 'setVoices'), { voiceIds: [...this.selected()] }));
       this.voices.reload();
-      this.sonner.success(this.transloco.translate('me.voices.saved'));
+      this.actions.notify('me.voices.saved');
       this.open.set(false);
       this.saved.emit();
-    } catch (error) {
-      this.sonner.error(this.transloco.translate(isApiProblem(error) ? error.messageKey : 'errors.unknown'));
-    } finally {
-      this.saving.set(false);
-    }
+    });
+    this.saving.set(false);
   }
 }

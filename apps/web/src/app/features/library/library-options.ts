@@ -9,6 +9,7 @@ import {
 
 import { ApiClient } from '../../core/api/api-client';
 import { SessionStore } from '../../core/auth/session.store';
+import { selectOr } from '../../core/util/resource-value';
 
 /**
  * Master data the library pages share: custom fields (N-2), club tags for the score form (N-17)
@@ -29,12 +30,12 @@ export class LibraryOptions {
     stream: () => this.api.get(apiUrl('scores', 'ensembleOptions'), scoreEnsembleOptionsResponseSchema),
   });
 
-  readonly fields = computed(() => (this.fieldsResource.hasValue() ? this.fieldsResource.value().items : []));
+  readonly fields = computed(() => selectOr(this.fieldsResource, (v) => v.items, []));
   readonly fieldsLoaded = computed(() => this.fieldsResource.hasValue());
-  readonly tags = computed(() => (this.tagsResource.hasValue() ? this.tagsResource.value().items : []));
-  readonly ensembles = computed(() => (this.ensemblesResource.hasValue() ? this.ensemblesResource.value().items : []));
+  readonly tags = computed(() => selectOr(this.tagsResource, (v) => v.items, []));
+  readonly ensembles = computed(() => selectOr(this.ensemblesResource, (v) => v.items, []));
   readonly defaultEnsembleId = computed(() =>
-    this.ensemblesResource.hasValue() ? this.ensemblesResource.value().defaultEnsembleId : null,
+    selectOr(this.ensemblesResource, (v) => v.defaultEnsembleId, null),
   );
   /** Creating custom fields: librarians (score.edit) or club configuration (config.edit). */
   readonly canCreateField = computed(() => this.session.can('score.edit') || this.session.can('config.edit'));

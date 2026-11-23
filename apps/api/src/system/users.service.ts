@@ -14,7 +14,7 @@ import { ProblemException } from '../common/problem-details/problem.exception';
 import { httpUrlOrNull } from '../common/url';
 import { DATABASE, type Database } from '../db/database';
 import { ensembles, memberships, roles, users, userVoices, voices } from '../db/schema';
-import { likePattern } from '../me/me.repository';
+import { likePattern } from '../common/sql';
 import { assertActiveEnsemble, assertRoleExists, roleOptions } from '../library/library-helpers';
 
 type UserRecord = typeof users.$inferSelect;

@@ -5,7 +5,7 @@ import { ProblemException } from '../common/problem-details/problem.exception';
 import { activeEnsembleOptions } from '../common/ensemble-tree';
 import type { Database } from '../db/database';
 import { ensembles, scores, roles } from '../db/schema';
-import { likePattern } from '../me/me.repository';
+import { likePattern } from '../common/sql';
 
 /** Non-archived ensembles in which the caller holds `permission` (incl. inherited, F-3), in tree order; 403 if none. */
 export async function ensembleOptions(db: Database, access: AccessContext, permission: Permission) {
