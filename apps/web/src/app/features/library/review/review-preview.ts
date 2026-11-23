@@ -16,7 +16,7 @@ import { TranslocoPipe } from '@jsverse/transloco';
 import type { PDFDocumentLoadingTask, PDFDocumentProxy, RenderTask } from 'pdfjs-dist';
 
 import { observeWidth } from '../../../shared/ui/observe-width';
-import { loadPdfJs, PDFJS_BASE } from '../../../shared/ui/pdf-viewer';
+import { loadPdfJs, PDFJS_ASSETS } from '../../../shared/ui/pdf-viewer';
 import type { CropMargins, Rotation } from './review-model';
 
 /**
@@ -110,9 +110,7 @@ export class ReviewPreview {
       const task = lib.getDocument({
         url: src,
         withCredentials: true,
-        wasmUrl: `${PDFJS_BASE}/wasm/`,
-        standardFontDataUrl: `${PDFJS_BASE}/standard_fonts/`,
-        cMapUrl: `${PDFJS_BASE}/cmaps/`,
+        ...PDFJS_ASSETS,
       });
       this.task = task;
       const doc = await task.promise;

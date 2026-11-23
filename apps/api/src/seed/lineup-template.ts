@@ -2,7 +2,7 @@ import { asc, eq, inArray, sql } from 'drizzle-orm';
 import { readFile } from 'node:fs/promises';
 import { z } from 'zod';
 import { uuidv7 } from '../common/ids/uuid-v7';
-import type { Database } from '../db/database';
+import type { Database, Tx } from '../db/database';
 import { instruments, voices, voiceSubstitutes } from '../db/schema';
 import { nextPosition } from '../db/table-helpers';
 
@@ -37,7 +37,6 @@ export async function loadLineupTemplate(path: string): Promise<LineupTemplate> 
   return lineupTemplateSchema.parse(JSON.parse(await readFile(path, 'utf8')));
 }
 
-type Tx = Parameters<Parameters<Database['transaction']>[0]>[0];
 
 /**
  * Creates missing instruments and voices of the template (matched case-insensitively by name) and

@@ -3,13 +3,12 @@ import type { CreateVoiceBody, CreateVoiceResponse, InstrumentSuggestionsRespons
 import { and, asc, eq, inArray, sql } from 'drizzle-orm';
 import { uuidv7 } from '../common/ids/uuid-v7';
 import { ProblemException } from '../common/problem-details/problem.exception';
-import { DATABASE, type Database } from '../db/database';
-import { isUniqueViolation } from '../db/db-errors';
+import { DATABASE, type Database, type Tx } from '../db/database';
+import { withNameTaken } from '../db/db-errors';
 import { ensembleLineupVoices, instruments, sheets, uploads, userVoices, voices, voiceSubstitutes } from '../db/schema';
-import { likePattern } from '../me/me.repository';
 import { assertPermutation, nextPosition, replaceRows } from '../db/table-helpers';
+import { escapeLike, likePattern } from '../common/sql';
 
-type Tx = Parameters<Parameters<Database['transaction']>[0]>[0];
 
 /** Voices and instruments: one list, instrument typed with autocomplete, ordered substitutes (N-6, N-7, N-9, F-16). */
 @Injectable()
@@ -52,7 +51,7 @@ export class VoicesService {
 
   /** Max. 20 instruments, prefix matches first (N-7). */
   async instrumentSuggestions(q: string): Promise<InstrumentSuggestionsResponse> {
-    const prefix = `${q.replace(/[\\%_]/g, (c) => `\\${c}`)}%`;
+    const prefix = `${escapeLike(q)}%`;
     const items = await this.db
       .select({ id: instruments.id, name: instruments.name })
       .from(instruments)
@@ -63,7 +62,7 @@ export class VoicesService {
   }
 
   async create(body: CreateVoiceBody): Promise<CreateVoiceResponse> {
-    return this.unique(() =>
+    return withNameTaken(() =>
       this.db.transaction(async (tx) => {
         await this.assertNameFree(tx, body.name);
         const { id: instrumentId, created } = await this.instrumentFor(tx, body.instrumentName);
@@ -76,7 +75,7 @@ export class VoicesService {
 
   /** Name and instrument; a voice moved to another instrument goes to the end of that instrument. */
   async update(voiceId: string, body: CreateVoiceBody): Promise<void> {
-    await this.unique(() =>
+    await withNameTaken(() =>
       this.db.transaction(async (tx) => {
         const [voice] = await tx.select().from(voices).where(eq(voices.id, voiceId));
         if (!voice) throw ProblemException.notFound();
@@ -125,7 +124,7 @@ export class VoicesService {
   }
 
   async renameInstrument(instrumentId: string, name: string): Promise<void> {
-    await this.unique(async () => {
+    await withNameTaken(async () => {
       const [taken] = await this.db
         .select({ id: instruments.id })
         .from(instruments)
@@ -176,15 +175,6 @@ export class VoicesService {
   private async countBy(query: ReturnType<typeof sql>): Promise<Map<string, number>> {
     const result = await this.db.execute<{ voice_id: string; n: number }>(query);
     return new Map(result.rows.map((r) => [r.voice_id, r.n]));
-  }
-
-  private async unique<T>(write: () => Promise<T>): Promise<T> {
-    try {
-      return await write();
-    } catch (error) {
-      if (isUniqueViolation(error)) throw ProblemException.conflict('name-taken');
-      throw error;
-    }
   }
 }
 

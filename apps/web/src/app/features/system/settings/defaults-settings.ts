@@ -4,7 +4,6 @@ import { TranslocoPipe } from '@jsverse/transloco';
 import { NgIcon, provideIcons } from '@ng-icons/core';
 import { lucideTriangleAlert } from '@ng-icons/lucide';
 import { apiUrl, configDefaultOptionsResponseSchema, type ConfigResponse } from '@vm-web/shared';
-import { firstValueFrom } from 'rxjs';
 
 import { ZardButtonComponent } from '@/shared/components/button';
 import { ZardNativeSelectDirective } from '@/shared/components/native-select';
@@ -92,8 +91,8 @@ export class DefaultsSettings {
   }
 
   protected async save(): Promise<void> {
-    const done = await this.actions.run(
-      () => firstValueFrom(this.api.postVoid(apiUrl('system', 'updateDefaults'), { defaultEnsembleId: this.ensembleId() || null, defaultRoleId: this.roleId() || null })),
+    const done = await this.actions.runOnce(
+      () => this.api.postVoid(apiUrl('system', 'updateDefaults'), { defaultEnsembleId: this.ensembleId() || null, defaultRoleId: this.roleId() || null }),
       { success: { key: 'system.settings.saved' } },
     );
     if (done) this.changed.emit();

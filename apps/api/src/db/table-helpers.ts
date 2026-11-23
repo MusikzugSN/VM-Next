@@ -1,9 +1,7 @@
 import { sql, type SQL } from 'drizzle-orm';
 import type { AnyPgColumn, PgInsertValue, PgTable } from 'drizzle-orm/pg-core';
 import { ProblemException } from '../common/problem-details/problem.exception';
-import type { Database } from './database';
-
-type Tx = Parameters<Parameters<Database['transaction']>[0]>[0];
+import type { Database, Tx } from './database';
 
 /** Replaces the child rows selected by `where`; an empty list only deletes. */
 export async function replaceRows<T extends PgTable>(tx: Database | Tx, table: T, where: SQL | undefined, rows: PgInsertValue<T>[]): Promise<void> {

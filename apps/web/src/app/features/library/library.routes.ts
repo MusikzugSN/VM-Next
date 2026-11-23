@@ -1,9 +1,9 @@
-import type { CanActivateFn, Route, Routes } from '@angular/router';
+import type { Routes } from '@angular/router';
 import { provideTranslocoScope } from '@jsverse/transloco';
-import { APP_ROUTES, childSegment, type AppPath } from '@vm-web/shared';
+import { APP_ROUTES, type AppPath } from '@vm-web/shared';
 
 import { requirePermission } from '../../core/auth/guards';
-import { page, type Crumb } from '../../core/layout/page';
+import { guardedPageFactory, type Crumb } from '../../core/layout/page';
 import { LibraryOptions } from './library-options';
 
 const r = APP_ROUTES.library;
@@ -18,10 +18,7 @@ const parents: Partial<Record<AppPath, Crumb>> = {
   [r.event]: { key: 'nav.library.events', path: r.events },
 };
 
-function libraryPage(path: AppPath, titleKey: string, guard: CanActivateFn, loadComponent: Route['loadComponent']): Route {
-  const meta = page(titleKey, section, parents[path]);
-  return { path: childSegment(path, r.root), canActivate: [guard], title: meta.title, data: meta.data, loadComponent };
-}
+const libraryPage = guardedPageFactory(r.root, section, parents);
 
 /** Notenverwaltung (Stufe 3) und Prüfung (Stufe 4); texts in the `library` scope. */
 export const LIBRARY_ROUTES: Routes = [

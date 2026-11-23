@@ -3,6 +3,7 @@ import { sql } from 'drizzle-orm';
 
 import type { Database } from '../db/database';
 import { ensembles } from '../db/schema';
+import { appendTo } from './collections';
 
 export interface TreeNode {
   id: string;
@@ -17,7 +18,7 @@ export interface TreeNode {
  */
 export function inTreeOrder(all: readonly TreeNode[], include: (node: TreeNode) => boolean): EnsembleOption[] {
   const byParent = new Map<string | null, TreeNode[]>();
-  for (const node of all) byParent.set(node.parentId, [...(byParent.get(node.parentId) ?? []), node]);
+  for (const node of all) appendTo(byParent, node.parentId, node);
   const known = new Set(all.map((n) => n.id));
   const result: EnsembleOption[] = [];
   const walk = (parentId: string | null, depth: number) => {
