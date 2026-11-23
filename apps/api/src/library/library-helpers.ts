@@ -4,6 +4,7 @@ import type { AccessContext } from '../access/access-context';
 import { ProblemException } from '../common/problem-details/problem.exception';
 import { activeEnsembleOptions } from '../common/ensemble-tree';
 import type { Database } from '../db/database';
+import { afterNameAndId } from '../common/pagination/keyset';
 import { ensembles, scores, roles } from '../db/schema';
 import { likePattern } from '../common/sql';
 
@@ -55,7 +56,7 @@ export async function scoreCandidates(
     .where(
       and(
         sql`(${scores.title} ilike ${pattern} or ${scores.composer} ilike ${pattern})`,
-        cursor ? sql`(lower(${scores.title}), ${scores.id}) > (${cursor[0]}, ${cursor[1]}::uuid)` : undefined,
+        afterNameAndId(scores.title, scores.id, cursor),
       ),
     )
     .orderBy(sql`lower(${scores.title})`, asc(scores.id))

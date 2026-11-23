@@ -22,6 +22,7 @@ import {
   voiceSubstitutes,
 } from '../db/schema';
 import type { SheetRow } from './sheet-resolution';
+import { afterNameAndId } from '../common/pagination/keyset';
 import { replaceRows } from '../db/table-helpers';
 import { appendTo } from '../common/collections';
 import { hasClubTag, likePattern } from '../common/sql';
@@ -432,7 +433,7 @@ export class MeRepository {
         and(
           sql`${scores.id} in ${visibleScoreIds(ensembleIds)}`,
           ...this.scoreFilter(filter),
-          cursor ? sql`(lower(${scores.title}), ${scores.id}) > (${cursor[0]}, ${cursor[1]}::uuid)` : undefined,
+          afterNameAndId(scores.title, scores.id, cursor),
         ),
       )
       .orderBy(sql`lower(${scores.title})`, asc(scores.id))

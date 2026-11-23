@@ -23,6 +23,7 @@ import { MeRepository } from '../me/me.repository';
 import { FILE_STORAGE, type IFileStorage } from '../storage/file-storage';
 import { InvalidPdfError, inspectPdf } from './pdf-tools';
 import { suggestVoice } from './voice-suggestion';
+import { afterNameAndId } from '../common/pagination/keyset';
 
 /** What the upload interceptor hands over per file (multer disk storage). */
 export interface UploadedFileInfo {
@@ -77,7 +78,7 @@ export class UploadsService {
         and(
           sql`(${scores.title} ilike ${pattern} or ${scores.composer} ilike ${pattern} or ${scores.arranger} ilike ${pattern})`,
           visible,
-          cursor ? sql`(lower(${scores.title}), ${scores.id}) > (${cursor[0]}, ${cursor[1]}::uuid)` : undefined,
+          afterNameAndId(scores.title, scores.id, cursor),
         ),
       )
       .orderBy(sql`lower(${scores.title})`, asc(scores.id))

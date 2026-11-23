@@ -23,6 +23,7 @@ import { ZodValidationPipe as Zod } from '../common/validation/zod-validation.pi
 import { DATABASE, type Database } from '../db/database';
 import { withNameTaken } from '../db/db-errors';
 import { clubTags } from '../db/schema';
+import { afterNameAndId } from '../common/pagination/keyset';
 import { likePattern } from '../common/sql';
 
 /** Club tags, maintained by librarians (N-17); separate from personal tags (M-8). */
@@ -43,7 +44,7 @@ export class TagsService {
       .where(
         and(
           query.q ? sql`${clubTags.name} ilike ${likePattern(query.q)}` : undefined,
-          cursor ? sql`(lower(${clubTags.name}), ${clubTags.id}) > (${cursor[0]}, ${cursor[1]}::uuid)` : undefined,
+          afterNameAndId(clubTags.name, clubTags.id, cursor),
         ),
       )
       .orderBy(sql`lower(${clubTags.name})`, asc(clubTags.id))
