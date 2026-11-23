@@ -21,6 +21,7 @@ import { ToggleSwitch } from '../../../shared/ui/toggle-switch';
 import { UserStatusBadge } from '../ui/user-status-badge';
 import { TreeLabelPipe } from '../../../shared/ui/tree-label.pipe';
 import { usePageName } from '../../../core/layout/page';
+import { sameMembers, toggleSetItem } from '../../../core/util/sets';
 import { selectOr, valueOr } from '../../../core/util/resource-value';
 
 /** Benutzer-Detail (S-1, A-5, R-1, R-6): roles per ensemble, voices, admin flag, block and delete. */
@@ -71,7 +72,7 @@ export class UserPage {
   protected readonly voicesDirty = computed(() => {
     const current = new Set(this.user()?.voices.map((v) => v.id) ?? []);
     const chosen = this.selectedVoices();
-    return current.size !== chosen.size || [...chosen].some((id) => !current.has(id));
+    return !sameMembers(current, chosen);
   });
 
   constructor() {
@@ -113,12 +114,7 @@ export class UserPage {
   }
 
   protected toggleVoice(id: string): void {
-    this.selectedVoices.update((current) => {
-      const next = new Set(current);
-      if (next.has(id)) next.delete(id);
-      else if (next.size < MAX_PROFILE_VOICES) next.add(id);
-      return next;
-    });
+    this.selectedVoices.update((current) => toggleSetItem(current, id, MAX_PROFILE_VOICES));
   }
 
   protected async saveVoices(): Promise<void> {

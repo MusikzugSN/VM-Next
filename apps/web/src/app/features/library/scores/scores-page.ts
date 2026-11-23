@@ -56,6 +56,7 @@ import {
 } from './score-query';
 import { PrintLauncher } from '../../../core/actions/pending-features';
 import { SelectionBar } from '../../../shared/ui/selection-bar';
+import { toggleSetItem } from '../../../core/util/sets';
 
 const HIDDEN_COLUMNS_KEY = 'vmweb.scoreTable.hiddenColumns';
 
@@ -184,12 +185,7 @@ export class ScoresPage {
   });
 
   protected toggle(id: string): void {
-    this.selected.update((current) => {
-      const next = new Set(current);
-      if (next.has(id)) next.delete(id);
-      else next.add(id);
-      return next;
-    });
+    this.selected.update((current) => toggleSetItem(current, id));
   }
 
   protected toggleAll(): void {

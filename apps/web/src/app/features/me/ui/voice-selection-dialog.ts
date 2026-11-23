@@ -14,6 +14,7 @@ import { ApiClient } from '../../../core/api/api-client';
 import { ActionRunner } from '../../../core/actions/action-runner';
 import { VoiceContextStore } from '../../../core/voices/voice-context.store';
 import { filterVoiceGroups } from '../../../core/voices/voice-groups';
+import { toggleSetItem } from '../../../core/util/sets';
 
 export { filterVoiceGroups };
 
@@ -115,12 +116,7 @@ export class VoiceSelectionDialog {
   }
 
   protected toggle(id: string): void {
-    this.selected.update((current) => {
-      const next = new Set(current);
-      if (next.has(id)) next.delete(id);
-      else if (next.size < MAX_PROFILE_VOICES) next.add(id);
-      return next;
-    });
+    this.selected.update((current) => toggleSetItem(current, id, MAX_PROFILE_VOICES));
   }
 
   protected later(): void {
