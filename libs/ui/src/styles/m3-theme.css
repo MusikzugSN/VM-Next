@@ -224,4 +224,9 @@
   --mat-sys-dialog-width-sm: 360px;
   --mat-sys-dialog-width-md: 480px;
   --mat-sys-dialog-width-lg: 560px;
+
+  /* Fokusring (Abweichung: Angular Material führt ihn als --mat-focus-indicator-*) */
+  --mat-sys-focus-indicator-color: var(--mat-sys-primary);
+  --mat-sys-focus-indicator-thickness: 2px;
+  --mat-sys-focus-indicator-outer-offset: 2px;
 }

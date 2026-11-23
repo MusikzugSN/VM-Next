@@ -43,7 +43,7 @@ export const inputGroupButtonVariants = cva(
   mergeClasses(
     'inline-flex cursor-pointer items-center justify-center gap-2 rounded-lg border border-transparent bg-clip-padding whitespace-nowrap',
     'text-sm font-medium shadow-none transition-all outline-none select-none',
-    'focus-visible:border-ring focus-visible:ring-ring/50 focus-visible:ring-3',
+    '',
     'aria-invalid:border-destructive aria-invalid:ring-destructive/20 aria-invalid:ring-3 dark:aria-invalid:border-destructive/50 dark:aria-invalid:ring-destructive/40',
     'disabled:pointer-events-none disabled:cursor-not-allowed disabled:opacity-50',
     "shrink-0 [&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*='size-'])]:size-4",
@@ -54,7 +54,7 @@ export const inputGroupButtonVariants = cva(
       zVariant: {
         default: 'bg-primary text-primary-foreground hover:bg-primary/80',
         destructive:
-          'bg-destructive/10 hover:bg-destructive/20 focus-visible:ring-destructive/20 dark:focus-visible:ring-destructive/40 dark:bg-destructive/20 text-destructive focus-visible:border-destructive/40 dark:hover:bg-destructive/30',
+          'bg-destructive/10 hover:bg-destructive/20 dark:bg-destructive/20 text-destructive focus-visible:border-destructive/40 dark:hover:bg-destructive/30',
         outline:
           'border-border bg-background hover:bg-muted hover:text-foreground dark:bg-input/30 dark:border-input dark:hover:bg-input/50 aria-expanded:bg-muted aria-expanded:text-foreground',
         secondary:

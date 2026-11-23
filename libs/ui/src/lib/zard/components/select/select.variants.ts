@@ -6,7 +6,7 @@ import { mergeClasses } from '@vm-web/ui/zard/utils/merge-classes';
 export const selectVariants = cva(
   mergeClasses(
     'relative inline-block w-full rounded-lg group',
-    '[&_button]:focus-visible:border [&_button]:focus-visible:border-ring [&_button]:focus-visible:ring-ring/50 [&_button]:focus-visible:ring-[3px]',
+    '[&_button]:focus-visible:border',
   ),
 );
 
