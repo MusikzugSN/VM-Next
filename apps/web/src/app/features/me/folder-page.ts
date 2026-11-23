@@ -91,7 +91,7 @@ import { selectOr } from '../../core/util/resource-value';
         <div class="flex flex-wrap items-center gap-2">
           <span class="inline-flex items-center gap-1 rounded-small bg-primary-soft py-0.5 ps-2 text-primary">
             {{ name }}
-            <button type="button" class="flex size-8 items-center justify-center" [attr.aria-label]="'me.filter.remove' | transloco: { name }" (click)="tagFilter.set(null)">
+            <button type="button" class="relative flex size-8 items-center justify-center rounded-full after:absolute after:-inset-1.5 hover:bg-on-primary-container/8 xl:after:inset-0" [attr.aria-label]="'me.filter.remove' | transloco: { name }" (click)="tagFilter.set(null)">
               <ng-icon name="lucideX" aria-hidden="true" />
             </button>
           </span>

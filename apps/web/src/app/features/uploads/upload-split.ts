@@ -112,9 +112,9 @@ const PAGE_WIDTH = 560;
               </li>
             }
             <li class="w-full" [attr.data-page]="page">
-              <div class="relative w-full overflow-hidden rounded-small border bg-white shadow-level1" [class.opacity-40]="section.skip">
-                <canvas class="block w-full" [attr.data-canvas]="page" [style.aspect-ratio]="ratio(page)" aria-hidden="true"></canvas>
-                <span class="absolute top-2 left-2 rounded-small bg-foreground/80 px-2 py-0.5 text-body-small text-background">
+              <div class="relative w-full overflow-hidden rounded-small border bg-white shadow-level1">
+                <canvas class="block w-full" [class.opacity-40]="section.skip" [attr.data-canvas]="page" [style.aspect-ratio]="ratio(page)" aria-hidden="true"></canvas>
+                <span class="absolute top-2 left-2 rounded-small bg-inverse-surface px-2 py-0.5 text-body-small text-inverse-on-surface">
                   {{ 'upload.split.page' | transloco: { page, count: pageCount() } }} · {{ sectionLabel(section) | transloco: { title: section.scoreTitle ?? '' } }}{{ voiceSuffix(section) }}
                 </span>
               </div>
