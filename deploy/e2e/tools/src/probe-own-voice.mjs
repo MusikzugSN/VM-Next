@@ -22,5 +22,5 @@ console.log(result(await call('browser_evaluate', { function: `async () => {
 }` })));
 await call('browser_navigate', { url: 'https://vm.test/me' });
 await new Promise((r) => setTimeout(r, 2000));
-console.log(result(await call('browser_evaluate', { function: `() => { const b = document.querySelector('button[aria-label^="Aktive Stimme"]'); return b.getAttribute('aria-label') + ' | Text: ' + b.textContent.replace(/\s+/g, ' ').trim(); }` })));
+console.log(result(await call('browser_evaluate', { function: `() => { const b = document.querySelector('button[aria-label^="Aktive Stimme"]'); return b.getAttribute('aria-label') + ' | Text: ' + b.textContent.replace(/s+/g, ' ').trim(); }` })));
 await call('browser_evaluate', { function: `() => { sessionStorage.removeItem('vmweb.voiceOverride'); return 1; }` });

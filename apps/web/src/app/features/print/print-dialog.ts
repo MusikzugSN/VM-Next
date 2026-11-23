@@ -23,6 +23,8 @@ import { VoiceContextStore } from '../../core/voices/voice-context.store';
 import { ToggleField } from '../../shared/ui/toggle-field';
 import { VoiceSelect } from '../../shared/ui/voice-select';
 import { planScores, printQuery, sheetsLabel, type PrintOptions } from './print-model';
+import { toggleSetItem } from '../../core/util/sets';
+import { valueOr } from '../../core/util/resource-value';
 
 /**
  * Druckdialog (D-1 bis D-3, M-7): scope, voices, duplex and substitutes; shows how each score lands
@@ -96,7 +98,7 @@ export class PrintDialog {
     stream: () => from(this.service.state()),
   });
   protected readonly printers = computed(() => {
-    const state = this.serviceState.hasValue() ? this.serviceState.value() : null;
+    const state = valueOr(this.serviceState, null);
     return state?.kind === 'ready' ? state.status.printers : [];
   });
   /** What the main button does. */
@@ -106,7 +108,7 @@ export class PrintDialog {
     if (!this.viewport.isDesktop()) return 'device';
     if (plan.route === 'browser') return 'browser';
     if (this.serviceState.isLoading()) return null;
-    const state = this.serviceState.hasValue() ? this.serviceState.value() : null;
+    const state = valueOr(this.serviceState, null);
     return state?.kind === 'ready' ? 'service' : 'fallback';
   });
   protected readonly canShare = typeof navigator !== 'undefined' && typeof navigator.canShare === 'function';
@@ -162,12 +164,7 @@ export class PrintDialog {
   }
 
   protected toggleScore(id: string): void {
-    this.selectedScores.update((current) => {
-      const next = new Set(current);
-      if (next.has(id)) next.delete(id);
-      else next.add(id);
-      return next;
-    });
+    this.selectedScores.update((current) => toggleSetItem(current, id));
   }
 
   protected sheets(sheets: number, mode: PrintMode) {

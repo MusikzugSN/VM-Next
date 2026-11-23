@@ -25,12 +25,12 @@ import {
   type ScoreColumn,
   type ScoreTableRow,
 } from '@vm-web/shared';
-import { firstValueFrom, map, tap } from 'rxjs';
+import { map, tap } from 'rxjs';
 
 import { ZardButtonComponent } from '@/shared/components/button';
 import { ZardDropdownImports } from '@/shared/components/dropdown/dropdown.imports';
 
-import { ActionRunner, ConfirmService } from '../../../core/actions/action-runner';
+import { ConfirmService } from '../../../core/actions/action-runner';
 import { ApiClient } from '../../../core/api/api-client';
 import { cursorList } from '../../../core/api/cursor-list';
 import { withQuery } from '../../../core/api/urls';
@@ -56,6 +56,8 @@ import {
 } from './score-query';
 import { PrintLauncher } from '../../../core/actions/pending-features';
 import { SelectionBar } from '../../../shared/ui/selection-bar';
+import { ignoreStorageErrors, readStoredStrings } from '../../../core/util/stored';
+import { toggleSetItem } from '../../../core/util/sets';
 
 const HIDDEN_COLUMNS_KEY = 'vmweb.scoreTable.hiddenColumns';
 
@@ -107,7 +109,6 @@ export class ScoresPage {
   private readonly router = inject(Router);
   private readonly route = inject(ActivatedRoute);
   private readonly session = inject(SessionStore);
-  private readonly actions = inject(ActionRunner);
   private readonly confirm = inject(ConfirmService);
   private readonly transloco = inject(TranslocoService);
   protected readonly options = inject(LibraryOptions);
@@ -185,12 +186,7 @@ export class ScoresPage {
   });
 
   protected toggle(id: string): void {
-    this.selected.update((current) => {
-      const next = new Set(current);
-      if (next.has(id)) next.delete(id);
-      else next.add(id);
-      return next;
-    });
+    this.selected.update((current) => toggleSetItem(current, id));
   }
 
   protected toggleAll(): void {
@@ -256,8 +252,7 @@ export class ScoresPage {
   }
 
   protected async remove(row: ScoreTableRow): Promise<void> {
-    if (!(await this.confirm.confirmDelete('library.scores.deleteTitle', 'library.scores.deleteText', { title: row.title }))) return;
-    const done = await this.actions.run(() => firstValueFrom(this.api.postVoid(apiUrl('scores', 'deleteScore', { scoreId: row.id }))), {
+    const done = await this.confirm.confirmedDelete('library.scores.deleteTitle', 'library.scores.deleteText', { title: row.title }, () => this.api.postVoid(apiUrl('scores', 'deleteScore', { scoreId: row.id })), {
       success: { key: 'library.scores.deleted', params: { title: row.title } },
     });
     if (done) this.list.reload();
@@ -270,19 +265,10 @@ export class ScoresPage {
 }
 
 function readHidden(): Set<string> {
-  try {
-    const raw = localStorage.getItem(HIDDEN_COLUMNS_KEY);
-    const parsed: unknown = raw ? JSON.parse(raw) : [];
-    return new Set(Array.isArray(parsed) ? parsed.filter((x): x is string => typeof x === 'string') : []);
-  } catch {
-    return new Set();
-  }
+  return new Set(readStoredStrings(() => localStorage, HIDDEN_COLUMNS_KEY));
 }
 
+/** With blocked storage the choice lasts until reload. */
 function writeHidden(hidden: ReadonlySet<string>): void {
-  try {
-    localStorage.setItem(HIDDEN_COLUMNS_KEY, JSON.stringify([...hidden]));
-  } catch {
-    // Storage blocked: the choice lasts until reload.
-  }
+  ignoreStorageErrors(() => localStorage.setItem(HIDDEN_COLUMNS_KEY, JSON.stringify([...hidden])));
 }

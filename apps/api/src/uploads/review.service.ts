@@ -7,21 +7,21 @@ import type {
   ReviewQueueResponse,
   UploadDetailsResponse,
 } from '@vm-web/shared';
-import { and, asc, eq, sql } from 'drizzle-orm';
+import { and, asc, desc, eq, sql } from 'drizzle-orm';
 import { alias } from 'drizzle-orm/pg-core';
 import type { Readable } from 'node:stream';
 import type { AccessContext } from '../access/access-context';
 import { uuidv7 } from '../common/ids/uuid-v7';
 import { decodeCursor, encodeCursor } from '../common/pagination/cursor';
 import { ProblemException } from '../common/problem-details/problem.exception';
-import { DATABASE, type Database } from '../db/database';
+import { DATABASE, type Database, type Tx } from '../db/database';
 import { scores, sheets, uploads, users, voices } from '../db/schema';
 import { FILE_STORAGE, type IFileStorage } from '../storage/file-storage';
 import { streamToBuffer } from '../storage/stream-utils';
 import { buildSheetPdf } from './pdf-tools';
 import { sheetKey } from './uploads.service';
+import { readOrNotFound } from '../storage/read-or-not-found';
 
-type Tx = Parameters<Parameters<Database['transaction']>[0]>[0];
 
 const uploader = alias(users, 'uploader');
 
@@ -101,10 +101,7 @@ export class ReviewService {
     const [row] = await this.db.select({ fileKey: uploads.fileKey, fileName: uploads.fileName }).from(uploads).where(eq(uploads.id, uploadId));
     if (!row?.fileKey) throw ProblemException.notFound();
     const fileKey = row.fileKey;
-    const stream = await this.storage.read(fileKey).catch(() => {
-      this.logger.error(`Original ${fileKey} of upload ${uploadId} is missing in storage`);
-      throw ProblemException.notFound();
-    });
+    const stream = await readOrNotFound(this.storage, fileKey, this.logger, `Original ${fileKey} of upload ${uploadId} is missing in storage`);
     return { stream, fileName: row.fileName };
   }
 
@@ -208,16 +205,16 @@ export class ReviewService {
     const created = ref.createdAt.toISOString();
     const after = sql`(${uploads.createdAt}, ${uploads.id}) > (${created}::timestamptz, ${uploadId}::uuid)`;
     const before = sql`(${uploads.createdAt}, ${uploads.id}) < (${created}::timestamptz, ${uploadId}::uuid)`;
-    const pick = async (cond: ReturnType<typeof sql> | undefined, order: 'asc' | 'desc') => {
+    const pick = async (cond: ReturnType<typeof sql> | undefined, sort: typeof asc) => {
       const [row] = await this.db
         .select({ id: uploads.id })
         .from(uploads)
         .where(and(eq(uploads.status, 'pending'), sql`${uploads.id} <> ${uploadId}::uuid`, cond))
-        .orderBy(order === 'asc' ? asc(uploads.createdAt) : sql`${uploads.createdAt} desc`, order === 'asc' ? asc(uploads.id) : sql`${uploads.id} desc`)
+        .orderBy(sort(uploads.createdAt), sort(uploads.id))
         .limit(1);
       return row?.id ?? null;
     };
-    if (direction === 'previous') return pick(before, 'desc');
-    return (await pick(after, 'asc')) ?? (await pick(undefined, 'asc'));
+    if (direction === 'previous') return pick(before, desc);
+    return (await pick(after, asc)) ?? (await pick(undefined, asc));
   }
 }

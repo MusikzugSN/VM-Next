@@ -13,7 +13,7 @@ import {
   scoreQueryParams,
   scoreTableQuery,
 } from './scores/score-query';
-import { moveItem } from './voices/voice-dialog';
+import { moveItem } from '../../core/util/move-item';
 import { filterVoiceList } from './voices/voices-page';
 
 const fields: FieldDefinition[] = [

@@ -15,7 +15,7 @@ import {
   ensembleMembersResponseSchema,
   userAssignmentOptionsResponseSchema,
 } from '@vm-web/shared';
-import { firstValueFrom, of } from 'rxjs';
+import { of } from 'rxjs';
 
 import { ZardButtonComponent } from '@/shared/components/button';
 import { ZardNativeSelectDirective } from '@/shared/components/native-select';
@@ -35,6 +35,8 @@ import { SearchField } from '../../../shared/ui/search-field';
 import { TreeLabelPipe } from '../../../shared/ui/tree-label.pipe';
 import { usePageName } from '../../../core/layout/page';
 import { PrintRulesTab } from './print-rules-tab';
+import { sameMembers, toggleSetItem } from '../../../core/util/sets';
+import { valueOr } from '../../../core/util/resource-value';
 
 type EnsembleTab = 'details' | 'lineup' | 'members' | 'print';
 const TABS: readonly EnsembleTab[] = ['details', 'lineup', 'members', 'print'];
@@ -76,7 +78,7 @@ export class EnsemblePage {
     params: () => this.ensembleId(),
     stream: ({ params }) => this.api.get(apiUrl('system', 'ensembleDetails', { ensembleId: params }), ensembleDetailsResponseSchema),
   });
-  protected readonly ensemble = computed(() => (this.details.hasValue() ? this.details.value() : null));
+  protected readonly ensemble = computed(() => valueOr(this.details, null));
   protected readonly selfPath = computed(() => appPath(APP_ROUTES.system.ensemble, { ensembleId: this.ensembleId() }));
 
   // Stammdaten
@@ -100,7 +102,7 @@ export class EnsemblePage {
   protected readonly lineupDirty = computed(() => {
     const saved = new Set(this.lineup.hasValue() ? this.lineup.value().voices.map((v) => v.id) : []);
     const chosen = this.selected();
-    return saved.size !== chosen.size || [...chosen].some((id) => !saved.has(id));
+    return !sameMembers(saved, chosen);
   });
 
   // Mitglieder
@@ -124,12 +126,10 @@ export class EnsemblePage {
     return appPath(APP_ROUTES.system.user, { userId });
   }
 
-  protected initialsOf(name: string): string {
-    return initials(name);
-  }
+  protected readonly initialsOf = initials;
 
   protected readonly rename = async (name: string): Promise<boolean> => {
-    const done = await this.actions.run(() => firstValueFrom(this.api.postVoid(apiUrl('system', 'renameEnsemble', { ensembleId: this.ensembleId() }), { name })), {
+    const done = await this.actions.runOnce(() => this.api.postVoid(apiUrl('system', 'renameEnsemble', { ensembleId: this.ensembleId() }), { name }), {
       success: { key: 'system.ensemble.renamed', params: { name } },
     });
     if (done) this.changed();
@@ -138,7 +138,7 @@ export class EnsemblePage {
 
   protected async setParent(parentId: string): Promise<void> {
     if (!parentId || parentId === this.ensemble()?.parentId) return;
-    const done = await this.actions.run(() => firstValueFrom(this.api.postVoid(apiUrl('system', 'moveEnsemble', { ensembleId: this.ensembleId() }), { parentId })), {
+    const done = await this.actions.runOnce(() => this.api.postVoid(apiUrl('system', 'moveEnsemble', { ensembleId: this.ensembleId() }), { parentId }), {
       success: { key: 'system.ensemble.moved' },
     });
     // Reload either way: on `invalid-hierarchy` the select must show the old parent again.
@@ -147,12 +147,7 @@ export class EnsemblePage {
   }
 
   protected toggleVoice(id: string): void {
-    this.selected.update((current) => {
-      const next = new Set(current);
-      if (next.has(id)) next.delete(id);
-      else next.add(id);
-      return next;
-    });
+    this.selected.update((current) => toggleSetItem(current, id));
   }
 
   /** All voices of one instrument on or off. */
@@ -180,7 +175,7 @@ export class EnsemblePage {
       .flatMap((g) => g.voices)
       .map((v) => v.id)
       .filter((id) => this.selected().has(id));
-    const done = await this.actions.run(() => firstValueFrom(this.api.postVoid(apiUrl('system', 'setLineup', { ensembleId: this.ensembleId() }), { voiceIds })), {
+    const done = await this.actions.runOnce(() => this.api.postVoid(apiUrl('system', 'setLineup', { ensembleId: this.ensembleId() }), { voiceIds }), {
       success: { key: 'system.ensemble.lineupSaved' },
     });
     if (done) this.lineupChanged();
@@ -189,8 +184,8 @@ export class EnsemblePage {
   protected async applyTemplate(): Promise<void> {
     const name = this.ensemble()?.name ?? '';
     if (!(await this.confirm.confirm('system.ensemble.templateTitle', 'system.ensemble.templateText', { name }, 'system.ensemble.templateOk'))) return;
-    const done = await this.actions.run(() =>
-      firstValueFrom(this.api.post(apiUrl('system', 'applyLineupTemplate', { ensembleId: this.ensembleId() }), {}, applyLineupTemplateResponseSchema)),
+    const done = await this.actions.runOnce(() =>
+      this.api.post(apiUrl('system', 'applyLineupTemplate', { ensembleId: this.ensembleId() }), {}, applyLineupTemplateResponseSchema),
     );
     if (!done) return;
     this.actions.notify('system.ensemble.templateDone', { ...done.value });

@@ -39,8 +39,7 @@ const JOB_ACTION = /^\/v1\/jobs\/([^/]+)\/(cancel|retry)$/;
 export function createPrintServer(deps: ServerDeps): Server {
   return createServer((req, res) => {
     void handle(deps, req, res).catch((error: unknown) => {
-      if (error instanceof HttpError) send(res, error.status, { code: error.code, message: error.message });
-      else if (error instanceof JobError) send(res, error.status, { code: error.code, message: error.message });
+      if (error instanceof HttpError || error instanceof JobError) send(res, error.status, { code: error.code, message: error.message });
       else send(res, 500, { code: 'internal-error', message: error instanceof Error ? error.message : 'Interner Fehler' });
     });
   });
