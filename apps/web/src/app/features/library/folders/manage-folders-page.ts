@@ -111,8 +111,7 @@ export class ManageFoldersPage {
   }
 
   protected async remove(folder: FolderListItem): Promise<void> {
-    if (!(await this.confirm.confirmDelete('library.folders.deleteTitle', 'library.folders.deleteText', { name: folder.name }))) return;
-    const done = await this.actions.runOnce(() => this.api.postVoid(apiUrl('folders', 'deleteFolder', { folderId: folder.id })), {
+    const done = await this.confirm.confirmedDelete('library.folders.deleteTitle', 'library.folders.deleteText', { name: folder.name }, () => this.api.postVoid(apiUrl('folders', 'deleteFolder', { folderId: folder.id })), {
       success: { key: 'library.folders.deleted', params: { name: folder.name } },
     });
     if (done) this.list.reload();

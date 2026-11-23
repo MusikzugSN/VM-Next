@@ -148,8 +148,7 @@ export class UserPage {
 
   protected async remove(): Promise<void> {
     const name = this.user()?.name ?? '';
-    if (!(await this.confirm.confirmDelete('system.user.deleteTitle', 'system.user.deleteText', { name }))) return;
-    const done = await this.actions.runOnce(() => this.api.postVoid(apiUrl('system', 'deleteUser', { userId: this.userId() })), {
+    const done = await this.confirm.confirmedDelete('system.user.deleteTitle', 'system.user.deleteText', { name }, () => this.api.postVoid(apiUrl('system', 'deleteUser', { userId: this.userId() })), {
       success: { key: 'system.user.deleted', params: { name } },
     });
     if (done) void this.router.navigateByUrl(this.usersPath);

@@ -172,8 +172,7 @@ export class EditFolderPage {
 
   protected async deleteFolder(): Promise<void> {
     const name = selectOr(this.details, (v) => v.name, '');
-    if (!(await this.confirm.confirmDelete('library.folders.deleteTitle', 'library.folders.deleteText', { name }))) return;
-    const done = await this.actions.runOnce(() => this.api.postVoid(apiUrl('folders', 'deleteFolder', { folderId: this.folderId() })), {
+    const done = await this.confirm.confirmedDelete('library.folders.deleteTitle', 'library.folders.deleteText', { name }, () => this.api.postVoid(apiUrl('folders', 'deleteFolder', { folderId: this.folderId() })), {
       success: { key: 'library.folders.deleted', params: { name } },
     });
     if (done) void this.router.navigateByUrl(this.foldersPath);
