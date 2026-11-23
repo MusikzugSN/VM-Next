@@ -42,7 +42,7 @@ export function ruleEnd(rules: readonly PrintRule[], index: number): number | nu
       <section aria-labelledby="h-print-rules" vm-card class="flex flex-col gap-4 p-4 md:p-6">
         <div class="flex flex-col gap-2 md:flex-row md:items-start md:justify-between">
           <div>
-            <h2 id="h-print-rules" class="text-lg font-semibold">{{ 'system.printRules.title' | transloco }}</h2>
+            <h2 id="h-print-rules" class="text-title-large">{{ 'system.printRules.title' | transloco }}</h2>
             <p class="text-muted-foreground">{{ 'system.printRules.hint' | transloco: { name: ensembleName() } }}</p>
           </div>
           @if (canEdit()) {
@@ -57,7 +57,7 @@ export function ruleEnd(rules: readonly PrintRule[], index: number): number | nu
           }
         </div>
 
-        <p class="rounded-md bg-muted px-4 py-3 text-[13px]">
+        <p class="rounded-md bg-muted px-4 py-3 text-body-medium">
           @if (info.own) {
             {{ 'system.printRules.own' | transloco }}
           } @else if (info.inheritedFrom; as parent) {
@@ -148,10 +148,10 @@ export function ruleEnd(rules: readonly PrintRule[], index: number): number | nu
             <ng-icon name="lucidePlus" aria-hidden="true" />{{ 'system.printRules.add' | transloco }}
           </button>
           @if (!valid()) {
-            <p role="alert" class="text-[13px] text-destructive-ink">{{ 'system.printRules.invalid' | transloco }}</p>
+            <p role="alert" class="text-body-medium text-destructive-ink">{{ 'system.printRules.invalid' | transloco }}</p>
           }
         }
-        <p class="text-[13px] text-muted-foreground">{{ 'system.printRules.footnote' | transloco }}</p>
+        <p class="text-body-medium text-muted-foreground">{{ 'system.printRules.footnote' | transloco }}</p>
       </section>
     }
   `,

@@ -13,16 +13,16 @@
         </label>
         @if (numbering() !== 'none') {
           <span
-            class="flex size-control shrink-0 self-start items-center justify-center rounded-md bg-primary-soft text-base font-semibold text-primary tabular-nums"
+            class="flex size-control shrink-0 self-start items-center justify-center rounded-md bg-primary-soft text-title-medium text-primary tabular-nums"
             [attr.aria-label]="'me.list.numberLabel' | transloco: { number: item.number }"
             >{{ item.number }}</span
           >
         }
         <div class="flex min-w-0 flex-1 flex-col gap-0.5">
           @if (item.missing) {
-            <span class="text-base font-medium">{{ item.row.title }}</span>
+            <span class="text-title-medium font-medium">{{ item.row.title }}</span>
           } @else {
-            <a [routerLink]="item.link" [queryParams]="item.query" class="text-base font-medium text-foreground no-underline hover:underline">{{
+            <a [routerLink]="item.link" [queryParams]="item.query" class="text-title-medium text-foreground no-underline hover:underline font-medium">{{
               item.row.title
             }}</a>
           }
@@ -100,7 +100,7 @@
             @if (numbering() !== 'none') {
               <td class="px-4 py-3">
                 <span
-                  class="flex size-10 items-center justify-center rounded-md bg-primary-soft text-base font-semibold text-primary tabular-nums"
+                  class="flex size-10 items-center justify-center rounded-md bg-primary-soft text-title-medium text-primary tabular-nums"
                   [attr.aria-label]="'me.list.numberLabel' | transloco: { number: item.number }"
                   >{{ item.number }}</span
                 >

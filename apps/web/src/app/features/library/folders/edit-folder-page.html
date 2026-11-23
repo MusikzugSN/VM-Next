@@ -8,7 +8,7 @@
   @let folder = details.value();
   <div class="flex flex-col gap-3 md:flex-row md:items-start md:justify-between">
     <div>
-      <h1 class="text-2xl font-semibold">{{ 'pages.editFolder' | transloco }}</h1>
+      <h1 class="text-headline-small">{{ 'pages.editFolder' | transloco }}</h1>
       <p class="mt-2 text-muted-foreground">
         {{ folder.name }} · {{ folder.ensemble.name }} · {{ 'library.folders.scoreCount' | tPlural: folder.scoreCount }}
         @if (canEdit()) {
@@ -29,7 +29,7 @@
   </div>
 
   <section aria-labelledby="h-folder" vm-card class="flex flex-col gap-4 p-4 md:p-6">
-    <h2 id="h-folder" class="text-lg font-semibold">{{ 'terms.folder' | transloco }}</h2>
+    <h2 id="h-folder" class="text-title-large">{{ 'terms.folder' | transloco }}</h2>
     <div class="grid gap-4 md:grid-cols-2">
       <label vm-field>
         <span vm-field-label>{{ 'library.common.name' | transloco }}</span>
@@ -63,7 +63,7 @@
 
   <section aria-labelledby="h-scores" class="flex flex-col gap-4">
     <div>
-      <h2 id="h-scores" class="text-lg font-semibold">{{ 'library.folder.scores' | transloco: { count: folder.scoreCount } }}</h2>
+      <h2 id="h-scores" class="text-title-large">{{ 'library.folder.scores' | transloco: { count: folder.scoreCount } }}</h2>
       <p class="text-muted-foreground">{{ 'library.folder.numberHint' | transloco }}</p>
     </div>
     <vm-search-field [(value)]="search" labelKey="library.folder.search" />

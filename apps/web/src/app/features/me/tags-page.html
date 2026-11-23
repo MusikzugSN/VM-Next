@@ -1,6 +1,6 @@
 <div class="flex flex-col gap-3 md:flex-row md:items-start md:justify-between">
   <div>
-    <h1 class="text-2xl font-semibold">{{ 'nav.me.tags' | transloco }}</h1>
+    <h1 class="text-headline-small">{{ 'nav.me.tags' | transloco }}</h1>
     <p class="mt-2 text-muted-foreground">{{ 'me.tags.intro' | transloco }}</p>
   </div>
   <button vm-button variant="outlined" type="button" class="w-full md:w-auto" (click)="creating.set(true)">
@@ -13,7 +13,7 @@
 @if (tags.hasValue()) {
   @let all = tags.value();
   <section aria-labelledby="h-club" class="flex flex-col gap-2">
-    <h2 id="h-club" class="text-base font-semibold">{{ 'me.tags.club' | transloco }}</h2>
+    <h2 id="h-club" class="text-title-medium">{{ 'me.tags.club' | transloco }}</h2>
     @if (all.clubTags.length) {
       <ul class="flex flex-wrap gap-2">
         @for (tag of all.clubTags; track tag.id) {
@@ -24,7 +24,7 @@
               class="inline-flex min-h-target items-center gap-2 rounded-md border px-3 font-medium no-underline xl:min-h-9"
               [class]="selected()?.tag?.id === tag.id ? 'border-primary bg-primary-soft text-primary' : 'border-input text-foreground'"
             >
-              {{ tag.name }}<span class="text-xs text-muted-foreground tabular-nums">{{ tag.scoreCount }}</span>
+              {{ tag.name }}<span class="text-body-small text-muted-foreground tabular-nums">{{ tag.scoreCount }}</span>
             </a>
           </li>
         }
@@ -35,7 +35,7 @@
   </section>
 
   <section aria-labelledby="h-personal" class="flex flex-col gap-2">
-    <h2 id="h-personal" class="text-base font-semibold">{{ 'me.tags.personal' | transloco }}</h2>
+    <h2 id="h-personal" class="text-title-medium">{{ 'me.tags.personal' | transloco }}</h2>
     @if (all.personalTags.length) {
       <ul class="flex flex-wrap gap-2">
         @for (tag of all.personalTags; track tag.id) {
@@ -46,7 +46,7 @@
               class="inline-flex min-h-target items-center gap-2 rounded-md border px-3 font-medium no-underline xl:min-h-9"
               [class]="selected()?.tag?.id === tag.id ? 'border-primary bg-primary-soft text-primary' : 'border-input text-foreground'"
             >
-              {{ tag.name }}<span class="text-xs text-muted-foreground tabular-nums">{{ tag.scoreCount }}</span>
+              {{ tag.name }}<span class="text-body-small text-muted-foreground tabular-nums">{{ tag.scoreCount }}</span>
             </a>
           </li>
         }
@@ -60,7 +60,7 @@
 @if (selected(); as current) {
   <section aria-labelledby="h-list" class="flex flex-col gap-4">
     <div class="flex flex-wrap items-center justify-between gap-2">
-      <h2 id="h-list" class="text-lg font-semibold">{{ 'me.tags.scoresWith' | transloco: { name: current.tag.name } }}</h2>
+      <h2 id="h-list" class="text-title-large">{{ 'me.tags.scoresWith' | transloco: { name: current.tag.name } }}</h2>
       <div class="flex flex-wrap gap-2">
         @if (current.kind === 'personal') {
           <button vm-button variant="text" type="button" (click)="renaming.set(true)">

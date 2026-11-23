@@ -1,6 +1,6 @@
 <div class="flex flex-col gap-3 md:flex-row md:items-start md:justify-between">
   <div>
-    <h1 class="text-2xl font-semibold">{{ 'nav.library.events' | transloco }}</h1>
+    <h1 class="text-headline-small">{{ 'nav.library.events' | transloco }}</h1>
     <p class="mt-2 text-muted-foreground">{{ 'library.events.intro' | transloco }}</p>
   </div>
   @if (canCreate()) {
@@ -60,7 +60,7 @@
     @for (event of list.items(); track event.id) {
       <li vm-card class="flex items-center gap-3 p-4">
         <a [routerLink]="link(event)" class="flex min-w-0 flex-1 flex-col text-foreground no-underline">
-          <span class="text-base font-semibold">{{ event.name }}</span>
+          <span class="text-title-medium">{{ event.name }}</span>
           <span class="text-muted-foreground">{{ event.date | date: 'EE dd.MM.yyyy' }} · {{ 'library.folders.scoreCount' | tPlural: event.scoreCount }}</span>
         </a>
         <vm-switch [checked]="event.showInMyArea" [label]="visibilityLabel(event)" [disabled]="!canEdit(event)" (toggled)="setVisibility(event, $event)" />

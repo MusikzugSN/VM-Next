@@ -20,7 +20,7 @@ import { VoiceSelectionDialog } from './ui/voice-selection-dialog';
   viewProviders: [provideIcons({ lucidePencil, lucideMusic2, lucideLogOut })],
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
-    <h1 class="text-2xl font-semibold">{{ 'nav.me.profile' | transloco }}</h1>
+    <h1 class="text-headline-small">{{ 'nav.me.profile' | transloco }}</h1>
 
     @if (profile.error()) {
       <vm-page-problem [error]="profile.error()" />
@@ -28,7 +28,7 @@ import { VoiceSelectionDialog } from './ui/voice-selection-dialog';
       @let account = profile.value();
       <section aria-labelledby="h-account" vm-card class="flex flex-col gap-4 p-4 md:p-6">
         <div>
-          <h2 id="h-account" class="text-lg font-semibold">{{ 'me.profile.account' | transloco }}</h2>
+          <h2 id="h-account" class="text-title-large">{{ 'me.profile.account' | transloco }}</h2>
           <p class="text-muted-foreground">{{ 'me.profile.accountHint' | transloco }}</p>
         </div>
         <div class="flex items-center gap-4">
@@ -38,7 +38,7 @@ import { VoiceSelectionDialog } from './ui/voice-selection-dialog';
             <span
               role="img"
               [attr.aria-label]="'me.profile.picture' | transloco: { name: account.name }"
-              class="flex size-16 items-center justify-center rounded-full bg-primary-soft text-lg font-semibold text-primary"
+              class="flex size-16 items-center justify-center rounded-full bg-primary-soft text-title-large text-primary"
               >{{ initialsOf(account.name) }}</span
             >
           }
@@ -53,7 +53,7 @@ import { VoiceSelectionDialog } from './ui/voice-selection-dialog';
 
       <section aria-labelledby="h-voices" vm-card class="flex flex-col gap-4 p-4 md:p-6">
         <div class="flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
-          <h2 id="h-voices" class="text-lg font-semibold">{{ 'me.profile.voices' | transloco }}</h2>
+          <h2 id="h-voices" class="text-title-large">{{ 'me.profile.voices' | transloco }}</h2>
           <button vm-button variant="outlined" type="button" class="w-full md:w-auto" (click)="editVoices.set(true)">
             <ng-icon name="lucidePencil" aria-hidden="true" />{{ 'me.profile.editVoices' | transloco }}
           </button>
@@ -73,10 +73,10 @@ import { VoiceSelectionDialog } from './ui/voice-selection-dialog';
       </section>
 
       <section aria-labelledby="h-ensembles" vm-card class="flex flex-col gap-4 p-4 md:p-6">
-        <h2 id="h-ensembles" class="text-lg font-semibold">{{ 'me.profile.ensembles' | transloco }}</h2>
+        <h2 id="h-ensembles" class="text-title-large">{{ 'me.profile.ensembles' | transloco }}</h2>
         @if (account.memberships.length) {
           <table class="w-full">
-            <thead class="text-xs font-medium text-muted-foreground">
+            <thead class="text-label-medium text-muted-foreground">
               <tr>
                 <th scope="col" class="py-2 text-start">{{ 'terms.ensemble' | transloco }}</th>
                 <th scope="col" class="py-2 text-start">{{ 'me.profile.role' | transloco }}</th>

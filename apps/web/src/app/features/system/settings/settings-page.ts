@@ -24,7 +24,7 @@ type SettingsTab = 'club' | 'defaults' | 'print' | 'fields';
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
     <div>
-      <h1 class="text-2xl font-semibold">{{ 'nav.system.settings' | transloco }}</h1>
+      <h1 class="text-headline-small">{{ 'nav.system.settings' | transloco }}</h1>
       <p class="mt-2 text-muted-foreground">{{ 'system.settings.intro' | transloco }}</p>
     </div>
 

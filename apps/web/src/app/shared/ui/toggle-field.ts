@@ -18,7 +18,7 @@ import { VmSwitch } from '@vm-web/ui';
       <span class="flex min-w-0 flex-col">
         <span class="font-medium">{{ label() }}</span>
         @if (hint(); as text) {
-          <span class="text-[13px] text-muted-foreground">{{ text }}</span>
+          <span class="text-body-medium text-muted-foreground">{{ text }}</span>
         }
       </span>
       <vm-switch [checked]="checked()" [label]="label()" [disabled]="disabled()" (toggled)="toggled.emit($event)" />

@@ -57,7 +57,7 @@ export interface ChosenScore {
                 <button type="button" class="flex min-h-target w-full flex-col items-start px-3 py-1.5 text-start hover:bg-accent xl:min-h-9" (click)="choose(score)">
                   <span class="font-medium">{{ score.title }}</span>
                   @if (score.composer || score.arranger) {
-                    <span class="text-xs text-muted-foreground">{{ score.composer ?? score.arranger }}</span>
+                    <span class="text-body-small text-muted-foreground">{{ score.composer ?? score.arranger }}</span>
                   }
                 </button>
               </li>

@@ -25,7 +25,7 @@ import { UploadStatusBadge } from './ui/upload-status-badge';
   template: `
     <div class="flex flex-col gap-3 md:flex-row md:items-start md:justify-between">
       <div>
-        <h1 class="text-2xl font-semibold">{{ 'nav.me.uploads' | transloco }}</h1>
+        <h1 class="text-headline-small">{{ 'nav.me.uploads' | transloco }}</h1>
         <p class="mt-2 text-muted-foreground">{{ 'me.uploads.intro' | transloco }}</p>
       </div>
       @if (canUpload()) {
@@ -53,7 +53,7 @@ import { UploadStatusBadge } from './ui/upload-status-badge';
       <ul class="flex flex-col gap-2">
         @for (entry of list.items(); track entry.id) {
           <li vm-card class="flex flex-col gap-1.5 p-4">
-            <span class="text-base font-medium">{{ title(entry) }}</span>
+            <span class="text-title-medium font-medium">{{ title(entry) }}</span>
             <span class="flex items-center gap-2">
               <vm-upload-status-badge [status]="entry.status" />
               <span class="text-muted-foreground">{{ entry.uploadedAt | date: 'dd.MM.yyyy' }}</span>
@@ -82,7 +82,7 @@ import { UploadStatusBadge } from './ui/upload-status-badge';
                 <td class="px-4 py-3 tabular-nums">{{ entry.uploadedAt | date: 'dd.MM.yyyy' }}</td>
                 <td class="px-4 py-3">{{ entry.score?.name ?? '–' }}</td>
                 <td class="px-4 py-3">{{ entry.voice?.name ?? '–' }}</td>
-                <td class="px-4 py-3 font-mono text-[13px] text-muted-foreground">{{ entry.fileName }}</td>
+                <td class="px-4 py-3 font-mono text-body-medium text-muted-foreground">{{ entry.fileName }}</td>
                 <td class="px-4 py-3">
                   <div class="flex flex-col items-start gap-1">
                     <vm-upload-status-badge [status]="entry.status" />

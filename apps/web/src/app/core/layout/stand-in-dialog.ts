@@ -44,7 +44,7 @@ import { filterVoiceGroups } from '../voices/voice-groups';
 
         @for (group of groups(); track group.instrument.id) {
           <div role="group" [attr.aria-labelledby]="'stand-in-' + group.instrument.id" class="flex flex-col gap-2">
-            <span [id]="'stand-in-' + group.instrument.id" class="text-xs font-medium text-muted-foreground">{{ group.instrument.name }}</span>
+            <span [id]="'stand-in-' + group.instrument.id" class="text-label-medium text-muted-foreground">{{ group.instrument.name }}</span>
             <div class="flex flex-wrap gap-2">
               @for (voice of group.voices; track voice.id) {
                 <button

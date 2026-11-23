@@ -20,7 +20,7 @@ import { VmButton } from '@vm-web/ui';
         <ng-icon name="lucideShieldX" size="var(--mat-sys-icon-size-md)" aria-hidden="true" />
       </span>
       <div class="flex flex-col gap-2">
-        <h1 class="text-2xl font-semibold">{{ 'pages.forbidden.title' | transloco }}</h1>
+        <h1 class="text-headline-small">{{ 'pages.forbidden.title' | transloco }}</h1>
         <p class="text-muted-foreground">{{ 'pages.forbidden.text' | transloco }}</p>
       </div>
       <div>
@@ -47,10 +47,10 @@ export class ForbiddenPage {
         <ng-icon name="lucideSearchX" size="var(--mat-sys-icon-size-md)" aria-hidden="true" />
       </span>
       <div class="flex flex-col gap-2">
-        <h1 class="text-2xl font-semibold">{{ 'pages.notFound.title' | transloco }}</h1>
+        <h1 class="text-headline-small">{{ 'pages.notFound.title' | transloco }}</h1>
         <p class="text-muted-foreground">{{ 'pages.notFound.text' | transloco }}</p>
         <p class="text-muted-foreground">
-          {{ 'pages.notFound.requested' | transloco }} <code class="font-mono text-[13px] text-foreground">{{ requested }}</code>
+          {{ 'pages.notFound.requested' | transloco }} <code class="font-mono text-body-medium text-foreground">{{ requested }}</code>
         </p>
       </div>
       <div class="flex flex-col gap-2 md:flex-row">

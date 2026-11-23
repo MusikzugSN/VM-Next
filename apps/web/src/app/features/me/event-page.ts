@@ -38,7 +38,7 @@ import { selectOr } from '../../core/util/resource-value';
       @let event = overview.value();
       <div class="flex flex-col gap-3 md:flex-row md:items-start md:justify-between md:gap-4">
         <div>
-          <h1 class="text-[22px] leading-7 font-semibold md:text-2xl md:leading-8">{{ event.name }} · {{ event.date | date: 'EE dd.MM.yyyy' }}</h1>
+          <h1 class="text-title-large leading-7 md:text-headline-small md:leading-8">{{ event.name }} · {{ event.date | date: 'EE dd.MM.yyyy' }}</h1>
           <p class="mt-2 text-muted-foreground">
             {{ event.ensemble.name }} · {{ 'me.event.setlistCount' | tPlural: event.scoreCount }} ·
             {{ 'me.list.pages' | tPlural: event.totalPages }}
@@ -60,7 +60,7 @@ import { selectOr } from '../../core/util/resource-value';
 
     <section aria-labelledby="h-setlist" class="flex flex-col gap-4">
       <div class="flex items-baseline justify-between gap-2">
-        <h2 id="h-setlist" class="text-lg font-semibold">{{ 'me.event.setlist' | transloco }}</h2>
+        <h2 id="h-setlist" class="text-title-large">{{ 'me.event.setlist' | transloco }}</h2>
         <span class="text-muted-foreground">{{ 'me.event.order' | transloco }}</span>
       </div>
       <vm-member-score-list [rows]="list.items()" numbering="position" [eventId]="eventId()" [listTitle]="overview.hasValue() ? overview.value().name : ''" />

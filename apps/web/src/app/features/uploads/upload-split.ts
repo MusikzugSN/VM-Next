@@ -88,7 +88,7 @@ const PAGE_WIDTH = 560;
               <li class="flex w-full items-center gap-2 py-2" [attr.data-boundary]="page">
                 <span class="h-px flex-1" [class]="section.start === page ? 'bg-primary' : 'bg-border'"></span>
                 @if (section.start === page) {
-                  <span class="flex items-center gap-1 rounded-full bg-primary px-3 py-1 text-xs font-medium text-primary-foreground">
+                  <span class="flex items-center gap-1 rounded-full bg-primary px-3 py-1 text-label-medium text-primary-foreground">
                     <ng-icon name="lucideScissors" aria-hidden="true" />{{ 'upload.split.sectionFrom' | transloco: { page } }}
                     <button
                       type="button"
@@ -102,7 +102,7 @@ const PAGE_WIDTH = 560;
                 } @else {
                   <button
                     type="button"
-                    class="flex items-center gap-1 rounded-full border border-dashed border-input bg-background px-3 py-1 text-xs text-muted-foreground hover:border-primary hover:text-primary"
+                    class="flex items-center gap-1 rounded-full border border-dashed border-input bg-background px-3 py-1 text-body-small text-muted-foreground hover:border-primary hover:text-primary"
                     (click)="startAt(page)"
                   >
                     <ng-icon name="lucideScissors" aria-hidden="true" />{{ 'upload.split.newSection' | transloco: { page } }}
@@ -114,7 +114,7 @@ const PAGE_WIDTH = 560;
             <li class="w-full" [attr.data-page]="page">
               <div class="relative w-full overflow-hidden rounded-sm border bg-white shadow-sm" [class.opacity-40]="section.skip">
                 <canvas class="block w-full" [attr.data-canvas]="page" [style.aspect-ratio]="ratio(page)" aria-hidden="true"></canvas>
-                <span class="absolute top-2 left-2 rounded-sm bg-foreground/80 px-2 py-0.5 text-xs text-background">
+                <span class="absolute top-2 left-2 rounded-sm bg-foreground/80 px-2 py-0.5 text-body-small text-background">
                   {{ 'upload.split.page' | transloco: { page, count: pageCount() } }} · {{ sectionLabel(section) | transloco: { title: section.scoreTitle ?? '' } }}{{ voiceSuffix(section) }}
                 </span>
               </div>
@@ -154,7 +154,7 @@ const PAGE_WIDTH = 560;
 
         <div class="flex flex-col gap-1">
           <h3 class="font-semibold">{{ 'upload.split.sections' | transloco }}</h3>
-          <ol class="flex max-h-60 flex-col overflow-y-auto rounded-md border text-[13px]">
+          <ol class="flex max-h-60 flex-col overflow-y-auto rounded-md border text-body-medium">
             @for (range of ranges(); track range.from; let first = $first) {
               <li [class.border-t]="!first">
                 <button
@@ -179,7 +179,7 @@ const PAGE_WIDTH = 560;
       @if (error()) {
         <p role="alert" class="flex items-center gap-2 text-destructive-ink md:me-auto"><ng-icon name="lucideCircleAlert" aria-hidden="true" />{{ 'upload.split.failed' | transloco }}</p>
       } @else if (unassigned() > 0) {
-        <p class="text-[13px] text-warning-ink md:me-auto">{{ 'upload.split.unassigned' | tPlural: unassigned() }}</p>
+        <p class="text-body-medium text-warning-ink md:me-auto">{{ 'upload.split.unassigned' | tPlural: unassigned() }}</p>
       }
       <button vm-button variant="tonal" type="button" [zDisabled]="working()" (click)="cancelled.emit()">{{ 'common.back' | transloco }}</button>
       <button vm-button type="button" [zLoading]="working()" [zDisabled]="working() || state() !== 'ready' || !partCount()" (click)="apply()">

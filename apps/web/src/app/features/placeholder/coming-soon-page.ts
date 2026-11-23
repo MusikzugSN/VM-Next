@@ -10,7 +10,7 @@ import { lucideClock } from '@ng-icons/lucide';
   viewProviders: [provideIcons({ lucideClock })],
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
-    <h1 class="text-2xl font-semibold">{{ titleKey() | transloco }}</h1>
+    <h1 class="text-headline-small">{{ titleKey() | transloco }}</h1>
     <div class="flex flex-col items-center gap-3 rounded-lg border border-dashed p-12 text-center">
       <span class="flex size-10 items-center justify-center rounded-lg bg-brass-soft text-brass-ink">
         <ng-icon name="lucideClock" aria-hidden="true" />

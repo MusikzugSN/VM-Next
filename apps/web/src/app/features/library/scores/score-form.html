@@ -1,6 +1,6 @@
 <fieldset vm-card class="flex flex-col gap-4 p-4 md:p-6" [disabled]="readonly()">
   <legend class="sr-only">{{ 'library.form.fixed' | transloco }}</legend>
-  <h2 class="text-lg font-semibold">{{ 'library.form.fixed' | transloco }}</h2>
+  <h2 class="text-title-large">{{ 'library.form.fixed' | transloco }}</h2>
 
   <label vm-field>
     <span vm-field-label>{{ 'library.fields.title' | transloco }} *</span>
@@ -38,7 +38,7 @@
         [attr.aria-invalid]="error('durationSeconds') ? 'true' : null"
         aria-describedby="hint-duration"
       />
-      <span id="hint-duration" class="text-xs text-muted-foreground">
+      <span id="hint-duration" class="text-body-small text-muted-foreground">
         @if (error('durationSeconds')) {
           <span vm-field-error>{{ 'library.form.durationInvalid' | transloco }}</span>
         } @else {
@@ -66,7 +66,7 @@
 <fieldset vm-card class="flex flex-col gap-4 p-4 md:p-6" [disabled]="readonly()">
   <legend class="sr-only">{{ 'library.form.custom' | transloco }}</legend>
   <div>
-    <h2 class="text-lg font-semibold">{{ 'library.form.custom' | transloco }}</h2>
+    <h2 class="text-title-large">{{ 'library.form.custom' | transloco }}</h2>
     <p class="text-muted-foreground">{{ 'library.form.customHint' | transloco }}</p>
   </div>
 

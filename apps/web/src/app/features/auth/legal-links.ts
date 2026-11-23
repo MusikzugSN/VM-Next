@@ -12,7 +12,7 @@ import { BrandingStore } from '../../core/branding/branding.store';
   template: `
     @if (branding.branding(); as b) {
       @if (b.imprintUrl || b.privacyUrl) {
-        <footer class="flex min-h-14 items-center justify-center gap-2 text-[13px] text-muted-foreground">
+        <footer class="flex min-h-14 items-center justify-center gap-2 text-body-medium text-muted-foreground">
           @if (b.imprintUrl) {
             <a [href]="b.imprintUrl" class="inline-flex min-h-target items-center px-1">{{ 'auth.legal.imprint' | transloco }}</a>
           }

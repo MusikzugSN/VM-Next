@@ -1,6 +1,6 @@
 <div class="flex flex-col gap-3 md:flex-row md:items-start md:justify-between">
   <div>
-    <h1 class="text-2xl font-semibold">{{ 'nav.library.voices' | transloco }}</h1>
+    <h1 class="text-headline-small">{{ 'nav.library.voices' | transloco }}</h1>
     <p class="mt-2 text-muted-foreground">
       {{ 'library.voices.instruments' | tPlural: groups().length }} · {{ 'library.voices.voices' | tPlural: voiceCount() }}.
       {{ 'library.voices.intro' | transloco }}
@@ -26,7 +26,7 @@
       <div class="flex flex-wrap items-center gap-2 bg-muted px-4 py-3">
         <h2 [id]="'inst-' + group.instrument.id" class="flex-1 font-semibold">
           {{ group.instrument.name }}
-          <span class="text-xs font-medium text-muted-foreground">· {{ 'library.voices.voices' | tPlural: group.voices.length }}</span>
+          <span class="text-label-medium text-muted-foreground">· {{ 'library.voices.voices' | tPlural: group.voices.length }}</span>
         </h2>
         @if (canEdit()) {
           <button vm-icon-button type="button" (click)="startRename(group)" [attr.aria-label]="'library.voices.renameInstrument' | transloco: { name: group.instrument.name }">
@@ -56,16 +56,16 @@
               <span class="font-medium">{{ voice.name }}</span>
               <span class="flex flex-wrap items-center gap-1 text-muted-foreground">
                 @if (voice.substitutes.length) {
-                  <span class="text-xs">{{ 'library.voices.substituteChain' | transloco }}</span>
+                  <span class="text-body-small">{{ 'library.voices.substituteChain' | transloco }}</span>
                   @for (s of voice.substitutes; track s.id; let n = $index) {
                     <span vm-badge tone="tertiary">{{ n + 1 }}. {{ s.name }}</span>
                   }
                 } @else {
-                  <span class="text-xs">{{ 'library.voices.noSubstitutes' | transloco }}</span>
+                  <span class="text-body-small">{{ 'library.voices.noSubstitutes' | transloco }}</span>
                 }
               </span>
             </div>
-            <span class="text-xs text-muted-foreground tabular-nums md:w-56 md:text-end">
+            <span class="text-body-small text-muted-foreground tabular-nums md:w-56 md:text-end">
               {{ 'library.voices.sheets' | tPlural: voice.sheetCount }} · {{ 'library.voices.lineups' | tPlural: voice.lineupCount }}
             </span>
             <div class="flex items-center gap-1">

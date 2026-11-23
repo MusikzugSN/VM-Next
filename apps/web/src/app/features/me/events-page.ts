@@ -23,7 +23,7 @@ export type EventsTab = 'upcoming' | 'archive';
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
     <div>
-      <h1 class="text-2xl font-semibold">{{ 'nav.me.events' | transloco }}</h1>
+      <h1 class="text-headline-small">{{ 'nav.me.events' | transloco }}</h1>
       <p class="mt-2 text-muted-foreground">{{ 'me.events.intro' | transloco }}</p>
     </div>
 
@@ -49,7 +49,7 @@ export type EventsTab = 'upcoming' | 'archive';
           >
             <vm-event-date [date]="event.date" />
             <span class="flex min-w-0 flex-1 flex-col">
-              <span class="text-base font-medium">{{ event.name }}</span>
+              <span class="text-title-medium font-medium">{{ event.name }}</span>
               <span class="text-muted-foreground">{{ event.date | date: 'EEEE, d.M.yyyy' }} · {{ event.ensemble.name }}</span>
             </span>
             <span class="hidden text-muted-foreground tabular-nums md:inline">{{

@@ -105,7 +105,7 @@ export function clampPage(page: number, count: number): number {
         </button>
       </nav>
     }
-    <p class="text-center text-xs text-muted-foreground tabular-nums" aria-live="polite">
+    <p class="text-center text-body-small text-muted-foreground tabular-nums" aria-live="polite">
       @if (state() === 'ready') {
         {{ 'pdf.status' | transloco: { page: page(), count: pageCount() } }}
       }

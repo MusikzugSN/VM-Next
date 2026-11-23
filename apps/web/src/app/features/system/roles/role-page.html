@@ -8,7 +8,7 @@
   <vm-name-dialog [(open)]="renaming" titleKey="common.rename" labelKey="system.common.name" submitKey="common.save" [initial]="r.name" [save]="rename" />
   <div class="flex flex-col gap-3 md:flex-row md:items-start md:justify-between">
       <div>
-        <h1 class="text-2xl font-semibold">{{ r.name }}</h1>
+        <h1 class="text-headline-small">{{ r.name }}</h1>
         <p class="mt-2 text-muted-foreground">
           {{ (r.defaultKey ? 'system.roles.default' : 'system.role.own') | transloco }}
           @if (r.modifiedFromDefault) {
@@ -34,7 +34,7 @@
   @if (catalog.hasValue()) {
     <form class="flex flex-col gap-6" (submit)="$event.preventDefault(); save()">
       <section aria-labelledby="h-matrix" class="flex flex-col gap-4">
-        <h2 id="h-matrix" class="text-lg font-semibold">{{ 'system.role.matrix' | transloco }}</h2>
+        <h2 id="h-matrix" class="text-title-large">{{ 'system.role.matrix' | transloco }}</h2>
         <div vm-card class="overflow-x-auto">
           <table vm-table>
             <thead>
@@ -50,7 +50,7 @@
                 <tr>
                   <th scope="row" class="px-4 py-2 text-start font-medium">
                     {{ 'system.permissions.areas.' + row.area | transloco }}
-                    <span class="block text-xs font-normal text-muted-foreground">{{ 'system.permissions.scopes.' + row.scope | transloco }}</span>
+                    <span class="block text-body-small text-muted-foreground">{{ 'system.permissions.scopes.' + row.scope | transloco }}</span>
                   </th>
                   @for (action of catalog.value().actions; track action) {
                     <td class="px-2 py-1 text-center">
@@ -78,13 +78,13 @@
       </section>
 
       <fieldset vm-card class="flex flex-col gap-1 p-4">
-        <legend class="px-1 text-lg font-semibold">{{ 'system.role.singles' | transloco }}</legend>
+        <legend class="px-1 text-title-large">{{ 'system.role.singles' | transloco }}</legend>
         @for (single of catalog.value().singles; track single.permission) {
           <label class="flex min-h-target items-center gap-3 xl:min-h-target-compact">
             <input vm-checkbox type="checkbox" [checked]="has(single.permission)" [disabled]="!canEdit()" (change)="toggle(single.permission, $any($event.target).checked)" />
             <span class="flex flex-col">
               <span>{{ key(single.permission) | transloco }}</span>
-              <span class="text-xs text-muted-foreground">{{ 'system.permissions.scopes.' + single.scope | transloco }}</span>
+              <span class="text-body-small text-muted-foreground">{{ 'system.permissions.scopes.' + single.scope | transloco }}</span>
             </span>
           </label>
         }
@@ -109,7 +109,7 @@
           }
         </div>
         @if (canDelete() && r.assignmentCount > 0) {
-          <p class="text-[13px] text-muted-foreground">{{ 'system.role.inUseHint' | transloco }}</p>
+          <p class="text-body-medium text-muted-foreground">{{ 'system.role.inUseHint' | transloco }}</p>
         }
       }
     </form>
