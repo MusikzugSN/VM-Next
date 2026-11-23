@@ -13,6 +13,8 @@ export interface RunOptions {
   onProblem?: (problem: unknown) => boolean | void;
   /** Flag that is `true` while the action runs, e.g. to disable the save button. */
   busy?: { set(value: boolean): void };
+  /** i18n key of the toast for failures that are not API problems (default `errors.unknown`). */
+  fallbackKey?: string;
 }
 
 /**
@@ -37,7 +39,7 @@ export class ActionRunner {
       return { value };
     } catch (error) {
       if (options.onProblem?.(error) === true) return undefined;
-      this.sonner.error(this.transloco.translate(isApiProblem(error) ? error.messageKey : 'errors.unknown'));
+      this.sonner.error(this.transloco.translate(isApiProblem(error) ? error.messageKey : (options.fallbackKey ?? 'errors.unknown')));
       return undefined;
     } finally {
       options.busy?.set(false);

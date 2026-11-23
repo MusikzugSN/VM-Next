@@ -17,6 +17,7 @@ import { NameDialog } from '../../../shared/ui/name-dialog';
 import { PageProblem } from '../../../shared/ui/page-problem';
 import { permissionKey, withDependencies } from './permission-labels';
 import { usePageName } from '../../../core/layout/page';
+import { valueOr } from '../../../core/util/resource-value';
 
 /** Rolle (S-3, R-3, R-7): permission matrix (areas × actions) plus single permissions. */
 @Component({
@@ -51,7 +52,7 @@ export class RolePage {
   protected readonly catalog = rxResource({
     stream: () => this.api.get(apiUrl('system', 'permissionCatalog'), permissionCatalogResponseSchema),
   });
-  protected readonly role = computed(() => (this.details.hasValue() ? this.details.value() : null));
+  protected readonly role = computed(() => valueOr(this.details, null));
 
   protected readonly selected = signal<ReadonlySet<Permission>>(new Set());
   protected readonly dirty = computed(() => {

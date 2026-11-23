@@ -121,32 +121,9 @@ export class ScoreImportService {
     const error = (target: string, code: string) => issues.push({ target, code, level: 'error' });
     const warn = (target: string, code: string) => issues.push({ target, code, level: 'warning' });
 
-    // fixed fields (N-1)
-    const text = (key: keyof Fixed, max: number) => take(parseText(row.fixed[key as 'title'], max), key, error);
-    const fixed: Fixed = {
-      title: text('title', 200) ?? '',
-      composer: text('composer', 200),
-      arranger: text('arranger', 200),
-      publisher: text('publisher', 200),
-      publisherNumber: text('publisherNumber', 100),
-      durationSeconds: take(parseDuration(row.fixed.duration), 'duration', error),
-    };
+    const fixed = parseFixedFields(row, error);
     if (!fixed.title && !issues.some((i) => i.target === 'title')) error('title', 'required');
-
-    // custom fields (N-2): option labels are resolved later, only when the row is imported
-    const custom: Record<string, unknown> = {};
-    const labels = new Map<FieldPlan, string[]>();
-    for (const [key, raw] of Object.entries(row.custom)) {
-      const field = fields.get(key);
-      if (!field) continue;
-      if (field.type === 'select' || field.type === 'multiselect') {
-        const found = parseLabels(raw, field.type === 'multiselect');
-        if (found.length) labels.set(field, found);
-      } else {
-        const value = take(parseScalar(field.type, raw), field.target, error);
-        if (value !== null) custom[field.id] = value;
-      }
-    }
+    const { custom, labels } = parseCustomFields(row, fields, error);
 
     // match (N-19): existing score or an earlier row of this file
     const candidates = (index.get(matchKey(fixed.title)) ?? []).filter(
@@ -188,23 +165,7 @@ export class ScoreImportService {
     } else {
       state = states.get(matched.id) ?? matched;
       states.set(state.id, state);
-      const onlyEmpty = action === 'link';
-      for (const key of FIXED_KEYS) {
-        const value = fixed[key];
-        if (value === null || (onlyEmpty && state.fixed[key] !== null) || state.fixed[key] === value) continue;
-        (state.fixed as Record<string, unknown>)[key] = value;
-        state.changed = true;
-      }
-      if (!onlyEmpty && fixed.title !== state.fixed.title) {
-        state.fixed.title = fixed.title;
-        state.changed = true;
-      }
-      for (const [id, value] of Object.entries(custom)) {
-        if (onlyEmpty && state.custom[id] !== undefined) continue;
-        if (JSON.stringify(state.custom[id]) === JSON.stringify(value)) continue;
-        state.custom[id] = value;
-        state.changed = true;
-      }
+      mergeIntoState(state, fixed, custom, action === 'link');
     }
     result.scoreId = state.id;
 
@@ -213,21 +174,7 @@ export class ScoreImportService {
     if (folder) {
       const number = (row.folder?.number ?? '').trim();
       result.folder = { name: folder.name, number, isNew: folder.isNew };
-      const existing = folder.entries.get(state.id);
-      if (existing !== undefined) {
-        if (existing !== number) warn('folder', 'folder-other-number');
-      } else if (!number) {
-        warn('folder', 'folder-number-missing');
-      } else if (number.length > FOLDER_NUMBER_MAX) {
-        warn('folder', 'folder-number-invalid');
-      } else if (folder.numbers.has(number)) {
-        warn('folder', 'folder-number-taken');
-      } else {
-        folder.entries.set(state.id, number);
-        folder.numbers.set(number, state.id);
-        folder.added.push({ scoreId: state.id, number });
-        folder.touched = true;
-      }
+      planFolderEntry(folder, state.id, number, warn);
     }
     return result;
   }
@@ -417,4 +364,76 @@ function take<T>(result: Parsed<T>, target: string, error: (target: string, code
     return null;
   }
   return result.value ?? null;
+}
+
+type ReportIssue = (target: string, code: string) => void;
+
+/** Fixed fields of a row (N-1). */
+function parseFixedFields(row: ScoreImportRow, error: ReportIssue): Fixed {
+  const text = (key: keyof Fixed, max: number) => take(parseText(row.fixed[key as 'title'], max), key, error);
+  return {
+    title: text('title', 200) ?? '',
+    composer: text('composer', 200),
+    arranger: text('arranger', 200),
+    publisher: text('publisher', 200),
+    publisherNumber: text('publisherNumber', 100),
+    durationSeconds: take(parseDuration(row.fixed.duration), 'duration', error),
+  };
+}
+
+/** Custom fields of a row (N-2); option labels are resolved later, only when the row is imported. */
+function parseCustomFields(row: ScoreImportRow, fields: Map<string, FieldPlan>, error: ReportIssue) {
+  const custom: Record<string, unknown> = {};
+  const labels = new Map<FieldPlan, string[]>();
+  for (const [key, raw] of Object.entries(row.custom)) {
+    const field = fields.get(key);
+    if (!field) continue;
+    if (field.type === 'select' || field.type === 'multiselect') {
+      const found = parseLabels(raw, field.type === 'multiselect');
+      if (found.length) labels.set(field, found);
+    } else {
+      const value = take(parseScalar(field.type, raw), field.target, error);
+      if (value !== null) custom[field.id] = value;
+    }
+  }
+  return { custom, labels };
+}
+
+/** Applies a row to the planned score; `onlyEmpty` (link) keeps values that are already set. */
+function mergeIntoState(state: ScoreState, fixed: Fixed, custom: Record<string, unknown>, onlyEmpty: boolean): void {
+  for (const key of FIXED_KEYS) {
+    const value = fixed[key];
+    if (value === null || (onlyEmpty && state.fixed[key] !== null) || state.fixed[key] === value) continue;
+    (state.fixed as Record<string, unknown>)[key] = value;
+    state.changed = true;
+  }
+  if (!onlyEmpty && fixed.title !== state.fixed.title) {
+    state.fixed.title = fixed.title;
+    state.changed = true;
+  }
+  for (const [id, value] of Object.entries(custom)) {
+    if (onlyEmpty && state.custom[id] !== undefined) continue;
+    if (JSON.stringify(state.custom[id]) === JSON.stringify(value)) continue;
+    state.custom[id] = value;
+    state.changed = true;
+  }
+}
+
+/** Plans the folder entry of a row (N-5); problems are warnings, the score is imported anyway. */
+function planFolderEntry(folder: FolderPlan, scoreId: string, number: string, warn: ReportIssue): void {
+  const existing = folder.entries.get(scoreId);
+  if (existing !== undefined) {
+    if (existing !== number) warn('folder', 'folder-other-number');
+  } else if (!number) {
+    warn('folder', 'folder-number-missing');
+  } else if (number.length > FOLDER_NUMBER_MAX) {
+    warn('folder', 'folder-number-invalid');
+  } else if (folder.numbers.has(number)) {
+    warn('folder', 'folder-number-taken');
+  } else {
+    folder.entries.set(scoreId, number);
+    folder.numbers.set(number, scoreId);
+    folder.added.push({ scoreId, number });
+    folder.touched = true;
+  }
 }

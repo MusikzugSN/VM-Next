@@ -1,7 +1,7 @@
 import { Inject, Injectable } from '@nestjs/common';
 import { and, eq, isNull, sql } from 'drizzle-orm';
 import { uuidv7 } from '../common/ids/uuid-v7';
-import { DATABASE, type Database } from '../db/database';
+import { DATABASE, type Database, type Tx } from '../db/database';
 import { clubSettings, ensembles, memberships, roles, users } from '../db/schema';
 import type { IdentityClaims } from './oidc.client';
 
@@ -81,4 +81,3 @@ export class UsersRepository implements IUsersRepository {
   }
 }
 
-type Tx = Parameters<Parameters<Database['transaction']>[0]>[0];
