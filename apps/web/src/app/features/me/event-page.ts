@@ -28,7 +28,7 @@ import { selectOr } from '../../core/util/resource-value';
   viewProviders: [provideIcons({ lucideChevronLeft, lucideFileArchive, lucidePrinter })],
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
-    <a [routerLink]="eventsPath" class="inline-flex min-h-11 items-center gap-1 self-start font-medium no-underline md:hidden">
+    <a [routerLink]="eventsPath" class="inline-flex min-h-target items-center gap-1 self-start font-medium no-underline md:hidden">
       <ng-icon name="lucideChevronLeft" aria-hidden="true" />{{ 'nav.me.events' | transloco }}
     </a>
 

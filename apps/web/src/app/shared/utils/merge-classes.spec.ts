@@ -17,4 +17,11 @@ describe('mergeClasses mit M3-Typrollen', () => {
     expect(mergeClasses('shadow-sm', 'shadow-level2')).toBe('shadow-level2');
     expect(mergeClasses('shadow-level1', 'shadow-primary')).toBe('shadow-level1 shadow-primary');
   });
+
+  it('behandelt Größen-Tokens wie andere Maße', () => {
+    expect(mergeClasses('h-control', 'h-9')).toBe('h-9');
+    expect(mergeClasses('h-9', 'xl:h-control-compact', 'h-control')).toBe('xl:h-control-compact h-control');
+    expect(mergeClasses('gap-2', 'gap-spacing-lg')).toBe('gap-spacing-lg');
+    expect(mergeClasses('max-w-md', 'max-w-dialog-lg')).toBe('max-w-dialog-lg');
+  });
 });

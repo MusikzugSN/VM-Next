@@ -71,9 +71,9 @@ import { canSee, isActive, NAV_SECTIONS } from './nav';
                 [class.text-primary]="isActive(item, url())"
                 [class.font-medium]="isActive(item, url())"
                 (click)="navigate.emit()"
-                class="flex h-11 items-center gap-2 rounded-md px-2 text-foreground no-underline hover:bg-accent xl:h-9"
+                class="flex h-control items-center gap-2 rounded-md px-2 text-foreground no-underline hover:bg-accent xl:h-control-compact"
               >
-                <ng-icon [name]="item.icon" size="20" aria-hidden="true" />
+                <ng-icon [name]="item.icon" size="var(--mat-sys-icon-size-md)" aria-hidden="true" />
                 <span class="flex-1">{{ item.labelKey | transloco }}</span>
                 @if (item.badge === 'review' && reviewCount() > 0) {
                   <span

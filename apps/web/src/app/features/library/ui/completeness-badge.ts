@@ -18,7 +18,7 @@ import type { CompletenessSummary } from '@vm-web/shared';
         [class]="complete() ? 'bg-success-soft text-success-ink' : 'bg-warning-soft text-warning-ink'"
         [attr.aria-label]="'library.completeness.label' | transloco: { present: value().present, total: value().total }"
       >
-        <ng-icon [name]="complete() ? 'lucideCircleCheck' : 'lucideCircleAlert'" size="14" aria-hidden="true" />
+        <ng-icon [name]="complete() ? 'lucideCircleCheck' : 'lucideCircleAlert'" size="var(--mat-sys-icon-size-xs)" aria-hidden="true" />
         {{ value().present }}/{{ value().total }}
         @if (withWord()) {
           {{ 'library.completeness.voices' | transloco }}

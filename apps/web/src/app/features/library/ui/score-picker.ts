@@ -50,7 +50,7 @@ export interface PickedScore {
       @if (results.hasValue()) {
         <ul class="flex flex-col" [attr.aria-label]="'library.picker.results' | transloco">
           @for (score of results.value().items; track score.id; let first = $first) {
-            <li class="flex min-h-11 items-center gap-3 py-1" [class.border-t]="!first">
+            <li class="flex min-h-target items-center gap-3 py-1" [class.border-t]="!first">
               <span class="flex min-w-0 flex-1 flex-col">
                 <span class="font-medium">{{ score.title }}</span>
                 @if (score.composer) {

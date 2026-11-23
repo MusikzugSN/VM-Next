@@ -15,9 +15,9 @@ import { ZardButtonComponent } from '@/shared/components/button';
   viewProviders: [provideIcons({ lucideShieldX, lucideHouse })],
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
-    <section class="mx-auto flex w-full max-w-[560px] flex-col gap-6 py-6 md:py-12">
+    <section class="mx-auto flex w-full max-w-dialog-lg flex-col gap-6 py-6 md:py-12">
       <span class="flex size-12 items-center justify-center rounded-full bg-muted text-foreground">
-        <ng-icon name="lucideShieldX" size="20" aria-hidden="true" />
+        <ng-icon name="lucideShieldX" size="var(--mat-sys-icon-size-md)" aria-hidden="true" />
       </span>
       <div class="flex flex-col gap-2">
         <h1 class="text-2xl font-semibold">{{ 'pages.forbidden.title' | transloco }}</h1>
@@ -42,9 +42,9 @@ export class ForbiddenPage {
   viewProviders: [provideIcons({ lucideSearchX, lucideHouse, lucideArrowLeft })],
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
-    <section class="mx-auto flex w-full max-w-[560px] flex-col gap-6 py-6 md:py-12">
+    <section class="mx-auto flex w-full max-w-dialog-lg flex-col gap-6 py-6 md:py-12">
       <span class="flex size-12 items-center justify-center rounded-full bg-muted text-foreground">
-        <ng-icon name="lucideSearchX" size="20" aria-hidden="true" />
+        <ng-icon name="lucideSearchX" size="var(--mat-sys-icon-size-md)" aria-hidden="true" />
       </span>
       <div class="flex flex-col gap-2">
         <h1 class="text-2xl font-semibold">{{ 'pages.notFound.title' | transloco }}</h1>

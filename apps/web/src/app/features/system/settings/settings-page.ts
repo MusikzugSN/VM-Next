@@ -35,7 +35,7 @@ type SettingsTab = 'club' | 'defaults' | 'print' | 'fields';
             [routerLink]="path"
             [queryParams]="{ tab: t === tabs()[0] ? null : t }"
             [attr.aria-current]="current() === t ? 'page' : null"
-            class="-mb-px inline-flex min-h-11 items-center border-b-2 px-3 font-medium whitespace-nowrap no-underline"
+            class="-mb-px inline-flex min-h-target items-center border-b-2 px-3 font-medium whitespace-nowrap no-underline"
             [class]="current() === t ? 'border-primary text-primary' : 'border-transparent text-muted-foreground hover:text-foreground'"
             >{{ 'system.settings.tabs.' + t | transloco }}</a
           >

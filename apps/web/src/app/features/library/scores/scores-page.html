@@ -30,7 +30,7 @@
     <vm-search-field [(value)]="search" labelKey="library.scores.search" />
     <button
       type="button"
-      class="relative flex size-11 shrink-0 items-center justify-center rounded-md border border-input bg-background shadow-sm hover:bg-accent xl:size-9"
+      class="relative flex size-control shrink-0 items-center justify-center rounded-md border border-input bg-background shadow-sm hover:bg-accent xl:size-control-compact"
       [attr.aria-label]="'common.filter' | transloco"
       aria-haspopup="dialog"
       (click)="filterOpen.set(true)"
@@ -48,7 +48,7 @@
         type="button"
         z-dropdown
         [zDropdownMenu]="columnMenu"
-        class="inline-flex h-11 shrink-0 items-center gap-2 rounded-md border border-input bg-background px-3 font-medium shadow-sm hover:bg-accent xl:h-9"
+        class="inline-flex h-control shrink-0 items-center gap-2 rounded-md border border-input bg-background px-3 font-medium shadow-sm hover:bg-accent xl:h-control-compact"
       >
         <ng-icon name="lucideColumns3" aria-hidden="true" />{{ 'library.scores.columns' | transloco: { shown: columns().length, total: allColumns().length } }}
       </button>
@@ -90,7 +90,7 @@
   <ul class="flex flex-col gap-2">
     @for (row of list.items(); track row.id) {
       <li class="flex items-center gap-1 rounded-lg border bg-card shadow-sm" [class.border-primary]="selected().has(row.id)">
-        <label class="flex size-11 shrink-0 items-center justify-center ms-2">
+        <label class="flex size-control shrink-0 items-center justify-center ms-2">
           <input
             type="checkbox"
             class="size-5 accent-primary"
@@ -129,13 +129,13 @@
                 {{ column.label ?? (column.labelKey! | transloco) }}
                 @switch (ariaSort(column)) {
                   @case ('ascending') {
-                    <ng-icon name="lucideArrowUp" size="14" aria-hidden="true" />
+                    <ng-icon name="lucideArrowUp" size="var(--mat-sys-icon-size-xs)" aria-hidden="true" />
                   }
                   @case ('descending') {
-                    <ng-icon name="lucideArrowDown" size="14" aria-hidden="true" />
+                    <ng-icon name="lucideArrowDown" size="var(--mat-sys-icon-size-xs)" aria-hidden="true" />
                   }
                   @default {
-                    <ng-icon name="lucideChevronsUpDown" size="14" class="opacity-50" aria-hidden="true" />
+                    <ng-icon name="lucideChevronsUpDown" size="var(--mat-sys-icon-size-xs)" class="opacity-50" aria-hidden="true" />
                   }
                 }
               </button>

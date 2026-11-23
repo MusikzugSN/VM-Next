@@ -21,7 +21,7 @@
                 role="radio"
                 [attr.aria-checked]="mode() === m"
                 (click)="mode.set($any(m))"
-                class="flex min-h-11 items-center gap-2 rounded-md border px-3 text-start font-medium"
+                class="flex min-h-target items-center gap-2 rounded-md border px-3 text-start font-medium"
                 [class]="mode() === m ? 'border-primary bg-primary-soft text-primary' : 'border-input bg-background'"
               >
                 <span class="flex size-4 shrink-0 items-center justify-center rounded-full border" [class.border-primary]="mode() === m" aria-hidden="true">
@@ -37,7 +37,7 @@
             <ul class="flex max-h-56 flex-col overflow-y-auto rounded-md border" [attr.aria-label]="'print.selectScores' | transloco">
               @for (s of selectableScores(); track s.scoreId; let first = $first) {
                 <li [class.border-t]="!first">
-                  <label class="flex min-h-11 items-center gap-3 px-4 py-2 xl:min-h-9">
+                  <label class="flex min-h-target items-center gap-3 px-4 py-2 xl:min-h-9">
                     <input type="checkbox" class="size-4 accent-primary" [checked]="selectedScores().has(s.scoreId)" (change)="toggleScore(s.scoreId)" />
                     @if (s.number) {
                       <span class="w-8 text-muted-foreground tabular-nums">{{ s.number }}</span>
@@ -61,7 +61,7 @@
               type="button"
               [attr.aria-pressed]="voiceIds().includes(voice.id)"
               (click)="toggleVoice(voice.id)"
-              class="inline-flex h-11 items-center gap-1.5 rounded-md border px-3 font-medium xl:h-9"
+              class="inline-flex h-control items-center gap-1.5 rounded-md border px-3 font-medium xl:h-control-compact"
               [class]="voiceIds().includes(voice.id) ? 'border-primary bg-primary-soft text-primary' : 'border-input bg-background'"
             >
               @if (voiceIds().includes(voice.id)) {
@@ -127,7 +127,7 @@
               <li class="flex items-center gap-3 border-t px-4 py-2.5">
                 <span class="flex-1 font-medium">{{ m.name }}</span>
                 <span class="inline-flex items-center gap-1 rounded-sm bg-destructive-soft px-2 py-0.5 text-xs font-medium text-destructive-ink">
-                  <ng-icon name="lucideCircleAlert" size="14" aria-hidden="true" />{{ 'print.missing' | transloco }}
+                  <ng-icon name="lucideCircleAlert" size="var(--mat-sys-icon-size-xs)" aria-hidden="true" />{{ 'print.missing' | transloco }}
                 </span>
               </li>
             }

@@ -117,7 +117,7 @@
                 min="0"
                 max="90"
                 step="1"
-                class="h-11 w-20 rounded-md border border-input px-2 text-sm tabular-nums xl:h-9"
+                class="h-control w-20 rounded-md border border-input px-2 text-sm tabular-nums xl:h-control-compact"
                 [value]="cropValue($any(side))"
                 (input)="setCrop($any(side), $any($event.target).value)"
               />
@@ -141,7 +141,7 @@
       }
 
       @if (current(); as p) {
-        <label class="flex min-h-11 items-center gap-2 border-t px-3 xl:min-h-9">
+        <label class="flex min-h-target items-center gap-2 border-t px-3 xl:min-h-9">
           <input type="checkbox" class="size-4 accent-primary" [checked]="p.keep" (change)="toggleKeep()" />
           {{ 'review.keepPage' | transloco: { page: page() } }}
           <span class="text-xs text-muted-foreground">({{ 'review.keptCount' | transloco: { kept: keptPages(), total: pages().length } }})</span>
@@ -176,7 +176,7 @@
           <div class="flex flex-col gap-2 rounded-md bg-warning-soft p-4 text-warning-ink">
             <p>{{ 'review.exists' | transloco }}</p>
             @if (canReplace()) {
-              <label class="inline-flex min-h-11 items-center gap-2 xl:min-h-8">
+              <label class="inline-flex min-h-target items-center gap-2 xl:min-h-target-compact">
                 <input type="checkbox" class="size-4 accent-primary" [checked]="replaceExisting()" (change)="replaceExisting.set($any($event.target).checked)" />
                 {{ 'review.replace' | transloco }}
               </label>

@@ -32,7 +32,7 @@ export type EventsTab = 'upcoming' | 'archive';
           [routerLink]="eventsPath"
           [queryParams]="{ tab: t.value === 'archive' ? 'archive' : null }"
           [attr.aria-current]="current() === t.value ? 'page' : null"
-          class="inline-flex min-h-11 items-center rounded-md px-4 font-medium text-foreground no-underline xl:min-h-8"
+          class="inline-flex min-h-target items-center rounded-md px-4 font-medium text-foreground no-underline xl:min-h-target-compact"
           [class.bg-background]="current() === t.value"
           [class.shadow-sm]="current() === t.value"
           >{{ t.labelKey | transloco }}</a

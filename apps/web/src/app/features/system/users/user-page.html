@@ -1,4 +1,4 @@
-<a [routerLink]="usersPath" class="inline-flex min-h-11 items-center gap-1 self-start font-medium no-underline">
+<a [routerLink]="usersPath" class="inline-flex min-h-target items-center gap-1 self-start font-medium no-underline">
   <ng-icon name="lucideChevronLeft" aria-hidden="true" />{{ 'system.users.all' | transloco }}
 </a>
 
@@ -120,7 +120,7 @@
                 [disabled]="!canEdit()"
                 [attr.aria-pressed]="selectedVoices().has(voice.id)"
                 (click)="toggleVoice(voice.id)"
-                class="inline-flex h-11 items-center gap-1.5 rounded-md border px-3 font-medium xl:h-9"
+                class="inline-flex h-control items-center gap-1.5 rounded-md border px-3 font-medium xl:h-control-compact"
                 [class]="selectedVoices().has(voice.id) ? 'border-primary bg-primary-soft text-primary' : 'border-input bg-background'"
               >
                 @if (selectedVoices().has(voice.id)) {

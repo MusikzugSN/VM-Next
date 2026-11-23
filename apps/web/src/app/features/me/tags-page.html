@@ -21,7 +21,7 @@
             <a
               [routerLink]="link('club', tag)"
               [attr.aria-current]="selected()?.tag?.id === tag.id ? 'true' : null"
-              class="inline-flex min-h-11 items-center gap-2 rounded-md border px-3 font-medium no-underline xl:min-h-9"
+              class="inline-flex min-h-target items-center gap-2 rounded-md border px-3 font-medium no-underline xl:min-h-9"
               [class]="selected()?.tag?.id === tag.id ? 'border-primary bg-primary-soft text-primary' : 'border-input text-foreground'"
             >
               {{ tag.name }}<span class="text-xs text-muted-foreground tabular-nums">{{ tag.scoreCount }}</span>
@@ -43,7 +43,7 @@
             <a
               [routerLink]="link('personal', tag)"
               [attr.aria-current]="selected()?.tag?.id === tag.id ? 'true' : null"
-              class="inline-flex min-h-11 items-center gap-2 rounded-md border px-3 font-medium no-underline xl:min-h-9"
+              class="inline-flex min-h-target items-center gap-2 rounded-md border px-3 font-medium no-underline xl:min-h-9"
               [class]="selected()?.tag?.id === tag.id ? 'border-primary bg-primary-soft text-primary' : 'border-input text-foreground'"
             >
               {{ tag.name }}<span class="text-xs text-muted-foreground tabular-nums">{{ tag.scoreCount }}</span>

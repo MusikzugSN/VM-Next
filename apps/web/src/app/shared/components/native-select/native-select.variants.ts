@@ -12,7 +12,7 @@ const CHEVRON_DARK =
 
 export const nativeSelectVariants = cva(
   mergeClasses(
-    'h-11 xl:h-9 w-full min-w-0 appearance-none rounded-lg border border-input bg-transparent py-1 ps-2.5 pe-8 text-sm transition-colors outline-none select-none selection:bg-primary selection:text-primary-foreground',
+    'h-control xl:h-control-compact w-full min-w-0 appearance-none rounded-lg border border-input bg-transparent py-1 ps-2.5 pe-8 text-sm transition-colors outline-none select-none selection:bg-primary selection:text-primary-foreground',
     'bg-no-repeat bg-size-[1rem] bg-position-[right_0.625rem_center] rtl:bg-position-[left_0.625rem_center]',
     CHEVRON_LIGHT,
     CHEVRON_DARK,

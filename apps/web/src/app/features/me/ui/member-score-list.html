@@ -2,7 +2,7 @@
   <ul class="flex flex-col gap-2">
     @for (item of items(); track item.row.scoreId) {
       <li class="flex items-center gap-3 rounded-lg border bg-card py-3 ps-3 pe-2 shadow-sm">
-        <label class="-ms-1 flex size-11 shrink-0 items-center justify-center self-start">
+        <label class="-ms-1 flex size-control shrink-0 items-center justify-center self-start">
           <input
               type="checkbox"
               class="size-5 accent-primary"
@@ -14,7 +14,7 @@
         </label>
         @if (numbering() !== 'none') {
           <span
-            class="flex size-11 shrink-0 self-start items-center justify-center rounded-md bg-primary-soft text-base font-semibold text-primary tabular-nums"
+            class="flex size-control shrink-0 self-start items-center justify-center rounded-md bg-primary-soft text-base font-semibold text-primary tabular-nums"
             [attr.aria-label]="'me.list.numberLabel' | transloco: { number: item.number }"
             >{{ item.number }}</span
           >
@@ -58,7 +58,7 @@
             download
             [attr.aria-label]="'me.list.download' | transloco: { title: item.row.title }"
           >
-            <ng-icon name="lucideDownload" size="20" aria-hidden="true" />
+            <ng-icon name="lucideDownload" size="var(--mat-sys-icon-size-md)" aria-hidden="true" />
           </a>
         }
       </li>

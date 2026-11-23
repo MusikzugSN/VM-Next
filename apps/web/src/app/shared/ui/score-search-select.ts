@@ -29,7 +29,7 @@ export interface ChosenScore {
   host: { class: 'flex flex-col gap-1.5' },
   template: `
     @if (value(); as chosen) {
-      <div class="flex min-h-11 items-center gap-2 rounded-md border border-input px-3 xl:min-h-9">
+      <div class="flex min-h-target items-center gap-2 rounded-md border border-input px-3 xl:min-h-9">
         <span class="flex-1 truncate font-medium">{{ chosen.title }}</span>
         <button type="button" class="font-medium text-primary underline-offset-4 hover:underline" (click)="changed.emit(null)">
           {{ 'upload.change' | transloco }}
@@ -54,7 +54,7 @@ export interface ChosenScore {
           @if (hits.hasValue()) {
             @for (score of hits.value().items; track score.id; let first = $first) {
               <li [class.border-t]="!first">
-                <button type="button" class="flex min-h-11 w-full flex-col items-start px-3 py-1.5 text-start hover:bg-accent xl:min-h-9" (click)="choose(score)">
+                <button type="button" class="flex min-h-target w-full flex-col items-start px-3 py-1.5 text-start hover:bg-accent xl:min-h-9" (click)="choose(score)">
                   <span class="font-medium">{{ score.title }}</span>
                   @if (score.composer || score.arranger) {
                     <span class="text-xs text-muted-foreground">{{ score.composer ?? score.arranger }}</span>
@@ -69,7 +69,7 @@ export interface ChosenScore {
             <li class="border-t">
               <button
                 type="button"
-                class="flex min-h-11 w-full items-center gap-2 px-3 py-1.5 text-start font-medium text-primary hover:bg-accent xl:min-h-9"
+                class="flex min-h-target w-full items-center gap-2 px-3 py-1.5 text-start font-medium text-primary hover:bg-accent xl:min-h-9"
                 [disabled]="creating()"
                 (click)="create()"
               >

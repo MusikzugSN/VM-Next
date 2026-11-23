@@ -14,13 +14,13 @@ import { BrandingStore } from '../../core/branding/branding.store';
       @if (b.imprintUrl || b.privacyUrl) {
         <footer class="flex min-h-14 items-center justify-center gap-2 text-[13px] text-muted-foreground">
           @if (b.imprintUrl) {
-            <a [href]="b.imprintUrl" class="inline-flex min-h-11 items-center px-1">{{ 'auth.legal.imprint' | transloco }}</a>
+            <a [href]="b.imprintUrl" class="inline-flex min-h-target items-center px-1">{{ 'auth.legal.imprint' | transloco }}</a>
           }
           @if (b.imprintUrl && b.privacyUrl) {
             <span aria-hidden="true">·</span>
           }
           @if (b.privacyUrl) {
-            <a [href]="b.privacyUrl" class="inline-flex min-h-11 items-center px-1">{{ 'auth.legal.privacy' | transloco }}</a>
+            <a [href]="b.privacyUrl" class="inline-flex min-h-target items-center px-1">{{ 'auth.legal.privacy' | transloco }}</a>
           }
         </footer>
       }

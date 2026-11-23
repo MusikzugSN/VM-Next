@@ -1,4 +1,4 @@
-<a [routerLink]="eventsPath" class="inline-flex min-h-11 items-center gap-1 self-start font-medium no-underline">
+<a [routerLink]="eventsPath" class="inline-flex min-h-target items-center gap-1 self-start font-medium no-underline">
   <ng-icon name="lucideChevronLeft" aria-hidden="true" />{{ 'library.events.all' | transloco }}
 </a>
 
@@ -79,7 +79,7 @@
               <button
                 cdkDragHandle
                 type="button"
-                class="flex size-11 shrink-0 cursor-grab items-center justify-center rounded-md text-muted-foreground hover:bg-accent xl:size-9"
+                class="flex size-control shrink-0 cursor-grab items-center justify-center rounded-md text-muted-foreground hover:bg-accent xl:size-control-compact"
                 [attr.aria-label]="'library.event.dragLabel' | transloco: { title: item.title }"
               >
                 <ng-icon name="lucideGripVertical" aria-hidden="true" />

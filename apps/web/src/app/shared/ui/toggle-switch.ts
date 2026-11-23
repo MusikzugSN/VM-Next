@@ -13,7 +13,7 @@ import { ChangeDetectionStrategy, Component, input, output } from '@angular/core
       [attr.aria-label]="label()"
       [disabled]="disabled()"
       (click)="toggled.emit(!checked())"
-      class="inline-flex min-h-11 min-w-11 items-center justify-center disabled:opacity-50 xl:min-h-8"
+      class="inline-flex min-h-target min-w-target items-center justify-center disabled:opacity-50 xl:min-h-target-compact"
     >
       <span
         aria-hidden="true"

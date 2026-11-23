@@ -27,9 +27,9 @@ import { LegalLinks } from './legal-links';
         <span class="font-semibold">{{ clubName() }}</span>
       </header>
       <main class="flex flex-1 items-start justify-center p-4 md:items-center md:p-8">
-        <section class="flex w-full max-w-[480px] flex-col gap-6 rounded-lg border bg-card p-6 shadow-sm md:p-8">
+        <section class="flex w-full max-w-dialog-md flex-col gap-6 rounded-lg border bg-card p-6 shadow-sm md:p-8">
           <span class="flex size-12 items-center justify-center rounded-full bg-destructive-soft text-destructive-ink">
-            <ng-icon name="lucideLock" size="20" aria-hidden="true" />
+            <ng-icon name="lucideLock" size="var(--mat-sys-icon-size-md)" aria-hidden="true" />
           </span>
           <div class="flex flex-col gap-2">
             <h1 class="text-2xl font-semibold">{{ 'auth.blocked.title' | transloco }}</h1>
