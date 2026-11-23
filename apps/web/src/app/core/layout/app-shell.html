@@ -106,17 +106,17 @@
 </div>
 
 @if (!viewport.isDesktop()) {
-  <z-sheet [(zVisible)]="navOpen" zSide="left" zWidth="288px" class="bg-sidebar">
-    <z-sheet-header>
-      <div z-sheet-title class="flex items-center gap-2">
+  <vm-sheet [(zVisible)]="navOpen" zSide="left" zWidth="288px" class="bg-sidebar">
+    <vm-sheet-header>
+      <div vm-sheet-title class="flex items-center gap-2">
         <vm-club-logo [size]="32" />
         <span class="truncate">{{ branding.clubName() ?? ('app.name' | transloco) }}</span>
       </div>
-    </z-sheet-header>
+    </vm-sheet-header>
     <div class="min-h-0 flex-1 overflow-y-auto px-4 pb-4">
       <vm-nav-list (navigate)="navOpen.set(false)" />
     </div>
-  </z-sheet>
+  </vm-sheet>
 }
 
 <vm-upload-dialog />

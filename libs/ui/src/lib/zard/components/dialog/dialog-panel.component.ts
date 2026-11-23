@@ -18,7 +18,7 @@ import { NgIcon, provideIcons } from '@ng-icons/core';
 import { lucideX } from '@ng-icons/lucide';
 import type { ClassValue } from 'clsx';
 
-import { ZardButtonComponent } from '@vm-web/ui/zard/components/button/button.component';
+import { VmIconButton } from '@vm-web/ui/button/vm-button';
 import { mergeClasses } from '@vm-web/ui/zard/utils/merge-classes';
 
 import { dialogVariants } from './dialog.variants';
@@ -35,17 +35,15 @@ export const DIALOG_DURATION = 100;
  */
 @Component({
   selector: 'z-dialog-panel',
-  imports: [ZardButtonComponent, NgIcon, TranslocoPipe],
+  imports: [VmIconButton, NgIcon, TranslocoPipe],
   template: `
     @if (zClosable()) {
       <button
         type="button"
         data-testid="z-close-header-button"
         data-slot="dialog-close"
-        z-button
-        zType="ghost"
-        zSize="icon-sm"
-        class="absolute end-3 top-3"
+        vm-icon-button
+        class="absolute end-2 top-2"
         (click)="closeRequested.emit()"
       >
         <ng-icon name="lucideX" class="size-4!" />

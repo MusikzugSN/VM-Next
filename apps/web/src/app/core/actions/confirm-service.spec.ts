@@ -1,8 +1,8 @@
 import { TestBed } from '@angular/core/testing';
 import { TranslocoService } from '@jsverse/transloco';
 import { of, throwError } from 'rxjs';
+import { VmConfirmDialogService } from '@vm-web/ui';
 
-import { ZardAlertDialogService } from '@vm-web/ui/zard/components/alert-dialog';
 import { ZardSonnerService } from '@vm-web/ui/zard/components/sonner';
 
 import { ConfirmService } from './action-runner';
@@ -23,7 +23,7 @@ describe('ConfirmService.confirmedDelete', () => {
     TestBed.configureTestingModule({
       providers: [
         { provide: ZardSonnerService, useValue: sonner },
-        { provide: ZardAlertDialogService, useValue: { confirm } },
+        { provide: VmConfirmDialogService, useValue: { confirm } },
         { provide: TranslocoService, useValue: { translate: (key: string) => key } },
       ],
     });

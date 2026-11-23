@@ -3,15 +3,15 @@ import { cva, type VariantProps } from 'class-variance-authority';
 export const sheetVariants = cva(
   [
     'fixed z-50 flex flex-col gap-4',
-    'bg-popover bg-clip-padding text-sm text-popover-foreground shadow-lg outline-none',
+    'bg-surface-container-low bg-clip-padding text-body-medium text-on-surface shadow-level3 outline-none',
   ],
   {
     variants: {
       zSide: {
         top: 'inset-x-0 top-0 h-auto border-b',
-        right: 'inset-y-0 right-0 h-full w-3/4 border-l',
+        right: 'inset-y-0 right-0 h-full w-3/4 rounded-s-large',
         bottom: 'inset-x-0 bottom-0 h-auto border-t',
-        left: 'inset-y-0 left-0 h-full w-3/4 border-r',
+        left: 'inset-y-0 left-0 h-full w-3/4 rounded-e-large',
       },
       zSize: {
         default: '',
@@ -56,13 +56,13 @@ export const sheetVariants = cva(
 );
 
 /** Classes of the mask behind a sheet, shared by the declarative form and the service. */
-export const SHEET_BACKDROP_CLASSES = ['bg-black/10', 'supports-backdrop-filter:backdrop-blur-xs'];
+export const SHEET_BACKDROP_CLASSES = ['bg-scrim/32'];
 
 export const sheetHeaderVariants = cva('flex flex-col gap-0.5 p-4');
 
-export const sheetTitleVariants = cva('text-base font-medium text-foreground wrap-anywhere');
+export const sheetTitleVariants = cva('text-title-medium text-on-surface wrap-anywhere');
 
-export const sheetDescriptionVariants = cva('text-sm text-muted-foreground wrap-anywhere');
+export const sheetDescriptionVariants = cva('text-body-medium text-on-surface-variant wrap-anywhere');
 
 export const sheetFooterVariants = cva('mt-auto flex flex-col gap-2 p-4');
 

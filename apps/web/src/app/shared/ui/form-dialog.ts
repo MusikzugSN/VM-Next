@@ -1,8 +1,7 @@
 import { ChangeDetectionStrategy, Component, input, model, output } from '@angular/core';
 import { TranslocoPipe } from '@jsverse/transloco';
 
-import { VmButton } from '@vm-web/ui';
-import { ZardDialogImports } from '@vm-web/ui/zard/components/dialog/dialog.imports';
+import { VmButton, VmDialogImports } from '@vm-web/ui';
 
 let nextId = 0;
 
@@ -13,18 +12,18 @@ let nextId = 0;
  */
 @Component({
   selector: 'vm-form-dialog',
-  imports: [TranslocoPipe, VmButton, ZardDialogImports],
+  imports: [TranslocoPipe, VmButton, VmDialogImports],
   changeDetection: ChangeDetectionStrategy.OnPush,
   // The dialog renders in an overlay; its host must not take up space (or a gap) in the page.
   host: { style: 'display: contents' },
   template: `
-    <z-dialog [(zVisible)]="open" [zWidth]="width()" [zMaskClosable]="!busy()">
-      <z-dialog-header>
-        <h2 z-dialog-title>{{ titleKey() | transloco: titleParams() }}</h2>
+    <vm-dialog [(zVisible)]="open" [zWidth]="width()" [zMaskClosable]="!busy()">
+      <vm-dialog-header>
+        <h2 vm-dialog-title>{{ titleKey() | transloco: titleParams() }}</h2>
         @if (descriptionKey(); as description) {
-          <p z-dialog-description>{{ description | transloco: titleParams() }}</p>
+          <p vm-dialog-description>{{ description | transloco: titleParams() }}</p>
         }
-      </z-dialog-header>
+      </vm-dialog-header>
 
       <form
         [id]="formId"
@@ -35,13 +34,13 @@ let nextId = 0;
         <ng-content />
       </form>
 
-      <z-dialog-footer>
+      <vm-dialog-footer>
         <button vm-button variant="tonal" type="button" (click)="open.set(false)">{{ (submitKey() ? 'common.cancel' : 'common.close') | transloco }}</button>
         @if (submitKey(); as submit) {
           <button vm-button type="submit" [attr.form]="formId" [zLoading]="busy()" [zDisabled]="busy() || !canSubmit()">{{ submit | transloco }}</button>
         }
-      </z-dialog-footer>
-    </z-dialog>
+      </vm-dialog-footer>
+    </vm-dialog>
   `,
 })
 export class FormDialog {

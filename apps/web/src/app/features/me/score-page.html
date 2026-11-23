@@ -51,14 +51,14 @@
 
     @if (viewport.isMobile()) {
       <button vm-button variant="outlined" type="button" class="w-full" (click)="detailsOpen.set(true)">{{ 'me.score.details' | transloco }}</button>
-      <z-sheet [(zVisible)]="detailsOpen" zSide="bottom" class="max-h-[85dvh] rounded-t-2xl">
-        <z-sheet-header>
-          <h2 z-sheet-title>{{ score.title }}</h2>
-        </z-sheet-header>
+      <vm-sheet [(zVisible)]="detailsOpen" zSide="bottom" class="max-h-[85dvh] rounded-t-2xl">
+        <vm-sheet-header>
+          <h2 vm-sheet-title>{{ score.title }}</h2>
+        </vm-sheet-header>
         <div class="overflow-y-auto px-4 pb-4">
           <ng-container [ngTemplateOutlet]="aside" />
         </div>
-      </z-sheet>
+      </vm-sheet>
     } @else {
       <aside [attr.aria-label]="'me.score.details' | transloco" class="flex w-full flex-col gap-6 rounded-lg border bg-card p-4 shadow-sm xl:w-80 xl:shrink-0">
         <ng-container [ngTemplateOutlet]="aside" />

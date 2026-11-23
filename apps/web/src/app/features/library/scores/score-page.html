@@ -231,12 +231,12 @@
     }
   }
 
-  <z-dialog [(zVisible)]="previewOpen" zWidth="760px">
-    <z-dialog-header>
-      <h2 z-dialog-title>{{ score.title }} – {{ preview()?.title }}</h2>
-    </z-dialog-header>
+  <vm-dialog [(zVisible)]="previewOpen" zWidth="760px">
+    <vm-dialog-header>
+      <h2 vm-dialog-title>{{ score.title }} – {{ preview()?.title }}</h2>
+    </vm-dialog-header>
     @if (previewOpen() && preview(); as p) {
       <vm-pdf-viewer [src]="sheetUrl(p.sheetId)" />
     }
-  </z-dialog>
+  </vm-dialog>
 }

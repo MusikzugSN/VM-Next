@@ -17,7 +17,7 @@ import { NgIcon, provideIcons } from '@ng-icons/core';
 import { lucideX } from '@ng-icons/lucide';
 import type { ClassValue } from 'clsx';
 
-import { ZardButtonComponent } from '@vm-web/ui/zard/components/button/button.component';
+import { VmIconButton } from '@vm-web/ui/button/vm-button';
 import { mergeClasses } from '@vm-web/ui/zard/utils/merge-classes';
 
 import { sheetVariants, type ZardSheetVariants } from './sheet.variants';
@@ -37,17 +37,15 @@ export type ZardSheetSize = NonNullable<ZardSheetVariants['zSize']>;
  */
 @Component({
   selector: 'z-sheet-panel',
-  imports: [ZardButtonComponent, NgIcon],
+  imports: [VmIconButton, NgIcon],
   template: `
     @if (zClosable()) {
       <button
         type="button"
         data-testid="z-close-header-button"
         data-slot="sheet-close"
-        z-button
-        zType="ghost"
-        zSize="icon-sm"
-        class="absolute end-3 top-3"
+        vm-icon-button
+        class="absolute end-2 top-2"
         (click)="closeRequested.emit()"
       >
         <ng-icon name="lucideX" class="size-4!" />

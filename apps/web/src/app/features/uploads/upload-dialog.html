@@ -1,15 +1,15 @@
-<z-dialog [(zVisible)]="open" [zWidth]="splitItem() ? '1180px' : '720px'" [zMaskClosable]="!sending() && !splitItem()">
+<vm-dialog [(zVisible)]="open" [zWidth]="splitItem() ? '1180px' : '720px'" [zMaskClosable]="!sending() && !splitItem()">
   @if (splitItem(); as item) {
-    <z-dialog-header>
-      <h2 z-dialog-title>{{ 'upload.split.title' | transloco: { name: item.file.name } }}</h2>
-      <p z-dialog-description>{{ 'upload.split.intro' | transloco }}</p>
-    </z-dialog-header>
+    <vm-dialog-header>
+      <h2 vm-dialog-title>{{ 'upload.split.title' | transloco: { name: item.file.name } }}</h2>
+      <p vm-dialog-description>{{ 'upload.split.intro' | transloco }}</p>
+    </vm-dialog-header>
     <vm-upload-split [file]="item.file" [preset]="splitPreset()" (done)="onSplit($event)" (cancelled)="splitKey.set(null)" />
   } @else {
-  <z-dialog-header>
-    <h2 z-dialog-title>{{ 'upload.title' | transloco }}</h2>
-    <p z-dialog-description>{{ 'upload.intro' | transloco }}</p>
-  </z-dialog-header>
+  <vm-dialog-header>
+    <h2 vm-dialog-title>{{ 'upload.title' | transloco }}</h2>
+    <p vm-dialog-description>{{ 'upload.intro' | transloco }}</p>
+  </vm-dialog-header>
 
   <div class="flex min-h-0 flex-1 flex-col gap-5 overflow-y-auto md:max-h-[55dvh] md:flex-none">
     <div
@@ -93,7 +93,7 @@
     }
   </div>
 
-  <z-dialog-footer class="flex-col items-stretch gap-3">
+  <vm-dialog-footer class="flex-col items-stretch gap-3">
     @if (items().length) {
       <div class="flex flex-col gap-1 text-[13px]" aria-live="polite">
         @if (canApprove()) {
@@ -127,6 +127,6 @@
         <ng-icon name="lucideUpload" aria-hidden="true" />{{ 'upload.send' | tPlural: valid().length }}
       </button>
     </div>
-  </z-dialog-footer>
+  </vm-dialog-footer>
   }
-</z-dialog>
+</vm-dialog>
