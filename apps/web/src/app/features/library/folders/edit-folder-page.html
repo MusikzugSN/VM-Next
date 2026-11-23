@@ -31,10 +31,10 @@
   <section aria-labelledby="h-folder" class="flex flex-col gap-4 rounded-lg border bg-card p-4 shadow-sm md:p-6">
     <h2 id="h-folder" class="text-lg font-semibold">{{ 'terms.folder' | transloco }}</h2>
     <div class="grid gap-4 md:grid-cols-2">
-      <label class="flex flex-col gap-1.5">
-        <span class="font-medium">{{ 'library.common.name' | transloco }}</span>
+      <label vm-field>
+        <span vm-field-label>{{ 'library.common.name' | transloco }}</span>
         <input
-          z-input
+          vm-input
           type="text"
           maxlength="100"
           [readonly]="!canEdit()"
@@ -74,7 +74,7 @@
           <label class="flex flex-col gap-1">
             <span class="sr-only">{{ 'library.folder.numberOf' | transloco: { title: entry.title } }}</span>
             <input
-              z-input
+              vm-input
               type="text"
               maxlength="10"
               class="w-20 text-center font-semibold text-primary tabular-nums"
@@ -98,7 +98,7 @@
             </button>
           }
           @if (numberErrors()[entry.scoreId]; as key) {
-            <span [id]="'num-err-' + entry.scoreId" role="alert" class="w-full text-destructive-ink">{{ key | transloco }}</span>
+            <span vm-field-error [id]="'num-err-' + entry.scoreId" role="alert" class="w-full">{{ key | transloco }}</span>
           }
         </li>
       }

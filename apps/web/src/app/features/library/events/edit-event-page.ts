@@ -17,8 +17,7 @@ import {
 } from '@vm-web/shared';
 import { firstValueFrom, map, type Observable } from 'rxjs';
 
-import { VmButton, VmIconButton } from '@vm-web/ui';
-import { ZardInputComponent } from '@vm-web/ui/zard/components/input';
+import { VmButton, VmField, VmFieldLabel, VmIconButton, VmInput } from '@vm-web/ui';
 
 import { ActionRunner, ConfirmService } from '../../../core/actions/action-runner';
 import { ApiClient } from '../../../core/api/api-client';
@@ -39,7 +38,7 @@ type Item = Pick<SetlistEntry, 'scoreId' | 'title' | 'composer'>;
 /** Event bearbeiten (N-15, N-16): date, name, visibility and the setlist in playing order. */
 @Component({
   selector: 'vm-library-edit-event-page',
-  imports: [
+  imports: [VmField, VmFieldLabel, 
     FormDialog,
     CdkDropList,
     CdkDrag,
@@ -48,7 +47,7 @@ type Item = Pick<SetlistEntry, 'scoreId' | 'title' | 'composer'>;
     NgIcon,
     TranslocoPipe,
     VmButton, VmIconButton,
-    ZardInputComponent,
+    VmInput,
     PageProblem,
     ToggleSwitch,
     ScorePicker,

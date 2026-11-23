@@ -15,8 +15,7 @@ import {
 } from '@vm-web/shared';
 import { type Observable } from 'rxjs';
 
-import { VmButton, VmIconButton } from '@vm-web/ui';
-import { ZardInputComponent } from '@vm-web/ui/zard/components/input';
+import { VmButton, VmField, VmFieldError, VmFieldLabel, VmIconButton, VmInput } from '@vm-web/ui';
 
 import { ActionRunner, ConfirmService } from '../../../core/actions/action-runner';
 import { ApiClient } from '../../../core/api/api-client';
@@ -37,14 +36,14 @@ import { selectOr } from '../../../core/util/resource-value';
 /** Mappe bearbeiten (N-5, N-15): name, visibility, scores with their own number in this folder. */
 @Component({
   selector: 'vm-library-edit-folder-page',
-  imports: [
+  imports: [VmField, VmFieldLabel, VmFieldError, 
     FormDialog,
     RouterLink,
     NgIcon,
     TranslocoPipe,
     PluralPipe,
     VmButton, VmIconButton,
-    ZardInputComponent,
+    VmInput,
     ListState,
     PageProblem,
     SearchField,

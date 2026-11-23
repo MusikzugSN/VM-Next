@@ -33,7 +33,7 @@
           <span class="flex-1 font-medium">{{ m.ensemble.name }}</span>
           <label class="flex items-center gap-2">
             <span class="sr-only">{{ 'system.user.roleIn' | transloco: { ensemble: m.ensemble.name } }}</span>
-            <select z-native-select class="md:w-56" [disabled]="!canEdit()" [value]="m.role.id" (change)="setRole(m.ensemble.id, $any($event.target).value)">
+            <select vm-select class="md:w-56" [disabled]="!canEdit()" [value]="m.role.id" (change)="setRole(m.ensemble.id, $any($event.target).value)">
               @if (options.hasValue()) {
                 @for (r of options.value().roles; track r.id) {
                   <option [value]="r.id" [selected]="r.id === m.role.id">{{ r.name }}</option>
@@ -64,18 +64,18 @@
         [busy]="busy()"
         (submitted)="addMembership()"
       >
-        <label class="flex flex-col gap-1.5">
-          <span class="font-medium">{{ 'terms.ensemble' | transloco }} *</span>
-          <select z-native-select cdkFocusInitial [value]="newEnsembleId()" (change)="newEnsembleId.set($any($event.target).value)">
+        <label vm-field>
+          <span vm-field-label>{{ 'terms.ensemble' | transloco }} *</span>
+          <select vm-select cdkFocusInitial [value]="newEnsembleId()" (change)="newEnsembleId.set($any($event.target).value)">
             <option value="">{{ 'system.common.choose' | transloco }}</option>
             @for (e of freeEnsembles(); track e.id) {
               <option [value]="e.id" [selected]="e.id === newEnsembleId()">{{ e | treeLabel }}</option>
             }
           </select>
         </label>
-        <label class="flex flex-col gap-1.5">
-          <span class="font-medium">{{ 'terms.role' | transloco }} *</span>
-          <select z-native-select [value]="newRoleId()" (change)="newRoleId.set($any($event.target).value)">
+        <label vm-field>
+          <span vm-field-label>{{ 'terms.role' | transloco }} *</span>
+          <select vm-select [value]="newRoleId()" (change)="newRoleId.set($any($event.target).value)">
             <option value="">{{ 'system.common.choose' | transloco }}</option>
             @for (r of options.value().roles; track r.id) {
               <option [value]="r.id" [selected]="r.id === newRoleId()">{{ r.name }}</option>

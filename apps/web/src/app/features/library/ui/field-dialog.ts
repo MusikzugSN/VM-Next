@@ -1,10 +1,8 @@
 import { ChangeDetectionStrategy, Component, computed, effect, input, model, signal, untracked } from '@angular/core';
 import { TranslocoPipe } from '@jsverse/transloco';
 import { customFieldTypeSchema, type CustomFieldType, type FieldDefinition } from '@vm-web/shared';
+import { VmField, VmFieldLabel, VmInput, VmSelect, VmTextarea } from '@vm-web/ui';
 
-import { ZardInputComponent } from '@vm-web/ui/zard/components/input';
-import { ZardNativeSelectDirective } from '@vm-web/ui/zard/components/native-select';
-import { ZardTextareaComponent } from '@vm-web/ui/zard/components/textarea';
 
 import { FormDialog, runDialogSave } from '../../../shared/ui/form-dialog';
 import { NAME_MAX } from '../../../shared/ui/name-dialog';
@@ -25,7 +23,7 @@ export interface FieldDialogValue {
  */
 @Component({
   selector: 'vm-field-dialog',
-  imports: [ToggleField, TranslocoPipe, ZardInputComponent, ZardNativeSelectDirective, ZardTextareaComponent, FormDialog],
+  imports: [VmField, VmFieldLabel, ToggleField, TranslocoPipe, VmInput, VmSelect, VmTextarea, FormDialog],
   changeDetection: ChangeDetectionStrategy.OnPush,
   // The dialog renders in an overlay; its host must not take up space (or a gap) in the page.
   host: { style: 'display: contents' },
@@ -39,13 +37,13 @@ export interface FieldDialogValue {
       [busy]="busy()"
       (submitted)="submit()"
     >
-      <label class="flex flex-col gap-1.5">
-        <span class="font-medium">{{ 'fields.name' | transloco }} *</span>
-        <input z-input cdkFocusInitial type="text" required [maxLength]="max" [value]="draft().name" (input)="patch({ name: $any($event.target).value })" />
+      <label vm-field>
+        <span vm-field-label>{{ 'fields.name' | transloco }} *</span>
+        <input vm-input cdkFocusInitial type="text" required [maxLength]="max" [value]="draft().name" (input)="patch({ name: $any($event.target).value })" />
       </label>
-      <label class="flex flex-col gap-1.5">
-        <span class="font-medium">{{ 'fields.type' | transloco }}</span>
-        <select z-native-select [disabled]="!!field()" [value]="draft().type" (change)="patch({ type: $any($event.target).value })" aria-describedby="field-type-hint">
+      <label vm-field>
+        <span vm-field-label>{{ 'fields.type' | transloco }}</span>
+        <select vm-select [disabled]="!!field()" [value]="draft().type" (change)="patch({ type: $any($event.target).value })" aria-describedby="field-type-hint">
           @for (type of types; track type) {
             <option [value]="type" [selected]="type === draft().type">{{ 'terms.fieldTypes.' + type | transloco }}</option>
           }
@@ -53,9 +51,9 @@ export interface FieldDialogValue {
         <span id="field-type-hint" class="text-xs text-muted-foreground">{{ 'fields.typeHint' | transloco }}</span>
       </label>
       @if (needsOptions()) {
-        <label class="flex flex-col gap-1.5">
-          <span class="font-medium">{{ 'fields.options' | transloco }} *</span>
-          <textarea z-textarea rows="5" [value]="draft().options" (input)="patch({ options: $any($event.target).value })" aria-describedby="field-options-hint"></textarea>
+        <label vm-field>
+          <span vm-field-label>{{ 'fields.options' | transloco }} *</span>
+          <textarea vm-textarea rows="5" [value]="draft().options" (input)="patch({ options: $any($event.target).value })" aria-describedby="field-options-hint"></textarea>
           <span id="field-options-hint" class="text-xs text-muted-foreground">{{ 'fields.optionsHint' | transloco }}</span>
         </label>
       }

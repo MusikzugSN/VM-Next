@@ -21,9 +21,9 @@
 
 <div class="flex flex-col gap-2 md:flex-row md:items-end">
   @if (filterOptions().length > 1) {
-    <label class="flex flex-col gap-1.5 md:w-64">
-      <span class="font-medium">{{ 'terms.ensemble' | transloco }}</span>
-      <select z-native-select [value]="ensembleId()" (change)="ensembleId.set($any($event.target).value)">
+    <label vm-field class="md:w-64">
+      <span vm-field-label>{{ 'terms.ensemble' | transloco }}</span>
+      <select vm-select [value]="ensembleId()" (change)="ensembleId.set($any($event.target).value)">
         <option value="">{{ 'library.common.allEnsembles' | transloco }}</option>
         @for (ensemble of filterOptions(); track ensemble.id) {
           <option [value]="ensemble.id">{{ ensemble.name }}</option>

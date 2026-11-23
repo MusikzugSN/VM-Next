@@ -26,13 +26,13 @@
   <form aria-labelledby="h-event" class="flex flex-col gap-4 rounded-lg border bg-card p-4 shadow-sm md:p-6" novalidate (submit)="$event.preventDefault(); saveDetails()">
     <h2 id="h-event" class="text-lg font-semibold">{{ 'terms.event' | transloco }}</h2>
     <fieldset class="grid gap-4 md:grid-cols-2" [disabled]="!canEdit()">
-      <label class="flex flex-col gap-1.5">
-        <span class="font-medium">{{ 'library.events.date' | transloco }} *</span>
-        <input z-input type="date" required [value]="date()" (input)="date.set($any($event.target).value)" />
+      <label vm-field>
+        <span vm-field-label>{{ 'library.events.date' | transloco }} *</span>
+        <input vm-input type="date" required [value]="date()" (input)="date.set($any($event.target).value)" />
       </label>
-      <label class="flex flex-col gap-1.5">
-        <span class="font-medium">{{ 'library.common.name' | transloco }} *</span>
-        <input z-input type="text" maxlength="100" required [value]="name()" (input)="name.set($any($event.target).value)" />
+      <label vm-field>
+        <span vm-field-label>{{ 'library.common.name' | transloco }} *</span>
+        <input vm-input type="text" maxlength="100" required [value]="name()" (input)="name.set($any($event.target).value)" />
       </label>
     </fieldset>
     <div class="flex flex-col gap-3 md:flex-row md:items-center md:justify-between">

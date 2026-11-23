@@ -2,13 +2,13 @@ import { ChangeDetectionStrategy, Component, input, model } from '@angular/core'
 import { TranslocoPipe } from '@jsverse/transloco';
 import { NgIcon, provideIcons } from '@ng-icons/core';
 import { lucideSearch } from '@ng-icons/lucide';
+import { VmInput } from '@vm-web/ui';
 
-import { ZardInputComponent } from '@vm-web/ui/zard/components/input';
 
 /** Search field of the Design Guideline (Suchen & Filtern); the label can be visually hidden. */
 @Component({
   selector: 'vm-search-field',
-  imports: [NgIcon, TranslocoPipe, ZardInputComponent],
+  imports: [NgIcon, TranslocoPipe, VmInput],
   viewProviders: [provideIcons({ lucideSearch })],
   changeDetection: ChangeDetectionStrategy.OnPush,
   host: { class: 'flex flex-1 flex-col gap-1.5' },
@@ -18,7 +18,7 @@ import { ZardInputComponent } from '@vm-web/ui/zard/components/input';
       <span class="relative">
         <ng-icon name="lucideSearch" class="absolute top-1/2 left-3 -translate-y-1/2 text-muted-foreground" aria-hidden="true" />
         <input
-          z-input
+          vm-input
           type="search"
           class="ps-9"
           [attr.cdkFocusInitial]="focusInDialog() ? '' : null"

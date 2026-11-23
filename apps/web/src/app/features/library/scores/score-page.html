@@ -78,7 +78,7 @@
             @if (options.ensembles().length > 1) {
               <label class="flex items-center gap-2">
                 <span class="text-muted-foreground">{{ 'library.filter.ensemble' | transloco }}</span>
-                <select z-native-select class="w-auto" [value]="c.ensemble?.id ?? ''" (change)="chooseEnsemble($any($event.target).value)">
+                <select vm-select class="w-auto" [value]="c.ensemble?.id ?? ''" (change)="chooseEnsemble($any($event.target).value)">
                   @for (ensemble of options.ensembles(); track ensemble.id) {
                     <option [value]="ensemble.id" [selected]="ensemble.id === c.ensemble?.id">{{ ensemble | treeLabel }}</option>
                   }

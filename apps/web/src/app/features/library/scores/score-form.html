@@ -2,10 +2,10 @@
   <legend class="sr-only">{{ 'library.form.fixed' | transloco }}</legend>
   <h2 class="text-lg font-semibold">{{ 'library.form.fixed' | transloco }}</h2>
 
-  <label class="flex flex-col gap-1.5">
-    <span class="font-medium">{{ 'library.fields.title' | transloco }} *</span>
+  <label vm-field>
+    <span vm-field-label>{{ 'library.fields.title' | transloco }} *</span>
     <input
-      z-input
+      vm-input
       type="text"
       maxlength="200"
       required
@@ -15,21 +15,21 @@
       [attr.aria-describedby]="error('title') ? 'err-title' : null"
     />
     @if (error('title'); as code) {
-      <span id="err-title" class="text-destructive-ink">{{ 'validation.' + code | transloco }}</span>
+      <span vm-field-error id="err-title">{{ 'validation.' + code | transloco }}</span>
     }
   </label>
 
   <div class="grid gap-4 md:grid-cols-2">
     @for (f of fixed; track f.key) {
-      <label class="flex flex-col gap-1.5">
-        <span class="font-medium">{{ f.labelKey | transloco }}</span>
-        <input z-input type="text" maxlength="200" [value]="value()[f.key]" (input)="set(f.key, $any($event.target).value)" />
+      <label vm-field>
+        <span vm-field-label>{{ f.labelKey | transloco }}</span>
+        <input vm-input type="text" maxlength="200" [value]="value()[f.key]" (input)="set(f.key, $any($event.target).value)" />
       </label>
     }
-    <label class="flex flex-col gap-1.5">
-      <span class="font-medium">{{ 'library.fields.duration' | transloco }}</span>
+    <label vm-field>
+      <span vm-field-label>{{ 'library.fields.duration' | transloco }}</span>
       <input
-        z-input
+        vm-input
         type="text"
         inputmode="numeric"
         placeholder="3:40"
@@ -40,7 +40,7 @@
       />
       <span id="hint-duration" class="text-xs text-muted-foreground">
         @if (error('durationSeconds')) {
-          <span class="text-destructive-ink">{{ 'library.form.durationInvalid' | transloco }}</span>
+          <span vm-field-error>{{ 'library.form.durationInvalid' | transloco }}</span>
         } @else {
           {{ 'library.form.durationHint' | transloco }}
         }
@@ -93,7 +93,7 @@
               }
             </div>
             @if (error(key); as code) {
-              <span class="text-destructive-ink">{{ 'validation.' + code | transloco }}</span>
+              <span vm-field-error>{{ 'validation.' + code | transloco }}</span>
             }
           </fieldset>
         }
@@ -103,7 +103,7 @@
             @if (field.type === 'select') {
               <select
                 [id]="'cf-' + field.id"
-                z-native-select
+                vm-select
                 [value]="current ?? ''"
                 (change)="setCustom(field, $any($event.target).value)"
                 [attr.aria-invalid]="error(key) ? 'true' : null"
@@ -115,7 +115,7 @@
               </select>
             } @else {
               <input
-                z-input
+                vm-input
                 [id]="'cf-' + field.id"
                 [type]="field.type === 'number' ? 'text' : field.type === 'date' ? 'date' : field.type === 'link' ? 'url' : 'text'"
                 [attr.inputmode]="field.type === 'number' ? 'decimal' : null"
@@ -126,7 +126,7 @@
               />
             }
             @if (error(key); as code) {
-              <span class="text-destructive-ink">{{ 'validation.' + code | transloco }}</span>
+              <span vm-field-error>{{ 'validation.' + code | transloco }}</span>
             }
           </div>
         }

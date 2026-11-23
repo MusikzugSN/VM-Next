@@ -5,9 +5,9 @@
   </z-dialog-header>
 
   <div class="flex min-h-0 flex-1 flex-col gap-5 overflow-y-auto md:max-h-[60dvh] md:flex-none">
-    <label class="flex flex-col gap-1.5">
-      <span class="font-medium">{{ 'library.filter.tag' | transloco }}</span>
-      <select z-native-select [value]="tagId()" (change)="tagId.set($any($event.target).value)">
+    <label vm-field>
+      <span vm-field-label>{{ 'library.filter.tag' | transloco }}</span>
+      <select vm-select [value]="tagId()" (change)="tagId.set($any($event.target).value)">
         <option value="">{{ 'library.filter.allTags' | transloco }}</option>
         @for (tag of options.tags(); track tag.id) {
           <option [value]="tag.id" [selected]="tag.id === tagId()">{{ tag.name }}</option>
@@ -16,9 +16,9 @@
     </label>
 
     @if (options.ensembles().length > 1) {
-      <label class="flex flex-col gap-1.5">
-        <span class="font-medium">{{ 'library.filter.ensemble' | transloco }}</span>
-        <select z-native-select [value]="ensembleId()" (change)="ensembleId.set($any($event.target).value)">
+      <label vm-field>
+        <span vm-field-label>{{ 'library.filter.ensemble' | transloco }}</span>
+        <select vm-select [value]="ensembleId()" (change)="ensembleId.set($any($event.target).value)">
           <option value="">{{ 'library.filter.defaultEnsemble' | transloco }}</option>
           @for (ensemble of options.ensembles(); track ensemble.id) {
             <option [value]="ensemble.id" [selected]="ensemble.id === ensembleId()">{{ ensemble | treeLabel }}</option>
@@ -28,13 +28,13 @@
       </label>
     }
 
-    <label class="flex flex-col gap-1.5">
-      <span class="font-medium">{{ 'library.fields.composer' | transloco }}</span>
-      <input z-input type="text" [value]="$any(input('composer'))?.contains ?? ''" (input)="setText('composer', $any($event.target).value)" />
+    <label vm-field>
+      <span vm-field-label>{{ 'library.fields.composer' | transloco }}</span>
+      <input vm-input type="text" [value]="$any(input('composer'))?.contains ?? ''" (input)="setText('composer', $any($event.target).value)" />
     </label>
-    <label class="flex flex-col gap-1.5">
-      <span class="font-medium">{{ 'library.fields.publisher' | transloco }}</span>
-      <input z-input type="text" [value]="$any(input('publisher'))?.contains ?? ''" (input)="setText('publisher', $any($event.target).value)" />
+    <label vm-field>
+      <span vm-field-label>{{ 'library.fields.publisher' | transloco }}</span>
+      <input vm-input type="text" [value]="$any(input('publisher'))?.contains ?? ''" (input)="setText('publisher', $any($event.target).value)" />
     </label>
 
     @for (field of options.fields(); track field.id) {
@@ -47,12 +47,12 @@
             <div class="flex items-end gap-2">
               <label class="flex flex-1 flex-col gap-1">
                 <span class="text-xs text-muted-foreground">{{ 'library.filter.from' | transloco }}</span>
-                <input z-input type="number" [value]="$any(current)?.from ?? ''" (input)="setRange(col, 'from', $any($event.target).value)" />
+                <input vm-input type="number" [value]="$any(current)?.from ?? ''" (input)="setRange(col, 'from', $any($event.target).value)" />
               </label>
               <span aria-hidden="true" class="pb-2.5">–</span>
               <label class="flex flex-1 flex-col gap-1">
                 <span class="text-xs text-muted-foreground">{{ 'library.filter.to' | transloco }}</span>
-                <input z-input type="number" [value]="$any(current)?.to ?? ''" (input)="setRange(col, 'to', $any($event.target).value)" />
+                <input vm-input type="number" [value]="$any(current)?.to ?? ''" (input)="setRange(col, 'to', $any($event.target).value)" />
               </label>
             </div>
           </fieldset>
@@ -63,12 +63,12 @@
             <div class="flex items-end gap-2">
               <label class="flex flex-1 flex-col gap-1">
                 <span class="text-xs text-muted-foreground">{{ 'library.filter.from' | transloco }}</span>
-                <input z-input type="date" [value]="$any(current)?.from ?? ''" (input)="setRange(col, 'from', $any($event.target).value)" />
+                <input vm-input type="date" [value]="$any(current)?.from ?? ''" (input)="setRange(col, 'from', $any($event.target).value)" />
               </label>
               <span aria-hidden="true" class="pb-2.5">–</span>
               <label class="flex flex-1 flex-col gap-1">
                 <span class="text-xs text-muted-foreground">{{ 'library.filter.to' | transloco }}</span>
-                <input z-input type="date" [value]="$any(current)?.to ?? ''" (input)="setRange(col, 'to', $any($event.target).value)" />
+                <input vm-input type="date" [value]="$any(current)?.to ?? ''" (input)="setRange(col, 'to', $any($event.target).value)" />
               </label>
             </div>
           </fieldset>
@@ -99,9 +99,9 @@
           <ng-container [ngTemplateOutlet]="optionsTpl" [ngTemplateOutletContext]="{ field, col }" />
         }
         @default {
-          <label class="flex flex-col gap-1.5">
-            <span class="font-medium">{{ field.name }}</span>
-            <input z-input type="text" [value]="$any(current)?.contains ?? ''" (input)="setText(col, $any($event.target).value)" />
+          <label vm-field>
+            <span vm-field-label>{{ field.name }}</span>
+            <input vm-input type="text" [value]="$any(current)?.contains ?? ''" (input)="setText(col, $any($event.target).value)" />
           </label>
         }
       }

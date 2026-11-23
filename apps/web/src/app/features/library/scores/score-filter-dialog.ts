@@ -3,10 +3,8 @@ import { ChangeDetectionStrategy, Component, effect, inject, input, model, outpu
 import { TranslocoPipe } from '@jsverse/transloco';
 import type { FieldDefinition } from '@vm-web/shared';
 
-import { VmButton } from '@vm-web/ui';
+import { VmButton, VmField, VmFieldLabel, VmInput, VmSelect } from '@vm-web/ui';
 import { ZardDialogImports } from '@vm-web/ui/zard/components/dialog/dialog.imports';
-import { ZardInputComponent } from '@vm-web/ui/zard/components/input';
-import { ZardNativeSelectDirective } from '@vm-web/ui/zard/components/native-select';
 
 import { ViewportService } from '../../../core/layout/viewport';
 import { LibraryOptions } from '../library-options';
@@ -33,7 +31,7 @@ export interface ScoreFilterResult {
  */
 @Component({
   selector: 'vm-score-filter-dialog',
-  imports: [TreeLabelPipe, NgTemplateOutlet, TranslocoPipe, VmButton, ZardDialogImports, ZardInputComponent, ZardNativeSelectDirective],
+  imports: [VmField, VmFieldLabel, TreeLabelPipe, NgTemplateOutlet, TranslocoPipe, VmButton, ZardDialogImports, VmInput, VmSelect],
   changeDetection: ChangeDetectionStrategy.OnPush,
   // The dialog renders in an overlay; its host must not take up space (or a gap) in the page.
   host: { style: 'display: contents' },
