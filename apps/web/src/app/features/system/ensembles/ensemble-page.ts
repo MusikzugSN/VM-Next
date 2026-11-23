@@ -35,6 +35,7 @@ import { SearchField } from '../../../shared/ui/search-field';
 import { TreeLabelPipe } from '../../../shared/ui/tree-label.pipe';
 import { usePageName } from '../../../core/layout/page';
 import { PrintRulesTab } from './print-rules-tab';
+import { sameMembers, toggled } from '../../../core/util/sets';
 
 type EnsembleTab = 'details' | 'lineup' | 'members' | 'print';
 const TABS: readonly EnsembleTab[] = ['details', 'lineup', 'members', 'print'];
@@ -100,7 +101,7 @@ export class EnsemblePage {
   protected readonly lineupDirty = computed(() => {
     const saved = new Set(this.lineup.hasValue() ? this.lineup.value().voices.map((v) => v.id) : []);
     const chosen = this.selected();
-    return saved.size !== chosen.size || [...chosen].some((id) => !saved.has(id));
+    return !sameMembers(saved, chosen);
   });
 
   // Mitglieder
@@ -147,12 +148,7 @@ export class EnsemblePage {
   }
 
   protected toggleVoice(id: string): void {
-    this.selected.update((current) => {
-      const next = new Set(current);
-      if (next.has(id)) next.delete(id);
-      else next.add(id);
-      return next;
-    });
+    this.selected.update((current) => toggled(current, id));
   }
 
   /** All voices of one instrument on or off. */

@@ -17,6 +17,7 @@ import { NameDialog } from '../../../shared/ui/name-dialog';
 import { PageProblem } from '../../../shared/ui/page-problem';
 import { permissionKey, withDependencies } from './permission-labels';
 import { usePageName } from '../../../core/layout/page';
+import { sameMembers } from '../../../core/util/sets';
 
 /** Rolle (S-3, R-3, R-7): permission matrix (areas × actions) plus single permissions. */
 @Component({
@@ -57,7 +58,7 @@ export class RolePage {
   protected readonly dirty = computed(() => {
     const saved = new Set(this.role()?.permissions ?? []);
     const chosen = this.selected();
-    return saved.size !== chosen.size || [...chosen].some((p) => !saved.has(p));
+    return !sameMembers(saved, chosen);
   });
   /** Live warning while editing (B-1): the role would grant club-wide permissions. */
   protected readonly grantsClub = computed(() => [...this.selected()].some((p) => permissionScope(p) === 'club'));

@@ -20,6 +20,7 @@ import { saveBlob } from '../../../core/util/save-blob';
 import { VoiceContextStore } from '../../../core/voices/voice-context.store';
 import { SelectionBar } from '../../../shared/ui/selection-bar';
 import { StatusBadge } from '../../../shared/ui/status-badge';
+import { toggled } from '../../../core/util/sets';
 
 export type ScoreListRow = MemberScoreRow & { position?: number };
 
@@ -96,12 +97,7 @@ export class MemberScoreList {
   protected readonly zipping = signal(false);
 
   protected toggle(scoreId: string): void {
-    this.selected.update((current) => {
-      const next = new Set(current);
-      if (next.has(scoreId)) next.delete(scoreId);
-      else next.add(scoreId);
-      return next;
-    });
+    this.selected.update((current) => toggled(current, scoreId));
   }
 
   protected toggleAll(): void {

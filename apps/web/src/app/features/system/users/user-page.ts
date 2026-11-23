@@ -22,6 +22,7 @@ import { ToggleSwitch } from '../../../shared/ui/toggle-switch';
 import { UserStatusBadge } from '../ui/user-status-badge';
 import { TreeLabelPipe } from '../../../shared/ui/tree-label.pipe';
 import { usePageName } from '../../../core/layout/page';
+import { sameMembers, toggled } from '../../../core/util/sets';
 
 /** Benutzer-Detail (S-1, A-5, R-1, R-6): roles per ensemble, voices, admin flag, block and delete. */
 @Component({
@@ -71,7 +72,7 @@ export class UserPage {
   protected readonly voicesDirty = computed(() => {
     const current = new Set(this.user()?.voices.map((v) => v.id) ?? []);
     const chosen = this.selectedVoices();
-    return current.size !== chosen.size || [...chosen].some((id) => !current.has(id));
+    return !sameMembers(current, chosen);
   });
 
   constructor() {
@@ -115,12 +116,7 @@ export class UserPage {
   }
 
   protected toggleVoice(id: string): void {
-    this.selectedVoices.update((current) => {
-      const next = new Set(current);
-      if (next.has(id)) next.delete(id);
-      else if (next.size < 20) next.add(id);
-      return next;
-    });
+    this.selectedVoices.update((current) => toggled(current, id, 20));
   }
 
   protected async saveVoices(): Promise<void> {
