@@ -43,7 +43,7 @@ import type { CropMargins, Rotation } from './review-model';
         @if (crop(); as c) {
           <div
             aria-hidden="true"
-            class="pointer-events-none absolute border-2 border-primary shadow-[0_0_0_9999px_rgba(24,24,27,0.35)]"
+            class="pointer-events-none absolute border-2 border-primary shadow-[0_0_0_9999px_color-mix(in_srgb,var(--mat-sys-scrim)_32%,transparent)]"
             [style.left.%]="c.left"
             [style.top.%]="c.top"
             [style.right.%]="c.right"

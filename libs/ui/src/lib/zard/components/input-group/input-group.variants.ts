@@ -22,7 +22,7 @@ export const inputGroupVariants = cva(
 );
 
 export const inputGroupAddonVariants = cva(
-  "flex h-auto cursor-text items-center justify-center gap-2 py-1.5 text-sm font-medium text-muted-foreground select-none group-data-[disabled=true]/input-group:opacity-50 [&>kbd]:rounded-[calc(var(--radius)-5px)] [&>svg:not([class*='size-'])]:size-4",
+  "flex h-auto cursor-text items-center justify-center gap-2 py-1.5 text-sm font-medium text-muted-foreground select-none group-data-[disabled=true]/input-group:opacity-50 [&>kbd]:rounded-extra-small [&>svg:not([class*='size-'])]:size-4",
   {
     variants: {
       zAlign: {
@@ -64,9 +64,9 @@ export const inputGroupButtonVariants = cva(
         link: 'text-primary underline-offset-4 hover:underline',
       },
       zSize: {
-        xs: "h-6 gap-1 rounded-[calc(var(--radius)-3px)] px-1.5 [&>svg:not([class*='size-'])]:size-3.5",
+        xs: "h-6 gap-1 rounded-extra-small px-1.5 [&>svg:not([class*='size-'])]:size-3.5",
         sm: 'h-8 px-3',
-        'icon-xs': 'size-6 rounded-[calc(var(--radius)-3px)] p-0 has-[>svg]:p-0',
+        'icon-xs': 'size-6 rounded-extra-small p-0 has-[>svg]:p-0',
         'icon-sm': 'size-8 p-0 has-[>svg]:p-0',
       },
     },

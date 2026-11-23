@@ -26,7 +26,7 @@ export const nativeSelectVariants = cva(
   {
     variants: {
       zSize: {
-        sm: 'h-7 rounded-[min(var(--radius-md),10px)] py-0.5',
+        sm: 'h-7 rounded-small py-0.5',
         default: '',
         lg: 'h-10 ps-3 pe-9 text-base md:text-sm',
       },
