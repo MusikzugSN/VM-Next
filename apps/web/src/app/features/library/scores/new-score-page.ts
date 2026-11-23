@@ -61,8 +61,8 @@ export class NewScorePage {
       this.focusInvalid();
       return;
     }
-    this.saving.set(true);
     const done = await this.actions.run(() => firstValueFrom(this.api.post(apiUrl('scores', 'createScore'), body, createdResponseSchema)), {
+      busy: this.saving,
       success: { key: 'library.form.created', params: { title: body.title } },
       onProblem: (problem) => {
         if (isApiProblem(problem) && problem.code === 'validation-failed') {
@@ -73,7 +73,6 @@ export class NewScorePage {
         return false;
       },
     });
-    this.saving.set(false);
     if (done) void this.router.navigateByUrl(appPath(APP_ROUTES.library.score, { scoreId: done.value.id }));
   }
 }

@@ -133,7 +133,6 @@ export class VoiceDialog {
       return;
     }
 
-    this.saving.set(true);
     const target = this.target();
     const onProblem = (problem: unknown) => {
       if (isApiProblem(problem) && problem.code === 'validation-failed') {
@@ -156,9 +155,8 @@ export class VoiceDialog {
           await firstValueFrom(this.api.postVoid(apiUrl('voices', 'setSubstitutes', { voiceId }), { substituteVoiceIds }));
         }
       },
-      { success: { key: target ? 'library.voices.saved' : 'library.voices.created', params: { name: body.name } }, onProblem },
+      { busy: this.saving, success: { key: target ? 'library.voices.saved' : 'library.voices.created', params: { name: body.name } }, onProblem },
     );
-    this.saving.set(false);
     if (done) {
       this.open.set(false);
       this.saved.emit();

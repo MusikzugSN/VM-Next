@@ -215,10 +215,10 @@ export class LibraryScorePage {
       this.focusInvalid();
       return;
     }
-    this.saving.set(true);
     const done = await this.actions.run(
       () => firstValueFrom(this.api.postVoid(apiUrl('scores', 'updateScoreDetails', { scoreId: this.scoreId() }), body)),
       {
+        busy: this.saving,
         success: { key: 'library.form.saved' },
         onProblem: (problem) => {
           if (isApiProblem(problem) && problem.code === 'validation-failed') {
@@ -230,7 +230,6 @@ export class LibraryScorePage {
         },
       },
     );
-    this.saving.set(false);
     if (done) this.details.reload();
   }
 
