@@ -484,3 +484,50 @@ Befunde im Bestand:
 | --- | --- | --- |
 | `@material/material-color-utilities` (Google, Apache-2.0) | Tonpaletten (HCT) aus der Markenfarbe erzeugen, inkl. Darkmode-Werten (D-21) | Liefert exakt die M3-Tonwerte statt handgewählter Hex-Werte; nur als Dev-Werkzeug bzw. Skript nötig, nicht im Bundle. |
 | `@playwright/test` (falls nicht schon über das E2E-Setup vorhanden) | Screenshot-Vergleiche vor/nach Design-Umbauten | Macht visuelle Änderungen der Umbau-PRs prüfbar; `axe-core` ist bereits vorhanden und kann für automatische Kontrastprüfung im selben Lauf genutzt werden. |
+
+## Umsetzungsstand
+
+Stand: 23.11.2026. Die Referenzseite `material.angular.dev` wurde im Browser ausgelesen. Damit sind die oben mit „(prüfen)“ markierten Werte geklärt: Fokus- und Pressed-State-Layer haben die Deckkraft `0.12`, Laufweiten werden in `rem` geführt, die Schatten `level0` bis `level5` sind die dort ausgegebenen dreiteiligen Werte. `--mat-sys-font-plain` gibt es in der Referenz nicht und wurde nicht angelegt. Ergänzt wurden `--mat-sys-neutral10`, `--mat-sys-neutral-variant20` und `--mat-sys-label-*-weight-prominent`.
+
+| Thema | PR | Anmerkung |
+| --- | --- | --- |
+| D-01 | MusikzugSN/VM-Next#32 | gemergt |
+| D-02 | MusikzugSN/VM-Next#33 | gemergt |
+| D-03 | MusikzugSN/VM-Next#34 | |
+| D-04 | MusikzugSN/VM-Next#36 | |
+| D-05 | MusikzugSN/VM-Next#37 | |
+| D-06 | MusikzugSN/VM-Next#38 | |
+| D-07 | MusikzugSN/VM-Next#39 | |
+| D-08 | MusikzugSN/VM-Next#40 | `vm-form-dialog` und `vm-name-dialog` bleiben in der App |
+| D-09 | MusikzugSN/VM-Next#41 | |
+| D-10 | MusikzugSN/VM-Next#42 | |
+| D-11 | MusikzugSN/VM-Next#43 | |
+| D-12 | MusikzugSN/VM-Next#44 | `vm-status-badge` bleibt in der App |
+| D-13 | MusikzugSN/VM-Next#45 | kein `vm-tooltip`, die App nutzt keine Tooltips |
+| D-14 | MusikzugSN/VM-Next#46 | kein `vm-list-item`, Profil-Tabelle bleibt |
+| D-15 | MusikzugSN/VM-Next#47 | |
+| D-16 | MusikzugSN/VM-Next#48 | |
+| D-17 | MusikzugSN/VM-Next#49 | keine Navigation Rail |
+| D-18 | MusikzugSN/VM-Next#50 | |
+| D-19 | MusikzugSN/VM-Next#51 | |
+| D-20 | MusikzugSN/VM-Next#52 | |
+| D-21 | MusikzugSN/VM-Next#53 | keine dunklen Farbwerte, Anforderung steht aus |
+| D-22 | MusikzugSN/VM-Next#54 | externe Design Guideline nicht geändert |
+
+### Zusätzliche Abweichungen aus der Umsetzung
+
+| Abweichung | Thema | Begründung |
+| --- | --- | --- |
+| Dialogfläche `surface-container-low` statt `surface-container-high` | D-08 | `outline` erreicht auf `surface-container-high` nur 2,90:1 (WCAG 1.4.11), auf `surface-container-low` 3,28:1. |
+| Trennlinien an Dialog-Header und -Footer | D-08 | Der Inhalt langer Dialoge scrollt zwischen beiden Bereichen. |
+| Button-Innenabstand 16 px statt 24 dp | D-06 | Viele Buttons in engen Zeilen der Verwaltungsseiten. |
+| Fokusring 2 px in `primary` statt 3 dp in `secondary` | D-09 | Festlegung der Design Guideline, deutlich höherer Kontrast. |
+| Schalter 48×28 px statt 52×32 dp | D-11 | Passt in die kompakten Zeilen ab 1280 px. |
+| Schalter-Griff aus: `on-surface-variant` statt `outline` | D-11 | `outline` erreicht auf der Spur nicht 3:1. |
+| Feste Farben in data-URLs (Haken `#ffffff`, Pfeil `#63636b`) | D-07, D-11 | In data-URLs greifen keine CSS-Variablen. Die Werte entsprechen `on-primary` und `on-surface-variant`. |
+| Menüeinträge 44/32 px statt 48 dp | D-13 | Gleiche Zielgrößen wie die übrigen Bedienelemente. |
+| Tabellenzeilen kompakt statt 52–56 dp | D-14 | Dichte der Verwaltungslisten. |
+| `text-[13px]` einheitlich zu `body-medium` | D-15 | Die größere Rolle ist die lesbarere, eine Unterscheidung nach Inhalt wäre unzuverlässig. |
+| Top App Bar 56 px statt 64 dp, Titel `title-medium` | D-17 | Mehr Inhaltshöhe auf kleinen Displays. |
+| Keine Navigation Rail | D-17 | Breakpoints und Verhalten der Navigation sollen gleich bleiben. |
+| Tailwind-Aliase `rounded-sm` … `-xl`, `shadow-sm`/`-lg`, shadcn-Farbnamen | D-01, D-19 | Der Zard-Code nutzt diese Namen. Sie zeigen ohne eigene Werte auf `--mat-sys-*`. |
