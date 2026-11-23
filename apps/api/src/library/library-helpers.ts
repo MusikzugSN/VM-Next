@@ -6,6 +6,7 @@ import { activeEnsembleOptions } from '../common/ensemble-tree';
 import type { Database } from '../db/database';
 import { ensembles, scores } from '../db/schema';
 import { likePattern } from '../me/me.repository';
+import { decodeCursor, toPage } from '../common/pagination/cursor';
 
 /** Non-archived ensembles in which the caller holds `permission` (incl. inherited, F-3), in tree order; 403 if none. */
 export async function ensembleOptions(db: Database, access: AccessContext, permission: Permission) {
@@ -19,6 +20,17 @@ export async function assertActiveEnsemble(db: Database, ensembleId: string): Pr
   const [row] = await db.select({ archivedAt: ensembles.archivedAt }).from(ensembles).where(eq(ensembles.id, ensembleId));
   if (!row) throw ProblemException.notFound('Unknown ensemble');
   if (row.archivedAt) throw ProblemException.validation([{ path: '/body/ensembleId', code: 'archived' }]);
+}
+
+/** One page of score candidates for a folder or setlist. */
+export async function scoreCandidatePage(db: Database, query: { q: string; cursor?: string; limit: number }, containedSql: SQL<boolean>) {
+  const rows = await scoreCandidates(db, query.q, containedSql, decodeCursor(query.cursor, 2), query.limit);
+  return toPage(rows, query.limit, (r) => [r.sortKey, r.id], (r) => ({
+    id: r.id,
+    title: r.title,
+    composer: r.composer,
+    alreadyContained: r.alreadyContained,
+  }));
 }
 
 /**

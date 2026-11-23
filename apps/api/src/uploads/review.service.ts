@@ -7,7 +7,7 @@ import type {
   ReviewQueueResponse,
   UploadDetailsResponse,
 } from '@vm-web/shared';
-import { and, asc, eq, sql } from 'drizzle-orm';
+import { and, asc, desc, eq, sql } from 'drizzle-orm';
 import { alias } from 'drizzle-orm/pg-core';
 import type { Readable } from 'node:stream';
 import type { AccessContext } from '../access/access-context';
@@ -208,16 +208,16 @@ export class ReviewService {
     const created = ref.createdAt.toISOString();
     const after = sql`(${uploads.createdAt}, ${uploads.id}) > (${created}::timestamptz, ${uploadId}::uuid)`;
     const before = sql`(${uploads.createdAt}, ${uploads.id}) < (${created}::timestamptz, ${uploadId}::uuid)`;
-    const pick = async (cond: ReturnType<typeof sql> | undefined, order: 'asc' | 'desc') => {
+    const pick = async (cond: ReturnType<typeof sql> | undefined, sort: typeof asc) => {
       const [row] = await this.db
         .select({ id: uploads.id })
         .from(uploads)
         .where(and(eq(uploads.status, 'pending'), sql`${uploads.id} <> ${uploadId}::uuid`, cond))
-        .orderBy(order === 'asc' ? asc(uploads.createdAt) : sql`${uploads.createdAt} desc`, order === 'asc' ? asc(uploads.id) : sql`${uploads.id} desc`)
+        .orderBy(sort(uploads.createdAt), sort(uploads.id))
         .limit(1);
       return row?.id ?? null;
     };
-    if (direction === 'previous') return pick(before, 'desc');
-    return (await pick(after, 'asc')) ?? (await pick(undefined, 'asc'));
+    if (direction === 'previous') return pick(before, desc);
+    return (await pick(after, asc)) ?? (await pick(undefined, asc));
   }
 }
