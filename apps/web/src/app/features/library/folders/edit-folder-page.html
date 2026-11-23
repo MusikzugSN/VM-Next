@@ -17,11 +17,11 @@
       </p>
     </div>
     <div class="flex flex-col gap-2 md:flex-row">
-      <button z-button zType="outline" type="button" class="w-full md:w-auto" (click)="print()">
+      <button vm-button variant="outlined" type="button" class="w-full md:w-auto" (click)="print()">
         <ng-icon name="lucidePrinter" aria-hidden="true" />{{ 'common.print' | transloco }}
       </button>
       @if (canEdit()) {
-        <button z-button type="button" class="w-full md:w-auto" (click)="adding.set(true)">
+        <button vm-button type="button" class="w-full md:w-auto" (click)="adding.set(true)">
           <ng-icon name="lucidePlus" aria-hidden="true" />{{ 'library.common.addScore' | transloco }}
         </button>
       }
@@ -93,7 +93,7 @@
             }
           </span>
           @if (canEdit()) {
-            <button z-button zType="ghost" zSize="icon" type="button" (click)="remove(entry)" [attr.aria-label]="'library.folder.removeLabel' | transloco: { title: entry.title }">
+            <button vm-icon-button type="button" (click)="remove(entry)" [attr.aria-label]="'library.folder.removeLabel' | transloco: { title: entry.title }">
               <ng-icon name="lucideX" aria-hidden="true" />
             </button>
           }
@@ -107,7 +107,7 @@
   </section>
 
   @if (canDelete()) {
-    <button z-button zType="destructive" type="button" class="w-full md:w-auto md:self-start" (click)="deleteFolder()">
+    <button vm-button variant="danger" type="button" class="w-full md:w-auto md:self-start" (click)="deleteFolder()">
       <ng-icon name="lucideTrash2" aria-hidden="true" />{{ 'library.folders.delete' | transloco }}
     </button>
   }

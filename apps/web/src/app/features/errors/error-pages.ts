@@ -6,12 +6,12 @@ import { NgIcon, provideIcons } from '@ng-icons/core';
 import { lucideArrowLeft, lucideHouse, lucideSearchX, lucideShieldX } from '@ng-icons/lucide';
 import { APP_ROUTES } from '@vm-web/shared';
 
-import { ZardButtonComponent } from '@vm-web/ui/zard/components/button';
+import { VmButton } from '@vm-web/ui';
 
 /** Kein Zugriff: page needs a permission the person does not have. */
 @Component({
   selector: 'vm-forbidden-page',
-  imports: [RouterLink, TranslocoPipe, NgIcon, ZardButtonComponent],
+  imports: [RouterLink, TranslocoPipe, NgIcon, VmButton],
   viewProviders: [provideIcons({ lucideShieldX, lucideHouse })],
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
@@ -24,7 +24,7 @@ import { ZardButtonComponent } from '@vm-web/ui/zard/components/button';
         <p class="text-muted-foreground">{{ 'pages.forbidden.text' | transloco }}</p>
       </div>
       <div>
-        <a z-button [routerLink]="homePath" class="w-full md:w-auto">
+        <a vm-button [routerLink]="homePath" class="w-full md:w-auto">
           <ng-icon name="lucideHouse" aria-hidden="true" />{{ 'pages.toHome' | transloco }}
         </a>
       </div>
@@ -38,7 +38,7 @@ export class ForbiddenPage {
 /** Seite nicht gefunden: unknown path inside the app. */
 @Component({
   selector: 'vm-not-found-page',
-  imports: [RouterLink, TranslocoPipe, NgIcon, ZardButtonComponent],
+  imports: [RouterLink, TranslocoPipe, NgIcon, VmButton],
   viewProviders: [provideIcons({ lucideSearchX, lucideHouse, lucideArrowLeft })],
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
@@ -54,8 +54,8 @@ export class ForbiddenPage {
         </p>
       </div>
       <div class="flex flex-col gap-2 md:flex-row">
-        <a z-button [routerLink]="homePath"> <ng-icon name="lucideHouse" aria-hidden="true" />{{ 'pages.toHome' | transloco }} </a>
-        <button z-button zType="outline" type="button" (click)="back()">
+        <a vm-button [routerLink]="homePath"> <ng-icon name="lucideHouse" aria-hidden="true" />{{ 'pages.toHome' | transloco }} </a>
+        <button vm-button variant="outlined" type="button" (click)="back()">
           <ng-icon name="lucideArrowLeft" aria-hidden="true" />{{ 'common.back' | transloco }}
         </button>
       </div>

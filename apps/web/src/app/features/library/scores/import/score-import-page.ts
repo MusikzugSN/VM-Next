@@ -15,7 +15,7 @@ import {
 } from '@vm-web/shared';
 import { catchError, of } from 'rxjs';
 
-import { ZardButtonComponent } from '@vm-web/ui/zard/components/button';
+import { VmButton } from '@vm-web/ui';
 import { ZardInputComponent } from '@vm-web/ui/zard/components/input';
 import { ZardNativeSelectDirective } from '@vm-web/ui/zard/components/native-select';
 
@@ -48,7 +48,7 @@ type RowFilter = 'all' | 'issues' | 'matches';
  */
 @Component({
   selector: 'vm-score-import-page',
-  imports: [RouterLink, NgIcon, TranslocoPipe, PluralPipe, TreeLabelPipe, ZardButtonComponent, ZardInputComponent, ZardNativeSelectDirective],
+  imports: [RouterLink, NgIcon, TranslocoPipe, PluralPipe, TreeLabelPipe, VmButton, ZardInputComponent, ZardNativeSelectDirective],
   viewProviders: [provideIcons({ lucideUpload, lucideFileSpreadsheet, lucideCircleAlert, lucideTriangleAlert })],
   changeDetection: ChangeDetectionStrategy.OnPush,
   templateUrl: './score-import-page.html',

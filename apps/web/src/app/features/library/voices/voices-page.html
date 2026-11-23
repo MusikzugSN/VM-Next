@@ -7,7 +7,7 @@
     </p>
   </div>
   @if (canCreate()) {
-    <button z-button type="button" class="w-full md:w-auto" (click)="create()">
+    <button vm-button type="button" class="w-full md:w-auto" (click)="create()">
       <ng-icon name="lucidePlus" aria-hidden="true" />{{ 'library.voices.create' | transloco }}
     </button>
   }
@@ -29,18 +29,17 @@
           <span class="text-xs font-medium text-muted-foreground">· {{ 'library.voices.voices' | tPlural: group.voices.length }}</span>
         </h2>
         @if (canEdit()) {
-          <button z-button zType="ghost" zSize="icon" type="button" (click)="startRename(group)" [attr.aria-label]="'library.voices.renameInstrument' | transloco: { name: group.instrument.name }">
+          <button vm-icon-button type="button" (click)="startRename(group)" [attr.aria-label]="'library.voices.renameInstrument' | transloco: { name: group.instrument.name }">
             <ng-icon name="lucidePencil" aria-hidden="true" />
           </button>
         }
         @if (canReorder()) {
-          <button z-button zType="ghost" zSize="icon" type="button" [zDisabled]="gi === 0" (click)="moveInstrument(gi, -1)" [attr.aria-label]="'common.moveUp' | transloco: { name: group.instrument.name }">
+          <button vm-icon-button type="button" [zDisabled]="gi === 0" (click)="moveInstrument(gi, -1)" [attr.aria-label]="'common.moveUp' | transloco: { name: group.instrument.name }">
             <ng-icon name="lucideArrowUp" aria-hidden="true" />
           </button>
           <button
-            z-button
-            zType="ghost"
-            zSize="icon"
+            vm-icon-button
+           
             type="button"
             [zDisabled]="gi === groups().length - 1"
             (click)="moveInstrument(gi, 1)"
@@ -71,20 +70,20 @@
             </span>
             <div class="flex items-center gap-1">
               @if (canReorder()) {
-                <button z-button zType="ghost" zSize="icon" type="button" [zDisabled]="first" (click)="moveVoice(group, i, -1)" [attr.aria-label]="'common.moveUp' | transloco: { name: voice.name }">
+                <button vm-icon-button type="button" [zDisabled]="first" (click)="moveVoice(group, i, -1)" [attr.aria-label]="'common.moveUp' | transloco: { name: voice.name }">
                   <ng-icon name="lucideArrowUp" aria-hidden="true" />
                 </button>
-                <button z-button zType="ghost" zSize="icon" type="button" [zDisabled]="last" (click)="moveVoice(group, i, 1)" [attr.aria-label]="'common.moveDown' | transloco: { name: voice.name }">
+                <button vm-icon-button type="button" [zDisabled]="last" (click)="moveVoice(group, i, 1)" [attr.aria-label]="'common.moveDown' | transloco: { name: voice.name }">
                   <ng-icon name="lucideArrowDown" aria-hidden="true" />
                 </button>
               }
               @if (canEdit()) {
-                <button z-button zType="ghost" zSize="icon" type="button" (click)="edit(group, voice)" [attr.aria-label]="'library.voices.editLabel' | transloco: { name: voice.name }">
+                <button vm-icon-button type="button" (click)="edit(group, voice)" [attr.aria-label]="'library.voices.editLabel' | transloco: { name: voice.name }">
                   <ng-icon name="lucidePencil" aria-hidden="true" />
                 </button>
               }
               @if (canDelete()) {
-                <button z-button zType="ghost" zSize="icon" type="button" class="text-destructive-ink" (click)="remove(voice)" [attr.aria-label]="'library.voices.deleteLabel' | transloco: { name: voice.name }">
+                <button vm-icon-button type="button" class="text-destructive-ink" (click)="remove(voice)" [attr.aria-label]="'library.voices.deleteLabel' | transloco: { name: voice.name }">
                   <ng-icon name="lucideTrash2" aria-hidden="true" />
                 </button>
               }

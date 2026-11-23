@@ -4,7 +4,7 @@ import { dirname, join, relative } from 'node:path';
 import { Component, signal } from '@angular/core';
 import { TestBed } from '@angular/core/testing';
 
-import { ZardButtonComponent } from '@vm-web/ui/zard/components/button';
+import { VmButton, VmIconButton } from '@vm-web/ui';
 
 function appRoot(): string {
   let dir = process.cwd();
@@ -21,17 +21,18 @@ function templates(dir: string): string[] {
 }
 
 @Component({
-  imports: [ZardButtonComponent],
+  imports: [VmButton, VmIconButton],
   template: `
-    <button z-button type="button" [zDisabled]="off()">Speichern</button>
-    <a z-button href="/x">Link</a>
+    <button vm-button type="button" [zDisabled]="off()">Speichern</button>
+    <a vm-button href="/x">Link</a>
+    <button vm-icon-button variant="danger" type="button" aria-label="Löschen"></button>
   `,
 })
 class Host {
   readonly off = signal(true);
 }
 
-describe('Zard button in VM-Web', () => {
+describe('vm-button in VM-Web', () => {
   it('disables a native button through zDisabled and keeps link semantics', async () => {
     const fixture = TestBed.createComponent(Host);
     await fixture.whenStable();
@@ -46,10 +47,30 @@ describe('Zard button in VM-Web', () => {
     expect(button.disabled).toBe(false);
   });
 
+  it('maps the M3 variants to their color roles', async () => {
+    const fixture = TestBed.createComponent(Host);
+    await fixture.whenStable();
+    const el = fixture.nativeElement as HTMLElement;
+    expect(el.querySelector('a')?.className).toContain('bg-primary');
+    expect(el.querySelector('a')?.className).toContain('text-on-primary');
+    const icon = el.querySelector('button[vm-icon-button]');
+    expect(icon?.className).toContain('bg-error');
+    expect(icon?.className).toContain('size-control');
+  });
+
+  it('shows a disabled button in the M3 disabled colors', async () => {
+    const fixture = TestBed.createComponent(Host);
+    await fixture.whenStable();
+    const cls = (fixture.nativeElement as HTMLElement).querySelector('button')?.className ?? '';
+    expect(cls).toContain('bg-on-surface/12');
+    expect(cls).toContain('text-on-surface/38');
+    expect(cls).not.toContain('bg-primary');
+  });
+
   it('is never disabled with [disabled] (the host binding would remove it)', () => {
     const root = appRoot();
     const offenders = templates(root).filter((file) =>
-      [...readFileSync(file, 'utf8').matchAll(/<(button|a)\b[^>]*?\bz-button\b[^>]*?>/gs)].some((m) => m[0].includes('[disabled]=')),
+      [...readFileSync(file, 'utf8').matchAll(/<(button|a)\b[^>]*?\bvm-(?:icon-)?button\b[^>]*?>/gs)].some((m) => m[0].includes('[disabled]=')),
     );
     expect(offenders.map((f) => relative(root, f))).toEqual([]);
   });

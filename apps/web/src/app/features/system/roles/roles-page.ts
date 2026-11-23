@@ -5,7 +5,7 @@ import { NgIcon, provideIcons } from '@ng-icons/core';
 import { lucidePlus, lucideRotateCcw, lucideTriangleAlert } from '@ng-icons/lucide';
 import { APP_ROUTES, apiUrl, appPath, createdResponseSchema, resetDefaultsResponseSchema, roleListResponseSchema, type RoleListItem } from '@vm-web/shared';
 
-import { ZardButtonComponent } from '@vm-web/ui/zard/components/button';
+import { VmButton } from '@vm-web/ui';
 
 import { ActionRunner, ConfirmService } from '../../../core/actions/action-runner';
 import { ApiClient } from '../../../core/api/api-client';
@@ -18,7 +18,7 @@ import { NameDialog } from '../../../shared/ui/name-dialog';
 /** Rollen (S-3, R-5): list with badges, create, reset all default roles. */
 @Component({
   selector: 'vm-system-roles-page',
-  imports: [RouterLink, NgIcon, TranslocoPipe, PluralPipe, ZardButtonComponent, ListState, NameDialog],
+  imports: [RouterLink, NgIcon, TranslocoPipe, PluralPipe, VmButton, ListState, NameDialog],
   viewProviders: [provideIcons({ lucidePlus, lucideRotateCcw, lucideTriangleAlert })],
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
@@ -29,12 +29,12 @@ import { NameDialog } from '../../../shared/ui/name-dialog';
       </div>
       <div class="flex flex-col gap-2 md:flex-row">
         @if (canEdit()) {
-          <button z-button zType="outline" type="button" (click)="resetAll()">
+          <button vm-button variant="outlined" type="button" (click)="resetAll()">
             <ng-icon name="lucideRotateCcw" aria-hidden="true" />{{ 'system.roles.resetAll' | transloco }}
           </button>
         }
         @if (canCreate()) {
-          <button z-button type="button" (click)="creating.set(true)">
+          <button vm-button type="button" (click)="creating.set(true)">
             <ng-icon name="lucidePlus" aria-hidden="true" />{{ 'system.roles.create' | transloco }}
           </button>
         }

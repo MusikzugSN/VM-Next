@@ -5,7 +5,7 @@ import { NgIcon, provideIcons } from '@ng-icons/core';
 import { lucideLogOut, lucideMusic2, lucidePencil } from '@ng-icons/lucide';
 import { apiUrl, profileResponseSchema } from '@vm-web/shared';
 
-import { ZardButtonComponent } from '@vm-web/ui/zard/components/button';
+import { VmButton } from '@vm-web/ui';
 
 import { ApiClient } from '../../core/api/api-client';
 import { SessionStore } from '../../core/auth/session.store';
@@ -16,7 +16,7 @@ import { VoiceSelectionDialog } from './ui/voice-selection-dialog';
 /** Profil (M-1, A-4): account from the identity server (read-only), own voices, ensembles and roles, Abmelden. */
 @Component({
   selector: 'vm-me-profile-page',
-  imports: [NgIcon, TranslocoPipe, ZardButtonComponent, PageProblem, VoiceSelectionDialog],
+  imports: [NgIcon, TranslocoPipe, VmButton, PageProblem, VoiceSelectionDialog],
   viewProviders: [provideIcons({ lucidePencil, lucideMusic2, lucideLogOut })],
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
@@ -54,7 +54,7 @@ import { VoiceSelectionDialog } from './ui/voice-selection-dialog';
       <section aria-labelledby="h-voices" class="flex flex-col gap-4 rounded-lg border bg-card p-4 shadow-sm md:p-6">
         <div class="flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
           <h2 id="h-voices" class="text-lg font-semibold">{{ 'me.profile.voices' | transloco }}</h2>
-          <button z-button zType="outline" type="button" class="w-full md:w-auto" (click)="editVoices.set(true)">
+          <button vm-button variant="outlined" type="button" class="w-full md:w-auto" (click)="editVoices.set(true)">
             <ng-icon name="lucidePencil" aria-hidden="true" />{{ 'me.profile.editVoices' | transloco }}
           </button>
         </div>
@@ -97,7 +97,7 @@ import { VoiceSelectionDialog } from './ui/voice-selection-dialog';
         }
       </section>
 
-      <button z-button zType="outline" type="button" class="w-full md:w-auto md:self-start" (click)="logout()">
+      <button vm-button variant="outlined" type="button" class="w-full md:w-auto md:self-start" (click)="logout()">
         <ng-icon name="lucideLogOut" aria-hidden="true" />{{ 'common.logout' | transloco }}
       </button>
     }

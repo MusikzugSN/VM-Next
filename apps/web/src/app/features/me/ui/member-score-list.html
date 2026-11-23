@@ -45,15 +45,14 @@
         </div>
         @if (item.missing) {
           @if (canUpload()) {
-            <button z-button zType="ghost" type="button" (click)="upload(item.row)">
+            <button vm-button variant="text" type="button" (click)="upload(item.row)">
               <ng-icon name="lucideUpload" aria-hidden="true" />{{ 'common.upload' | transloco }}
             </button>
           }
         } @else if (item.download) {
           <a
-            z-button
-            zType="ghost"
-            zSize="icon"
+            vm-icon-button
+           
             [href]="item.download"
             download
             [attr.aria-label]="'me.list.download' | transloco: { title: item.row.title }"
@@ -135,9 +134,8 @@
             <td class="px-4 py-3 text-end">
               @if (item.download) {
                 <a
-                  z-button
-                  zType="ghost"
-                  zSize="icon"
+                  vm-icon-button
+                 
                   [href]="item.download"
                   download
                   [attr.aria-label]="'me.list.download' | transloco: { title: item.row.title }"
@@ -154,10 +152,10 @@
 }
 
 <vm-selection-bar [count]="selected().size" (cleared)="clearSelection()">
-  <button z-button zType="outline" type="button" [zLoading]="zipping()" [zDisabled]="zipping()" (click)="downloadZip()">
+  <button vm-button variant="outlined" type="button" [zLoading]="zipping()" [zDisabled]="zipping()" (click)="downloadZip()">
     <ng-icon name="lucideFileArchive" aria-hidden="true" />{{ 'common.selection.zip' | transloco }}
   </button>
-  <button z-button type="button" (click)="printSelection()">
+  <button vm-button type="button" (click)="printSelection()">
     <ng-icon name="lucidePrinter" aria-hidden="true" />{{ 'common.selection.print' | transloco }}
   </button>
 </vm-selection-bar>

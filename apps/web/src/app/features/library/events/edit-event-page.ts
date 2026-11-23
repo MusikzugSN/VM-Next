@@ -17,7 +17,7 @@ import {
 } from '@vm-web/shared';
 import { firstValueFrom, map, type Observable } from 'rxjs';
 
-import { ZardButtonComponent } from '@vm-web/ui/zard/components/button';
+import { VmButton, VmIconButton } from '@vm-web/ui';
 import { ZardInputComponent } from '@vm-web/ui/zard/components/input';
 
 import { ActionRunner, ConfirmService } from '../../../core/actions/action-runner';
@@ -47,7 +47,7 @@ type Item = Pick<SetlistEntry, 'scoreId' | 'title' | 'composer'>;
     RouterLink,
     NgIcon,
     TranslocoPipe,
-    ZardButtonComponent,
+    VmButton, VmIconButton,
     ZardInputComponent,
     PageProblem,
     ToggleSwitch,

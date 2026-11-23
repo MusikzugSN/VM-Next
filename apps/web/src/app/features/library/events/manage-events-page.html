@@ -4,7 +4,7 @@
     <p class="mt-2 text-muted-foreground">{{ 'library.events.intro' | transloco }}</p>
   </div>
   @if (canCreate()) {
-    <button z-button type="button" class="w-full md:w-auto" (click)="creating.set(true)">
+    <button vm-button type="button" class="w-full md:w-auto" (click)="creating.set(true)">
       <ng-icon name="lucidePlus" aria-hidden="true" />{{ 'library.events.create' | transloco }}
     </button>
   }
@@ -95,12 +95,12 @@
             </td>
             <td class="px-4 py-2 text-end">
               @if (canEdit(event)) {
-                <a z-button zType="ghost" zSize="icon" [routerLink]="link(event)" [attr.aria-label]="'library.events.editLabel' | transloco: { name: event.name }">
+                <a vm-icon-button [routerLink]="link(event)" [attr.aria-label]="'library.events.editLabel' | transloco: { name: event.name }">
                   <ng-icon name="lucidePencil" aria-hidden="true" />
                 </a>
               }
               @if (canDelete(event)) {
-                <button z-button zType="ghost" zSize="icon" type="button" class="text-destructive-ink" (click)="remove(event)" [attr.aria-label]="'library.events.deleteLabel' | transloco: { name: event.name }">
+                <button vm-icon-button type="button" class="text-destructive-ink" (click)="remove(event)" [attr.aria-label]="'library.events.deleteLabel' | transloco: { name: event.name }">
                   <ng-icon name="lucideTrash2" aria-hidden="true" />
                 </button>
               }

@@ -5,7 +5,7 @@ import { NgIcon, provideIcons } from '@ng-icons/core';
 import { lucideTriangleAlert } from '@ng-icons/lucide';
 import { apiUrl, configDefaultOptionsResponseSchema, type ConfigResponse } from '@vm-web/shared';
 
-import { ZardButtonComponent } from '@vm-web/ui/zard/components/button';
+import { VmButton } from '@vm-web/ui';
 import { ZardNativeSelectDirective } from '@vm-web/ui/zard/components/native-select';
 
 import { ActionRunner } from '../../../core/actions/action-runner';
@@ -15,7 +15,7 @@ import { TreeLabelPipe } from '../../../shared/ui/tree-label.pipe';
 /** Tab „Standardwerte“ (A-3): ensemble and role of new accounts; warning if that role has club permissions (B-1). */
 @Component({
   selector: 'vm-defaults-settings',
-  imports: [TreeLabelPipe, NgIcon, TranslocoPipe, ZardButtonComponent, ZardNativeSelectDirective],
+  imports: [TreeLabelPipe, NgIcon, TranslocoPipe, VmButton, ZardNativeSelectDirective],
   viewProviders: [provideIcons({ lucideTriangleAlert })],
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
@@ -52,7 +52,7 @@ import { TreeLabelPipe } from '../../../shared/ui/tree-label.pipe';
       </div>
       <p class="text-[13px] text-muted-foreground">{{ 'system.settings.defaults.noneHint' | transloco }}</p>
       @if (!readonly()) {
-        <button z-button type="submit" class="self-end" [zDisabled]="!dirty()">{{ 'common.save' | transloco }}</button>
+        <button vm-button type="submit" class="self-end" [zDisabled]="!dirty()">{{ 'common.save' | transloco }}</button>
       }
     </form>
   `,

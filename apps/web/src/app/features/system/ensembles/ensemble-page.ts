@@ -17,7 +17,7 @@ import {
 } from '@vm-web/shared';
 import { of } from 'rxjs';
 
-import { ZardButtonComponent } from '@vm-web/ui/zard/components/button';
+import { VmButton } from '@vm-web/ui';
 import { ZardNativeSelectDirective } from '@vm-web/ui/zard/components/native-select';
 
 import { ActionRunner, ConfirmService } from '../../../core/actions/action-runner';
@@ -44,7 +44,7 @@ const TABS: readonly EnsembleTab[] = ['details', 'lineup', 'members', 'print'];
 /** Ensemble (S-2, F-3, N-8): Stammdaten · Besetzung · Mitglieder (tab in `?tab=`). */
 @Component({
   selector: 'vm-system-ensemble-page',
-  imports: [TreeLabelPipe, DatePipe, RouterLink, NgIcon, TranslocoPipe, PluralPipe, ZardButtonComponent, ZardNativeSelectDirective, ListState, NameDialog, PageProblem, SearchField, PrintRulesTab],
+  imports: [TreeLabelPipe, DatePipe, RouterLink, NgIcon, TranslocoPipe, PluralPipe, VmButton, ZardNativeSelectDirective, ListState, NameDialog, PageProblem, SearchField, PrintRulesTab],
   viewProviders: [provideIcons({ lucideChevronLeft, lucideWandSparkles })],
   changeDetection: ChangeDetectionStrategy.OnPush,
   templateUrl: './ensemble-page.html',

@@ -8,7 +8,7 @@ import { NgIcon, provideIcons } from '@ng-icons/core';
 import { lucideChevronLeft, lucideFileArchive, lucidePrinter } from '@ng-icons/lucide';
 import { APP_ROUTES, apiUrl, myEventOverviewResponseSchema, myEventSetlistResponseSchema } from '@vm-web/shared';
 
-import { ZardButtonComponent } from '@vm-web/ui/zard/components/button';
+import { VmButton } from '@vm-web/ui';
 
 import { PrintLauncher } from '../../core/actions/pending-features';
 import { ApiClient } from '../../core/api/api-client';
@@ -24,7 +24,7 @@ import { selectOr } from '../../core/util/resource-value';
 /** Event (M-5, M-6, M-7): setlist in playing order, ZIP and print. */
 @Component({
   selector: 'vm-me-event-page',
-  imports: [PluralPipe, DatePipe, RouterLink, NgIcon, TranslocoPipe, ZardButtonComponent, ListState, MemberScoreList, PageProblem],
+  imports: [PluralPipe, DatePipe, RouterLink, NgIcon, TranslocoPipe, VmButton, ListState, MemberScoreList, PageProblem],
   viewProviders: [provideIcons({ lucideChevronLeft, lucideFileArchive, lucidePrinter })],
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
@@ -45,10 +45,10 @@ import { selectOr } from '../../core/util/resource-value';
           </p>
         </div>
         <div class="flex flex-col gap-2 md:flex-row-reverse">
-          <a z-button [href]="zip()" download class="w-full md:w-auto">
+          <a vm-button [href]="zip()" download class="w-full md:w-auto">
             <ng-icon name="lucideFileArchive" aria-hidden="true" />{{ 'me.common.zip' | transloco }}
           </a>
-          <button z-button zType="outline" type="button" class="w-full md:w-auto" (click)="print()">
+          <button vm-button variant="outlined" type="button" class="w-full md:w-auto" (click)="print()">
             <ng-icon name="lucidePrinter" aria-hidden="true" />{{ 'common.print' | transloco }}
           </button>
         </div>

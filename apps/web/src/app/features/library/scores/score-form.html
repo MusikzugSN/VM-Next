@@ -137,7 +137,7 @@
   </div>
 
   @if (options.canCreateField() && !readonly()) {
-    <button z-button zType="outline" type="button" class="self-start" (click)="addingField.set(true)">
+    <button vm-button variant="outlined" type="button" class="self-start" (click)="addingField.set(true)">
       <ng-icon name="lucidePlus" aria-hidden="true" />{{ 'library.form.addField' | transloco }}
     </button>
     <vm-field-dialog [(open)]="addingField" [save]="createField" />

@@ -128,7 +128,7 @@
   </ng-template>
 
   <z-dialog-footer class="flex-col-reverse gap-2 md:flex-row">
-    <button z-button zType="ghost" type="button" (click)="reset()">{{ 'library.filter.reset' | transloco }}</button>
-    <button z-button type="button" (click)="apply()">{{ 'library.filter.apply' | transloco }}</button>
+    <button vm-button variant="text" type="button" (click)="reset()">{{ 'library.filter.reset' | transloco }}</button>
+    <button vm-button type="button" (click)="apply()">{{ 'library.filter.apply' | transloco }}</button>
   </z-dialog-footer>
 </z-dialog>

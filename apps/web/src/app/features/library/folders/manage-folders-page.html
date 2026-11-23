@@ -4,7 +4,7 @@
     <p class="mt-2 text-muted-foreground">{{ 'library.folders.intro' | transloco }}</p>
   </div>
   @if (canCreate()) {
-    <button z-button type="button" class="w-full md:w-auto" (click)="creating.set(true)">
+    <button vm-button type="button" class="w-full md:w-auto" (click)="creating.set(true)">
       <ng-icon name="lucidePlus" aria-hidden="true" />{{ 'library.folders.create' | transloco }}
     </button>
   }
@@ -72,7 +72,7 @@
             </td>
             <td class="px-4 py-2 text-end">
               @if (canDelete(folder)) {
-                <button z-button zType="ghost" zSize="icon" type="button" class="text-destructive-ink" (click)="remove(folder)" [attr.aria-label]="'library.folders.deleteLabel' | transloco: { name: folder.name }">
+                <button vm-icon-button type="button" class="text-destructive-ink" (click)="remove(folder)" [attr.aria-label]="'library.folders.deleteLabel' | transloco: { name: folder.name }">
                   <ng-icon name="lucideTrash2" aria-hidden="true" />
                 </button>
               }

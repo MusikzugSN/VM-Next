@@ -10,7 +10,7 @@ import {
 } from '@vm-web/shared';
 import { firstValueFrom } from 'rxjs';
 
-import { ZardButtonComponent } from '@vm-web/ui/zard/components/button';
+import { VmButton, VmIconButton } from '@vm-web/ui';
 import { ZardDialogImports } from '@vm-web/ui/zard/components/dialog/dialog.imports';
 import { ZardInputComponent } from '@vm-web/ui/zard/components/input';
 import { ZardNativeSelectDirective } from '@vm-web/ui/zard/components/native-select';
@@ -39,7 +39,7 @@ export interface VoiceDialogTarget {
  */
 @Component({
   selector: 'vm-voice-dialog',
-  imports: [NgIcon, TranslocoPipe, ZardButtonComponent, ZardDialogImports, ZardInputComponent, ZardNativeSelectDirective],
+  imports: [NgIcon, TranslocoPipe, VmButton, VmIconButton, ZardDialogImports, ZardInputComponent, ZardNativeSelectDirective],
   viewProviders: [provideIcons({ lucideArrowUp, lucideArrowDown, lucideX, lucideCheck })],
   changeDetection: ChangeDetectionStrategy.OnPush,
   // The dialog renders in an overlay; its host must not take up space (or a gap) in the page.

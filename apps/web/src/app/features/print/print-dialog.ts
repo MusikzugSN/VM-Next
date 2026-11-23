@@ -7,7 +7,7 @@ import { lucideCheck, lucideCircleAlert, lucideExternalLink, lucidePrinter, luci
 import { APP_ROUTES, PRINT_SERVICE_CONTRACT, apiUrl, printPlanResponseSchema, type PrintMode, type VoiceRef } from '@vm-web/shared';
 import { firstValueFrom, from } from 'rxjs';
 
-import { ZardButtonComponent } from '@vm-web/ui/zard/components/button';
+import { VmButton } from '@vm-web/ui';
 import { ZardDialogImports } from '@vm-web/ui/zard/components/dialog/dialog.imports';
 import { ZardNativeSelectDirective } from '@vm-web/ui/zard/components/native-select';
 import { ZardSonnerService } from '@vm-web/ui/zard/components/sonner';
@@ -34,7 +34,7 @@ import { valueOr } from '../../core/util/resource-value';
  */
 @Component({
   selector: 'vm-print-dialog',
-  imports: [RouterLink, NgIcon, TranslocoPipe, PluralPipe, ZardButtonComponent, ZardDialogImports, ZardNativeSelectDirective, ToggleField, VoiceSelect],
+  imports: [RouterLink, NgIcon, TranslocoPipe, PluralPipe, VmButton, ZardDialogImports, ZardNativeSelectDirective, ToggleField, VoiceSelect],
   viewProviders: [provideIcons({ lucidePrinter, lucideCheck, lucideCircleAlert, lucideTriangleAlert, lucideExternalLink, lucideShare2, lucideRepeat, lucideX })],
   changeDetection: ChangeDetectionStrategy.OnPush,
   // The dialog renders in an overlay; its host must not take up space in the shell.

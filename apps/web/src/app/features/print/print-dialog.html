@@ -175,8 +175,8 @@
                 </span>
               </p>
               <div class="flex flex-wrap gap-2">
-                <a z-button zType="outline" [routerLink]="historyPath" (click)="open.set(false)">{{ 'print.installGuide' | transloco }}</a>
-                <button z-button zType="ghost" type="button" (click)="recheckService()">
+                <a vm-button variant="outlined" [routerLink]="historyPath" (click)="open.set(false)">{{ 'print.installGuide' | transloco }}</a>
+                <button vm-button variant="text" type="button" (click)="recheckService()">
                   <ng-icon name="lucideRepeat" aria-hidden="true" />{{ 'print.recheck' | transloco }}
                 </button>
               </div>
@@ -193,13 +193,13 @@
     </div>
 
     <z-dialog-footer>
-      <button z-button zType="secondary" type="button" (click)="open.set(false)">{{ 'common.cancel' | transloco }}</button>
+      <button vm-button variant="tonal" type="button" (click)="open.set(false)">{{ 'common.cancel' | transloco }}</button>
       @if (action() === 'device' && canShare) {
-        <button z-button zType="outline" type="button" [zDisabled]="busy()" (click)="share()">
+        <button vm-button variant="outlined" type="button" [zDisabled]="busy()" (click)="share()">
           <ng-icon name="lucideShare2" aria-hidden="true" />{{ 'print.share' | transloco }}
         </button>
       }
-      <button z-button type="button" [zLoading]="busy()" [zDisabled]="busy() || !action()" (click)="run()">
+      <button vm-button type="button" [zLoading]="busy()" [zDisabled]="busy() || !action()" (click)="run()">
         <ng-icon [name]="action() === 'device' ? 'lucideExternalLink' : 'lucidePrinter'" aria-hidden="true" />
         {{ (action() ? 'print.actions.' + action() : 'common.print') | transloco }}
       </button>

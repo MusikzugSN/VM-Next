@@ -4,7 +4,7 @@ import { NgIcon, provideIcons } from '@ng-icons/core';
 import { lucidePlus } from '@ng-icons/lucide';
 import { apiUrl, createdResponseSchema, type FieldDefinition } from '@vm-web/shared';
 
-import { ZardButtonComponent } from '@vm-web/ui/zard/components/button';
+import { VmButton } from '@vm-web/ui';
 import { ZardInputComponent } from '@vm-web/ui/zard/components/input';
 import { ZardNativeSelectDirective } from '@vm-web/ui/zard/components/native-select';
 
@@ -20,7 +20,7 @@ import type { ScoreFormErrors, ScoreFormInput } from './score-form-model';
  */
 @Component({
   selector: 'vm-score-form',
-  imports: [NgIcon, TranslocoPipe, ZardButtonComponent, ZardInputComponent, ZardNativeSelectDirective, FieldDialog],
+  imports: [NgIcon, TranslocoPipe, VmButton, ZardInputComponent, ZardNativeSelectDirective, FieldDialog],
   viewProviders: [provideIcons({ lucidePlus })],
   changeDetection: ChangeDetectionStrategy.OnPush,
   templateUrl: './score-form.html',

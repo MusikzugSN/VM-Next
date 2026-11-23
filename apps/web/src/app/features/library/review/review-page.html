@@ -21,14 +21,14 @@
 } @else {
   @if (viewport.isMobile()) {
     <div class="flex items-center gap-2">
-      <button z-button zType="outline" zSize="icon" type="button" [zDisabled]="!upload()?.previousUploadId" (click)="openUpload(upload()?.previousUploadId)" [attr.aria-label]="'review.previousUpload' | transloco">
+      <button vm-icon-button variant="outlined" type="button" [zDisabled]="!upload()?.previousUploadId" (click)="openUpload(upload()?.previousUploadId)" [attr.aria-label]="'review.previousUpload' | transloco">
         <ng-icon name="lucideChevronLeft" aria-hidden="true" />
       </button>
       <div class="flex-1 text-center">
         <p class="font-semibold tabular-nums">{{ position() ? ('review.position' | transloco: { position: position(), total: total() }) : '' }}</p>
         <p class="text-xs text-muted-foreground">{{ 'review.inQueue' | transloco }}</p>
       </div>
-      <button z-button zType="outline" zSize="icon" type="button" [zDisabled]="!upload()?.nextUploadId" (click)="openUpload(upload()?.nextUploadId)" [attr.aria-label]="'review.nextUpload' | transloco">
+      <button vm-icon-button variant="outlined" type="button" [zDisabled]="!upload()?.nextUploadId" (click)="openUpload(upload()?.nextUploadId)" [attr.aria-label]="'review.nextUpload' | transloco">
         <ng-icon name="lucideChevronRight" aria-hidden="true" />
       </button>
     </div>
@@ -39,9 +39,8 @@
       <section [attr.aria-label]="'review.queue' | transloco" class="flex shrink-0 flex-col border-e bg-sidebar" [class]="queueOpen() ? 'w-64' : 'w-14 items-center'">
         <div class="flex items-center gap-2 border-b p-2">
           <button
-            z-button
-            zType="ghost"
-            zSize="icon"
+            vm-icon-button
+           
             type="button"
             [attr.aria-expanded]="queueOpen()"
             [attr.aria-label]="(queueOpen() ? 'review.collapseQueue' : 'review.expandQueue') | transloco"
@@ -73,7 +72,7 @@
             }
           </ul>
           @if (queue.hasMore()) {
-            <button z-button zType="ghost" type="button" class="m-2" (click)="queue.loadMore()">{{ 'common.loadMore' | transloco }}</button>
+            <button vm-button variant="text" type="button" class="m-2" (click)="queue.loadMore()">{{ 'common.loadMore' | transloco }}</button>
           }
         } @else {
           <span class="py-2 text-xs font-medium text-muted-foreground tabular-nums">{{ position() ?? '–' }}/{{ total() }}</span>
@@ -83,24 +82,24 @@
 
     <section [attr.aria-label]="'review.preview' | transloco" class="flex min-w-0 flex-1 flex-col">
       <div role="toolbar" [attr.aria-label]="'review.tools' | transloco" class="flex flex-wrap items-center gap-1 border-b px-1 py-1">
-        <button z-button zType="ghost" zSize="icon" type="button" [zDisabled]="page() <= 1" (click)="goPage(-1)" [attr.aria-label]="'pdf.previous' | transloco">
+        <button vm-icon-button type="button" [zDisabled]="page() <= 1" (click)="goPage(-1)" [attr.aria-label]="'pdf.previous' | transloco">
           <ng-icon name="lucideChevronLeft" aria-hidden="true" />
         </button>
         <span class="text-[13px] tabular-nums" aria-live="polite">{{ 'pdf.status' | transloco: { page: page(), count: pages().length } }}</span>
-        <button z-button zType="ghost" zSize="icon" type="button" [zDisabled]="page() >= pages().length" (click)="goPage(1)" [attr.aria-label]="'pdf.next' | transloco">
+        <button vm-icon-button type="button" [zDisabled]="page() >= pages().length" (click)="goPage(1)" [attr.aria-label]="'pdf.next' | transloco">
           <ng-icon name="lucideChevronRight" aria-hidden="true" />
         </button>
         <span class="flex-1"></span>
-        <button z-button zType="ghost" type="button" (click)="rotateCurrent()"><ng-icon name="lucideRotateCw" aria-hidden="true" />{{ 'review.rotate' | transloco }}</button>
-        <button z-button zType="ghost" type="button" [attr.aria-pressed]="cropping()" (click)="cropping.set(!cropping())">
+        <button vm-button variant="text" type="button" (click)="rotateCurrent()"><ng-icon name="lucideRotateCw" aria-hidden="true" />{{ 'review.rotate' | transloco }}</button>
+        <button vm-button variant="text" type="button" [attr.aria-pressed]="cropping()" (click)="cropping.set(!cropping())">
           <ng-icon name="lucideCrop" aria-hidden="true" />{{ 'review.crop' | transloco }}
         </button>
         @if (!viewport.isMobile()) {
-          <button z-button zType="ghost" zSize="icon" type="button" [zDisabled]="zoomIndex() === 0" (click)="zoomBy(-1)" [attr.aria-label]="'review.zoomOut' | transloco">
+          <button vm-icon-button type="button" [zDisabled]="zoomIndex() === 0" (click)="zoomBy(-1)" [attr.aria-label]="'review.zoomOut' | transloco">
             <ng-icon name="lucideZoomOut" aria-hidden="true" />
           </button>
           <span class="w-12 text-center text-[13px] tabular-nums">{{ zoom() * 100 }} %</span>
-          <button z-button zType="ghost" zSize="icon" type="button" [zDisabled]="zoomIndex() === 5" (click)="zoomBy(1)" [attr.aria-label]="'review.zoomIn' | transloco">
+          <button vm-icon-button type="button" [zDisabled]="zoomIndex() === 5" (click)="zoomBy(1)" [attr.aria-label]="'review.zoomIn' | transloco">
             <ng-icon name="lucideZoomIn" aria-hidden="true" />
           </button>
         }
@@ -123,7 +122,7 @@
               />
             </label>
           }
-          <button z-button zType="ghost" type="button" (click)="resetCrop()">{{ 'review.resetCrop' | transloco }}</button>
+          <button vm-button variant="text" type="button" (click)="resetCrop()">{{ 'review.resetCrop' | transloco }}</button>
           <p class="w-full text-xs text-muted-foreground">{{ 'review.cropHint' | transloco }}</p>
         </fieldset>
       }
@@ -205,10 +204,10 @@
         </label>
 
         <div class="mt-auto flex gap-2 md:flex-col-reverse" [class.sticky]="viewport.isMobile()" [class.bottom-16]="viewport.isMobile()">
-          <button z-button zType="outline" type="button" class="flex-1 border-destructive text-destructive-ink" [zDisabled]="busy()" (click)="reject()">
+          <button vm-button variant="outlined" type="button" class="flex-1 border-destructive text-destructive-ink" [zDisabled]="busy()" (click)="reject()">
             {{ 'review.reject' | transloco }}
           </button>
-          <button z-button type="button" class="flex-[1.6]" [zLoading]="busy()" [zDisabled]="!canApprove()" (click)="approve()">
+          <button vm-button type="button" class="flex-[1.6]" [zLoading]="busy()" [zDisabled]="!canApprove()" (click)="approve()">
             {{ 'review.approve' | transloco }}
           </button>
         </div>

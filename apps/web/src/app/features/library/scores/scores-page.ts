@@ -27,7 +27,7 @@ import {
 } from '@vm-web/shared';
 import { map, tap } from 'rxjs';
 
-import { ZardButtonComponent } from '@vm-web/ui/zard/components/button';
+import { VmButton, VmIconButton } from '@vm-web/ui';
 import { ZardDropdownImports } from '@vm-web/ui/zard/components/dropdown/dropdown.imports';
 
 import { ConfirmService } from '../../../core/actions/action-runner';
@@ -77,7 +77,7 @@ interface Column {
     NgIcon,
     TranslocoPipe,
     PluralPipe,
-    ZardButtonComponent,
+    VmButton, VmIconButton,
     ZardDropdownImports,
     SearchField,
     ListState,

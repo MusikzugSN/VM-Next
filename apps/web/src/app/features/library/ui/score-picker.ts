@@ -6,7 +6,7 @@ import { lucidePlus } from '@ng-icons/lucide';
 import type { ScoreCandidate } from '@vm-web/shared';
 import { of, type Observable } from 'rxjs';
 
-import { ZardButtonComponent } from '@vm-web/ui/zard/components/button';
+import { VmButton } from '@vm-web/ui';
 import { ZardInputComponent } from '@vm-web/ui/zard/components/input';
 
 import { debounced } from '../../../core/util/debounced';
@@ -31,7 +31,7 @@ export interface PickedScore {
  */
 @Component({
   selector: 'vm-score-picker',
-  imports: [NgIcon, TranslocoPipe, ZardButtonComponent, ZardInputComponent, SearchField],
+  imports: [NgIcon, TranslocoPipe, VmButton, ZardInputComponent, SearchField],
   viewProviders: [provideIcons({ lucidePlus })],
   changeDetection: ChangeDetectionStrategy.OnPush,
   host: { class: 'flex flex-col gap-3' },
@@ -61,8 +61,8 @@ export interface PickedScore {
                 <span class="text-xs text-muted-foreground">{{ 'library.picker.contained' | transloco }}</span>
               } @else {
                 <button
-                  z-button
-                  zType="outline"
+                  vm-button
+                  variant="outlined"
                   type="button"
                   [zDisabled]="numbered() && !number().trim()"
                   (click)="pick(score)"

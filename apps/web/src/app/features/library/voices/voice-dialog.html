@@ -36,8 +36,8 @@
           <span class="text-muted-foreground">{{ 'library.voices.instrumentFromName' | transloco }}</span>
         }
         <button
-          z-button
-          zType="ghost"
+          vm-button
+          variant="text"
           type="button"
           class="ms-auto"
           [attr.aria-expanded]="choosing()"
@@ -94,13 +94,13 @@
             <li class="flex items-center gap-1 rounded-md border px-3 py-2">
               <span class="w-6 text-xs text-muted-foreground tabular-nums">{{ i + 1 }}.</span>
               <span class="flex-1 font-medium">{{ s.name }}</span>
-              <button z-button zType="ghost" zSize="icon" type="button" [zDisabled]="first" (click)="move(i, -1)" [attr.aria-label]="'common.moveUp' | transloco: { name: s.name }">
+              <button vm-icon-button type="button" [zDisabled]="first" (click)="move(i, -1)" [attr.aria-label]="'common.moveUp' | transloco: { name: s.name }">
                 <ng-icon name="lucideArrowUp" aria-hidden="true" />
               </button>
-              <button z-button zType="ghost" zSize="icon" type="button" [zDisabled]="last" (click)="move(i, 1)" [attr.aria-label]="'common.moveDown' | transloco: { name: s.name }">
+              <button vm-icon-button type="button" [zDisabled]="last" (click)="move(i, 1)" [attr.aria-label]="'common.moveDown' | transloco: { name: s.name }">
                 <ng-icon name="lucideArrowDown" aria-hidden="true" />
               </button>
-              <button z-button zType="ghost" zSize="icon" type="button" (click)="removeSubstitute(i)" [attr.aria-label]="'common.removeItem' | transloco: { name: s.name }">
+              <button vm-icon-button type="button" (click)="removeSubstitute(i)" [attr.aria-label]="'common.removeItem' | transloco: { name: s.name }">
                 <ng-icon name="lucideX" aria-hidden="true" />
               </button>
             </li>
@@ -126,7 +126,7 @@
   </form>
 
   <z-dialog-footer class="flex-col-reverse gap-2 md:flex-row">
-    <button z-button zType="secondary" type="button" (click)="open.set(false)">{{ 'common.cancel' | transloco }}</button>
-    <button z-button type="submit" form="voice-form" [zLoading]="saving()" [zDisabled]="saving()">{{ 'common.save' | transloco }}</button>
+    <button vm-button variant="tonal" type="button" (click)="open.set(false)">{{ 'common.cancel' | transloco }}</button>
+    <button vm-button type="submit" form="voice-form" [zLoading]="saving()" [zDisabled]="saving()">{{ 'common.save' | transloco }}</button>
   </z-dialog-footer>
 </z-dialog>

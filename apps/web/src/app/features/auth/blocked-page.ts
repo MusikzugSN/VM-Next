@@ -5,7 +5,7 @@ import { NgIcon, provideIcons } from '@ng-icons/core';
 import { lucideLock, lucideLogIn } from '@ng-icons/lucide';
 import { APP_ROUTES } from '@vm-web/shared';
 
-import { ZardButtonComponent } from '@vm-web/ui/zard/components/button';
+import { VmButton } from '@vm-web/ui';
 
 import { BrandingStore } from '../../core/branding/branding.store';
 import { ClubLogo } from '../../core/branding/club-logo';
@@ -17,7 +17,7 @@ import { LegalLinks } from './legal-links';
  */
 @Component({
   selector: 'vm-blocked-page',
-  imports: [RouterLink, TranslocoPipe, NgIcon, ZardButtonComponent, ClubLogo, LegalLinks],
+  imports: [RouterLink, TranslocoPipe, NgIcon, VmButton, ClubLogo, LegalLinks],
   viewProviders: [provideIcons({ lucideLock, lucideLogIn })],
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
@@ -40,7 +40,7 @@ import { LegalLinks } from './legal-links';
             <p class="text-muted-foreground">{{ 'auth.blocked.contactText' | transloco }}</p>
           </div>
           <div class="flex justify-end">
-            <a z-button zType="outline" [routerLink]="loginPath" class="w-full md:w-auto">
+            <a vm-button variant="outlined" [routerLink]="loginPath" class="w-full md:w-auto">
               <ng-icon name="lucideLogIn" aria-hidden="true" />{{ 'auth.blocked.otherAccount' | transloco }}
             </a>
           </div>

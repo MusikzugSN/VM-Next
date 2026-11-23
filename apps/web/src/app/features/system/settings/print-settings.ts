@@ -2,7 +2,7 @@ import { ChangeDetectionStrategy, Component, effect, inject, input, output, sign
 import { TranslocoPipe } from '@jsverse/transloco';
 import { apiUrl, updatePrintBodySchema, type ConfigResponse } from '@vm-web/shared';
 
-import { ZardButtonComponent } from '@vm-web/ui/zard/components/button';
+import { VmButton } from '@vm-web/ui';
 import { ZardInputComponent } from '@vm-web/ui/zard/components/input';
 
 import { ActionRunner } from '../../../core/actions/action-runner';
@@ -11,7 +11,7 @@ import { ApiClient } from '../../../core/api/api-client';
 /** Tab „Drucken“ (D-2, D-4): page limit of the browser print and the address the print service accepts. */
 @Component({
   selector: 'vm-print-settings',
-  imports: [TranslocoPipe, ZardButtonComponent, ZardInputComponent],
+  imports: [TranslocoPipe, VmButton, ZardInputComponent],
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
     <form class="flex flex-col gap-4 rounded-lg border bg-card p-4 shadow-sm md:p-6" novalidate (submit)="$event.preventDefault(); save()">
@@ -52,7 +52,7 @@ import { ApiClient } from '../../../core/api/api-client';
         }}</span>
       </label>
       @if (!readonly()) {
-        <button z-button type="submit" class="self-end">{{ 'common.save' | transloco }}</button>
+        <button vm-button type="submit" class="self-end">{{ 'common.save' | transloco }}</button>
       }
     </form>
   `,

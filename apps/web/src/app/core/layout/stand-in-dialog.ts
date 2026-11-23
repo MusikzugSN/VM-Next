@@ -3,7 +3,7 @@ import { TranslocoPipe } from '@jsverse/transloco';
 import { NgIcon, provideIcons } from '@ng-icons/core';
 import { lucideCheck, lucideSearch } from '@ng-icons/lucide';
 
-import { ZardButtonComponent } from '@vm-web/ui/zard/components/button';
+import { VmButton } from '@vm-web/ui';
 import { ZardDialogImports } from '@vm-web/ui/zard/components/dialog/dialog.imports';
 import { ZardInputComponent } from '@vm-web/ui/zard/components/input';
 
@@ -16,7 +16,7 @@ import { filterVoiceGroups } from '../voices/voice-groups';
  */
 @Component({
   selector: 'vm-stand-in-dialog',
-  imports: [NgIcon, TranslocoPipe, ZardButtonComponent, ZardDialogImports, ZardInputComponent],
+  imports: [NgIcon, TranslocoPipe, VmButton, ZardDialogImports, ZardInputComponent],
   viewProviders: [provideIcons({ lucideCheck, lucideSearch })],
   changeDetection: ChangeDetectionStrategy.OnPush,
   // The dialog renders in an overlay; its host must not take up space in the header.
@@ -70,7 +70,7 @@ import { filterVoiceGroups } from '../voices/voice-groups';
       </div>
 
       <z-dialog-footer>
-        <button z-button zType="secondary" type="button" (click)="open.set(false)">{{ 'common.cancel' | transloco }}</button>
+        <button vm-button variant="tonal" type="button" (click)="open.set(false)">{{ 'common.cancel' | transloco }}</button>
       </z-dialog-footer>
     </z-dialog>
   `,

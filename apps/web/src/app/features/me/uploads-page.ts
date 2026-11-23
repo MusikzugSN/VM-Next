@@ -5,7 +5,7 @@ import { NgIcon, provideIcons } from '@ng-icons/core';
 import { lucideUpload } from '@ng-icons/lucide';
 import { apiUrl, myUploadsResponseSchema, type MyUploadItem, type UploadStatus } from '@vm-web/shared';
 
-import { ZardButtonComponent } from '@vm-web/ui/zard/components/button';
+import { VmButton } from '@vm-web/ui';
 
 import { UploadLauncher } from '../../core/actions/pending-features';
 import { onUploadCompleted } from '../../core/actions/on-upload';
@@ -19,7 +19,7 @@ import { UploadStatusBadge } from './ui/upload-status-badge';
 /** Meine Uploads (N-14): status of each own upload incl. the reason for a rejection. */
 @Component({
   selector: 'vm-me-uploads-page',
-  imports: [DatePipe, NgIcon, TranslocoPipe, ZardButtonComponent, ListState, UploadStatusBadge],
+  imports: [DatePipe, NgIcon, TranslocoPipe, VmButton, ListState, UploadStatusBadge],
   viewProviders: [provideIcons({ lucideUpload })],
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
@@ -29,7 +29,7 @@ import { UploadStatusBadge } from './ui/upload-status-badge';
         <p class="mt-2 text-muted-foreground">{{ 'me.uploads.intro' | transloco }}</p>
       </div>
       @if (canUpload()) {
-        <button z-button type="button" class="w-full md:w-auto" (click)="upload()">
+        <button vm-button type="button" class="w-full md:w-auto" (click)="upload()">
           <ng-icon name="lucideUpload" aria-hidden="true" />{{ 'me.start.uploadVoice' | transloco }}
         </button>
       }

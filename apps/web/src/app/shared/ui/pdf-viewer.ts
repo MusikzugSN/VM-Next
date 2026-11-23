@@ -16,7 +16,7 @@ import { NgIcon, provideIcons } from '@ng-icons/core';
 import { lucideChevronLeft, lucideChevronRight } from '@ng-icons/lucide';
 import type { PDFDocumentLoadingTask, PDFDocumentProxy, RenderTask } from 'pdfjs-dist';
 
-import { ZardButtonComponent } from '@vm-web/ui/zard/components/button';
+import { VmIconButton } from '@vm-web/ui';
 
 import { observeWidth } from './observe-width';
 
@@ -55,7 +55,7 @@ export function clampPage(page: number, count: number): number {
  */
 @Component({
   selector: 'vm-pdf-viewer',
-  imports: [NgIcon, TranslocoPipe, ZardButtonComponent],
+  imports: [NgIcon, TranslocoPipe, VmIconButton],
   viewProviders: [provideIcons({ lucideChevronLeft, lucideChevronRight })],
   changeDetection: ChangeDetectionStrategy.OnPush,
   host: { class: 'flex flex-col gap-3' },
@@ -82,15 +82,14 @@ export function clampPage(page: number, count: number): number {
 
     @if (pageCount() > 1) {
       <nav [attr.aria-label]="'pdf.pages' | transloco" class="flex flex-wrap items-center justify-center gap-1">
-        <button z-button zType="ghost" zSize="icon" type="button" [zDisabled]="page() <= 1" (click)="go(page() - 1)" [attr.aria-label]="'pdf.previous' | transloco">
+        <button vm-icon-button type="button" [zDisabled]="page() <= 1" (click)="go(page() - 1)" [attr.aria-label]="'pdf.previous' | transloco">
           <ng-icon name="lucideChevronLeft" aria-hidden="true" />
         </button>
         @if (pageCount() <= maxPageButtons) {
           @for (n of pages(); track n) {
             <button
-              z-button
-              [zType]="n === page() ? 'secondary' : 'ghost'"
-              zSize="icon"
+              vm-icon-button
+              [variant]="n === page() ? 'tonal' : 'text'"
               type="button"
               class="tabular-nums"
               [attr.aria-current]="n === page() ? 'page' : null"
@@ -101,7 +100,7 @@ export function clampPage(page: number, count: number): number {
             </button>
           }
         }
-        <button z-button zType="ghost" zSize="icon" type="button" [zDisabled]="page() >= pageCount()" (click)="go(page() + 1)" [attr.aria-label]="'pdf.next' | transloco">
+        <button vm-icon-button type="button" [zDisabled]="page() >= pageCount()" (click)="go(page() + 1)" [attr.aria-label]="'pdf.next' | transloco">
           <ng-icon name="lucideChevronRight" aria-hidden="true" />
         </button>
       </nav>
