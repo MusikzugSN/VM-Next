@@ -121,6 +121,21 @@
   --shadow-sm: 0 1px 2px 0 rgba(24, 24, 27, 0.06);
   --shadow-lg: 0 10px 24px -6px rgba(24, 24, 27, 0.18);
 
+  /* M3-Formen und -Elevation als Tailwind-Klassen. rounded-sm … rounded-xl und shadow-sm/-lg bleiben bis D-16. */
+  --radius-none: var(--mat-sys-corner-none);
+  --radius-extra-small: var(--mat-sys-corner-extra-small);
+  --radius-small: var(--mat-sys-corner-small);
+  --radius-medium: var(--mat-sys-corner-medium);
+  --radius-large: var(--mat-sys-corner-large);
+  --radius-extra-large: var(--mat-sys-corner-extra-large);
+  --radius-full: var(--mat-sys-corner-full);
+  --shadow-level0: var(--mat-sys-level0);
+  --shadow-level1: var(--mat-sys-level1);
+  --shadow-level2: var(--mat-sys-level2);
+  --shadow-level3: var(--mat-sys-level3);
+  --shadow-level4: var(--mat-sys-level4);
+  --shadow-level5: var(--mat-sys-level5);
+
   --color-sidebar: var(--mat-sys-surface-container-low);
   --color-sidebar-foreground: var(--mat-sys-on-surface);
   --color-sidebar-primary: var(--mat-sys-primary);
