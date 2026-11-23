@@ -124,9 +124,7 @@ export class EnsemblePage {
     return appPath(APP_ROUTES.system.user, { userId });
   }
 
-  protected initialsOf(name: string): string {
-    return initials(name);
-  }
+  protected readonly initialsOf = initials;
 
   protected readonly rename = async (name: string): Promise<boolean> => {
     const done = await this.actions.run(() => firstValueFrom(this.api.postVoid(apiUrl('system', 'renameEnsemble', { ensembleId: this.ensembleId() }), { name })), {

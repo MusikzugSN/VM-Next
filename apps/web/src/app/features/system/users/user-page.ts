@@ -81,9 +81,7 @@ export class UserPage {
     });
   }
 
-  protected initialsOf(name: string): string {
-    return initials(name);
-  }
+  protected readonly initialsOf = initials;
 
   protected async setRole(ensembleId: string, roleId: string): Promise<boolean> {
     if (!roleId) return false;
