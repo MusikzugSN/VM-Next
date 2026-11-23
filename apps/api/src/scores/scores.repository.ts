@@ -21,6 +21,8 @@ import {
 } from '../db/schema';
 import type { FieldDef } from './custom-fields';
 import type { SortPlan } from './score-query';
+import { replaceRows } from '../db/table-helpers';
+import { appendTo } from '../common/collections';
 
 export type ScoreRow = typeof scores.$inferSelect;
 
@@ -84,7 +86,7 @@ export class ScoresRepository {
       .innerJoin(clubTags, eq(clubTags.id, scoreClubTags.tagId))
       .where(inArray(scoreClubTags.scoreId, [...scoreIds]))
       .orderBy(sql`lower(${clubTags.name})`);
-    for (const { scoreId, ...tag } of rows) result.set(scoreId, [...(result.get(scoreId) ?? []), tag]);
+    for (const { scoreId, ...tag } of rows) appendTo(result, scoreId, tag);
     return result;
   }
 
@@ -104,8 +106,7 @@ export class ScoresRepository {
   async updateScore(id: string, fixed: ScoreFixedFields, customValues: Record<string, unknown>, tagIds: readonly string[]): Promise<void> {
     await this.db.transaction(async (tx) => {
       await tx.update(scores).set({ ...fixed, customValues, updatedAt: new Date() }).where(eq(scores.id, id));
-      await tx.delete(scoreClubTags).where(eq(scoreClubTags.scoreId, id));
-      if (tagIds.length) await tx.insert(scoreClubTags).values(tagIds.map((tagId) => ({ scoreId: id, tagId })));
+      await replaceRows(tx, scoreClubTags, eq(scoreClubTags.scoreId, id), tagIds.map((tagId) => ({ scoreId: id, tagId })));
     });
   }
 
@@ -194,7 +195,6 @@ export class ScoresRepository {
       .orderBy(asc(ensembleLineupVoices.position));
   }
 
-  /** Non-archived ensembles that have a lineup. */
   /** Active ensembles with a lineup, in tree order (F-3). */
   async ensemblesWithLineup(): Promise<EnsembleOption[]> {
     const rows = await this.db

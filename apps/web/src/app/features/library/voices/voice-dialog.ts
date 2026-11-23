@@ -6,6 +6,7 @@ import {
   apiUrl,
   createVoiceResponseSchema,
   type VoiceListResponse,
+  MAX_SUBSTITUTES,
 } from '@vm-web/shared';
 import { firstValueFrom } from 'rxjs';
 
@@ -15,9 +16,9 @@ import { ZardInputComponent } from '@/shared/components/input';
 import { ZardNativeSelectDirective } from '@/shared/components/native-select';
 
 import { ActionRunner } from '../../../core/actions/action-runner';
+import { fieldProblemHandler } from '../../../core/actions/field-problem-handler';
 import { focusFirstInvalid } from '../../../core/util/focus-invalid';
 import { ApiClient } from '../../../core/api/api-client';
-import { isApiProblem } from '../../../core/api/api-problem';
 import { instrumentFromVoiceName } from './voice-name';
 
 type Voice = VoiceListResponse['groups'][number]['voices'][number];
@@ -29,7 +30,6 @@ export interface VoiceDialogTarget {
 }
 
 /** API limit of `set-substitutes`. */
-export const MAX_SUBSTITUTES = 10;
 
 /** Moves an item one step up (-1) or down (+1); returns a new array. */
 export function moveItem<T>(items: readonly T[], index: number, delta: -1 | 1): T[] {
@@ -133,16 +133,8 @@ export class VoiceDialog {
       return;
     }
 
-    this.saving.set(true);
     const target = this.target();
-    const onProblem = (problem: unknown) => {
-      if (isApiProblem(problem) && problem.code === 'validation-failed') {
-        this.errors.set(problem.fieldErrors());
-        this.focusInvalid();
-        return true;
-      }
-      return false;
-    };
+    const onProblem = fieldProblemHandler(this.errors, this.focusInvalid);
     const done = await this.actions.run(
       async () => {
         let voiceId = target?.voice.id;
@@ -156,9 +148,8 @@ export class VoiceDialog {
           await firstValueFrom(this.api.postVoid(apiUrl('voices', 'setSubstitutes', { voiceId }), { substituteVoiceIds }));
         }
       },
-      { success: { key: target ? 'library.voices.saved' : 'library.voices.created', params: { name: body.name } }, onProblem },
+      { busy: this.saving, success: { key: target ? 'library.voices.saved' : 'library.voices.created', params: { name: body.name } }, onProblem },
     );
-    this.saving.set(false);
     if (done) {
       this.open.set(false);
       this.saved.emit();

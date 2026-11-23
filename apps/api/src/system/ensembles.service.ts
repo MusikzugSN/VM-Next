@@ -14,14 +14,17 @@ import { uuidv7 } from '../common/ids/uuid-v7';
 import { decodeCursor, encodeCursor } from '../common/pagination/cursor';
 import { ProblemException } from '../common/problem-details/problem.exception';
 import { httpUrlOrNull } from '../common/url';
-import { DATABASE, type Database } from '../db/database';
-import { isUniqueViolation } from '../db/db-errors';
+import { DATABASE, type Database, type Tx } from '../db/database';
+import { withNameTaken } from '../db/db-errors';
 import { clubSettings, ensembleLineupVoices, ensembles, memberships, roles, users, userVoices, voices } from '../db/schema';
-import { likePattern } from '../me/me.repository';
+import { likePattern } from '../common/sql';
 import { lineupTemplateFile } from '../seed/defaults';
 import { importLineupTemplate, loadLineupTemplate } from '../seed/lineup-template';
+import { afterNameAndId } from '../common/pagination/keyset';
+import { assertKnownIds, assertNoDuplicates } from '../common/validation/id-list';
+import { replaceRows } from '../db/table-helpers';
+import { appendTo } from '../common/collections';
 
-type Tx = Parameters<Parameters<Database['transaction']>[0]>[0];
 type EnsembleRecord = typeof ensembles.$inferSelect;
 
 /** Ensembles as a tree with lineup (S-2, F-3, N-4, N-8). */
@@ -75,7 +78,7 @@ export class EnsemblesService {
         and(
           eq(memberships.ensembleId, ensembleId),
           query.q ? sql`${users.name} ilike ${likePattern(query.q)}` : undefined,
-          cursor ? sql`(lower(${users.name}), ${users.id}) > (${cursor[0]}, ${cursor[1]}::uuid)` : undefined,
+          afterNameAndId(users.name, users.id, cursor),
         ),
       )
       .orderBy(sql`lower(${users.name})`, asc(users.id))
@@ -107,7 +110,7 @@ export class EnsemblesService {
     if (parent.archivedAt) throw ProblemException.validation([{ path: '/body/parentId', code: 'archived' }]);
     const template = body.applyLineupTemplate ? await loadLineupTemplate(lineupTemplateFile()) : undefined;
     const id = uuidv7();
-    await this.unique(() =>
+    await withNameTaken(() =>
       this.db.transaction(async (tx) => {
         await tx.insert(ensembles).values({ id, parentId: body.parentId, name: body.name });
         if (template) await setLineup(tx, id, (await importLineupTemplate(tx, template)).lineupVoiceIds);
@@ -119,7 +122,7 @@ export class EnsemblesService {
   /** The root may be renamed too (H-4). Names are unique among siblings. */
   async rename(ensembleId: string, name: string): Promise<void> {
     await this.ensemble(ensembleId);
-    await this.unique(() => this.db.update(ensembles).set({ name, updatedAt: new Date() }).where(eq(ensembles.id, ensembleId)));
+    await withNameTaken(() => this.db.update(ensembles).set({ name, updatedAt: new Date() }).where(eq(ensembles.id, ensembleId)));
   }
 
   /** Moves an ensemble in the tree (F-3); never the root, never below itself. */
@@ -129,7 +132,7 @@ export class EnsemblesService {
     await this.ensemble(parentId, 'Unknown parent');
     const all = await this.db.select({ id: ensembles.id, parentId: ensembles.parentId }).from(ensembles);
     if (descendantsOf(ensembleId, all).has(parentId) || parentId === ensembleId) throw ProblemException.conflict('invalid-hierarchy');
-    await this.unique(() => this.db.update(ensembles).set({ parentId, updatedAt: new Date() }).where(eq(ensembles.id, ensembleId)));
+    await withNameTaken(() => this.db.update(ensembles).set({ parentId, updatedAt: new Date() }).where(eq(ensembles.id, ensembleId)));
   }
 
   /** Not the root, not the default ensemble, not with active sub-ensembles (S-2). */
@@ -158,13 +161,11 @@ export class EnsemblesService {
   /** Ordered voice list for completeness (N-4). */
   async setLineup(ensembleId: string, voiceIds: readonly string[]): Promise<void> {
     await this.ensemble(ensembleId);
-    const duplicates = voiceIds.flatMap((id, i) => (voiceIds.indexOf(id) !== i ? [{ path: `/body/voiceIds/${i}`, code: 'duplicate' }] : []));
-    if (duplicates.length) throw ProblemException.validation(duplicates);
+    assertNoDuplicates(voiceIds, '/body/voiceIds');
     const found = new Set(
       voiceIds.length ? (await this.db.select({ id: voices.id }).from(voices).where(inArray(voices.id, [...voiceIds]))).map((v) => v.id) : [],
     );
-    const unknown = voiceIds.map((id, i) => [id, i] as const).filter(([id]) => !found.has(id));
-    if (unknown.length) throw ProblemException.validation(unknown.map(([, i]) => ({ path: `/body/voiceIds/${i}`, code: 'unknown_voice' })));
+    assertKnownIds(voiceIds, found, '/body/voiceIds', 'unknown_voice');
     await this.db.transaction((tx) => setLineup(tx, ensembleId, voiceIds));
   }
 
@@ -195,7 +196,7 @@ export class EnsemblesService {
       this.db.select({ defaultEnsembleId: clubSettings.defaultEnsembleId }).from(clubSettings),
     ]);
     const byParent = new Map<string | null, typeof rows>();
-    for (const r of rows) byParent.set(r.parentId, [...(byParent.get(r.parentId) ?? []), r]);
+    for (const r of rows) appendTo(byParent, r.parentId, r);
     const result: EnsembleListItem[] = [];
     const walk = (parentId: string | null, depth: number) => {
       const children = (byParent.get(parentId) ?? []).sort((a, b) => a.name.localeCompare(b.name, 'de'));
@@ -224,20 +225,10 @@ export class EnsemblesService {
     if (!row) throw ProblemException.notFound(detail);
     return row;
   }
-
-  private async unique<T>(write: () => Promise<T>): Promise<T> {
-    try {
-      return await write();
-    } catch (error) {
-      if (isUniqueViolation(error)) throw ProblemException.conflict('name-taken');
-      throw error;
-    }
-  }
 }
 
 async function setLineup(tx: Tx, ensembleId: string, voiceIds: readonly string[]): Promise<void> {
-  await tx.delete(ensembleLineupVoices).where(eq(ensembleLineupVoices.ensembleId, ensembleId));
-  if (voiceIds.length) await tx.insert(ensembleLineupVoices).values(voiceIds.map((voiceId, position) => ({ ensembleId, voiceId, position })));
+  await replaceRows(tx, ensembleLineupVoices, eq(ensembleLineupVoices.ensembleId, ensembleId), voiceIds.map((voiceId, position) => ({ ensembleId, voiceId, position })));
 }
 
 /** All descendants of an ensemble (not including itself). */
