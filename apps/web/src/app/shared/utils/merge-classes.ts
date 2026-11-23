@@ -22,7 +22,12 @@ const M3_TYPE_ROLES = [
   'label-small',
 ];
 
-const twMerge = extendTailwindMerge({ extend: { theme: { text: M3_TYPE_ROLES } } });
+const M3_CORNERS = ['none', 'extra-small', 'small', 'medium', 'large', 'extra-large', 'full'];
+const M3_LEVELS = ['level0', 'level1', 'level2', 'level3', 'level4', 'level5'];
+
+const twMerge = extendTailwindMerge({
+  extend: { theme: { text: M3_TYPE_ROLES, radius: M3_CORNERS, shadow: M3_LEVELS } },
+});
 
 /** Merges CVA variants with a consumer's `class` input, last write winning. */
 export function mergeClasses(...inputs: ClassValue[]): string {

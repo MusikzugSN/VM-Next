@@ -11,4 +11,10 @@ describe('mergeClasses mit M3-Typrollen', () => {
     expect(mergeClasses('text-sm', 'text-title-large')).toBe('text-title-large');
     expect(mergeClasses('text-label-small', 'text-body-large')).toBe('text-body-large');
   });
+
+  it('behandelt M3-Formen und -Elevation als eigene Gruppen', () => {
+    expect(mergeClasses('rounded-lg', 'rounded-medium')).toBe('rounded-medium');
+    expect(mergeClasses('shadow-sm', 'shadow-level2')).toBe('shadow-level2');
+    expect(mergeClasses('shadow-level1', 'shadow-primary')).toBe('shadow-level1 shadow-primary');
+  });
 });
