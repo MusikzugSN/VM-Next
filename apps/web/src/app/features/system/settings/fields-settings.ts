@@ -12,6 +12,7 @@ import { ApiClient } from '../../../core/api/api-client';
 import { SessionStore } from '../../../core/auth/session.store';
 import { PageProblem } from '../../../shared/ui/page-problem';
 import { FieldDialog, type FieldDialogValue } from '../../library/ui/field-dialog';
+import { moveItem } from '../../../core/util/move-item';
 import { selectOr } from '../../../core/util/resource-value';
 
 /** Tab „Eigene Felder“ (N-2, N-3): custom score fields in display order; create and edit in a dialog. */
@@ -114,10 +115,10 @@ export class FieldsSettings {
   };
 
   protected async move(index: number, delta: -1 | 1): Promise<void> {
-    const ids = this.items().map((f) => f.id);
+    const current = this.items().map((f) => f.id);
     const target = index + delta;
-    if (target < 0 || target >= ids.length) return;
-    [ids[index], ids[target]] = [ids[target], ids[index]];
+    if (target < 0 || target >= current.length) return; // at the edge nothing is sent
+    const ids = moveItem(current, index, delta);
     const done = await this.actions.runOnce(() => this.api.postVoid(apiUrl('scores', 'reorderFields'), { fieldIds: ids }));
     if (done) this.fields.reload();
   }

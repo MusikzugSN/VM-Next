@@ -20,6 +20,7 @@ import { fieldProblemHandler } from '../../../core/actions/field-problem-handler
 import { focusFirstInvalid } from '../../../core/util/focus-invalid';
 import { ApiClient } from '../../../core/api/api-client';
 import { instrumentFromVoiceName } from './voice-name';
+import { moveItem } from '../../../core/util/move-item';
 
 type Voice = VoiceListResponse['groups'][number]['voices'][number];
 
@@ -30,15 +31,6 @@ export interface VoiceDialogTarget {
 }
 
 /** API limit of `set-substitutes`. */
-
-/** Moves an item one step up (-1) or down (+1); returns a new array. */
-export function moveItem<T>(items: readonly T[], index: number, delta: -1 | 1): T[] {
-  const target = index + delta;
-  if (target < 0 || target >= items.length) return [...items];
-  const next = [...items];
-  [next[index], next[target]] = [next[target], next[index]];
-  return next;
-}
 
 /**
  * Stimme anlegen/bearbeiten (N-6, N-7, N-9): one field for the full voice name; the instrument follows
