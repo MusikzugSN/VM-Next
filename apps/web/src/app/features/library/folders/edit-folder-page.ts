@@ -32,6 +32,7 @@ import { FormDialog } from '../../../shared/ui/form-dialog';
 import { ScorePicker, type CandidatePage, type PickedScore } from '../ui/score-picker';
 import { usePageName } from '../../../core/layout/page';
 import { PrintLauncher } from '../../../core/actions/pending-features';
+import { selectOr } from '../../../core/util/resource-value';
 
 /** Mappe bearbeiten (N-5, N-15): name, visibility, scores with their own number in this folder. */
 @Component({
@@ -57,7 +58,7 @@ import { PrintLauncher } from '../../../core/actions/pending-features';
 export class EditFolderPage {
   private readonly printer = inject(PrintLauncher);
   /** Breadcrumb and document title show the loaded element's name. */
-  private readonly pageName = usePageName(() => this.details.hasValue() ? this.details.value().name : null);
+  private readonly pageName = usePageName(() => selectOr(this.details, (v) => v.name, null));
   private readonly api = inject(ApiClient);
   private readonly actions = inject(ActionRunner);
   private readonly confirm = inject(ConfirmService);
@@ -79,7 +80,7 @@ export class EditFolderPage {
     params: () => this.folderId(),
     stream: ({ params }) => this.api.get(apiUrl('folders', 'folderDetails', { folderId: params }), folderDetailsResponseSchema),
   });
-  protected readonly ensembleId = computed(() => (this.details.hasValue() ? this.details.value().ensemble.id : undefined));
+  protected readonly ensembleId = computed(() => selectOr(this.details, (v) => v.ensemble.id, undefined));
   protected readonly canEdit = computed(() => this.session.can('folder.edit', this.ensembleId()));
   protected readonly canDelete = computed(() => this.session.can('folder.delete', this.ensembleId()));
 
@@ -104,7 +105,7 @@ export class EditFolderPage {
   }
 
   protected async rename(name: string): Promise<void> {
-    const current = this.details.hasValue() ? this.details.value().name : '';
+    const current = selectOr(this.details, (v) => v.name, '');
     if (!name.trim() || name.trim() === current) return;
     const done = await this.actions.run(
       () => firstValueFrom(this.api.postVoid(apiUrl('folders', 'renameFolder', { folderId: this.folderId() }), { name: name.trim() })),
@@ -172,7 +173,7 @@ export class EditFolderPage {
   }
 
   protected async deleteFolder(): Promise<void> {
-    const name = this.details.hasValue() ? this.details.value().name : '';
+    const name = selectOr(this.details, (v) => v.name, '');
     if (!(await this.confirm.confirmDelete('library.folders.deleteTitle', 'library.folders.deleteText', { name }))) return;
     const done = await this.actions.run(() => firstValueFrom(this.api.postVoid(apiUrl('folders', 'deleteFolder', { folderId: this.folderId() }))), {
       success: { key: 'library.folders.deleted', params: { name } },
@@ -182,7 +183,7 @@ export class EditFolderPage {
 
   /** Druckdialog (D-1) for the whole folder; the voices come from the voice switch. */
   protected print(): void {
-    this.printer.open({ scope: 'folder', id: this.folderId(), title: this.details.hasValue() ? this.details.value().name : '' });
+    this.printer.open({ scope: 'folder', id: this.folderId(), title: selectOr(this.details, (v) => v.name, '') });
   }
 }
 

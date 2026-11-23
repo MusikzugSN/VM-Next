@@ -14,6 +14,7 @@ import { ActionRunner } from '../../../core/actions/action-runner';
 import { ApiClient } from '../../../core/api/api-client';
 import { pluralKey } from '../../../core/i18n/plural.pipe';
 import { PageProblem } from '../../../shared/ui/page-problem';
+import { selectOr } from '../../../core/util/resource-value';
 
 /** Sheets for a page count under a mode, for the example column („3 Seiten → 2 Blätter“). */
 export function sheetsFor(pages: number, mode: PrintMode): number {
@@ -178,7 +179,7 @@ export class PrintRulesTab {
   protected readonly draft = signal<PrintRule[]>([]);
   protected readonly valid = computed(() => printRulesSchema.safeParse(this.draft()).success);
   protected readonly dirty = computed(() => {
-    const saved = this.data.hasValue() ? this.data.value().rules : [];
+    const saved = selectOr(this.data, (v) => v.rules, []);
     return JSON.stringify(saved) !== JSON.stringify(this.draft()) || (this.data.hasValue() && !this.data.value().own);
   });
 

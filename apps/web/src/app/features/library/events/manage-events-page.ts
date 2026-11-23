@@ -30,6 +30,7 @@ import { ListState } from '../../../shared/ui/list-state';
 import { SearchField } from '../../../shared/ui/search-field';
 import { ToggleSwitch } from '../../../shared/ui/toggle-switch';
 import { CreateInEnsembleDialog, type CreateInEnsemble } from '../ui/create-in-ensemble-dialog';
+import { ensemblesWith } from '../ui/ensembles-with';
 
 /** Events verwalten (N-15): upcoming and past events per ensemble, visibility, create and delete. */
 @Component({
@@ -74,9 +75,7 @@ export class ManageEventsPage {
     stream: () => this.api.get(apiUrl('events', 'ensembleOptions'), ensembleOptionsResponseSchema),
   });
   protected readonly canCreate = computed(() => this.createOptions.hasValue() && this.createOptions.value().items.length > 0);
-  protected readonly filterOptions = computed(() =>
-    (this.session.access()?.permissions.ensembles ?? []).filter((e) => this.session.can('event.view', e.ensemble.id)).map((e) => e.ensemble),
-  );
+  protected readonly filterOptions = computed(() => ensemblesWith(this.session, 'event.view'));
 
   protected readonly list = cursorList({
     params: () => ({ period: this.period(), ensembleId: this.ensembleId() || undefined, q: this.query().trim() || undefined }),

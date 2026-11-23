@@ -146,10 +146,9 @@ export class UploadDialog {
         batch.forEach((item) => sent.add(item.key));
         done += batch.reduce((sum, item) => sum + item.file.size, 0);
       }
-      const body = { items: results };
-      const approved = body.items.filter((item) => item.status === 'approved').length;
-      const key = approved === body.items.length ? 'upload.doneApproved' : approved > 0 ? 'upload.donePartly' : 'upload.done';
-      this.sonner.success(this.transloco.translate(pluralKey(key, body.items.length), { count: body.items.length, approved }));
+      const approved = results.filter((item) => item.status === 'approved').length;
+      const key = approved === results.length ? 'upload.doneApproved' : approved > 0 ? 'upload.donePartly' : 'upload.done';
+      this.sonner.success(this.transloco.translate(pluralKey(key, results.length), { count: results.length, approved }));
       this.review.refresh();
       this.launcher.notifyCompleted();
       this.open.set(false);

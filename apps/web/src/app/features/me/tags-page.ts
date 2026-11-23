@@ -18,10 +18,9 @@ import { firstValueFrom, of } from 'rxjs';
 import { ZardAlertDialogService } from '@/shared/components/alert-dialog';
 import { ZardButtonComponent } from '@/shared/components/button';
 import { ZardInputComponent } from '@/shared/components/input';
-import { ZardSonnerService } from '@/shared/components/sonner';
 
 import { ApiClient } from '../../core/api/api-client';
-import { isApiProblem } from '../../core/api/api-problem';
+import { ActionRunner } from '../../core/actions/action-runner';
 import { cursorList } from '../../core/api/cursor-list';
 import { debounced } from '../../core/util/debounced';
 import { VoiceContextStore } from '../../core/voices/voice-context.store';
@@ -46,7 +45,7 @@ export class TagsPage {
   private readonly api = inject(ApiClient);
   private readonly voices = inject(VoiceContextStore);
   private readonly router = inject(Router);
-  private readonly sonner = inject(ZardSonnerService);
+  private readonly actions = inject(ActionRunner);
   private readonly alerts = inject(ZardAlertDialogService);
   private readonly transloco = inject(TranslocoService);
 
@@ -86,18 +85,18 @@ export class TagsPage {
   }
 
   protected readonly create = async (name: string): Promise<boolean> => {
-    const created = await this.run(() => firstValueFrom(this.api.post(apiUrl('me', 'createPersonalTag'), { name }, createdResponseSchema)));
+    const created = await this.actions.run(() => firstValueFrom(this.api.post(apiUrl('me', 'createPersonalTag'), { name }, createdResponseSchema)));
     if (!created) return false;
     this.tags.reload();
-    void this.router.navigateByUrl(appPath(APP_ROUTES.me.personalTag, { tagId: created.id }));
+    void this.router.navigateByUrl(appPath(APP_ROUTES.me.personalTag, { tagId: created.value.id }));
     return true;
   };
 
   protected readonly rename = async (name: string): Promise<boolean> => {
     const id = this.tagId();
     if (!id) return false;
-    const ok = await this.run(() => firstValueFrom(this.api.postVoid(apiUrl('me', 'renamePersonalTag', { tagId: id }), { name })));
-    if (ok === undefined) return false;
+    const done = await this.actions.run(() => firstValueFrom(this.api.postVoid(apiUrl('me', 'renamePersonalTag', { tagId: id }), { name })));
+    if (!done) return false;
     this.tags.reload();
     return true;
   };
@@ -110,23 +109,13 @@ export class TagsPage {
       zCancelText: this.transloco.translate('common.cancel'),
       zOkDestructive: true,
       zOnOk: () => {
-        void this.run(() => firstValueFrom(this.api.postVoid(apiUrl('me', 'deletePersonalTag', { tagId: tag.id })))).then((ok) => {
-          if (ok === undefined) return;
-          this.sonner.success(this.transloco.translate('me.tags.deleted', { name: tag.name }));
+        void this.actions.run(() => firstValueFrom(this.api.postVoid(apiUrl('me', 'deletePersonalTag', { tagId: tag.id })))).then((done) => {
+          if (!done) return;
+          this.actions.notify('me.tags.deleted', { name: tag.name });
           this.tags.reload();
           void this.router.navigateByUrl(APP_ROUTES.me.tags);
         });
       },
     });
-  }
-
-  /** Runs an action; on failure shows the problem as toast and returns `undefined`. */
-  private async run<T>(action: () => Promise<T>): Promise<T | undefined> {
-    try {
-      return (await action()) ?? (true as T);
-    } catch (error) {
-      this.sonner.error(this.transloco.translate(isApiProblem(error) ? error.messageKey : 'errors.unknown'));
-      return undefined;
-    }
   }
 }
