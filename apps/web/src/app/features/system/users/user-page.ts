@@ -5,7 +5,7 @@ import { Router, RouterLink } from '@angular/router';
 import { TranslocoPipe } from '@jsverse/transloco';
 import { NgIcon, provideIcons } from '@ng-icons/core';
 import { lucideCheck, lucideChevronLeft, lucideLock, lucideLockOpen, lucidePlus, lucideTrash2, lucideX } from '@ng-icons/lucide';
-import { APP_ROUTES, apiUrl, userAssignmentOptionsResponseSchema, userDetailsResponseSchema } from '@vm-web/shared';
+import { MAX_PROFILE_VOICES, APP_ROUTES, apiUrl, userAssignmentOptionsResponseSchema, userDetailsResponseSchema } from '@vm-web/shared';
 import { firstValueFrom } from 'rxjs';
 
 import { ZardButtonComponent } from '@/shared/components/button';
@@ -119,7 +119,7 @@ export class UserPage {
     this.selectedVoices.update((current) => {
       const next = new Set(current);
       if (next.has(id)) next.delete(id);
-      else if (next.size < 20) next.add(id);
+      else if (next.size < MAX_PROFILE_VOICES) next.add(id);
       return next;
     });
   }

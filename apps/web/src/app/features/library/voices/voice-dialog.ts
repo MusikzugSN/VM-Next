@@ -6,6 +6,7 @@ import {
   apiUrl,
   createVoiceResponseSchema,
   type VoiceListResponse,
+  MAX_SUBSTITUTES,
 } from '@vm-web/shared';
 import { firstValueFrom } from 'rxjs';
 
@@ -29,7 +30,6 @@ export interface VoiceDialogTarget {
 }
 
 /** API limit of `set-substitutes`. */
-export const MAX_SUBSTITUTES = 10;
 
 /** Moves an item one step up (-1) or down (+1); returns a new array. */
 export function moveItem<T>(items: readonly T[], index: number, delta: -1 | 1): T[] {

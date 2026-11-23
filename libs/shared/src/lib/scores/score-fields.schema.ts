@@ -1,9 +1,12 @@
 import * as z from 'zod';
 import { idSchema, isoDateSchema } from '../common/ids.schema';
 
+/** Longest title of a score. */
+export const SCORE_TITLE_MAX = 200;
+
 /** Fixed fields of a score (N-1). */
 export const scoreFixedFieldsSchema = z.object({
-  title: z.string().trim().min(1).max(200),
+  title: z.string().trim().min(1).max(SCORE_TITLE_MAX),
   composer: z.string().trim().max(200).nullable(),
   arranger: z.string().trim().max(200).nullable(),
   publisher: z.string().trim().max(200).nullable(),
