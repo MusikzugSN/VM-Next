@@ -15,7 +15,6 @@ import {
   voiceOptionsResponseSchema,
   type ScoreCompletenessResponse,
 } from '@vm-web/shared';
-import { firstValueFrom } from 'rxjs';
 
 import { ZardButtonComponent } from '@/shared/components/button';
 import { ZardDialogImports } from '@/shared/components/dialog/dialog.imports';
@@ -198,7 +197,7 @@ export class LibraryScorePage {
 
   protected async deleteSheet(sheetId: string, voiceName: string): Promise<void> {
     if (!(await this.confirm.confirmDelete('library.score.deleteSheetTitle', 'library.score.deleteSheetText', { voice: voiceName }))) return;
-    const done = await this.actions.run(() => firstValueFrom(this.api.postVoid(apiUrl('scores', 'deleteSheet', { sheetId }))), {
+    const done = await this.actions.runOnce(() => this.api.postVoid(apiUrl('scores', 'deleteSheet', { sheetId })), {
       success: { key: 'library.score.sheetDeleted', params: { voice: voiceName } },
     });
     if (done) {
@@ -216,8 +215,8 @@ export class LibraryScorePage {
       this.focusInvalid();
       return;
     }
-    const done = await this.actions.run(
-      () => firstValueFrom(this.api.postVoid(apiUrl('scores', 'updateScoreDetails', { scoreId: this.scoreId() }), body)),
+    const done = await this.actions.runOnce(
+      () => this.api.postVoid(apiUrl('scores', 'updateScoreDetails', { scoreId: this.scoreId() }), body),
       {
         busy: this.saving,
         success: { key: 'library.form.saved' },
@@ -230,7 +229,7 @@ export class LibraryScorePage {
   protected async remove(): Promise<void> {
     const title = selectOr(this.details, (v) => v.title, '');
     if (!(await this.confirm.confirmDelete('library.scores.deleteTitle', 'library.scores.deleteText', { title }))) return;
-    const done = await this.actions.run(() => firstValueFrom(this.api.postVoid(apiUrl('scores', 'deleteScore', { scoreId: this.scoreId() }))), {
+    const done = await this.actions.runOnce(() => this.api.postVoid(apiUrl('scores', 'deleteScore', { scoreId: this.scoreId() })), {
       success: { key: 'library.scores.deleted', params: { title } },
     });
     if (done) void this.router.navigateByUrl(APP_ROUTES.library.scores);

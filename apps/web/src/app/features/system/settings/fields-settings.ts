@@ -4,7 +4,6 @@ import { TranslocoPipe } from '@jsverse/transloco';
 import { NgIcon, provideIcons } from '@ng-icons/core';
 import { lucideArrowDown, lucideArrowUp, lucidePencil, lucidePlus, lucideTrash2 } from '@ng-icons/lucide';
 import { apiUrl, createdResponseSchema, fieldDefinitionsResponseSchema, type FieldDefinition } from '@vm-web/shared';
-import { firstValueFrom } from 'rxjs';
 
 import { ZardButtonComponent } from '@/shared/components/button';
 
@@ -102,14 +101,12 @@ export class FieldsSettings {
   protected readonly save = async (value: FieldDialogValue): Promise<boolean> => {
     const field = this.editing();
     const done = field
-      ? await this.actions.run(
+      ? await this.actions.runOnce(
           () =>
-            firstValueFrom(
-              this.api.postVoid(apiUrl('scores', 'updateField', { fieldId: field.id }), { name: value.name, required: value.required, options: value.options }),
-            ),
+            this.api.postVoid(apiUrl('scores', 'updateField', { fieldId: field.id }), { name: value.name, required: value.required, options: value.options }),
           { success: { key: 'system.settings.saved' } },
         )
-      : await this.actions.run(() => firstValueFrom(this.api.post(apiUrl('scores', 'createField'), value, createdResponseSchema)), {
+      : await this.actions.runOnce(() => this.api.post(apiUrl('scores', 'createField'), value, createdResponseSchema), {
           success: { key: 'system.settings.fields.created', params: { name: value.name } },
         });
     if (done) this.fields.reload();
@@ -121,13 +118,13 @@ export class FieldsSettings {
     const target = index + delta;
     if (target < 0 || target >= ids.length) return;
     [ids[index], ids[target]] = [ids[target], ids[index]];
-    const done = await this.actions.run(() => firstValueFrom(this.api.postVoid(apiUrl('scores', 'reorderFields'), { fieldIds: ids })));
+    const done = await this.actions.runOnce(() => this.api.postVoid(apiUrl('scores', 'reorderFields'), { fieldIds: ids }));
     if (done) this.fields.reload();
   }
 
   protected async remove(field: FieldDefinition): Promise<void> {
     if (!(await this.confirm.confirmDelete('system.settings.fields.deleteTitle', 'system.settings.fields.deleteText', { name: field.name }))) return;
-    const done = await this.actions.run(() => firstValueFrom(this.api.postVoid(apiUrl('scores', 'deleteField', { fieldId: field.id }))), {
+    const done = await this.actions.runOnce(() => this.api.postVoid(apiUrl('scores', 'deleteField', { fieldId: field.id })), {
       success: { key: 'system.settings.fields.deleted', params: { name: field.name } },
     });
     if (done) this.fields.reload();

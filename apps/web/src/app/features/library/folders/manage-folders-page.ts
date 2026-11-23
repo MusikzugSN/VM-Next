@@ -13,7 +13,6 @@ import {
   folderListResponseSchema,
   type FolderListItem,
 } from '@vm-web/shared';
-import { firstValueFrom } from 'rxjs';
 
 import { ZardButtonComponent } from '@/shared/components/button';
 import { ZardNativeSelectDirective } from '@/shared/components/native-select';
@@ -94,11 +93,9 @@ export class ManageFoldersPage {
   }
 
   protected readonly create = async (input: CreateInEnsemble): Promise<boolean> => {
-    const done = await this.actions.run(
+    const done = await this.actions.runOnce(
       () =>
-        firstValueFrom(
-          this.api.post(apiUrl('folders', 'createFolder'), { ensembleId: input.ensembleId, name: input.name, showInMyArea: input.show }, createdResponseSchema),
-        ),
+        this.api.post(apiUrl('folders', 'createFolder'), { ensembleId: input.ensembleId, name: input.name, showInMyArea: input.show }, createdResponseSchema),
       { success: { key: 'library.folders.created', params: { name: input.name } } },
     );
     if (done) void this.router.navigateByUrl(appPath(APP_ROUTES.library.folder, { folderId: done.value.id }));
@@ -106,8 +103,8 @@ export class ManageFoldersPage {
   };
 
   protected async setVisibility(folder: FolderListItem, show: boolean): Promise<void> {
-    const done = await this.actions.run(
-      () => firstValueFrom(this.api.postVoid(apiUrl('folders', 'setVisibility', { folderId: folder.id }), { showInMyArea: show })),
+    const done = await this.actions.runOnce(
+      () => this.api.postVoid(apiUrl('folders', 'setVisibility', { folderId: folder.id }), { showInMyArea: show }),
       { success: { key: show ? 'library.folders.shown' : 'library.folders.hidden', params: { name: folder.name } } },
     );
     if (done) this.list.reload();
@@ -115,7 +112,7 @@ export class ManageFoldersPage {
 
   protected async remove(folder: FolderListItem): Promise<void> {
     if (!(await this.confirm.confirmDelete('library.folders.deleteTitle', 'library.folders.deleteText', { name: folder.name }))) return;
-    const done = await this.actions.run(() => firstValueFrom(this.api.postVoid(apiUrl('folders', 'deleteFolder', { folderId: folder.id }))), {
+    const done = await this.actions.runOnce(() => this.api.postVoid(apiUrl('folders', 'deleteFolder', { folderId: folder.id })), {
       success: { key: 'library.folders.deleted', params: { name: folder.name } },
     });
     if (done) this.list.reload();

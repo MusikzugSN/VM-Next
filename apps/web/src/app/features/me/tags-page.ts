@@ -13,7 +13,7 @@ import {
   myTagsResponseSchema,
   type MyTagItem,
 } from '@vm-web/shared';
-import { firstValueFrom, of } from 'rxjs';
+import { of } from 'rxjs';
 
 import { ZardAlertDialogService } from '@/shared/components/alert-dialog';
 import { ZardButtonComponent } from '@/shared/components/button';
@@ -85,7 +85,7 @@ export class TagsPage {
   }
 
   protected readonly create = async (name: string): Promise<boolean> => {
-    const created = await this.actions.run(() => firstValueFrom(this.api.post(apiUrl('me', 'createPersonalTag'), { name }, createdResponseSchema)));
+    const created = await this.actions.runOnce(() => this.api.post(apiUrl('me', 'createPersonalTag'), { name }, createdResponseSchema));
     if (!created) return false;
     this.tags.reload();
     void this.router.navigateByUrl(appPath(APP_ROUTES.me.personalTag, { tagId: created.value.id }));
@@ -95,7 +95,7 @@ export class TagsPage {
   protected readonly rename = async (name: string): Promise<boolean> => {
     const id = this.tagId();
     if (!id) return false;
-    const done = await this.actions.run(() => firstValueFrom(this.api.postVoid(apiUrl('me', 'renamePersonalTag', { tagId: id }), { name })));
+    const done = await this.actions.runOnce(() => this.api.postVoid(apiUrl('me', 'renamePersonalTag', { tagId: id }), { name }));
     if (!done) return false;
     this.tags.reload();
     return true;
@@ -109,7 +109,7 @@ export class TagsPage {
       zCancelText: this.transloco.translate('common.cancel'),
       zOkDestructive: true,
       zOnOk: () => {
-        void this.actions.run(() => firstValueFrom(this.api.postVoid(apiUrl('me', 'deletePersonalTag', { tagId: tag.id })))).then((done) => {
+        void this.actions.runOnce(() => this.api.postVoid(apiUrl('me', 'deletePersonalTag', { tagId: tag.id }))).then((done) => {
           if (!done) return;
           this.actions.notify('me.tags.deleted', { name: tag.name });
           this.tags.reload();

@@ -4,7 +4,7 @@ import { TranslocoPipe } from '@jsverse/transloco';
 import { NgIcon, provideIcons } from '@ng-icons/core';
 import { lucidePlus, lucideSearch } from '@ng-icons/lucide';
 import { SCORE_TITLE_MAX, apiUrl, createdResponseSchema, scoreSearchResponseSchema, type ScoreSearchItem } from '@vm-web/shared';
-import { firstValueFrom, of } from 'rxjs';
+import { of } from 'rxjs';
 
 import { ZardInputComponent } from '@/shared/components/input';
 
@@ -106,7 +106,7 @@ export class ScoreSearchSelect {
     const title = this.query().trim().slice(0, SCORE_TITLE_MAX);
     if (!title) return;
     const body = { title, composer: null, arranger: null, publisher: null, publisherNumber: null, durationSeconds: null };
-    const done = await this.actions.run(() => firstValueFrom(this.api.post(apiUrl('scores', 'createScore'), body, createdResponseSchema)), {
+    const done = await this.actions.runOnce(() => this.api.post(apiUrl('scores', 'createScore'), body, createdResponseSchema), {
       busy: this.creating,
       success: { key: 'upload.scoreCreated', params: { title } },
     });

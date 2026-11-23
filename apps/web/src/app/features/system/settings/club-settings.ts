@@ -4,7 +4,6 @@ import { TranslocoPipe, TranslocoService } from '@jsverse/transloco';
 import { NgIcon, provideIcons } from '@ng-icons/core';
 import { lucideImageUp, lucideTrash2 } from '@ng-icons/lucide';
 import { apiUrl, LOGO_FILE_FIELD, LOGO_MAX_BYTES, LOGO_MIME_TYPES, updateClubBodySchema, type ConfigResponse } from '@vm-web/shared';
-import { firstValueFrom } from 'rxjs';
 
 import { ZardButtonComponent } from '@/shared/components/button';
 import { ZardInputComponent } from '@/shared/components/input';
@@ -187,7 +186,7 @@ export class ClubSettings {
       this.focusInvalid(this.formRef().nativeElement);
       return;
     }
-    const done = await this.actions.run(() => firstValueFrom(this.api.postVoid(apiUrl('system', 'updateClub'), parsed.data)), {
+    const done = await this.actions.runOnce(() => this.api.postVoid(apiUrl('system', 'updateClub'), parsed.data), {
       busy: this.saving,
       success: { key: 'system.settings.saved' },
     });
@@ -203,7 +202,7 @@ export class ClubSettings {
     }
     const form = new FormData();
     form.append(LOGO_FILE_FIELD, file, file.name);
-    const done = await this.actions.run(() => firstValueFrom(this.http.post(apiUrl('system', 'uploadLogo'), form)), {
+    const done = await this.actions.runOnce(() => this.http.post(apiUrl('system', 'uploadLogo'), form), {
       busy: this.uploading,
       success: { key: 'system.settings.club.logoUploaded' },
     });
@@ -211,7 +210,7 @@ export class ClubSettings {
   }
 
   protected async removeLogo(): Promise<void> {
-    const done = await this.actions.run(() => firstValueFrom(this.api.postVoid(apiUrl('system', 'removeLogo'))), {
+    const done = await this.actions.runOnce(() => this.api.postVoid(apiUrl('system', 'removeLogo')), {
       success: { key: 'system.settings.club.logoRemoved' },
     });
     if (done) this.afterChange();

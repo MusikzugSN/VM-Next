@@ -15,7 +15,6 @@ import {
   myTagsResponseSchema,
   type MemberSheet,
 } from '@vm-web/shared';
-import { firstValueFrom } from 'rxjs';
 
 import { ZardButtonComponent } from '@/shared/components/button';
 import { ZardDropdownImports } from '@/shared/components/dropdown/dropdown.imports';
@@ -121,21 +120,21 @@ export class ScorePage {
   }
 
   protected async addTag(tagId: string): Promise<void> {
-    await this.actions.run(() => firstValueFrom(this.api.postVoid(apiUrl('me', 'addPersonalTag', { scoreId: this.scoreId() }), { tagId })));
+    await this.actions.runOnce(() => this.api.postVoid(apiUrl('me', 'addPersonalTag', { scoreId: this.scoreId() }), { tagId }));
     this.overview.reload();
   }
 
   protected async removeTag(tagId: string): Promise<void> {
-    await this.actions.run(() =>
-      firstValueFrom(this.api.postVoid(apiUrl('me', 'removePersonalTag', { scoreId: this.scoreId() }), { tagId })),
+    await this.actions.runOnce(() =>
+      this.api.postVoid(apiUrl('me', 'removePersonalTag', { scoreId: this.scoreId() }), { tagId }),
     );
     this.overview.reload();
   }
 
   /** New personal tag from the tag menu; it is added to this score right away. */
   protected readonly createTag = async (name: string): Promise<boolean> => {
-    const created = await this.actions.run(() =>
-      firstValueFrom(this.api.post(apiUrl('me', 'createPersonalTag'), { name }, createdResponseSchema)),
+    const created = await this.actions.runOnce(() =>
+      this.api.post(apiUrl('me', 'createPersonalTag'), { name }, createdResponseSchema),
     );
     if (!created) return false;
     this.myTags.reload();

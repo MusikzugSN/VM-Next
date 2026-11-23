@@ -5,7 +5,6 @@ import { TranslocoPipe } from '@jsverse/transloco';
 import { NgIcon, provideIcons } from '@ng-icons/core';
 import { lucideChevronLeft, lucideRotateCcw, lucideTrash2, lucideTriangleAlert } from '@ng-icons/lucide';
 import { APP_ROUTES, apiUrl, permissionCatalogResponseSchema, permissionScope, roleDetailsResponseSchema, type Permission } from '@vm-web/shared';
-import { firstValueFrom } from 'rxjs';
 
 import { ZardButtonComponent } from '@/shared/components/button';
 
@@ -85,15 +84,15 @@ export class RolePage {
   }
 
   protected async save(): Promise<void> {
-    const done = await this.actions.run(
-      () => firstValueFrom(this.api.postVoid(apiUrl('system', 'setPermissions', { roleId: this.roleId() }), { permissions: [...this.selected()] })),
+    const done = await this.actions.runOnce(
+      () => this.api.postVoid(apiUrl('system', 'setPermissions', { roleId: this.roleId() }), { permissions: [...this.selected()] }),
       { busy: this.saving, success: { key: 'system.role.saved' } },
     );
     if (done) this.changed();
   }
 
   protected readonly rename = async (name: string): Promise<boolean> => {
-    const done = await this.actions.run(() => firstValueFrom(this.api.postVoid(apiUrl('system', 'renameRole', { roleId: this.roleId() }), { name })), {
+    const done = await this.actions.runOnce(() => this.api.postVoid(apiUrl('system', 'renameRole', { roleId: this.roleId() }), { name }), {
       success: { key: 'system.role.renamed', params: { name } },
     });
     if (done) this.details.reload();
@@ -103,7 +102,7 @@ export class RolePage {
   protected async reset(): Promise<void> {
     const name = this.role()?.name ?? '';
     if (!(await this.confirm.confirm('system.role.resetTitle', 'system.role.resetText', { name }, 'system.roles.resetOk'))) return;
-    const done = await this.actions.run(() => firstValueFrom(this.api.postVoid(apiUrl('system', 'resetRole', { roleId: this.roleId() }))), {
+    const done = await this.actions.runOnce(() => this.api.postVoid(apiUrl('system', 'resetRole', { roleId: this.roleId() })), {
       success: { key: 'system.role.resetDone', params: { name } },
     });
     if (done) this.changed();
@@ -113,7 +112,7 @@ export class RolePage {
     const role = this.role();
     if (!role) return;
     if (!(await this.confirm.confirmDelete('system.role.deleteTitle', 'system.role.deleteText', { name: role.name }))) return;
-    const done = await this.actions.run(() => firstValueFrom(this.api.postVoid(apiUrl('system', 'deleteRole', { roleId: this.roleId() }))), {
+    const done = await this.actions.runOnce(() => this.api.postVoid(apiUrl('system', 'deleteRole', { roleId: this.roleId() })), {
       success: { key: 'system.role.deleted', params: { name: role.name } },
     });
     if (done) void this.router.navigateByUrl(this.listPath);

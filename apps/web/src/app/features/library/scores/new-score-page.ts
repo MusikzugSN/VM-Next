@@ -2,7 +2,6 @@ import { ChangeDetectionStrategy, Component, inject, signal } from '@angular/cor
 import { Router, RouterLink } from '@angular/router';
 import { TranslocoPipe } from '@jsverse/transloco';
 import { APP_ROUTES, apiUrl, appPath, createdResponseSchema } from '@vm-web/shared';
-import { firstValueFrom } from 'rxjs';
 
 import { ZardButtonComponent } from '@/shared/components/button';
 
@@ -61,7 +60,7 @@ export class NewScorePage {
       this.focusInvalid();
       return;
     }
-    const done = await this.actions.run(() => firstValueFrom(this.api.post(apiUrl('scores', 'createScore'), body, createdResponseSchema)), {
+    const done = await this.actions.runOnce(() => this.api.post(apiUrl('scores', 'createScore'), body, createdResponseSchema), {
       busy: this.saving,
       success: { key: 'library.form.created', params: { title: body.title } },
       onProblem: fieldProblemHandler(this.errors, this.focusInvalid),
