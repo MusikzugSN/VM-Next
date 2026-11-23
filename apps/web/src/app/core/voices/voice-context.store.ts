@@ -5,6 +5,7 @@ import { apiUrl, voiceContextResponseSchema, voiceOptionsResponseSchema } from '
 import { ApiClient } from '../api/api-client';
 import { SessionStore } from '../auth/session.store';
 import { isStandIn } from './voice-groups';
+import { ignoreStorageErrors, readStoredStrings } from '../util/stored';
 
 const OVERRIDE_KEY = 'vmweb.voiceOverride';
 /** API limit for `?voiceId=` (repeatable, max. 20). */
@@ -67,20 +68,13 @@ export class VoiceContextStore {
 }
 
 function readOverride(): string[] {
-  try {
-    const raw = sessionStorage.getItem(OVERRIDE_KEY);
-    const parsed: unknown = raw ? JSON.parse(raw) : [];
-    return Array.isArray(parsed) ? parsed.filter((id): id is string => typeof id === 'string') : [];
-  } catch {
-    return [];
-  }
+  return readStoredStrings(() => sessionStorage, OVERRIDE_KEY);
 }
 
+/** With blocked storage (private mode) the override lasts until the next reload. */
 function writeOverride(ids: readonly string[]): void {
-  try {
+  ignoreStorageErrors(() => {
     if (ids.length) sessionStorage.setItem(OVERRIDE_KEY, JSON.stringify(ids));
     else sessionStorage.removeItem(OVERRIDE_KEY);
-  } catch {
-    // Storage blocked (private mode): the override then lasts until the next reload.
-  }
+  });
 }
