@@ -14,8 +14,11 @@ export const profileResponseSchema = z.object({
 });
 export type ProfileResponse = z.infer<typeof profileResponseSchema>;
 
+/** Most profile voices of a person. */
+export const MAX_PROFILE_VOICES = 20;
+
 /** POST me/profile/set-voices – replaces the profile voices (M-1). Response 204. */
 export const setMyVoicesBodySchema = z.object({
-  voiceIds: z.array(idSchema).min(1).max(20),
+  voiceIds: z.array(idSchema).min(1).max(MAX_PROFILE_VOICES),
 });
 export type SetMyVoicesBody = z.infer<typeof setMyVoicesBodySchema>;

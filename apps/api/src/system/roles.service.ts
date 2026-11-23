@@ -17,13 +17,14 @@ import { and, asc, eq, inArray, sql } from 'drizzle-orm';
 import { uuidv7 } from '../common/ids/uuid-v7';
 import { decodeCursor, toPage } from '../common/pagination/cursor';
 import { ProblemException } from '../common/problem-details/problem.exception';
-import { DATABASE, type Database } from '../db/database';
-import { isUniqueViolation } from '../db/db-errors';
+import { DATABASE, type Database, type Tx } from '../db/database';
+import { withNameTaken } from '../db/db-errors';
 import { clubSettings, memberships, rolePermissions, roles } from '../db/schema';
 import { loadDefaultRoles, type DefaultRole } from '../seed/default-roles';
 import { rolesFile } from '../seed/defaults';
+import { replaceRows } from '../db/table-helpers';
+import { appendTo } from '../common/collections';
 
-type Tx = Parameters<Parameters<Database['transaction']>[0]>[0];
 type RoleRecord = typeof roles.$inferSelect;
 
 const sorted = (permissions: readonly string[]) => ALL_PERMISSIONS.filter((p) => permissions.includes(p));
@@ -68,7 +69,7 @@ export class RolesService {
 
   async create(name: string, permissions: readonly Permission[]): Promise<{ id: string }> {
     const id = uuidv7();
-    await this.unique(() =>
+    await withNameTaken(() =>
       this.db.transaction(async (tx) => {
         await tx.insert(roles).values({ id, name });
         await writePermissions(tx, id, permissions);
@@ -79,7 +80,7 @@ export class RolesService {
 
   async rename(roleId: string, name: string): Promise<void> {
     await this.role(roleId);
-    await this.unique(() => this.db.update(roles).set({ name, updatedAt: new Date() }).where(eq(roles.id, roleId)));
+    await withNameTaken(() => this.db.update(roles).set({ name, updatedAt: new Date() }).where(eq(roles.id, roleId)));
   }
 
   async setPermissions(roleId: string, permissions: readonly Permission[]): Promise<void> {
@@ -106,7 +107,7 @@ export class RolesService {
     const role = await this.role(roleId);
     const def = role.defaultKey ? (await this.defaults()).get(role.defaultKey) : undefined;
     if (!def) throw ProblemException.conflict('not-default-role');
-    await this.unique(() =>
+    await withNameTaken(() =>
       this.db.transaction(async (tx) => {
         await tx.update(roles).set({ name: def.name, updatedAt: new Date() }).where(eq(roles.id, roleId));
         await writePermissions(tx, roleId, def.permissions);
@@ -163,7 +164,7 @@ export class RolesService {
     const result = new Map<string, Permission[]>();
     if (!roleIds.length) return result;
     const rows = await this.db.select().from(rolePermissions).where(inArray(rolePermissions.roleId, [...roleIds]));
-    for (const r of rows) result.set(r.roleId, [...(result.get(r.roleId) ?? []), r.permission as Permission]);
+    for (const r of rows) appendTo(result, r.roleId, r.permission as Permission);
     for (const [id, list] of result) result.set(id, sorted(list));
     return result;
   }
@@ -183,21 +184,11 @@ export class RolesService {
     if (!row) throw ProblemException.notFound();
     return row;
   }
-
-  private async unique<T>(write: () => Promise<T>): Promise<T> {
-    try {
-      return await write();
-    } catch (error) {
-      if (isUniqueViolation(error)) throw ProblemException.conflict('name-taken');
-      throw error;
-    }
-  }
 }
 
 async function writePermissions(tx: Tx, roleId: string, permissions: readonly Permission[]): Promise<void> {
-  await tx.delete(rolePermissions).where(eq(rolePermissions.roleId, roleId));
   const unique = [...new Set(permissions)];
-  if (unique.length) await tx.insert(rolePermissions).values(unique.map((permission) => ({ roleId, permission })));
+  await replaceRows(tx, rolePermissions, eq(rolePermissions.roleId, roleId), unique.map((permission) => ({ roleId, permission })));
 }
 
 async function freeName(tx: Tx, name: string, ownId: string | undefined): Promise<string> {

@@ -3,6 +3,7 @@ import { rxResource } from '@angular/core/rxjs-interop';
 import { apiUrl, loginPageResponseSchema } from '@vm-web/shared';
 
 import { ApiClient } from '../api/api-client';
+import { valueOr } from '../util/resource-value';
 
 /** Club name, logo, banner and legal links (S-4); public, loaded once per page load. */
 @Injectable({ providedIn: 'root' })
@@ -13,7 +14,7 @@ export class BrandingStore {
     stream: () => this.api.get(apiUrl('auth', 'loginPage'), loginPageResponseSchema),
   });
 
-  readonly branding = computed(() => (this.resource.hasValue() ? this.resource.value() : null));
+  readonly branding = computed(() => valueOr(this.resource, null));
   readonly loading = this.resource.isLoading;
   readonly clubName = computed(() => this.branding()?.clubName ?? null);
   readonly logoUrl = computed(() => this.branding()?.logoUrl ?? null);

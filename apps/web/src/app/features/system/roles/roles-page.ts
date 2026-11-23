@@ -4,7 +4,6 @@ import { TranslocoPipe } from '@jsverse/transloco';
 import { NgIcon, provideIcons } from '@ng-icons/core';
 import { lucidePlus, lucideRotateCcw, lucideTriangleAlert } from '@ng-icons/lucide';
 import { APP_ROUTES, apiUrl, appPath, createdResponseSchema, resetDefaultsResponseSchema, roleListResponseSchema, type RoleListItem } from '@vm-web/shared';
-import { firstValueFrom } from 'rxjs';
 
 import { ZardButtonComponent } from '@/shared/components/button';
 
@@ -89,8 +88,8 @@ export class RolesPage {
   }
 
   protected readonly create = async (name: string): Promise<boolean> => {
-    const done = await this.actions.run(
-      () => firstValueFrom(this.api.post(apiUrl('system', 'createRole'), { name, permissions: [] }, createdResponseSchema)),
+    const done = await this.actions.runOnce(
+      () => this.api.post(apiUrl('system', 'createRole'), { name, permissions: [] }, createdResponseSchema),
       { success: { key: 'system.roles.created', params: { name } } },
     );
     // Straight to the matrix: a new role without permissions is of little use.
@@ -100,7 +99,7 @@ export class RolesPage {
 
   protected async resetAll(): Promise<void> {
     if (!(await this.confirm.confirm('system.roles.resetAllTitle', 'system.roles.resetAllText', {}, 'system.roles.resetOk'))) return;
-    const done = await this.actions.run(() => firstValueFrom(this.api.post(apiUrl('system', 'resetAllRoles'), {}, resetDefaultsResponseSchema)));
+    const done = await this.actions.runOnce(() => this.api.post(apiUrl('system', 'resetAllRoles'), {}, resetDefaultsResponseSchema));
     if (!done) return;
     this.actions.notify('system.roles.resetAllDone', { ...done.value });
     this.list.reload();

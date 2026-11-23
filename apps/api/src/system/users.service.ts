@@ -14,8 +14,10 @@ import { ProblemException } from '../common/problem-details/problem.exception';
 import { httpUrlOrNull } from '../common/url';
 import { DATABASE, type Database } from '../db/database';
 import { ensembles, memberships, roles, users, userVoices, voices } from '../db/schema';
-import { likePattern } from '../me/me.repository';
 import { assertKnownIds } from '../common/validation/id-list';
+import { replaceRows } from '../db/table-helpers';
+import { likePattern } from '../common/sql';
+import { assertActiveEnsemble, assertRoleExists, roleOptions } from '../library/library-helpers';
 
 type UserRecord = typeof users.$inferSelect;
 
@@ -57,7 +59,7 @@ export class UsersService {
   async assignmentOptions(): Promise<UserAssignmentOptionsResponse> {
     const [ensembleRows, roleRows] = await Promise.all([
       activeEnsembleOptions(this.db),
-      this.db.select({ id: roles.id, name: roles.name }).from(roles).orderBy(sql`lower(${roles.name})`),
+      roleOptions(this.db),
     ]);
     return { ensembles: ensembleRows, roles: roleRows };
   }
@@ -65,11 +67,8 @@ export class UsersService {
   /** Creates or changes the membership in one ensemble (R-1); archived ensembles are refused. */
   async setMembership(userId: string, ensembleId: string, roleId: string): Promise<void> {
     await this.user(userId);
-    const [ensemble] = await this.db.select({ archivedAt: ensembles.archivedAt }).from(ensembles).where(eq(ensembles.id, ensembleId));
-    if (!ensemble) throw ProblemException.notFound('Unknown ensemble');
-    if (ensemble.archivedAt) throw ProblemException.validation([{ path: '/body/ensembleId', code: 'archived' }]);
-    const [role] = await this.db.select({ id: roles.id }).from(roles).where(eq(roles.id, roleId));
-    if (!role) throw ProblemException.notFound('Unknown role');
+    await assertActiveEnsemble(this.db, ensembleId);
+    await assertRoleExists(this.db, roleId);
     await this.db
       .insert(memberships)
       .values({ userId, ensembleId, roleId })
@@ -93,8 +92,7 @@ export class UsersService {
     );
     assertKnownIds(voiceIds, found, '/body/voiceIds', 'unknown_voice');
     await this.db.transaction(async (tx) => {
-      await tx.delete(userVoices).where(eq(userVoices.userId, userId));
-      if (unique.length) await tx.insert(userVoices).values(unique.map((voiceId, position) => ({ userId, voiceId, position })));
+      await replaceRows(tx, userVoices, eq(userVoices.userId, userId), unique.map((voiceId, position) => ({ userId, voiceId, position })));
     });
   }
 

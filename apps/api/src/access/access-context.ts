@@ -1,4 +1,5 @@
 import { ALL_PERMISSIONS, permissionScope, type Permission } from '@vm-web/shared';
+import { appendTo } from '../common/collections';
 
 export interface MembershipRow {
   ensembleId: string;
@@ -49,7 +50,7 @@ export class AccessContext {
 
     const children = new Map<string, string[]>();
     for (const e of input.ensembles) {
-      if (e.parentId) children.set(e.parentId, [...(children.get(e.parentId) ?? []), e.id]);
+      if (e.parentId) appendTo(children, e.parentId, e.id);
     }
 
     const byEnsemble = new Map<string, Set<Permission>>();

@@ -36,7 +36,7 @@ import {
 } from '@vm-web/shared';
 import type { AccessContext } from '../access/access-context';
 import { CurrentAccess, RequirePermission } from '../access/decorators';
-import { contentDisposition } from '../common/files/download-names';
+import { contentDisposition, pdfFile } from '../common/files/download-names';
 import { ResponseSchema } from '../common/validation/zod-response.interceptor';
 import { ZodValidationPipe as Zod } from '../common/validation/zod-validation.pipe';
 import { todayIn } from '../common/time/today';
@@ -128,7 +128,7 @@ export class ScoresController {
     @Query(new Zod(librarySheetPdfQuerySchema)) q: { disposition: 'inline' | 'attachment' },
   ): Promise<StreamableFile> {
     const { stream, fileName } = await this.scores.sheetFile(p.sheetId);
-    return new StreamableFile(stream, { type: 'application/pdf', disposition: contentDisposition(q.disposition, fileName) });
+    return pdfFile(stream, q.disposition, fileName);
   }
 
   @RequirePermission('score.create')

@@ -8,7 +8,7 @@ import { catchError, from, switchMap, throwError } from 'rxjs';
 import { ApiProblem } from './api-problem';
 
 export function isApiRequest(url: string): boolean {
-  return url.startsWith(`${API_PREFIX}/`) || url.includes(`${API_PREFIX}/`);
+  return url.includes(`${API_PREFIX}/`);
 }
 
 /**
