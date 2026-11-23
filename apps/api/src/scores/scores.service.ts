@@ -29,6 +29,7 @@ import { completenessOf } from './completeness';
 import { displayValue, validateCustomValues, type FieldDef } from './custom-fields';
 import { afterCursor, buildFilters, buildSort, searchSql } from './score-query';
 import { ScoresRepository, type ScoreRow } from './scores.repository';
+import { readOrNotFound } from '../storage/read-or-not-found';
 
 const EXPORT_MAX_ROWS = 10_000;
 
@@ -164,10 +165,7 @@ export class ScoresService {
   async sheetFile(sheetId: string): Promise<{ stream: Readable; fileName: string }> {
     const sheet = await this.repo.sheet(sheetId);
     if (!sheet) throw ProblemException.notFound();
-    const stream = await this.storage.read(sheet.fileKey).catch(() => {
-      this.logger.error(`File ${sheet.fileKey} of sheet ${sheetId} is missing in storage`);
-      throw ProblemException.notFound();
-    });
+    const stream = await readOrNotFound(this.storage, sheet.fileKey, this.logger, `File ${sheet.fileKey} of sheet ${sheetId} is missing in storage`);
     return { stream, fileName: sheetFileName({ title: sheet.title, voice: sheet.voiceName }) };
   }
 
