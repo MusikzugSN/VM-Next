@@ -20,6 +20,7 @@ import { clubSettings, ensembleLineupVoices, ensembles, memberships, roles, user
 import { likePattern } from '../me/me.repository';
 import { lineupTemplateFile } from '../seed/defaults';
 import { importLineupTemplate, loadLineupTemplate } from '../seed/lineup-template';
+import { appendTo } from '../common/collections';
 
 type Tx = Parameters<Parameters<Database['transaction']>[0]>[0];
 type EnsembleRecord = typeof ensembles.$inferSelect;
@@ -195,7 +196,7 @@ export class EnsemblesService {
       this.db.select({ defaultEnsembleId: clubSettings.defaultEnsembleId }).from(clubSettings),
     ]);
     const byParent = new Map<string | null, typeof rows>();
-    for (const r of rows) byParent.set(r.parentId, [...(byParent.get(r.parentId) ?? []), r]);
+    for (const r of rows) appendTo(byParent, r.parentId, r);
     const result: EnsembleListItem[] = [];
     const walk = (parentId: string | null, depth: number) => {
       const children = (byParent.get(parentId) ?? []).sort((a, b) => a.name.localeCompare(b.name, 'de'));

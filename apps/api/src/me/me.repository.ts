@@ -22,6 +22,7 @@ import {
   voiceSubstitutes,
 } from '../db/schema';
 import type { SheetRow } from './sheet-resolution';
+import { appendTo } from '../common/collections';
 
 /** `( $1, $2, … )` for `in` lists; callers guarantee a non-empty list. */
 const list = (ids: readonly string[]): SQL => sql`(${sql.join(ids.map((id) => sql`${id}::uuid`), sql`, `)})`;
@@ -161,7 +162,7 @@ export class MeRepository {
       .innerJoin(voices, eq(voices.id, voiceSubstitutes.substituteVoiceId))
       .where(inArray(voiceSubstitutes.voiceId, [...voiceIds]))
       .orderBy(asc(voiceSubstitutes.voiceId), asc(voiceSubstitutes.position));
-    for (const { voiceId, ...ref } of rows) result.set(voiceId, [...(result.get(voiceId) ?? []), ref]);
+    for (const { voiceId, ...ref } of rows) appendTo(result, voiceId, ref);
     return result;
   }
 
@@ -206,7 +207,7 @@ export class MeRepository {
       .select({ scoreId: sheets.scoreId, sheetId: sheets.id, voiceId: sheets.voiceId, pageCount: sheets.pageCount })
       .from(sheets)
       .where(and(inArray(sheets.scoreId, [...scoreIds]), inArray(sheets.voiceId, [...voiceIds])));
-    for (const { scoreId, ...sheet } of rows) result.set(scoreId, [...(result.get(scoreId) ?? []), sheet]);
+    for (const { scoreId, ...sheet } of rows) appendTo(result, scoreId, sheet);
     return result;
   }
 

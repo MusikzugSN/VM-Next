@@ -22,6 +22,7 @@ import { isUniqueViolation } from '../db/db-errors';
 import { clubSettings, memberships, rolePermissions, roles } from '../db/schema';
 import { loadDefaultRoles, type DefaultRole } from '../seed/default-roles';
 import { rolesFile } from '../seed/defaults';
+import { appendTo } from '../common/collections';
 
 type Tx = Parameters<Parameters<Database['transaction']>[0]>[0];
 type RoleRecord = typeof roles.$inferSelect;
@@ -163,7 +164,7 @@ export class RolesService {
     const result = new Map<string, Permission[]>();
     if (!roleIds.length) return result;
     const rows = await this.db.select().from(rolePermissions).where(inArray(rolePermissions.roleId, [...roleIds]));
-    for (const r of rows) result.set(r.roleId, [...(result.get(r.roleId) ?? []), r.permission as Permission]);
+    for (const r of rows) appendTo(result, r.roleId, r.permission as Permission);
     for (const [id, list] of result) result.set(id, sorted(list));
     return result;
   }

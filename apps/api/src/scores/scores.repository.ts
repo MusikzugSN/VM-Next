@@ -21,6 +21,7 @@ import {
 } from '../db/schema';
 import type { FieldDef } from './custom-fields';
 import type { SortPlan } from './score-query';
+import { appendTo } from '../common/collections';
 
 export type ScoreRow = typeof scores.$inferSelect;
 
@@ -84,7 +85,7 @@ export class ScoresRepository {
       .innerJoin(clubTags, eq(clubTags.id, scoreClubTags.tagId))
       .where(inArray(scoreClubTags.scoreId, [...scoreIds]))
       .orderBy(sql`lower(${clubTags.name})`);
-    for (const { scoreId, ...tag } of rows) result.set(scoreId, [...(result.get(scoreId) ?? []), tag]);
+    for (const { scoreId, ...tag } of rows) appendTo(result, scoreId, tag);
     return result;
   }
 
