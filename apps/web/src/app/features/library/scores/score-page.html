@@ -205,8 +205,8 @@
     @case ('folders') {
       @if (folders.hasValue() && folders.value().items.length) {
         <div vm-card class="overflow-x-auto">
-          <table class="w-full">
-            <thead class="bg-muted text-xs font-medium text-muted-foreground">
+          <table vm-table>
+            <thead>
               <tr>
                 <th scope="col" class="w-20 px-4 py-3 text-start">{{ 'library.common.number' | transloco }}</th>
                 <th scope="col" class="px-4 py-3 text-start">{{ 'terms.folder' | transloco }}</th>
@@ -215,7 +215,7 @@
             </thead>
             <tbody>
               @for (entry of folders.value().items; track entry.folder.id) {
-                <tr class="border-t">
+                <tr>
                   <td class="px-4 py-3 font-semibold text-primary tabular-nums">{{ entry.number }}</td>
                   <td class="px-4 py-3"><a [routerLink]="folderLink(entry.folder.id)" class="font-medium">{{ entry.folder.name }}</a></td>
                   <td class="px-4 py-3 text-muted-foreground">{{ entry.ensemble.name }}</td>

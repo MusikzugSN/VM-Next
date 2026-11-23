@@ -14,7 +14,7 @@ import {
   type FolderListItem,
 } from '@vm-web/shared';
 
-import { VmButton, VmCard, VmField, VmFieldLabel, VmIconButton, VmSelect, VmSwitch } from '@vm-web/ui';
+import { VmButton, VmCard, VmField, VmFieldLabel, VmIconButton, VmSelect, VmSwitch, VmTable } from '@vm-web/ui';
 
 import { ActionRunner, ConfirmService } from '../../../core/actions/action-runner';
 import { ApiClient } from '../../../core/api/api-client';
@@ -31,7 +31,7 @@ import { ensemblesWith } from '../ui/ensembles-with';
 /** Mappen verwalten (N-15): folders per ensemble, visibility in Mein Bereich, create and delete. */
 @Component({
   selector: 'vm-library-manage-folders-page',
-  imports: [VmSwitch, VmCard, VmField, VmFieldLabel, 
+  imports: [VmTable, VmSwitch, VmCard, VmField, VmFieldLabel, 
     RouterLink,
     NgIcon,
     TranslocoPipe,

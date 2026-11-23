@@ -19,3 +19,4 @@ export { VmCard, type VmCardVariant } from './lib/card/vm-card';
 export { VmCheckbox, VmSwitch } from './lib/switch/vm-switch';
 export { VmBadge, VmBadgeCount, type VmBadgeTone } from './lib/badge/vm-badge';
 export { VmMenuImports, VmToaster, VmToastService } from './lib/menu/vm-menu';
+export { VmTable } from './lib/table/vm-table';

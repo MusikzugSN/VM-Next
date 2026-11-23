@@ -15,7 +15,7 @@ import {
   type EventListItem,
 } from '@vm-web/shared';
 
-import { VmButton, VmCard, VmField, VmFieldLabel, VmIconButton, VmSelect, VmSwitch } from '@vm-web/ui';
+import { VmButton, VmCard, VmField, VmFieldLabel, VmIconButton, VmSelect, VmSwitch, VmTable } from '@vm-web/ui';
 
 import { ActionRunner, ConfirmService } from '../../../core/actions/action-runner';
 import { ApiClient } from '../../../core/api/api-client';
@@ -32,7 +32,7 @@ import { ensemblesWith } from '../ui/ensembles-with';
 /** Events verwalten (N-15): upcoming and past events per ensemble, visibility, create and delete. */
 @Component({
   selector: 'vm-library-manage-events-page',
-  imports: [VmSwitch, VmCard, VmField, VmFieldLabel, 
+  imports: [VmTable, VmSwitch, VmCard, VmField, VmFieldLabel, 
     DatePipe,
     RouterLink,
     NgIcon,

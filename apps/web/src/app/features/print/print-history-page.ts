@@ -5,7 +5,7 @@ import { NgIcon, provideIcons } from '@ng-icons/core';
 import { lucideCircleCheck, lucideCopy, lucidePrinter, lucideRepeat, lucideTriangleAlert, lucideX } from '@ng-icons/lucide';
 import type { PrintJob, PrintJobStatus } from '@vm-web/shared';
 
-import { VmButton, VmCard, VmToastService } from '@vm-web/ui';
+import { VmButton, VmCard, VmTable, VmToastService } from '@vm-web/ui';
 
 import { PluralPipe } from '../../core/i18n/plural.pipe';
 import { ViewportService } from '../../core/layout/viewport';
@@ -29,7 +29,7 @@ const STATUS_CLASSES: Record<PrintJobStatus, string> = {
  */
 @Component({
   selector: 'vm-print-history-page',
-  imports: [VmCard, DatePipe, NgTemplateOutlet, NgIcon, TranslocoPipe, PluralPipe, VmButton],
+  imports: [VmTable, VmCard, DatePipe, NgTemplateOutlet, NgIcon, TranslocoPipe, PluralPipe, VmButton],
   viewProviders: [provideIcons({ lucidePrinter, lucideCircleCheck, lucideTriangleAlert, lucideCopy, lucideRepeat, lucideX })],
   changeDetection: ChangeDetectionStrategy.OnPush,
   templateUrl: './print-history-page.html',

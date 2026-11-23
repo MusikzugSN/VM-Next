@@ -64,8 +64,8 @@
   </ul>
 } @else {
   <div vm-card class="overflow-x-auto">
-    <table class="w-full text-start">
-      <thead class="bg-muted text-xs font-medium text-muted-foreground">
+    <table vm-table>
+      <thead>
         <tr>
           <th scope="col" class="w-12 px-4 py-3">
             <input vm-checkbox
@@ -87,7 +87,7 @@
       </thead>
       <tbody>
         @for (item of items(); track item.row.scoreId) {
-          <tr class="border-t" [class.bg-primary-soft]="selected().has(item.row.scoreId)">
+          <tr [class.bg-primary-soft]="selected().has(item.row.scoreId)">
             <td class="px-4 py-3">
               <input vm-checkbox
               type="checkbox"

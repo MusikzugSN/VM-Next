@@ -27,7 +27,7 @@ import {
 } from '@vm-web/shared';
 import { map, tap } from 'rxjs';
 
-import { VmBadgeCount, VmButton, VmCard, VmCheckbox, VmIconButton, VmMenuImports } from '@vm-web/ui';
+import { VmBadgeCount, VmButton, VmCard, VmCheckbox, VmIconButton, VmMenuImports, VmTable } from '@vm-web/ui';
 
 import { ConfirmService } from '../../../core/actions/action-runner';
 import { ApiClient } from '../../../core/api/api-client';
@@ -71,7 +71,7 @@ interface Column {
 /** Stücke (N-1, N-3, N-4): table with fixed and custom fields, search, filter, sort, completeness, export. */
 @Component({
   selector: 'vm-library-scores-page',
-  imports: [VmBadgeCount, VmCheckbox, VmCard, 
+  imports: [VmTable, VmBadgeCount, VmCheckbox, VmCard, 
     RouterLink,
     NgIcon,
     TranslocoPipe,

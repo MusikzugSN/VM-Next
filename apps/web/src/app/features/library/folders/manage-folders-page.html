@@ -48,8 +48,8 @@
   </ul>
 } @else if (list.items().length > 0) {
   <div vm-card class="overflow-x-auto">
-    <table class="w-full">
-      <thead class="bg-muted text-xs font-medium text-muted-foreground">
+    <table vm-table>
+      <thead>
         <tr>
           <th scope="col" class="px-4 py-3 text-start">{{ 'library.common.name' | transloco }}</th>
           <th scope="col" class="px-4 py-3 text-start">{{ 'terms.ensemble' | transloco }}</th>
@@ -60,7 +60,7 @@
       </thead>
       <tbody>
         @for (folder of list.items(); track folder.id) {
-          <tr class="border-t">
+          <tr>
             <td class="px-4 py-3"><a [routerLink]="link(folder)" class="font-medium">{{ folder.name }}</a></td>
             <td class="px-4 py-3 text-muted-foreground">{{ folder.ensemble.name }}</td>
             <td class="px-4 py-3 text-end tabular-nums">{{ folder.scoreCount }}</td>

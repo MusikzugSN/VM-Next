@@ -16,7 +16,7 @@ import {
   type ScoreCompletenessResponse,
 } from '@vm-web/shared';
 
-import { VmButton, VmCard, VmDialogImports, VmIconButton, VmSelect } from '@vm-web/ui';
+import { VmButton, VmCard, VmDialogImports, VmIconButton, VmSelect, VmTable } from '@vm-web/ui';
 
 import { ActionRunner, ConfirmService } from '../../../core/actions/action-runner';
 import { fieldProblemHandler } from '../../../core/actions/field-problem-handler';
@@ -64,7 +64,7 @@ export function groupCompleteness(
 /** Stück in der Notenverwaltung (N-1 bis N-5, N-9): tabs Stammdaten · Stimmen & Vollständigkeit · Mappen & Nummern. */
 @Component({
   selector: 'vm-library-score-page',
-  imports: [VmCard, TreeLabelPipe, 
+  imports: [VmTable, VmCard, TreeLabelPipe, 
     RouterLink,
     NgIcon,
     TranslocoPipe,

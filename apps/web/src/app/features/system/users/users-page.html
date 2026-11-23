@@ -51,8 +51,8 @@
   </ul>
 } @else if (list.items().length > 0) {
   <div vm-card class="overflow-x-auto">
-    <table class="w-full">
-      <thead class="bg-muted text-xs font-medium text-muted-foreground">
+    <table vm-table>
+      <thead>
         <tr>
           <th scope="col" class="px-4 py-3 text-start">{{ 'system.common.name' | transloco }}</th>
           <th scope="col" class="px-4 py-3 text-start">{{ 'system.users.email' | transloco }}</th>
@@ -64,7 +64,7 @@
       </thead>
       <tbody>
         @for (user of list.items(); track user.id) {
-          <tr class="border-t align-top">
+          <tr class="align-top">
             <td class="px-4 py-3">
               <a [routerLink]="link(user)" class="inline-flex items-center gap-2 font-medium">
                 <span aria-hidden="true" class="flex size-7 items-center justify-center rounded-full bg-primary-soft text-[11px] font-semibold text-primary no-underline">{{

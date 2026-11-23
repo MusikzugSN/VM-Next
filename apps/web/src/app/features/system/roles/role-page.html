@@ -36,8 +36,8 @@
       <section aria-labelledby="h-matrix" class="flex flex-col gap-4">
         <h2 id="h-matrix" class="text-lg font-semibold">{{ 'system.role.matrix' | transloco }}</h2>
         <div vm-card class="overflow-x-auto">
-          <table class="w-full">
-            <thead class="bg-muted text-xs font-medium text-muted-foreground">
+          <table vm-table>
+            <thead>
               <tr>
                 <th scope="col" class="px-4 py-3 text-start">{{ 'system.role.area' | transloco }}</th>
                 @for (action of catalog.value().actions; track action) {
@@ -47,7 +47,7 @@
             </thead>
             <tbody>
               @for (row of catalog.value().areas; track row.area) {
-                <tr class="border-t">
+                <tr>
                   <th scope="row" class="px-4 py-2 text-start font-medium">
                     {{ 'system.permissions.areas.' + row.area | transloco }}
                     <span class="block text-xs font-normal text-muted-foreground">{{ 'system.permissions.scopes.' + row.scope | transloco }}</span>

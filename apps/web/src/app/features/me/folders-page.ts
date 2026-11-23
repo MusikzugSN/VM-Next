@@ -6,7 +6,7 @@ import { NgIcon, provideIcons } from '@ng-icons/core';
 import { lucideChevronRight, lucideFileArchive } from '@ng-icons/lucide';
 import { APP_ROUTES, apiUrl, appPath, myFoldersResponseSchema, type MyFolderItem } from '@vm-web/shared';
 
-import { VmCard, VmIconButton } from '@vm-web/ui';
+import { VmCard, VmIconButton, VmTable } from '@vm-web/ui';
 
 import { ApiClient } from '../../core/api/api-client';
 import { cursorList } from '../../core/api/cursor-list';
@@ -18,7 +18,7 @@ import { ListState } from '../../shared/ui/list-state';
 /** Mappen (R-2, M-4): folders released for Mein Bereich in the own ensembles. */
 @Component({
   selector: 'vm-me-folders-page',
-  imports: [VmCard, PluralPipe, RouterLink, NgIcon, TranslocoPipe, VmIconButton, ListState],
+  imports: [VmTable, VmCard, PluralPipe, RouterLink, NgIcon, TranslocoPipe, VmIconButton, ListState],
   viewProviders: [provideIcons({ lucideChevronRight, lucideFileArchive })],
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
@@ -47,8 +47,8 @@ import { ListState } from '../../shared/ui/list-state';
       </ul>
     } @else if (list.items().length > 0) {
       <div vm-card class="overflow-x-auto">
-        <table class="w-full">
-          <thead class="bg-muted text-xs font-medium text-muted-foreground">
+        <table vm-table>
+          <thead>
             <tr>
               <th scope="col" class="px-4 py-3 text-start">{{ 'terms.folder' | transloco }}</th>
               <th scope="col" class="px-4 py-3 text-start">{{ 'terms.ensemble' | transloco }}</th>
@@ -58,7 +58,7 @@ import { ListState } from '../../shared/ui/list-state';
           </thead>
           <tbody>
             @for (folder of list.items(); track folder.id) {
-              <tr class="border-t">
+              <tr>
                 <td class="px-4 py-3"><a [routerLink]="link(folder)" class="font-medium">{{ folder.name }}</a></td>
                 <td class="px-4 py-3 text-muted-foreground">{{ folder.ensemble.name }}</td>
                 <td class="px-4 py-3 text-end tabular-nums">{{ folder.scoreCount }}</td>
