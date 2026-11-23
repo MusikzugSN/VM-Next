@@ -30,43 +30,43 @@ Alle Umbau-PRs wurden einzeln gegen ihren Abzweigpunkt von `feat/api-mvp` lokal 
 
 | Nr. | Status | PR | Anmerkung |
 |---|---|---|---|
-| 01 | offen | [#3](https://github.com/MusikzugSN/VM-Next/pull/3) | |
-| 02 | offen | [#4](https://github.com/MusikzugSN/VM-Next/pull/4) | |
-| 03 | offen | [#5](https://github.com/MusikzugSN/VM-Next/pull/5) | Konflikt |
-| 04 | offen | [#6](https://github.com/MusikzugSN/VM-Next/pull/6) | |
-| 05 | offen | [#7](https://github.com/MusikzugSN/VM-Next/pull/7) | |
-| 06 | offen | [#8](https://github.com/MusikzugSN/VM-Next/pull/8) | |
-| 07 | offen | [#9](https://github.com/MusikzugSN/VM-Next/pull/9) | Konflikt |
-| 08 | offen | [#10](https://github.com/MusikzugSN/VM-Next/pull/10) | Konflikt; `actions.send` statt `post`/`postVoid` |
-| 09 | offen | [#11](https://github.com/MusikzugSN/VM-Next/pull/11) | Konflikt |
-| 10 | offen | [#12](https://github.com/MusikzugSN/VM-Next/pull/12) | |
-| 11 | offen | [#13](https://github.com/MusikzugSN/VM-Next/pull/13) | |
-| 12 | offen | [#14](https://github.com/MusikzugSN/VM-Next/pull/14) | Konflikt; ohne `score-import` und Filter in Schleifen |
-| 13 | offen | [#15](https://github.com/MusikzugSN/VM-Next/pull/15) | Konflikt |
-| 14 | offen | [#16](https://github.com/MusikzugSN/VM-Next/pull/16) | Konflikt |
-| 15 | offen | [#17](https://github.com/MusikzugSN/VM-Next/pull/17) | Konflikt |
-| 16 | offen, reduziert | [#18](https://github.com/MusikzugSN/VM-Next/pull/18) | Ohne `ZParam`/`ZQuery`/`ZBody`: Decorators können die Typen nicht ableiten |
-| 17 | offen, reduziert | [#19](https://github.com/MusikzugSN/VM-Next/pull/19) | Konflikt; nur Listen nach Name und ID |
-| 18 | offen | [#20](https://github.com/MusikzugSN/VM-Next/pull/20) | Konflikt |
-| 19 | offen | [#21](https://github.com/MusikzugSN/VM-Next/pull/21) | Konflikt |
-| 20 | offen | [#22](https://github.com/MusikzugSN/VM-Next/pull/22) | Konflikt |
-| 21 | offen | [#23](https://github.com/MusikzugSN/VM-Next/pull/23) | Konflikt |
-| 22 | offen | [#24](https://github.com/MusikzugSN/VM-Next/pull/24) | |
-| 23 | offen, reduziert | [#25](https://github.com/MusikzugSN/VM-Next/pull/25) | Nur der Ensemble-Filter |
+| 01 | gemergt | [#3](https://github.com/MusikzugSN/VM-Next/pull/3) | |
+| 02 | gemergt | [#4](https://github.com/MusikzugSN/VM-Next/pull/4) | |
+| 03 | gemergt | [#5](https://github.com/MusikzugSN/VM-Next/pull/5) |  |
+| 04 | gemergt | [#6](https://github.com/MusikzugSN/VM-Next/pull/6) | |
+| 05 | gemergt | [#7](https://github.com/MusikzugSN/VM-Next/pull/7) | |
+| 06 | gemergt | [#8](https://github.com/MusikzugSN/VM-Next/pull/8) | |
+| 07 | gemergt | [#9](https://github.com/MusikzugSN/VM-Next/pull/9) |  |
+| 08 | gemergt | [#10](https://github.com/MusikzugSN/VM-Next/pull/10) | `actions.runOnce` statt `post`/`postVoid` (Review) |
+| 09 | gemergt | [#11](https://github.com/MusikzugSN/VM-Next/pull/11) |  |
+| 10 | gemergt | [#12](https://github.com/MusikzugSN/VM-Next/pull/12) | |
+| 11 | gemergt | [#13](https://github.com/MusikzugSN/VM-Next/pull/13) | |
+| 12 | gemergt | [#14](https://github.com/MusikzugSN/VM-Next/pull/14) | ohne `score-import` und Filter in Schleifen |
+| 13 | gemergt | [#15](https://github.com/MusikzugSN/VM-Next/pull/15) |  |
+| 14 | gemergt | [#16](https://github.com/MusikzugSN/VM-Next/pull/16) |  |
+| 15 | gemergt | [#17](https://github.com/MusikzugSN/VM-Next/pull/17) |  |
+| 16 | gemergt, reduziert | [#18](https://github.com/MusikzugSN/VM-Next/pull/18) | Ohne `ZParam`/`ZQuery`/`ZBody`: Decorators können die Typen nicht ableiten |
+| 17 | gemergt, reduziert | [#19](https://github.com/MusikzugSN/VM-Next/pull/19) | nur Listen nach Name und ID |
+| 18 | gemergt | [#20](https://github.com/MusikzugSN/VM-Next/pull/20) | Helfer heißt nach Review `toggleSetItem` |
+| 19 | verworfen | [#21](https://github.com/MusikzugSN/VM-Next/pull/21) | Im Review als unnötig verworfen |
+| 20 | gemergt | [#22](https://github.com/MusikzugSN/VM-Next/pull/22) |  |
+| 21 | gemergt | [#23](https://github.com/MusikzugSN/VM-Next/pull/23) |  |
+| 22 | gemergt | [#24](https://github.com/MusikzugSN/VM-Next/pull/24) | |
+| 23 | gemergt, reduziert | [#25](https://github.com/MusikzugSN/VM-Next/pull/25) | Nur der Ensemble-Filter |
 | 24 | verworfen | – | Nach 08 bis 10 bleibt nur endpunktspezifischer Code |
-| 25 | offen, reduziert | [#26](https://github.com/MusikzugSN/VM-Next/pull/26) | Nur pdf.js-Ressourcen; Renderlogik ist ungetestet und enthält B-14, B-15 |
-| 26 | offen | [#27](https://github.com/MusikzugSN/VM-Next/pull/27) | |
-| 27 | offen, reduziert | [#28](https://github.com/MusikzugSN/VM-Next/pull/28) | Nur Lesen mit 404; `storeOne` wartet auf B-04, B-05 |
-| 28 | offen, reduziert | [#29](https://github.com/MusikzugSN/VM-Next/pull/29) | Konflikt; ohne `isHttpUrl` und `contextEnsemble` |
-| 29 | offen | [#30](https://github.com/MusikzugSN/VM-Next/pull/30) | |
+| 25 | gemergt, reduziert | [#26](https://github.com/MusikzugSN/VM-Next/pull/26) | Nur pdf.js-Ressourcen; Renderlogik ist ungetestet und enthält B-14, B-15 |
+| 26 | gemergt | [#27](https://github.com/MusikzugSN/VM-Next/pull/27) | |
+| 27 | gemergt, reduziert | [#28](https://github.com/MusikzugSN/VM-Next/pull/28) | Nur Lesen mit 404; `storeOne` wartet auf B-04, B-05 |
+| 28 | gemergt, reduziert | [#29](https://github.com/MusikzugSN/VM-Next/pull/29) | ohne `isHttpUrl` und `contextEnsemble` |
+| 29 | gemergt | [#30](https://github.com/MusikzugSN/VM-Next/pull/30) | |
 | 30 | verworfen | – | Eine neue Abhängigkeit lohnt sich für wenige klare Einzeiler nicht |
 | 31 | verworfen | – | `linkedSignal` ändert das Timing der `dirty`-Zustände, also das Verhalten |
-| 32 | offen | [#31](https://github.com/MusikzugSN/VM-Next/pull/31) | |
+| 32 | gemergt | [#31](https://github.com/MusikzugSN/VM-Next/pull/31) | |
 | 33 | verworfen | – | Die beiden URL-Quellen unterscheiden sich in Zeitpunkt und Form |
 
-### Merge-Reihenfolge und Konflikte
+### Abschluss
 
-Stand 23.11.2026, `feat/api-mvp` auf `c17e82f`: 9 PRs sind gemergt, 6 sind laut GitHub konfliktfrei (23, 25, 26, 27, 29, 32), 14 haben Konflikte mit dem aktuellen Branch (03, 07, 08, 09, 12, 13, 14, 15, 17, 18, 19, 20, 21, 28). Die Checks der offenen PRs liefen gegen den Stand `1a28bf6`. Vor dem Merge müssen sie auf den aktuellen Stand gebracht und erneut geprüft werden, auch die konfliktfreien.
+Alle umsetzbaren Themen sind in `feat/api-mvp` gemergt. Die Themen 19, 24, 30, 31 und 33 sind verworfen. Offen bleiben die Breaking-Vorschläge, die Lib-Vorschläge und die zurückgestellten Bereiche. Die Themenbeschreibungen unten zeigen den ursprünglichen Plan, Abweichungen stehen in der Tabelle und in den PRs.
 
 ## Übersicht
 
