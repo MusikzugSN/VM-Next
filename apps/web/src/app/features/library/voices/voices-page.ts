@@ -16,19 +16,16 @@ import { ViewportService } from '../../../core/layout/viewport';
 import { NameDialog } from '../../../shared/ui/name-dialog';
 import { PageProblem } from '../../../shared/ui/page-problem';
 import { SearchField } from '../../../shared/ui/search-field';
-import { moveItem, VoiceDialog, type VoiceDialogTarget } from './voice-dialog';
+import { VoiceDialog, type VoiceDialogTarget } from './voice-dialog';
+import { moveItem } from '../../../core/util/move-item';
+import { filterGroups } from '../../../core/voices/voice-groups';
 
 type Group = VoiceListResponse['groups'][number];
 type Voice = Group['voices'][number];
 
 /** Groups with voices whose name, instrument or substitutes contain the search text. */
 export function filterVoiceList(groups: readonly Group[], search: string): Group[] {
-  const needle = search.trim().toLocaleLowerCase('de');
-  if (!needle) return [...groups];
-  const hit = (text: string) => text.toLocaleLowerCase('de').includes(needle);
-  return groups
-    .map((g) => (hit(g.instrument.name) ? g : { ...g, voices: g.voices.filter((v) => hit(v.name) || v.substitutes.some((s) => hit(s.name))) }))
-    .filter((g) => g.voices.length > 0);
+  return filterGroups<Voice, Group>(groups, search, (v, hit) => hit(v.name) || v.substitutes.some((s) => hit(s.name)));
 }
 
 /** Stimmen & Instrumente (N-6, N-7, N-9, F-16): one list grouped by instrument with substitutes. */

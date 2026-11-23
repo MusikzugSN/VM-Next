@@ -26,7 +26,7 @@ import { PageProblem } from '../../../shared/ui/page-problem';
 import { ToggleSwitch } from '../../../shared/ui/toggle-switch';
 import { FormDialog } from '../../../shared/ui/form-dialog';
 import { ScorePicker, type CandidatePage, type PickedScore } from '../ui/score-picker';
-import { moveItem } from '../voices/voice-dialog';
+import { moveItem } from '../../../core/util/move-item';
 import { usePageName } from '../../../core/layout/page';
 import { PrintLauncher } from '../../../core/actions/pending-features';
 

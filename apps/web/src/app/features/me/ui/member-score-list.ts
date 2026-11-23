@@ -20,6 +20,7 @@ import { saveBlob } from '../../../core/util/save-blob';
 import { VoiceContextStore } from '../../../core/voices/voice-context.store';
 import { SelectionBar } from '../../../shared/ui/selection-bar';
 import { StatusBadge } from '../../../shared/ui/status-badge';
+import { safeFileName } from '../../../core/util/safe-file-name';
 
 export type ScoreListRow = MemberScoreRow & { position?: number };
 
@@ -132,7 +133,7 @@ export class MemberScoreList {
         }),
       );
       const title = this.listTitle() || this.transloco.translate('common.selection.title');
-      saveBlob(zip, `${title.replace(/[\\/:*?"<>|]+/g, ' ').trim()}.zip`);
+      saveBlob(zip, `${safeFileName(title)}.zip`);
     } catch (error) {
       this.sonner.error(this.transloco.translate(isApiProblem(error) ? error.messageKey : 'common.selection.zipFailed'));
     } finally {
