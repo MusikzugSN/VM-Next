@@ -11,6 +11,7 @@ import { ZardInputComponent } from '@/shared/components/input';
 
 import { debounced } from '../../../core/util/debounced';
 import { SearchField } from '../../../shared/ui/search-field';
+import { selectOr } from '../../../core/util/resource-value';
 
 export interface CandidatePage {
   items: ScoreCandidate[];
@@ -99,7 +100,7 @@ export class ScorePicker {
   constructor() {
     // Take over the suggested folder number after each search, unless typed by hand.
     effect(() => {
-      const suggested = this.results.hasValue() ? this.results.value().suggestedNumber : null;
+      const suggested = selectOr(this.results, (v) => v.suggestedNumber, null);
       if (suggested && !untracked(this.number).trim()) this.number.set(suggested);
     });
   }

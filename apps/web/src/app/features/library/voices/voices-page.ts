@@ -17,6 +17,7 @@ import { NameDialog } from '../../../shared/ui/name-dialog';
 import { PageProblem } from '../../../shared/ui/page-problem';
 import { SearchField } from '../../../shared/ui/search-field';
 import { moveItem, VoiceDialog, type VoiceDialogTarget } from './voice-dialog';
+import { selectOr } from '../../../core/util/resource-value';
 
 type Group = VoiceListResponse['groups'][number];
 type Voice = Group['voices'][number];
@@ -51,7 +52,7 @@ export class VoicesPage {
   protected readonly canDelete = computed(() => this.session.can('voice.delete'));
 
   protected readonly list = rxResource({ stream: () => this.api.get(apiUrl('voices', 'voiceList'), voiceListResponseSchema) });
-  protected readonly groups = computed(() => (this.list.hasValue() ? this.list.value().groups : []));
+  protected readonly groups = computed(() => selectOr(this.list, (v) => v.groups, []));
   protected readonly search = signal('');
   protected readonly shown = computed(() => filterVoiceList(this.groups(), this.search()));
   protected readonly voiceCount = computed(() => this.groups().reduce((sum, g) => sum + g.voices.length, 0));

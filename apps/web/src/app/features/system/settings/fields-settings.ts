@@ -13,6 +13,7 @@ import { ApiClient } from '../../../core/api/api-client';
 import { SessionStore } from '../../../core/auth/session.store';
 import { PageProblem } from '../../../shared/ui/page-problem';
 import { FieldDialog, type FieldDialogValue } from '../../library/ui/field-dialog';
+import { selectOr } from '../../../core/util/resource-value';
 
 /** Tab „Eigene Felder“ (N-2, N-3): custom score fields in display order; create and edit in a dialog. */
 @Component({
@@ -83,7 +84,7 @@ export class FieldsSettings {
   protected readonly fields = rxResource({
     stream: () => this.api.get(apiUrl('scores', 'fieldDefinitions'), fieldDefinitionsResponseSchema),
   });
-  protected readonly items = computed(() => (this.fields.hasValue() ? this.fields.value().items : []));
+  protected readonly items = computed(() => selectOr(this.fields, (v) => v.items, []));
 
   protected readonly dialogOpen = signal(false);
   /** Field in the dialog, `null` for a new one. */
