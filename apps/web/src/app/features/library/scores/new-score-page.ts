@@ -3,7 +3,7 @@ import { Router, RouterLink } from '@angular/router';
 import { TranslocoPipe } from '@jsverse/transloco';
 import { APP_ROUTES, apiUrl, appPath, createdResponseSchema } from '@vm-web/shared';
 
-import { ZardButtonComponent } from '@/shared/components/button';
+import { ZardButtonComponent } from '@vm-web/ui/zard/components/button';
 
 import { ActionRunner } from '../../../core/actions/action-runner';
 import { fieldProblemHandler } from '../../../core/actions/field-problem-handler';

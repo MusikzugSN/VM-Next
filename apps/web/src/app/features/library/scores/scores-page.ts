@@ -27,8 +27,8 @@ import {
 } from '@vm-web/shared';
 import { map, tap } from 'rxjs';
 
-import { ZardButtonComponent } from '@/shared/components/button';
-import { ZardDropdownImports } from '@/shared/components/dropdown/dropdown.imports';
+import { ZardButtonComponent } from '@vm-web/ui/zard/components/button';
+import { ZardDropdownImports } from '@vm-web/ui/zard/components/dropdown/dropdown.imports';
 
 import { ConfirmService } from '../../../core/actions/action-runner';
 import { ApiClient } from '../../../core/api/api-client';

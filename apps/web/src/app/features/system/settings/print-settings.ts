@@ -2,8 +2,8 @@ import { ChangeDetectionStrategy, Component, effect, inject, input, output, sign
 import { TranslocoPipe } from '@jsverse/transloco';
 import { apiUrl, updatePrintBodySchema, type ConfigResponse } from '@vm-web/shared';
 
-import { ZardButtonComponent } from '@/shared/components/button';
-import { ZardInputComponent } from '@/shared/components/input';
+import { ZardButtonComponent } from '@vm-web/ui/zard/components/button';
+import { ZardInputComponent } from '@vm-web/ui/zard/components/input';
 
 import { ActionRunner } from '../../../core/actions/action-runner';
 import { ApiClient } from '../../../core/api/api-client';

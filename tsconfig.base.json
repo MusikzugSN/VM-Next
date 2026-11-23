@@ -20,6 +20,12 @@
     "paths": {
       "@vm-web/shared": [
         "./libs/shared/src/index.ts"
+      ],
+      "@vm-web/ui": [
+        "./libs/ui/src/index.ts"
+      ],
+      "@vm-web/ui/*": [
+        "./libs/ui/src/lib/*"
       ]
     }
   },

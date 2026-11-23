@@ -17,7 +17,7 @@ import { NgIcon, provideIcons } from '@ng-icons/core';
 import { lucideCircleAlert, lucideScissors, lucideX } from '@ng-icons/lucide';
 import type { PDFDocumentProxy } from 'pdfjs-dist';
 
-import { ZardButtonComponent } from '@/shared/components/button';
+import { ZardButtonComponent } from '@vm-web/ui/zard/components/button';
 
 import { SessionStore } from '../../core/auth/session.store';
 import { VoiceContextStore } from '../../core/voices/voice-context.store';

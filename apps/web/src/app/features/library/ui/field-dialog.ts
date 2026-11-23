@@ -2,9 +2,9 @@ import { ChangeDetectionStrategy, Component, computed, effect, input, model, sig
 import { TranslocoPipe } from '@jsverse/transloco';
 import { customFieldTypeSchema, type CustomFieldType, type FieldDefinition } from '@vm-web/shared';
 
-import { ZardInputComponent } from '@/shared/components/input';
-import { ZardNativeSelectDirective } from '@/shared/components/native-select';
-import { ZardTextareaComponent } from '@/shared/components/textarea';
+import { ZardInputComponent } from '@vm-web/ui/zard/components/input';
+import { ZardNativeSelectDirective } from '@vm-web/ui/zard/components/native-select';
+import { ZardTextareaComponent } from '@vm-web/ui/zard/components/textarea';
 
 import { FormDialog, runDialogSave } from '../../../shared/ui/form-dialog';
 import { NAME_MAX } from '../../../shared/ui/name-dialog';

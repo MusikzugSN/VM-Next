@@ -5,10 +5,10 @@ import { NgIcon, provideIcons } from '@ng-icons/core';
 import { lucideImageUp, lucideTrash2 } from '@ng-icons/lucide';
 import { apiUrl, LOGO_FILE_FIELD, LOGO_MAX_BYTES, LOGO_MIME_TYPES, updateClubBodySchema, type ConfigResponse } from '@vm-web/shared';
 
-import { ZardButtonComponent } from '@/shared/components/button';
-import { ZardInputComponent } from '@/shared/components/input';
-import { ZardSonnerService } from '@/shared/components/sonner';
-import { ZardTextareaComponent } from '@/shared/components/textarea';
+import { ZardButtonComponent } from '@vm-web/ui/zard/components/button';
+import { ZardInputComponent } from '@vm-web/ui/zard/components/input';
+import { ZardSonnerService } from '@vm-web/ui/zard/components/sonner';
+import { ZardTextareaComponent } from '@vm-web/ui/zard/components/textarea';
 
 import { ActionRunner } from '../../../core/actions/action-runner';
 import { ApiClient } from '../../../core/api/api-client';

@@ -16,9 +16,9 @@ import {
   type MemberSheet,
 } from '@vm-web/shared';
 
-import { ZardButtonComponent } from '@/shared/components/button';
-import { ZardDropdownImports } from '@/shared/components/dropdown/dropdown.imports';
-import { ZardSheetImports } from '@/shared/components/sheet/sheet.imports';
+import { ZardButtonComponent } from '@vm-web/ui/zard/components/button';
+import { ZardDropdownImports } from '@vm-web/ui/zard/components/dropdown/dropdown.imports';
+import { ZardSheetImports } from '@vm-web/ui/zard/components/sheet/sheet.imports';
 
 import { PrintLauncher, UploadLauncher } from '../../core/actions/pending-features';
 import { ApiClient } from '../../core/api/api-client';

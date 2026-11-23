@@ -3,7 +3,7 @@ import { TranslocoPipe } from '@jsverse/transloco';
 import { NgIcon, provideIcons } from '@ng-icons/core';
 import { lucideX } from '@ng-icons/lucide';
 
-import { ZardButtonComponent } from '@/shared/components/button';
+import { ZardButtonComponent } from '@vm-web/ui/zard/components/button';
 
 import { PluralPipe } from '../../core/i18n/plural.pipe';
 

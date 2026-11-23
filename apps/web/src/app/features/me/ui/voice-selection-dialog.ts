@@ -6,9 +6,9 @@ import { lucideCheck, lucideSearch } from '@ng-icons/lucide';
 import { MAX_PROFILE_VOICES, apiUrl } from '@vm-web/shared';
 import { firstValueFrom } from 'rxjs';
 
-import { ZardButtonComponent } from '@/shared/components/button';
-import { ZardDialogImports } from '@/shared/components/dialog/dialog.imports';
-import { ZardInputComponent } from '@/shared/components/input';
+import { ZardButtonComponent } from '@vm-web/ui/zard/components/button';
+import { ZardDialogImports } from '@vm-web/ui/zard/components/dialog/dialog.imports';
+import { ZardInputComponent } from '@vm-web/ui/zard/components/input';
 
 import { ApiClient } from '../../../core/api/api-client';
 import { ActionRunner } from '../../../core/actions/action-runner';

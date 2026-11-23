@@ -6,7 +6,7 @@ import { NgIcon, provideIcons } from '@ng-icons/core';
 import { lucideArrowLeft, lucideHouse, lucideSearchX, lucideShieldX } from '@ng-icons/lucide';
 import { APP_ROUTES } from '@vm-web/shared';
 
-import { ZardButtonComponent } from '@/shared/components/button';
+import { ZardButtonComponent } from '@vm-web/ui/zard/components/button';
 
 /** Kein Zugriff: page needs a permission the person does not have. */
 @Component({

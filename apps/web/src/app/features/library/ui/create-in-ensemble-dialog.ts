@@ -2,8 +2,8 @@ import { ChangeDetectionStrategy, Component, computed, effect, input, model, sig
 import { TranslocoPipe } from '@jsverse/transloco';
 import type { Ref } from '@vm-web/shared';
 
-import { ZardInputComponent } from '@/shared/components/input';
-import { ZardNativeSelectDirective } from '@/shared/components/native-select';
+import { ZardInputComponent } from '@vm-web/ui/zard/components/input';
+import { ZardNativeSelectDirective } from '@vm-web/ui/zard/components/native-select';
 
 import { FormDialog, runDialogSave } from '../../../shared/ui/form-dialog';
 import { NAME_MAX } from '../../../shared/ui/name-dialog';

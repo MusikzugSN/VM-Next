@@ -6,7 +6,7 @@ import { NgIcon, provideIcons } from '@ng-icons/core';
 import { lucideChevronLeft, lucideRotateCcw, lucideTrash2, lucideTriangleAlert } from '@ng-icons/lucide';
 import { APP_ROUTES, apiUrl, permissionCatalogResponseSchema, permissionScope, roleDetailsResponseSchema, type Permission } from '@vm-web/shared';
 
-import { ZardButtonComponent } from '@/shared/components/button';
+import { ZardButtonComponent } from '@vm-web/ui/zard/components/button';
 
 import { ActionRunner, ConfirmService } from '../../../core/actions/action-runner';
 import { ApiClient } from '../../../core/api/api-client';

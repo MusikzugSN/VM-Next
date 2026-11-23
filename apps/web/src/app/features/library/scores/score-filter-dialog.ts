@@ -3,10 +3,10 @@ import { ChangeDetectionStrategy, Component, effect, inject, input, model, outpu
 import { TranslocoPipe } from '@jsverse/transloco';
 import type { FieldDefinition } from '@vm-web/shared';
 
-import { ZardButtonComponent } from '@/shared/components/button';
-import { ZardDialogImports } from '@/shared/components/dialog/dialog.imports';
-import { ZardInputComponent } from '@/shared/components/input';
-import { ZardNativeSelectDirective } from '@/shared/components/native-select';
+import { ZardButtonComponent } from '@vm-web/ui/zard/components/button';
+import { ZardDialogImports } from '@vm-web/ui/zard/components/dialog/dialog.imports';
+import { ZardInputComponent } from '@vm-web/ui/zard/components/input';
+import { ZardNativeSelectDirective } from '@vm-web/ui/zard/components/native-select';
 
 import { ViewportService } from '../../../core/layout/viewport';
 import { LibraryOptions } from '../library-options';

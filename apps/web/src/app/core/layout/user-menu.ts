@@ -6,7 +6,7 @@ import { NgIcon, provideIcons } from '@ng-icons/core';
 import { lucideLogOut, lucideUser } from '@ng-icons/lucide';
 import { APP_ROUTES } from '@vm-web/shared';
 
-import { ZardDropdownImports } from '@/shared/components/dropdown/dropdown.imports';
+import { ZardDropdownImports } from '@vm-web/ui/zard/components/dropdown/dropdown.imports';
 
 import { SessionStore } from '../auth/session.store';
 import { initials } from '../branding/branding.store';

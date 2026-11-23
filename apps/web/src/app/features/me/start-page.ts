@@ -15,7 +15,7 @@ import {
   upcomingEventsResponseSchema,
 } from '@vm-web/shared';
 
-import { ZardButtonComponent } from '@/shared/components/button';
+import { ZardButtonComponent } from '@vm-web/ui/zard/components/button';
 
 import { onUploadCompleted } from '../../core/actions/on-upload';
 import { UploadLauncher } from '../../core/actions/pending-features';
