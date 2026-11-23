@@ -39,7 +39,7 @@ import type { CropMargins, Rotation } from './review-model';
         }
       }
       <div class="relative shrink-0" [class.hidden]="state() !== 'ready'">
-        <canvas #canvas class="block border bg-white shadow-sm" [class.opacity-40]="dimmed()" aria-hidden="true"></canvas>
+        <canvas #canvas class="block border bg-white shadow-level1" [class.opacity-40]="dimmed()" aria-hidden="true"></canvas>
         @if (crop(); as c) {
           <div
             aria-hidden="true"

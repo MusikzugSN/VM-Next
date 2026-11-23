@@ -92,7 +92,7 @@
           <p class="text-muted-foreground" aria-live="polite">{{ 'system.ensembles.lineupSize' | tPlural: selected().size }}</p>
           <div class="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
             @for (group of voices.options(); track group.instrument.id) {
-              <fieldset class="flex flex-col gap-1 rounded-md border p-4">
+              <fieldset class="flex flex-col gap-1 rounded-small border p-4">
                 <legend class="px-1 font-semibold">{{ group.instrument.name }}</legend>
                 @if (canEdit() && group.voices.length > 1) {
                   <button type="button" class="self-start text-label-large text-primary" (click)="toggleInstrument(group.voices)">

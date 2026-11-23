@@ -35,7 +35,7 @@ import { selectOr } from '../../../core/util/resource-value';
     @if (fields.error()) {
       <vm-page-problem [error]="fields.error()" />
     } @else if (items().length === 0 && fields.hasValue()) {
-      <p class="rounded-lg border border-dashed p-8 text-center text-muted-foreground">{{ 'system.settings.fields.empty' | transloco }}</p>
+      <p class="rounded-medium border border-dashed p-8 text-center text-muted-foreground">{{ 'system.settings.fields.empty' | transloco }}</p>
     } @else {
       <ul vm-card class="overflow-hidden">
         @for (field of items(); track field.id; let first = $first, last = $last, i = $index) {

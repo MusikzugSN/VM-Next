@@ -27,13 +27,13 @@ export type EventsTab = 'upcoming' | 'archive';
       <p class="mt-2 text-muted-foreground">{{ 'me.events.intro' | transloco }}</p>
     </div>
 
-    <nav [attr.aria-label]="'me.events.view' | transloco" class="inline-flex self-start rounded-lg bg-muted p-1">
+    <nav [attr.aria-label]="'me.events.view' | transloco" class="inline-flex self-start rounded-medium bg-muted p-1">
       @for (t of tabs; track t.value) {
         <a
           [routerLink]="eventsPath"
           [queryParams]="{ tab: t.value === 'archive' ? 'archive' : null }"
           [attr.aria-current]="current() === t.value ? 'page' : null"
-          class="inline-flex min-h-target items-center rounded-md px-4 font-medium text-foreground no-underline xl:min-h-target-compact"
+          class="inline-flex min-h-target items-center rounded-small px-4 font-medium text-foreground no-underline xl:min-h-target-compact"
           [class.bg-background]="current() === t.value"
           [class.shadow-sm]="current() === t.value"
           >{{ t.labelKey | transloco }}</a

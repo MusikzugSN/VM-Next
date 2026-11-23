@@ -13,7 +13,7 @@
 
   <div class="flex min-h-0 flex-1 flex-col gap-5 overflow-y-auto md:max-h-[55dvh] md:flex-none">
     <div
-      class="flex flex-col items-center gap-2 rounded-lg border-2 border-dashed p-6 text-center"
+      class="flex flex-col items-center gap-2 rounded-medium border-2 border-dashed p-6 text-center"
       [class]="dragging() ? 'border-primary bg-primary-soft' : 'border-input'"
       (dragover)="onDragOver($event)"
       (dragleave)="dragging.set(false)"
@@ -37,7 +37,7 @@
       </div>
       <ul class="flex flex-col gap-3">
         @for (item of items(); track item.key; let i = $index) {
-          <li class="flex flex-col gap-3 rounded-lg border p-4">
+          <li class="flex flex-col gap-3 rounded-medium border p-4">
             <div class="flex items-center gap-2">
               <ng-icon name="lucideFileText" class="shrink-0 text-muted-foreground" aria-hidden="true" />
               <span class="min-w-0 flex-1 truncate font-mono text-body-medium">{{ item.file.name }}</span>
@@ -80,7 +80,7 @@
                   <label class="font-medium" [for]="'up-voice-' + i">
                     {{ 'terms.voice' | transloco }}
                     @if (item.suggested) {
-                      <span class="ms-1 rounded-sm bg-primary-soft px-1.5 py-0.5 text-body-small text-primary">{{ 'upload.suggested' | transloco }}</span>
+                      <span class="ms-1 rounded-small bg-primary-soft px-1.5 py-0.5 text-body-small text-primary">{{ 'upload.suggested' | transloco }}</span>
                     }
                   </label>
                   <vm-voice-select [controlId]="'up-voice-' + i" [value]="item.voiceId" (changed)="setVoice(item.key, $event)" />

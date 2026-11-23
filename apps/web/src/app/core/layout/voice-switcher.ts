@@ -23,7 +23,7 @@ import { StandInDialog } from './stand-in-dialog';
     @if (store.needsVoiceSelection()) {
       <a
         [routerLink]="profilePath"
-        class="inline-flex h-control items-center gap-2 rounded-md border border-primary bg-primary-soft px-3 font-medium text-primary no-underline xl:h-8"
+        class="inline-flex h-control items-center gap-2 rounded-full border border-primary bg-primary-soft px-3 font-medium text-primary no-underline xl:h-8"
       >
         <ng-icon name="lucideMusic2" aria-hidden="true" />{{ 'shell.voice.choose' | transloco }}
       </a>
@@ -33,12 +33,12 @@ import { StandInDialog } from './stand-in-dialog';
         vm-menu-trigger
         [zDropdownMenu]="menu"
         [attr.aria-label]="'shell.voice.label' | transloco: { voices: label() }"
-        class="inline-flex h-control max-w-72 items-center gap-2 rounded-md border border-primary bg-primary-soft px-3 font-medium text-primary xl:h-8"
+        class="inline-flex h-control max-w-72 items-center gap-2 rounded-full border border-primary bg-primary-soft px-3 font-medium text-primary xl:h-8"
       >
         <ng-icon name="lucideMusic2" aria-hidden="true" class="shrink-0" />
         <span class="truncate">{{ label() }}</span>
         @if (store.isStandIn()) {
-          <span class="rounded-sm bg-background px-1 text-body-small">{{ 'shell.voice.override' | transloco }}</span>
+          <span class="rounded-small bg-background px-1 text-body-small">{{ 'shell.voice.override' | transloco }}</span>
         }
         <ng-icon name="lucideChevronDown" aria-hidden="true" class="shrink-0" />
       </button>

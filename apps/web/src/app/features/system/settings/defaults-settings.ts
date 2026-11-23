@@ -24,7 +24,7 @@ import { TreeLabelPipe } from '../../../shared/ui/tree-label.pipe';
         <p class="text-muted-foreground">{{ 'system.settings.defaults.hint' | transloco }}</p>
       </div>
       @if (warning()) {
-        <div role="status" class="flex items-start gap-2 rounded-lg bg-destructive-soft p-4 text-destructive-ink">
+        <div role="status" class="flex items-start gap-2 rounded-medium bg-destructive-soft p-4 text-destructive-ink">
           <ng-icon name="lucideTriangleAlert" class="mt-0.5 shrink-0" aria-hidden="true" />
           <span>{{ 'system.settings.defaults.clubWarning' | transloco }}</span>
         </div>

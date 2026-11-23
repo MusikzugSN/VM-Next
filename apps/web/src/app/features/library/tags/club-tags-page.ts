@@ -73,7 +73,7 @@ import { LibraryOptions } from '../library-options';
     </ul>
     <vm-list-state [list]="list" emptyKey="library.tags.empty" />
 
-    <aside class="flex items-start gap-2 rounded-lg border p-4 text-body-medium text-muted-foreground">
+    <aside class="flex items-start gap-2 rounded-medium border p-4 text-body-medium text-muted-foreground">
       <ng-icon name="lucideLock" class="mt-0.5 shrink-0" aria-hidden="true" />
       <span>{{ 'library.tags.personalHint' | transloco }} <a [routerLink]="meTagsPath" class="font-medium">{{ 'library.tags.personalLink' | transloco }}</a></span>
     </aside>

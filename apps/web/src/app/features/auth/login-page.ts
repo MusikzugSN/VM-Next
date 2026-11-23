@@ -31,7 +31,7 @@ export function loginErrorKey(code: string | undefined): string | null {
     <ng-template #welcome>
       <section
         [attr.aria-label]="'auth.login.welcomeLabel' | transloco"
-        class="flex flex-col gap-3 rounded-lg bg-primary-soft px-4 py-5 text-primary md:flex-1 md:justify-between md:gap-0 md:rounded-none md:p-12 xl:p-16"
+        class="flex flex-col gap-3 rounded-medium bg-primary-soft px-4 py-5 text-primary md:flex-1 md:justify-between md:gap-0 md:rounded-none md:p-12 xl:p-16"
       >
         <div class="hidden items-center gap-3 md:flex">
           <vm-club-logo [size]="32" />
@@ -75,7 +75,7 @@ export function loginErrorKey(code: string | undefined): string | null {
             }
 
             @if (errorKey(); as key) {
-              <p role="alert" class="flex items-start gap-2 rounded-md bg-destructive-soft p-4 text-start text-destructive-ink">
+              <p role="alert" class="flex items-start gap-2 rounded-small bg-destructive-soft p-4 text-start text-destructive-ink">
                 <ng-icon name="lucideCircleAlert" class="mt-0.5 shrink-0" aria-hidden="true" />{{ key | transloco }}
               </p>
             }

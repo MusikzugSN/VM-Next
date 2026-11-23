@@ -82,13 +82,13 @@ import { selectOr } from '../../../core/util/resource-value';
             <a [routerLink]="link(e)" class="font-medium">{{ e.name }}</a>
             <span class="flex flex-wrap gap-1.5 text-body-medium text-muted-foreground">
               @if (e.isRoot) {
-                <span class="rounded-sm bg-muted px-1.5 py-0.5 text-body-small">{{ 'system.ensembles.root' | transloco }}</span>
+                <span class="rounded-small bg-muted px-1.5 py-0.5 text-body-small">{{ 'system.ensembles.root' | transloco }}</span>
               }
               @if (e.isDefault) {
-                <span class="rounded-sm bg-primary-soft px-1.5 py-0.5 text-body-small text-primary">{{ 'system.ensembles.default' | transloco }}</span>
+                <span class="rounded-small bg-primary-soft px-1.5 py-0.5 text-body-small text-primary">{{ 'system.ensembles.default' | transloco }}</span>
               }
               @if (e.archived) {
-                <span class="rounded-sm bg-muted px-1.5 py-0.5 text-body-small">{{ 'system.ensembles.archived' | transloco }}</span>
+                <span class="rounded-small bg-muted px-1.5 py-0.5 text-body-small">{{ 'system.ensembles.archived' | transloco }}</span>
               }
               <span>{{ 'system.ensembles.memberCount' | tPlural: e.memberCount }} · {{ 'system.ensembles.lineupSize' | tPlural: e.lineupSize }}</span>
             </span>

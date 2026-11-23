@@ -5,7 +5,7 @@
   </div>
 
   @if (!canEdit()) {
-    <p role="alert" class="rounded-md bg-destructive-soft p-4 text-destructive-ink">{{ 'library.import.needsEdit' | transloco }}</p>
+    <p role="alert" class="rounded-small bg-destructive-soft p-4 text-destructive-ink">{{ 'library.import.needsEdit' | transloco }}</p>
   }
 
   <!-- 1 · Datei -->
@@ -41,7 +41,7 @@
       </div>
 
       <!-- Table on wide screens, stacked cards on phones: the target must stay reachable without side scrolling. -->
-      <div class="rounded-md border">
+      <div class="rounded-small border">
         <div class="hidden grid-cols-[minmax(0,12rem)_minmax(0,1fr)_18rem] gap-3 bg-muted px-3 py-2 text-label-medium text-muted-foreground md:grid" aria-hidden="true">
           <span>{{ 'library.import.column' | transloco }}</span>
           <span>{{ 'library.import.examples' | transloco }}</span>
@@ -55,7 +55,7 @@
               <span class="min-w-0 text-body-medium text-muted-foreground">
                 <span class="sr-only">{{ 'library.import.examples' | transloco }}: </span>
                 @for (example of examplesOf(i); track example) {
-                  <span class="me-1 mb-1 inline-block max-w-full truncate rounded-sm bg-muted px-1.5 py-0.5 align-top">{{ example }}</span>
+                  <span class="me-1 mb-1 inline-block max-w-full truncate rounded-small bg-muted px-1.5 py-0.5 align-top">{{ example }}</span>
                 } @empty {
                   <span>{{ 'library.import.emptyColumn' | transloco }}</span>
                 }
@@ -200,7 +200,7 @@
         </label>
 
         <!-- Like the mapping: grid rows on wide screens, cards on phones (the action stays usable). -->
-        <div class="max-h-[60dvh] overflow-auto rounded-md border">
+        <div class="max-h-[60dvh] overflow-auto rounded-small border">
           <div class="sticky top-0 z-10 hidden gap-3 bg-muted px-3 py-2 text-label-medium text-muted-foreground md:grid md:grid-cols-[3rem_minmax(0,1.4fr)_minmax(0,1fr)_minmax(0,0.8fr)_11rem]" aria-hidden="true">
             <span class="text-end">{{ 'library.import.line' | transloco }}</span>
             <span>{{ 'library.fields.title' | transloco }}</span>
@@ -238,7 +238,7 @@
                       <span class="text-muted-foreground"> · {{ m.composer }}</span>
                     }
                     @if (m.inFile) {
-                      <span class="ms-1 rounded-sm bg-primary-soft px-1.5 py-0.5 text-body-small text-primary">{{ 'library.import.inFile' | transloco }}</span>
+                      <span class="ms-1 rounded-small bg-primary-soft px-1.5 py-0.5 text-body-small text-primary">{{ 'library.import.inFile' | transloco }}</span>
                     }
                   } @else {
                     <span class="text-muted-foreground">{{ 'library.import.noMatch' | transloco }}</span>
@@ -252,7 +252,7 @@
                       <span class="font-medium"> · {{ f.number }}</span>
                     }
                     @if (f.isNew) {
-                      <span class="ms-1 rounded-sm bg-muted px-1.5 py-0.5 text-body-small">{{ 'library.import.newFolder' | transloco }}</span>
+                      <span class="ms-1 rounded-small bg-muted px-1.5 py-0.5 text-body-small">{{ 'library.import.newFolder' | transloco }}</span>
                     }
                   }
                 </div>

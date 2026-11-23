@@ -41,7 +41,7 @@ import { UploadStatusBadge } from './ui/upload-status-badge';
           type="button"
           [attr.aria-pressed]="status() === option.value"
           (click)="status.set(option.value)"
-          class="inline-flex min-h-target items-center rounded-md border px-3 font-medium xl:min-h-9"
+          class="inline-flex min-h-target items-center rounded-small border px-3 font-medium xl:min-h-9"
           [class]="status() === option.value ? 'border-primary bg-primary-soft text-primary' : 'border-input'"
         >
           {{ option.labelKey | transloco }}

@@ -21,7 +21,7 @@
             <a
               [routerLink]="link('club', tag)"
               [attr.aria-current]="selected()?.tag?.id === tag.id ? 'true' : null"
-              class="inline-flex min-h-target items-center gap-2 rounded-md border px-3 font-medium no-underline xl:min-h-9"
+              class="inline-flex min-h-target items-center gap-2 rounded-small border px-3 font-medium no-underline xl:min-h-9"
               [class]="selected()?.tag?.id === tag.id ? 'border-primary bg-primary-soft text-primary' : 'border-input text-foreground'"
             >
               {{ tag.name }}<span class="text-body-small text-muted-foreground tabular-nums">{{ tag.scoreCount }}</span>
@@ -43,7 +43,7 @@
             <a
               [routerLink]="link('personal', tag)"
               [attr.aria-current]="selected()?.tag?.id === tag.id ? 'true' : null"
-              class="inline-flex min-h-target items-center gap-2 rounded-md border px-3 font-medium no-underline xl:min-h-9"
+              class="inline-flex min-h-target items-center gap-2 rounded-small border px-3 font-medium no-underline xl:min-h-9"
               [class]="selected()?.tag?.id === tag.id ? 'border-primary bg-primary-soft text-primary' : 'border-input text-foreground'"
             >
               {{ tag.name }}<span class="text-body-small text-muted-foreground tabular-nums">{{ tag.scoreCount }}</span>
@@ -102,5 +102,5 @@
     <vm-list-state [list]="list" emptyKey="me.tags.empty" />
   </section>
 } @else if (tagId() && tags.hasValue()) {
-  <p role="alert" class="rounded-md bg-destructive-soft p-4 text-destructive-ink">{{ 'errors.not-found' | transloco }}</p>
+  <p role="alert" class="rounded-small bg-destructive-soft p-4 text-destructive-ink">{{ 'errors.not-found' | transloco }}</p>
 }

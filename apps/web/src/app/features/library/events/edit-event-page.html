@@ -66,7 +66,7 @@
       }
     </div>
     @if (setlistDirty()) {
-      <p class="rounded-md bg-warning-soft p-4 text-warning-ink">{{ 'library.event.unsaved' | transloco }}</p>
+      <p class="rounded-small bg-warning-soft p-4 text-warning-ink">{{ 'library.event.unsaved' | transloco }}</p>
     }
 
     <p class="sr-only" aria-live="polite">{{ announcement() }}</p>
@@ -79,7 +79,7 @@
               <button
                 cdkDragHandle
                 type="button"
-                class="flex size-control shrink-0 cursor-grab items-center justify-center rounded-md text-muted-foreground hover:bg-accent xl:size-control-compact"
+                class="flex size-control shrink-0 cursor-grab items-center justify-center rounded-full text-muted-foreground hover:bg-accent xl:size-control-compact"
                 [attr.aria-label]="'library.event.dragLabel' | transloco: { title: item.title }"
               >
                 <ng-icon name="lucideGripVertical" aria-hidden="true" />
@@ -107,7 +107,7 @@
         }
       </ol>
     } @else if (setlistLoaded()) {
-      <p class="rounded-lg border border-dashed p-8 text-center text-muted-foreground">{{ 'library.event.empty' | transloco }}</p>
+      <p class="rounded-medium border border-dashed p-8 text-center text-muted-foreground">{{ 'library.event.empty' | transloco }}</p>
     }
   </section>
 

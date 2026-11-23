@@ -26,7 +26,7 @@ import { buildScoreBody, emptyScoreForm, type ScoreFormErrors, type ScoreFormInp
       </div>
 
       @if (hasErrors()) {
-        <p role="alert" class="rounded-md bg-destructive-soft p-4 text-destructive-ink">{{ 'errors.validation-failed' | transloco }}</p>
+        <p role="alert" class="rounded-small bg-destructive-soft p-4 text-destructive-ink">{{ 'errors.validation-failed' | transloco }}</p>
       }
 
       <vm-score-form [(value)]="form" [errors]="errors()" />

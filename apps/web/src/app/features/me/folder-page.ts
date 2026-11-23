@@ -89,7 +89,7 @@ import { selectOr } from '../../core/util/resource-value';
       </div>
       @if (filter.activeName(); as name) {
         <div class="flex flex-wrap items-center gap-2">
-          <span class="inline-flex items-center gap-1 rounded-sm bg-primary-soft py-0.5 ps-2 text-primary">
+          <span class="inline-flex items-center gap-1 rounded-small bg-primary-soft py-0.5 ps-2 text-primary">
             {{ name }}
             <button type="button" class="flex size-8 items-center justify-center" [attr.aria-label]="'me.filter.remove' | transloco: { name }" (click)="tagFilter.set(null)">
               <ng-icon name="lucideX" aria-hidden="true" />

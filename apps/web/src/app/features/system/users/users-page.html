@@ -3,7 +3,7 @@
   <p class="mt-2 text-muted-foreground">{{ 'system.users.intro' | transloco }}</p>
 </div>
 
-<p class="flex items-start gap-2 rounded-lg border p-4 text-body-medium text-muted-foreground">
+<p class="flex items-start gap-2 rounded-medium border p-4 text-body-medium text-muted-foreground">
   <ng-icon name="lucideInfo" class="mt-0.5 shrink-0" aria-hidden="true" />{{ 'system.users.accountsHint' | transloco }}
 </p>
 
@@ -73,7 +73,7 @@
                 {{ user.name }}
               </a>
               @if (user.isAdmin) {
-                <span class="ms-1 rounded-sm bg-muted px-1.5 py-0.5 text-body-small">{{ 'system.users.admin' | transloco }}</span>
+                <span class="ms-1 rounded-small bg-muted px-1.5 py-0.5 text-body-small">{{ 'system.users.admin' | transloco }}</span>
               }
             </td>
             <td class="px-4 py-3 text-muted-foreground">{{ user.email ?? '–' }}</td>

@@ -38,7 +38,7 @@ export function decodeTagFilter(value: string | undefined): TagFilterValue {
       vm-menu-trigger
       [zDropdownMenu]="menu"
       [attr.aria-label]="'common.filter' | transloco"
-      class="relative flex size-control shrink-0 items-center justify-center rounded-md border border-input bg-background shadow-sm hover:bg-accent xl:size-control-compact"
+      class="relative flex size-control shrink-0 items-center justify-center rounded-full border border-input bg-background hover:bg-accent xl:size-control-compact"
     >
       <ng-icon name="lucideSlidersHorizontal" aria-hidden="true" />
       @if (value()) {

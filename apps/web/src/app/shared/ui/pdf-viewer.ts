@@ -67,7 +67,7 @@ export function clampPage(page: number, count: number): number {
       [attr.aria-label]="'pdf.label' | transloco: { page: page(), count: pageCount() }"
       (keydown.arrowleft)="go(page() - 1)"
       (keydown.arrowright)="go(page() + 1)"
-      class="flex min-h-64 items-start justify-center overflow-auto rounded-md bg-muted p-2 md:p-4"
+      class="flex min-h-64 items-start justify-center overflow-auto rounded-small bg-muted p-2 md:p-4"
     >
       @switch (state()) {
         @case ('loading') {
@@ -77,7 +77,7 @@ export function clampPage(page: number, count: number): number {
           <p role="alert" class="self-center text-destructive-ink">{{ 'pdf.error' | transloco }}</p>
         }
       }
-      <canvas #canvas [class.hidden]="state() !== 'ready'" class="max-w-full border bg-white shadow-sm" aria-hidden="true"></canvas>
+      <canvas #canvas [class.hidden]="state() !== 'ready'" class="max-w-full border bg-white shadow-level1" aria-hidden="true"></canvas>
     </div>
 
     @if (pageCount() > 1) {

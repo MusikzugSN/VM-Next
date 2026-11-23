@@ -120,7 +120,7 @@
                 [disabled]="!canEdit()"
                 [attr.aria-pressed]="selectedVoices().has(voice.id)"
                 (click)="toggleVoice(voice.id)"
-                class="inline-flex h-control items-center gap-1.5 rounded-md border px-3 font-medium xl:h-control-compact"
+                class="inline-flex h-control items-center gap-1.5 rounded-full border px-3 font-medium xl:h-control-compact"
                 [class]="selectedVoices().has(voice.id) ? 'border-primary bg-primary-soft text-primary' : 'border-input bg-background'"
               >
                 @if (selectedVoices().has(voice.id)) {
@@ -146,7 +146,7 @@
   </section>
 
   @if ((canEdit() || canDelete()) && !isSelf()) {
-    <section aria-labelledby="h-danger" class="flex flex-col gap-4 rounded-lg border border-destructive/40 p-4 md:p-6">
+    <section aria-labelledby="h-danger" class="flex flex-col gap-4 rounded-medium border border-destructive/40 p-4 md:p-6">
       <h2 id="h-danger" class="text-title-large">{{ 'system.user.danger' | transloco }}</h2>
       @if (canEdit()) {
         <p class="text-muted-foreground">{{ 'system.user.blockHint' | transloco: { name: u.name } }}</p>

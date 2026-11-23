@@ -68,7 +68,7 @@ const PAGE_WIDTH = 560;
       <!-- pages -->
       <div
         #scroller
-        class="order-2 min-h-[50dvh] flex-1 overflow-y-auto rounded-lg bg-muted p-3 md:order-1 md:max-h-[65dvh] md:min-h-0"
+        class="order-2 min-h-[50dvh] flex-1 overflow-y-auto rounded-medium bg-muted p-3 md:order-1 md:max-h-[65dvh] md:min-h-0"
         (scroll)="onScroll()"
         [attr.aria-label]="'upload.split.pages' | transloco"
         tabindex="0"
@@ -112,9 +112,9 @@ const PAGE_WIDTH = 560;
               </li>
             }
             <li class="w-full" [attr.data-page]="page">
-              <div class="relative w-full overflow-hidden rounded-sm border bg-white shadow-sm" [class.opacity-40]="section.skip">
+              <div class="relative w-full overflow-hidden rounded-small border bg-white shadow-level1" [class.opacity-40]="section.skip">
                 <canvas class="block w-full" [attr.data-canvas]="page" [style.aspect-ratio]="ratio(page)" aria-hidden="true"></canvas>
-                <span class="absolute top-2 left-2 rounded-sm bg-foreground/80 px-2 py-0.5 text-body-small text-background">
+                <span class="absolute top-2 left-2 rounded-small bg-foreground/80 px-2 py-0.5 text-body-small text-background">
                   {{ 'upload.split.page' | transloco: { page, count: pageCount() } }} · {{ sectionLabel(section) | transloco: { title: section.scoreTitle ?? '' } }}{{ voiceSuffix(section) }}
                 </span>
               </div>
@@ -126,7 +126,7 @@ const PAGE_WIDTH = 560;
       <!-- section in view -->
       <aside class="order-1 flex flex-col gap-4 md:order-2 md:w-80 md:shrink-0" [attr.aria-label]="'upload.split.sectionPanel' | transloco">
         @if (current(); as c) {
-          <div class="flex flex-col gap-3 rounded-lg border p-4">
+          <div class="flex flex-col gap-3 rounded-medium border p-4">
             <p class="font-semibold" aria-live="polite">
               {{ 'upload.split.currentSection' | transloco: { from: c.from, to: c.to } }}
             </p>
@@ -154,7 +154,7 @@ const PAGE_WIDTH = 560;
 
         <div class="flex flex-col gap-1">
           <h3 class="font-semibold">{{ 'upload.split.sections' | transloco }}</h3>
-          <ol class="flex max-h-60 flex-col overflow-y-auto rounded-md border text-body-medium">
+          <ol class="flex max-h-60 flex-col overflow-y-auto rounded-small border text-body-medium">
             @for (range of ranges(); track range.from; let first = $first) {
               <li [class.border-t]="!first">
                 <button
