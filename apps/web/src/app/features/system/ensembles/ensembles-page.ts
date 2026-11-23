@@ -14,9 +14,7 @@ import {
   type EnsembleListItem,
 } from '@vm-web/shared';
 
-import { VmButton } from '@vm-web/ui';
-import { ZardInputComponent } from '@vm-web/ui/zard/components/input';
-import { ZardNativeSelectDirective } from '@vm-web/ui/zard/components/native-select';
+import { VmButton, VmInput, VmSelect } from '@vm-web/ui';
 
 import { ActionRunner } from '../../../core/actions/action-runner';
 import { ApiClient } from '../../../core/api/api-client';
@@ -34,7 +32,7 @@ import { selectOr } from '../../../core/util/resource-value';
 /** Ensembles (S-2, F-3): the tree in pre-order, create below a parent, archive and restore. */
 @Component({
   selector: 'vm-system-ensembles-page',
-  imports: [ToggleField, TreeLabelPipe, RouterLink, NgIcon, TranslocoPipe, PluralPipe, VmButton, ZardInputComponent, ZardNativeSelectDirective, ListState, ToggleSwitch, FormDialog],
+  imports: [ToggleField, TreeLabelPipe, RouterLink, NgIcon, TranslocoPipe, PluralPipe, VmButton, VmInput, VmSelect, ListState, ToggleSwitch, FormDialog],
   viewProviders: [provideIcons({ lucidePlus, lucideArchive, lucideArchiveRestore })],
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
@@ -60,11 +58,11 @@ import { selectOr } from '../../../core/util/resource-value';
     >
       <label class="flex flex-col gap-1.5">
         <span class="font-medium">{{ 'system.common.name' | transloco }} *</span>
-        <input z-input cdkFocusInitial type="text" [maxLength]="nameMax" [value]="newName()" (input)="newName.set($any($event.target).value)" required />
+        <input vm-input cdkFocusInitial type="text" [maxLength]="nameMax" [value]="newName()" (input)="newName.set($any($event.target).value)" required />
       </label>
       <label class="flex flex-col gap-1.5">
         <span class="font-medium">{{ 'system.ensembles.parent' | transloco }} *</span>
-        <select z-native-select [value]="newParentId()" (change)="newParentId.set($any($event.target).value)">
+        <select vm-select [value]="newParentId()" (change)="newParentId.set($any($event.target).value)">
           @for (e of parents(); track e.id) {
             <option [value]="e.id" [selected]="e.id === newParentId()">{{ e | treeLabel }}</option>
           }

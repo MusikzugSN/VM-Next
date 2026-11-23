@@ -5,8 +5,7 @@ import { NgIcon, provideIcons } from '@ng-icons/core';
 import { lucideTriangleAlert } from '@ng-icons/lucide';
 import { apiUrl, configDefaultOptionsResponseSchema, type ConfigResponse } from '@vm-web/shared';
 
-import { VmButton } from '@vm-web/ui';
-import { ZardNativeSelectDirective } from '@vm-web/ui/zard/components/native-select';
+import { VmButton, VmSelect } from '@vm-web/ui';
 
 import { ActionRunner } from '../../../core/actions/action-runner';
 import { ApiClient } from '../../../core/api/api-client';
@@ -15,7 +14,7 @@ import { TreeLabelPipe } from '../../../shared/ui/tree-label.pipe';
 /** Tab „Standardwerte“ (A-3): ensemble and role of new accounts; warning if that role has club permissions (B-1). */
 @Component({
   selector: 'vm-defaults-settings',
-  imports: [TreeLabelPipe, NgIcon, TranslocoPipe, VmButton, ZardNativeSelectDirective],
+  imports: [TreeLabelPipe, NgIcon, TranslocoPipe, VmButton, VmSelect],
   viewProviders: [provideIcons({ lucideTriangleAlert })],
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
@@ -33,7 +32,7 @@ import { TreeLabelPipe } from '../../../shared/ui/tree-label.pipe';
       <div class="grid gap-4 md:grid-cols-2">
         <label class="flex flex-col gap-1.5">
           <span class="font-medium">{{ 'system.settings.defaults.ensemble' | transloco }}</span>
-          <select z-native-select [disabled]="readonly()" [value]="ensembleId()" (change)="ensembleId.set($any($event.target).value)">
+          <select vm-select [disabled]="readonly()" [value]="ensembleId()" (change)="ensembleId.set($any($event.target).value)">
             <option value="">{{ 'system.settings.defaults.none' | transloco }}</option>
             @for (e of options.hasValue() ? options.value().ensembles : []; track e.id) {
               <option [value]="e.id" [selected]="e.id === ensembleId()">{{ e | treeLabel }}</option>
@@ -42,7 +41,7 @@ import { TreeLabelPipe } from '../../../shared/ui/tree-label.pipe';
         </label>
         <label class="flex flex-col gap-1.5">
           <span class="font-medium">{{ 'system.settings.defaults.role' | transloco }}</span>
-          <select z-native-select [disabled]="readonly()" [value]="roleId()" (change)="roleId.set($any($event.target).value)">
+          <select vm-select [disabled]="readonly()" [value]="roleId()" (change)="roleId.set($any($event.target).value)">
             <option value="">{{ 'system.settings.defaults.none' | transloco }}</option>
             @for (r of options.hasValue() ? options.value().roles : []; track r.id) {
               <option [value]="r.id" [selected]="r.id === roleId()">{{ r.name }}</option>

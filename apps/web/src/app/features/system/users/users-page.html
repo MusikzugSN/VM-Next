@@ -11,7 +11,7 @@
   <vm-search-field [(value)]="search" labelKey="system.users.search" />
   <label class="flex flex-col gap-1.5 md:w-44">
     <span class="font-medium">{{ 'system.users.status' | transloco }}</span>
-    <select z-native-select [value]="status()" (change)="status.set($any($event.target).value)">
+    <select vm-select [value]="status()" (change)="status.set($any($event.target).value)">
       <option value="">{{ 'system.users.allStatus' | transloco }}</option>
       <option value="active">{{ 'system.users.active' | transloco }}</option>
       <option value="blocked">{{ 'system.users.blocked' | transloco }}</option>
@@ -20,7 +20,7 @@
   @if (options.hasValue() && options.value().ensembles.length > 1) {
     <label class="flex flex-col gap-1.5 md:w-56">
       <span class="font-medium">{{ 'terms.ensemble' | transloco }}</span>
-      <select z-native-select [value]="ensembleId()" (change)="ensembleId.set($any($event.target).value)">
+      <select vm-select [value]="ensembleId()" (change)="ensembleId.set($any($event.target).value)">
         <option value="">{{ 'system.common.allEnsembles' | transloco }}</option>
         @for (e of options.value().ensembles; track e.id) {
           <option [value]="e.id">{{ e | treeLabel }}</option>

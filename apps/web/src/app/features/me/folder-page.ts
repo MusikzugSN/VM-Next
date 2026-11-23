@@ -7,8 +7,7 @@ import { NgIcon, provideIcons } from '@ng-icons/core';
 import { lucideChevronLeft, lucideFileArchive, lucidePrinter, lucideSearch, lucideX } from '@ng-icons/lucide';
 import { APP_ROUTES, apiUrl, myFolderOverviewResponseSchema, myFolderScoresResponseSchema } from '@vm-web/shared';
 
-import { VmButton } from '@vm-web/ui';
-import { ZardInputComponent } from '@vm-web/ui/zard/components/input';
+import { VmButton, VmInput } from '@vm-web/ui';
 
 import { PrintLauncher } from '../../core/actions/pending-features';
 import { ApiClient } from '../../core/api/api-client';
@@ -31,7 +30,7 @@ import { selectOr } from '../../core/util/resource-value';
     NgIcon,
     TranslocoPipe,
     VmButton,
-    ZardInputComponent,
+    VmInput,
     ListState,
     MemberScoreList,
     PageProblem,
@@ -77,7 +76,7 @@ import { selectOr } from '../../core/util/resource-value';
           <span class="relative">
             <ng-icon name="lucideSearch" class="absolute top-1/2 left-3 -translate-y-1/2 text-muted-foreground" aria-hidden="true" />
             <input
-              z-input
+              vm-input
               type="search"
               class="ps-9"
               [placeholder]="'me.folder.searchPlaceholder' | transloco"

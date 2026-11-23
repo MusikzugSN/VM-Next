@@ -1,18 +1,18 @@
 import { ChangeDetectionStrategy, Component, inject, input, output } from '@angular/core';
 import { TranslocoPipe } from '@jsverse/transloco';
+import { VmSelect } from '@vm-web/ui';
 
-import { ZardNativeSelectDirective } from '@vm-web/ui/zard/components/native-select';
 
 import { VoiceContextStore } from '../../core/voices/voice-context.store';
 
 /** Voice picker grouped by instrument (N-6); options from `me/voice-options`. */
 @Component({
   selector: 'vm-voice-select',
-  imports: [TranslocoPipe, ZardNativeSelectDirective],
+  imports: [TranslocoPipe, VmSelect],
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
     <select
-      z-native-select
+      vm-select
       [id]="controlId()"
       [value]="value() ?? ''"
       (change)="changed.emit($any($event.target).value || null)"

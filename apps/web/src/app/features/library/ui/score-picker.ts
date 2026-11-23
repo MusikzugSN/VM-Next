@@ -6,8 +6,7 @@ import { lucidePlus } from '@ng-icons/lucide';
 import type { ScoreCandidate } from '@vm-web/shared';
 import { of, type Observable } from 'rxjs';
 
-import { VmButton } from '@vm-web/ui';
-import { ZardInputComponent } from '@vm-web/ui/zard/components/input';
+import { VmButton, VmInput } from '@vm-web/ui';
 
 import { debounced } from '../../../core/util/debounced';
 import { SearchField } from '../../../shared/ui/search-field';
@@ -31,7 +30,7 @@ export interface PickedScore {
  */
 @Component({
   selector: 'vm-score-picker',
-  imports: [NgIcon, TranslocoPipe, VmButton, ZardInputComponent, SearchField],
+  imports: [NgIcon, TranslocoPipe, VmButton, VmInput, SearchField],
   viewProviders: [provideIcons({ lucidePlus })],
   changeDetection: ChangeDetectionStrategy.OnPush,
   host: { class: 'flex flex-col gap-3' },
@@ -41,7 +40,7 @@ export interface PickedScore {
       @if (numbered()) {
         <label class="flex flex-col gap-1.5 md:w-32">
           <span class="font-medium">{{ 'library.picker.number' | transloco }}</span>
-          <input z-input type="text" maxlength="10" [value]="number()" (input)="number.set($any($event.target).value)" />
+          <input vm-input type="text" maxlength="10" [value]="number()" (input)="number.set($any($event.target).value)" />
         </label>
       }
     </div>

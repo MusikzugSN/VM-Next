@@ -26,8 +26,7 @@ import {
 } from '@vm-web/shared';
 import { tap } from 'rxjs';
 
-import { VmButton, VmIconButton } from '@vm-web/ui';
-import { ZardTextareaComponent } from '@vm-web/ui/zard/components/textarea';
+import { VmButton, VmIconButton, VmTextarea } from '@vm-web/ui';
 
 import { ActionRunner } from '../../../core/actions/action-runner';
 import { onUploadCompleted } from '../../../core/actions/on-upload';
@@ -62,7 +61,7 @@ const ZOOM_STEPS = [0.5, 0.75, 1, 1.25, 1.5, 2];
     TranslocoPipe,
     PluralPipe,
     VmButton, VmIconButton,
-    ZardTextareaComponent,
+    VmTextarea,
     ListState,
     PageProblem,
     ScoreSearchSelect,

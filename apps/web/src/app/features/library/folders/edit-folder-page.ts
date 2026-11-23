@@ -15,8 +15,7 @@ import {
 } from '@vm-web/shared';
 import { type Observable } from 'rxjs';
 
-import { VmButton, VmIconButton } from '@vm-web/ui';
-import { ZardInputComponent } from '@vm-web/ui/zard/components/input';
+import { VmButton, VmIconButton, VmInput } from '@vm-web/ui';
 
 import { ActionRunner, ConfirmService } from '../../../core/actions/action-runner';
 import { ApiClient } from '../../../core/api/api-client';
@@ -44,7 +43,7 @@ import { selectOr } from '../../../core/util/resource-value';
     TranslocoPipe,
     PluralPipe,
     VmButton, VmIconButton,
-    ZardInputComponent,
+    VmInput,
     ListState,
     PageProblem,
     SearchField,

@@ -8,7 +8,7 @@
       <label class="flex flex-col gap-1.5">
         <span class="font-medium">{{ 'library.voices.name' | transloco }} *</span>
         <input
-          z-input
+          vm-input
           cdkFocusInitial
           type="text"
           maxlength="100"
@@ -73,7 +73,7 @@
           <label class="flex flex-col gap-1.5">
             <span class="font-medium">{{ 'library.voices.otherInstrument' | transloco }}</span>
             <input
-              z-input
+              vm-input
               type="text"
               maxlength="100"
               autocomplete="off"
@@ -110,7 +110,7 @@
       @if (substitutes().length < max) {
         <label class="flex flex-col gap-1.5">
           <span class="sr-only">{{ 'library.voices.addSubstitute' | transloco }}</span>
-          <select z-native-select (change)="addSubstitute($any($event.target).value); $any($event.target).value = ''">
+          <select vm-select (change)="addSubstitute($any($event.target).value); $any($event.target).value = ''">
             <option value="">{{ 'library.voices.addSubstitute' | transloco }}</option>
             @for (group of candidates(); track group.instrument.id) {
               <optgroup [label]="group.instrument.name">

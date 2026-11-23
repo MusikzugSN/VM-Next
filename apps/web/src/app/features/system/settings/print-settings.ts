@@ -2,8 +2,7 @@ import { ChangeDetectionStrategy, Component, effect, inject, input, output, sign
 import { TranslocoPipe } from '@jsverse/transloco';
 import { apiUrl, updatePrintBodySchema, type ConfigResponse } from '@vm-web/shared';
 
-import { VmButton } from '@vm-web/ui';
-import { ZardInputComponent } from '@vm-web/ui/zard/components/input';
+import { VmButton, VmInput } from '@vm-web/ui';
 
 import { ActionRunner } from '../../../core/actions/action-runner';
 import { ApiClient } from '../../../core/api/api-client';
@@ -11,7 +10,7 @@ import { ApiClient } from '../../../core/api/api-client';
 /** Tab „Drucken“ (D-2, D-4): page limit of the browser print and the address the print service accepts. */
 @Component({
   selector: 'vm-print-settings',
-  imports: [TranslocoPipe, VmButton, ZardInputComponent],
+  imports: [TranslocoPipe, VmButton, VmInput],
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
     <form class="flex flex-col gap-4 rounded-lg border bg-card p-4 shadow-sm md:p-6" novalidate (submit)="$event.preventDefault(); save()">
@@ -19,7 +18,7 @@ import { ApiClient } from '../../../core/api/api-client';
       <label class="flex flex-col gap-1.5 md:w-60">
         <span class="font-medium">{{ 'system.settings.print.pageLimit' | transloco }}</span>
         <input
-          z-input
+          vm-input
           type="number"
           min="1"
           max="500"
@@ -37,7 +36,7 @@ import { ApiClient } from '../../../core/api/api-client';
       <label class="flex flex-col gap-1.5">
         <span class="font-medium">{{ 'system.settings.print.publicBaseUrl' | transloco }}</span>
         <input
-          z-input
+          vm-input
           type="url"
           maxlength="500"
           placeholder="https://"

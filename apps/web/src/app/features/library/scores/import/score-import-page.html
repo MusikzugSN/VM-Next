@@ -62,7 +62,7 @@
               </span>
               <div class="flex min-w-0 flex-col gap-2">
                 <select
-                  z-native-select
+                  vm-select
                   (change)="setTarget(i, $any($event.target).value)"
                   [attr.aria-label]="'library.import.targetFor' | transloco: { column: header }"
                 >
@@ -90,14 +90,14 @@
                 @if (column.target === 'new') {
                   <div class="grid grid-cols-2 gap-2">
                     <input
-                      z-input
+                      vm-input
                       [value]="column.newName"
                       (input)="patchColumn(i, { newName: $any($event.target).value })"
                       [attr.aria-label]="'library.import.newFieldName' | transloco: { column: header }"
                       maxlength="100"
                     />
                     <select
-                      z-native-select
+                      vm-select
                       (change)="patchColumn(i, { newType: $any($event.target).value })"
                       [attr.aria-label]="'library.import.newFieldType' | transloco: { column: header }"
                     >
@@ -118,14 +118,14 @@
           @if (!hasFolderColumn()) {
             <label class="flex flex-col gap-1.5">
               <span class="font-medium">{{ 'library.import.fixedFolder' | transloco }}</span>
-              <input z-input [value]="fixedFolder()" (input)="setFixedFolder($any($event.target).value)" maxlength="100" />
+              <input vm-input [value]="fixedFolder()" (input)="setFixedFolder($any($event.target).value)" maxlength="100" />
               <span class="text-[13px] text-muted-foreground">{{ 'library.import.fixedFolderHint' | transloco }}</span>
             </label>
           }
           @if (withFolder()) {
             <label class="flex flex-col gap-1.5">
               <span class="font-medium">{{ 'library.import.folderEnsemble' | transloco }}</span>
-              <select z-native-select (change)="setEnsemble($any($event.target).value)">
+              <select vm-select (change)="setEnsemble($any($event.target).value)">
                 <option value="">{{ 'library.import.chooseEnsemble' | transloco }}</option>
                 @for (ensemble of ensembleItems(); track ensemble.id) {
                   <option [value]="ensemble.id" [selected]="ensemble.id === folderEnsembleId()">{{ ensemble | treeLabel }}</option>
@@ -192,7 +192,7 @@
 
         <label class="flex flex-col gap-1.5 md:w-64">
           <span class="font-medium">{{ 'library.import.show' | transloco }}</span>
-          <select z-native-select (change)="rowFilter.set($any($event.target).value)">
+          <select vm-select (change)="rowFilter.set($any($event.target).value)">
             <option value="all" [selected]="rowFilter() === 'all'">{{ 'library.import.filter.all' | transloco }}</option>
             <option value="issues" [selected]="rowFilter() === 'issues'">{{ 'library.import.filter.issues' | transloco }}</option>
             <option value="matches" [selected]="rowFilter() === 'matches'">{{ 'library.import.filter.matches' | transloco }}</option>
@@ -261,7 +261,7 @@
                     <span class="text-[13px] text-destructive-ink">{{ 'library.import.notImported' | transloco }}</span>
                   } @else {
                     <select
-                      z-native-select
+                      vm-select
                       [disabled]="busy() !== null"
                       (change)="setAction(row, $any($event.target).value)"
                       [attr.aria-label]="'library.import.actionFor' | transloco: { line: row.line }"

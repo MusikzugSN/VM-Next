@@ -48,7 +48,7 @@
           } @else if (canEdit()) {
             <label class="flex flex-col gap-1.5 md:w-80">
               <span class="font-medium">{{ 'system.ensemble.parent' | transloco }}</span>
-              <select z-native-select [value]="e.parentId" (change)="setParent($any($event.target).value)">
+              <select vm-select [value]="e.parentId" (change)="setParent($any($event.target).value)">
                 @for (p of parents(); track p.id) {
                   <option [value]="p.id" [selected]="p.id === e.parentId">{{ p | treeLabel }}</option>
                 }

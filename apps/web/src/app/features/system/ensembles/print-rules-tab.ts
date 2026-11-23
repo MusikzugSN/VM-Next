@@ -5,9 +5,7 @@ import { NgIcon, provideIcons } from '@ng-icons/core';
 import { lucidePlus, lucideRotateCcw, lucideX } from '@ng-icons/lucide';
 import { apiUrl, ensemblePrintRulesResponseSchema, printRulesSchema, type PrintMode, type PrintRule } from '@vm-web/shared';
 
-import { VmButton, VmIconButton } from '@vm-web/ui';
-import { ZardInputComponent } from '@vm-web/ui/zard/components/input';
-import { ZardNativeSelectDirective } from '@vm-web/ui/zard/components/native-select';
+import { VmButton, VmIconButton, VmInput, VmSelect } from '@vm-web/ui';
 
 import { ActionRunner } from '../../../core/actions/action-runner';
 import { ApiClient } from '../../../core/api/api-client';
@@ -32,7 +30,7 @@ export function ruleEnd(rules: readonly PrintRule[], index: number): number | nu
  */
 @Component({
   selector: 'vm-print-rules-tab',
-  imports: [NgIcon, TranslocoPipe, VmButton, VmIconButton, ZardInputComponent, ZardNativeSelectDirective, PageProblem],
+  imports: [NgIcon, TranslocoPipe, VmButton, VmIconButton, VmInput, VmSelect, PageProblem],
   viewProviders: [provideIcons({ lucidePlus, lucideX, lucideRotateCcw })],
   changeDetection: ChangeDetectionStrategy.OnPush,
   host: { class: 'flex flex-col gap-4' },
@@ -92,7 +90,7 @@ export function ruleEnd(rules: readonly PrintRule[], index: number): number | nu
                       <label class="flex items-center gap-2">
                         <span>{{ 'system.printRules.from' | transloco }}</span>
                         <input
-                          z-input
+                          vm-input
                           type="number"
                           min="2"
                           max="500"
@@ -113,7 +111,7 @@ export function ruleEnd(rules: readonly PrintRule[], index: number): number | nu
                   <td class="px-4 py-3">
                     @if (canEdit()) {
                       <select
-                        z-native-select
+                        vm-select
                         class="md:w-60"
                         [value]="rule.mode"
                         (change)="setMode(i, $any($event.target).value)"

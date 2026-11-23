@@ -154,7 +154,7 @@
               @if (printers().length > 1) {
                 <label class="flex flex-col gap-1.5 text-foreground">
                   <span class="font-medium">{{ 'print.printer' | transloco }}</span>
-                  <select z-native-select [value]="printerId() ?? ''" (change)="printerId.set($any($event.target).value || null)">
+                  <select vm-select [value]="printerId() ?? ''" (change)="printerId.set($any($event.target).value || null)">
                     @for (printer of printers(); track printer.id) {
                       <option [value]="printer.id" [selected]="printer.id === printerId()">
                         {{ printer.name }}{{ printer.isDefault ? ' (' + ('print.defaultPrinter' | transloco) + ')' : '' }}

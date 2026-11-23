@@ -5,8 +5,8 @@ import { NgIcon, provideIcons } from '@ng-icons/core';
 import { lucidePlus, lucideSearch } from '@ng-icons/lucide';
 import { SCORE_TITLE_MAX, apiUrl, createdResponseSchema, scoreSearchResponseSchema, type ScoreSearchItem } from '@vm-web/shared';
 import { of } from 'rxjs';
+import { VmInput } from '@vm-web/ui';
 
-import { ZardInputComponent } from '@vm-web/ui/zard/components/input';
 
 import { ActionRunner } from '../../core/actions/action-runner';
 import { ApiClient } from '../../core/api/api-client';
@@ -23,7 +23,7 @@ export interface ChosenScore {
  */
 @Component({
   selector: 'vm-score-search-select',
-  imports: [NgIcon, TranslocoPipe, ZardInputComponent],
+  imports: [NgIcon, TranslocoPipe, VmInput],
   viewProviders: [provideIcons({ lucideSearch, lucidePlus })],
   changeDetection: ChangeDetectionStrategy.OnPush,
   host: { class: 'flex flex-col gap-1.5' },
@@ -39,7 +39,7 @@ export interface ChosenScore {
       <span class="relative">
         <ng-icon name="lucideSearch" class="absolute top-1/2 left-3 -translate-y-1/2 text-muted-foreground" aria-hidden="true" />
         <input
-          z-input
+          vm-input
           type="search"
           class="ps-9"
           [id]="controlId()"

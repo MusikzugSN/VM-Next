@@ -15,8 +15,7 @@ import {
   type EventListItem,
 } from '@vm-web/shared';
 
-import { VmButton, VmIconButton } from '@vm-web/ui';
-import { ZardNativeSelectDirective } from '@vm-web/ui/zard/components/native-select';
+import { VmButton, VmIconButton, VmSelect } from '@vm-web/ui';
 
 import { ActionRunner, ConfirmService } from '../../../core/actions/action-runner';
 import { ApiClient } from '../../../core/api/api-client';
@@ -41,7 +40,7 @@ import { ensemblesWith } from '../ui/ensembles-with';
     TranslocoPipe,
     PluralPipe,
     VmButton, VmIconButton,
-    ZardNativeSelectDirective,
+    VmSelect,
     ListState,
     SearchField,
     ToggleSwitch,

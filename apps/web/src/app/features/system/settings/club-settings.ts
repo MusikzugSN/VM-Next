@@ -5,10 +5,8 @@ import { NgIcon, provideIcons } from '@ng-icons/core';
 import { lucideImageUp, lucideTrash2 } from '@ng-icons/lucide';
 import { apiUrl, LOGO_FILE_FIELD, LOGO_MAX_BYTES, LOGO_MIME_TYPES, updateClubBodySchema, type ConfigResponse } from '@vm-web/shared';
 
-import { VmButton } from '@vm-web/ui';
-import { ZardInputComponent } from '@vm-web/ui/zard/components/input';
+import { VmButton, VmInput, VmTextarea } from '@vm-web/ui';
 import { ZardSonnerService } from '@vm-web/ui/zard/components/sonner';
-import { ZardTextareaComponent } from '@vm-web/ui/zard/components/textarea';
 
 import { ActionRunner } from '../../../core/actions/action-runner';
 import { ApiClient } from '../../../core/api/api-client';
@@ -28,7 +26,7 @@ type ClubErrors = Partial<Record<keyof ClubForm, string>>;
 /** Tab „Verein & Anmeldung“ (S-4, A-2, F-12): name, legal links, login banner, logo. */
 @Component({
   selector: 'vm-club-settings',
-  imports: [NgIcon, TranslocoPipe, VmButton, ZardInputComponent, ZardTextareaComponent, ToggleSwitch],
+  imports: [NgIcon, TranslocoPipe, VmButton, VmInput, VmTextarea, ToggleSwitch],
   viewProviders: [provideIcons({ lucideImageUp, lucideTrash2 })],
   changeDetection: ChangeDetectionStrategy.OnPush,
   host: { class: 'flex flex-col gap-6' },
@@ -38,7 +36,7 @@ type ClubErrors = Partial<Record<keyof ClubForm, string>>;
       <label class="flex flex-col gap-1.5">
         <span class="font-medium">{{ 'system.settings.club.clubName' | transloco }} *</span>
         <input
-          z-input
+          vm-input
           type="text"
           maxlength="100"
           required
@@ -57,7 +55,7 @@ type ClubErrors = Partial<Record<keyof ClubForm, string>>;
           <label class="flex flex-col gap-1.5">
             <span class="font-medium">{{ 'system.settings.club.' + f | transloco }}</span>
             <input
-              z-input
+              vm-input
               type="url"
               maxlength="500"
               placeholder="https://"
@@ -75,7 +73,7 @@ type ClubErrors = Partial<Record<keyof ClubForm, string>>;
       </div>
       <label class="flex flex-col gap-1.5">
         <span class="font-medium">{{ 'system.settings.club.loginBanner' | transloco }}</span>
-        <textarea z-textarea rows="3" maxlength="2000" [readOnly]="readonly()" [value]="form().loginBanner" (input)="set('loginBanner', $any($event.target).value)"></textarea>
+        <textarea vm-textarea rows="3" maxlength="2000" [readOnly]="readonly()" [value]="form().loginBanner" (input)="set('loginBanner', $any($event.target).value)"></textarea>
         <span class="text-[13px] text-muted-foreground">{{ 'system.settings.club.loginBannerHint' | transloco }}</span>
       </label>
       <div class="flex items-center justify-between gap-4">

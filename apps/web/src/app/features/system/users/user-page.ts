@@ -7,8 +7,7 @@ import { NgIcon, provideIcons } from '@ng-icons/core';
 import { lucideCheck, lucideChevronLeft, lucideLock, lucideLockOpen, lucidePlus, lucideTrash2, lucideX } from '@ng-icons/lucide';
 import { MAX_PROFILE_VOICES, APP_ROUTES, apiUrl, userAssignmentOptionsResponseSchema, userDetailsResponseSchema } from '@vm-web/shared';
 
-import { VmButton, VmIconButton } from '@vm-web/ui';
-import { ZardNativeSelectDirective } from '@vm-web/ui/zard/components/native-select';
+import { VmButton, VmIconButton, VmSelect } from '@vm-web/ui';
 
 import { ActionRunner, ConfirmService } from '../../../core/actions/action-runner';
 import { ApiClient } from '../../../core/api/api-client';
@@ -27,7 +26,7 @@ import { selectOr, valueOr } from '../../../core/util/resource-value';
 /** Benutzer-Detail (S-1, A-5, R-1, R-6): roles per ensemble, voices, admin flag, block and delete. */
 @Component({
   selector: 'vm-system-user-page',
-  imports: [TreeLabelPipe, DatePipe, RouterLink, NgIcon, TranslocoPipe, VmButton, VmIconButton, ZardNativeSelectDirective, PageProblem, ToggleSwitch, UserStatusBadge, FormDialog],
+  imports: [TreeLabelPipe, DatePipe, RouterLink, NgIcon, TranslocoPipe, VmButton, VmIconButton, VmSelect, PageProblem, ToggleSwitch, UserStatusBadge, FormDialog],
   viewProviders: [provideIcons({ lucideChevronLeft, lucidePlus, lucideX, lucideCheck, lucideLock, lucideLockOpen, lucideTrash2 })],
   changeDetection: ChangeDetectionStrategy.OnPush,
   templateUrl: './user-page.html',

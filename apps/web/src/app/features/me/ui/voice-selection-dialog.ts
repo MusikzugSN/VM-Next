@@ -6,9 +6,8 @@ import { lucideCheck, lucideSearch } from '@ng-icons/lucide';
 import { MAX_PROFILE_VOICES, apiUrl } from '@vm-web/shared';
 import { firstValueFrom } from 'rxjs';
 
-import { VmButton } from '@vm-web/ui';
+import { VmButton, VmInput } from '@vm-web/ui';
 import { ZardDialogImports } from '@vm-web/ui/zard/components/dialog/dialog.imports';
-import { ZardInputComponent } from '@vm-web/ui/zard/components/input';
 
 import { ApiClient } from '../../../core/api/api-client';
 import { ActionRunner } from '../../../core/actions/action-runner';
@@ -26,7 +25,7 @@ export { filterVoiceGroups };
  */
 @Component({
   selector: 'vm-voice-selection-dialog',
-  imports: [PluralPipe, NgIcon, TranslocoPipe, VmButton, ZardDialogImports, ZardInputComponent],
+  imports: [PluralPipe, NgIcon, TranslocoPipe, VmButton, ZardDialogImports, VmInput],
   viewProviders: [provideIcons({ lucideCheck, lucideSearch })],
   changeDetection: ChangeDetectionStrategy.OnPush,
   // The dialog renders in an overlay; its host must not take up space (or a gap) in the page.
@@ -44,7 +43,7 @@ export { filterVoiceGroups };
           <span class="relative">
             <ng-icon name="lucideSearch" class="absolute top-1/2 left-3 -translate-y-1/2 text-muted-foreground" aria-hidden="true" />
             <input
-              z-input
+              vm-input
               type="search"
               class="ps-9"
               [placeholder]="'me.voices.searchPlaceholder' | transloco"
