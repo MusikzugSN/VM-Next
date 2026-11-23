@@ -14,7 +14,7 @@ import {
 } from '@vm-web/shared';
 import { filter, firstValueFrom, last, map, tap } from 'rxjs';
 
-import { ZardButtonComponent } from '@vm-web/ui/zard/components/button';
+import { VmButton, VmIconButton } from '@vm-web/ui';
 import { ZardDialogImports } from '@vm-web/ui/zard/components/dialog/dialog.imports';
 import { ZardSonnerService } from '@vm-web/ui/zard/components/sonner';
 
@@ -35,7 +35,7 @@ import { addFiles, batches, formatSize, replaceWithParts, sendable, uploadMeta, 
  */
 @Component({
   selector: 'vm-upload-dialog',
-  imports: [NgIcon, TranslocoPipe, PluralPipe, ZardButtonComponent, ZardDialogImports, ScoreSearchSelect, VoiceSelect, UploadSplit],
+  imports: [NgIcon, TranslocoPipe, PluralPipe, VmButton, VmIconButton, ZardDialogImports, ScoreSearchSelect, VoiceSelect, UploadSplit],
   viewProviders: [provideIcons({ lucideUpload, lucideFileText, lucideX, lucideInfo, lucideCircleAlert, lucideScissors })],
   changeDetection: ChangeDetectionStrategy.OnPush,
   // The dialog renders in an overlay; its host must not take up space (or a gap) in the page.

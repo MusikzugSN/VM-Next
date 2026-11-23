@@ -6,7 +6,7 @@ import { NgIcon, provideIcons } from '@ng-icons/core';
 import { lucideChevronRight, lucideFileArchive } from '@ng-icons/lucide';
 import { APP_ROUTES, apiUrl, appPath, myFoldersResponseSchema, type MyFolderItem } from '@vm-web/shared';
 
-import { ZardButtonComponent } from '@vm-web/ui/zard/components/button';
+import { VmIconButton } from '@vm-web/ui';
 
 import { ApiClient } from '../../core/api/api-client';
 import { cursorList } from '../../core/api/cursor-list';
@@ -18,7 +18,7 @@ import { ListState } from '../../shared/ui/list-state';
 /** Mappen (R-2, M-4): folders released for Mein Bereich in the own ensembles. */
 @Component({
   selector: 'vm-me-folders-page',
-  imports: [PluralPipe, RouterLink, NgIcon, TranslocoPipe, ZardButtonComponent, ListState],
+  imports: [PluralPipe, RouterLink, NgIcon, TranslocoPipe, VmIconButton, ListState],
   viewProviders: [provideIcons({ lucideChevronRight, lucideFileArchive })],
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
@@ -64,9 +64,8 @@ import { ListState } from '../../shared/ui/list-state';
                 <td class="px-4 py-3 text-end tabular-nums">{{ folder.scoreCount }}</td>
                 <td class="px-4 py-3 text-end">
                   <a
-                    z-button
-                    zType="ghost"
-                    zSize="icon"
+                    vm-icon-button
+                   
                     [href]="zip(folder)"
                     download
                     [attr.aria-label]="'me.folders.zipLabel' | transloco: { name: folder.name }"

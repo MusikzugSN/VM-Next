@@ -21,11 +21,11 @@
       }
     </div>
     <div class="flex flex-col gap-2 md:flex-row">
-      <button z-button zType="outline" type="button" class="w-full md:w-auto" (click)="print()">
+      <button vm-button variant="outlined" type="button" class="w-full md:w-auto" (click)="print()">
         <ng-icon name="lucidePrinter" aria-hidden="true" />{{ 'common.print' | transloco }}
       </button>
       @if (canUpload()) {
-        <button z-button type="button" class="w-full md:w-auto" (click)="upload()">
+        <button vm-button type="button" class="w-full md:w-auto" (click)="upload()">
           <ng-icon name="lucideUpload" aria-hidden="true" />{{ 'library.score.uploadVoices' | transloco }}
         </button>
       }
@@ -54,14 +54,14 @@
           @if (canEdit() || canDelete()) {
             <div class="flex flex-col-reverse gap-2 md:flex-row md:justify-between">
               @if (canDelete()) {
-                <button z-button zType="destructive" type="button" (click)="remove()">
+                <button vm-button variant="danger" type="button" (click)="remove()">
                   <ng-icon name="lucideTrash2" aria-hidden="true" />{{ 'library.score.delete' | transloco }}
                 </button>
               } @else {
                 <span></span>
               }
               @if (canEdit()) {
-                <button z-button type="submit" [zLoading]="saving()" [zDisabled]="saving()">{{ 'common.save' | transloco }}</button>
+                <button vm-button type="submit" [zLoading]="saving()" [zDisabled]="saving()">{{ 'common.save' | transloco }}</button>
               }
             </div>
           }
@@ -151,9 +151,8 @@
                         }
                         @if (entry.sheetId) {
                           <button
-                            z-button
-                            zType="ghost"
-                            zSize="icon"
+                            vm-icon-button
+                           
                             type="button"
                             [attr.aria-label]="'library.score.preview' | transloco: { voice: entry.voice.name }"
                             (click)="showSheet(entry.sheetId, entry.voice.name)"
@@ -162,9 +161,8 @@
                           </button>
                           @if (canEdit()) {
                             <button
-                              z-button
-                              zType="ghost"
-                              zSize="icon"
+                              vm-icon-button
+                             
                               type="button"
                               [attr.aria-label]="'library.score.deleteSheet' | transloco: { voice: entry.voice.name }"
                               (click)="deleteSheet(entry.sheetId, entry.voice.name)"
@@ -183,8 +181,8 @@
                     }
                     @if (entry.status !== 'present' && canUpload()) {
                       <button
-                        z-button
-                        zType="outline"
+                        vm-button
+                        variant="outlined"
                         type="button"
                         (click)="upload(entry.voice.id)"
                         [attr.aria-label]="'library.score.uploadVoice' | transloco: { voice: entry.voice.name }"

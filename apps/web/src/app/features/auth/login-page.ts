@@ -5,7 +5,7 @@ import { NgIcon, provideIcons } from '@ng-icons/core';
 import { lucideCircleAlert, lucideInfo, lucideLogIn } from '@ng-icons/lucide';
 import { apiUrl, loginErrorCodeSchema, problemCodeSchema } from '@vm-web/shared';
 
-import { ZardButtonComponent } from '@vm-web/ui/zard/components/button';
+import { VmButton } from '@vm-web/ui';
 
 import { safeReturnTo } from '../../core/auth/guards';
 import { BrandingStore } from '../../core/branding/branding.store';
@@ -24,7 +24,7 @@ export function loginErrorKey(code: string | undefined): string | null {
 /** Anmeldung (A-1, A-2): club logo and banner, „Mit Vereinskonto anmelden“, optional direct redirect. */
 @Component({
   selector: 'vm-login-page',
-  imports: [NgTemplateOutlet, TranslocoPipe, NgIcon, ZardButtonComponent, ClubLogo, LegalLinks],
+  imports: [NgTemplateOutlet, TranslocoPipe, NgIcon, VmButton, ClubLogo, LegalLinks],
   viewProviders: [provideIcons({ lucideLogIn, lucideInfo, lucideCircleAlert })],
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
@@ -81,7 +81,7 @@ export function loginErrorKey(code: string | undefined): string | null {
             }
 
             <div class="mt-auto flex w-full flex-col gap-3 md:mt-0">
-              <a z-button [href]="loginHref()" class="w-full">
+              <a vm-button [href]="loginHref()" class="w-full">
                 <ng-icon name="lucideLogIn" aria-hidden="true" />{{ 'auth.login.submit' | transloco }}
               </a>
               <p class="flex items-start gap-2 text-start text-[13px] text-muted-foreground">

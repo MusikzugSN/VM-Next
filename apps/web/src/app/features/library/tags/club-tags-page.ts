@@ -5,7 +5,7 @@ import { NgIcon, provideIcons } from '@ng-icons/core';
 import { lucideLock, lucidePencil, lucidePlus, lucideTrash2 } from '@ng-icons/lucide';
 import { APP_ROUTES, apiUrl, clubTagListResponseSchema, createdResponseSchema, type ClubTagItem } from '@vm-web/shared';
 
-import { ZardButtonComponent } from '@vm-web/ui/zard/components/button';
+import { VmButton } from '@vm-web/ui';
 
 import { ActionRunner, ConfirmService } from '../../../core/actions/action-runner';
 import { ApiClient } from '../../../core/api/api-client';
@@ -21,7 +21,7 @@ import { LibraryOptions } from '../library-options';
 /** Vereins-Tags (N-17): create, rename, delete; personal tags live in Mein Bereich. */
 @Component({
   selector: 'vm-library-club-tags-page',
-  imports: [RouterLink, NgIcon, TranslocoPipe, PluralPipe, ZardButtonComponent, ListState, NameDialog, SearchField],
+  imports: [RouterLink, NgIcon, TranslocoPipe, PluralPipe, VmButton, ListState, NameDialog, SearchField],
   viewProviders: [provideIcons({ lucidePlus, lucidePencil, lucideTrash2, lucideLock })],
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
@@ -31,7 +31,7 @@ import { LibraryOptions } from '../library-options';
         <p class="mt-2 text-muted-foreground">{{ 'library.tags.intro' | transloco }}</p>
       </div>
       @if (canCreate()) {
-        <button z-button type="button" class="w-full md:w-auto" (click)="creating.set(true)">
+        <button vm-button type="button" class="w-full md:w-auto" (click)="creating.set(true)">
           <ng-icon name="lucidePlus" aria-hidden="true" />{{ 'library.tags.create' | transloco }}
         </button>
       }
@@ -58,12 +58,12 @@ import { LibraryOptions } from '../library-options';
             </span>
             <span class="flex gap-1">
               @if (canEdit()) {
-                <button z-button zType="ghost" type="button" (click)="startRename(tag)" [attr.aria-label]="'library.tags.renameLabel' | transloco: { name: tag.name }">
+                <button vm-button variant="text" type="button" (click)="startRename(tag)" [attr.aria-label]="'library.tags.renameLabel' | transloco: { name: tag.name }">
                   <ng-icon name="lucidePencil" aria-hidden="true" /><span class="hidden md:inline">{{ 'common.rename' | transloco }}</span>
                 </button>
               }
               @if (canDelete()) {
-                <button z-button zType="ghost" type="button" class="text-destructive-ink" (click)="remove(tag)" [attr.aria-label]="'library.tags.deleteLabel' | transloco: { name: tag.name }">
+                <button vm-button variant="text" type="button" class="text-destructive-ink" (click)="remove(tag)" [attr.aria-label]="'library.tags.deleteLabel' | transloco: { name: tag.name }">
                   <ng-icon name="lucideTrash2" aria-hidden="true" /><span class="hidden md:inline">{{ 'common.delete' | transloco }}</span>
                 </button>
               }

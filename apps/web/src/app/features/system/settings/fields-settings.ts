@@ -5,7 +5,7 @@ import { NgIcon, provideIcons } from '@ng-icons/core';
 import { lucideArrowDown, lucideArrowUp, lucidePencil, lucidePlus, lucideTrash2 } from '@ng-icons/lucide';
 import { apiUrl, createdResponseSchema, fieldDefinitionsResponseSchema, type FieldDefinition } from '@vm-web/shared';
 
-import { ZardButtonComponent } from '@vm-web/ui/zard/components/button';
+import { VmButton, VmIconButton } from '@vm-web/ui';
 
 import { ActionRunner, ConfirmService } from '../../../core/actions/action-runner';
 import { ApiClient } from '../../../core/api/api-client';
@@ -18,7 +18,7 @@ import { selectOr } from '../../../core/util/resource-value';
 /** Tab „Eigene Felder“ (N-2, N-3): custom score fields in display order; create and edit in a dialog. */
 @Component({
   selector: 'vm-fields-settings',
-  imports: [NgIcon, TranslocoPipe, ZardButtonComponent, PageProblem, FieldDialog],
+  imports: [NgIcon, TranslocoPipe, VmButton, VmIconButton, PageProblem, FieldDialog],
   viewProviders: [provideIcons({ lucideArrowUp, lucideArrowDown, lucidePencil, lucidePlus, lucideTrash2 })],
   changeDetection: ChangeDetectionStrategy.OnPush,
   host: { class: 'flex flex-col gap-4' },
@@ -26,7 +26,7 @@ import { selectOr } from '../../../core/util/resource-value';
     <div class="flex flex-col gap-3 md:flex-row md:items-start md:justify-between">
       <p class="text-muted-foreground">{{ 'system.settings.fields.hint' | transloco }}</p>
       @if (canEdit()) {
-        <button z-button type="button" class="w-full shrink-0 md:w-auto" (click)="openDialog(null)">
+        <button vm-button type="button" class="w-full shrink-0 md:w-auto" (click)="openDialog(null)">
           <ng-icon name="lucidePlus" aria-hidden="true" />{{ 'fields.create' | transloco }}
         </button>
       }
@@ -51,16 +51,16 @@ import { selectOr } from '../../../core/util/resource-value';
             </span>
             @if (canEdit()) {
               <span class="flex gap-1">
-                <button z-button zType="ghost" zSize="icon" type="button" [zDisabled]="first" (click)="move(i, -1)" [attr.aria-label]="'common.moveUp' | transloco: { name: field.name }">
+                <button vm-icon-button type="button" [zDisabled]="first" (click)="move(i, -1)" [attr.aria-label]="'common.moveUp' | transloco: { name: field.name }">
                   <ng-icon name="lucideArrowUp" aria-hidden="true" />
                 </button>
-                <button z-button zType="ghost" zSize="icon" type="button" [zDisabled]="last" (click)="move(i, 1)" [attr.aria-label]="'common.moveDown' | transloco: { name: field.name }">
+                <button vm-icon-button type="button" [zDisabled]="last" (click)="move(i, 1)" [attr.aria-label]="'common.moveDown' | transloco: { name: field.name }">
                   <ng-icon name="lucideArrowDown" aria-hidden="true" />
                 </button>
-                <button z-button zType="ghost" type="button" (click)="openDialog(field)" [attr.aria-label]="'system.settings.fields.editLabel' | transloco: { name: field.name }">
+                <button vm-button variant="text" type="button" (click)="openDialog(field)" [attr.aria-label]="'system.settings.fields.editLabel' | transloco: { name: field.name }">
                   <ng-icon name="lucidePencil" aria-hidden="true" /><span class="hidden md:inline">{{ 'common.edit' | transloco }}</span>
                 </button>
-                <button z-button zType="ghost" type="button" class="text-destructive-ink" (click)="remove(field)" [attr.aria-label]="'system.settings.fields.deleteLabel' | transloco: { name: field.name }">
+                <button vm-button variant="text" type="button" class="text-destructive-ink" (click)="remove(field)" [attr.aria-label]="'system.settings.fields.deleteLabel' | transloco: { name: field.name }">
                   <ng-icon name="lucideTrash2" aria-hidden="true" /><span class="hidden md:inline">{{ 'common.delete' | transloco }}</span>
                 </button>
               </span>

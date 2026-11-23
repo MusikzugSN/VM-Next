@@ -5,7 +5,7 @@ import { NgIcon, provideIcons } from '@ng-icons/core';
 import { lucideCircleCheck, lucideCopy, lucidePrinter, lucideRepeat, lucideTriangleAlert, lucideX } from '@ng-icons/lucide';
 import type { PrintJob, PrintJobStatus } from '@vm-web/shared';
 
-import { ZardButtonComponent } from '@vm-web/ui/zard/components/button';
+import { VmButton } from '@vm-web/ui';
 import { ZardSonnerService } from '@vm-web/ui/zard/components/sonner';
 
 import { PluralPipe } from '../../core/i18n/plural.pipe';
@@ -30,7 +30,7 @@ const STATUS_CLASSES: Record<PrintJobStatus, string> = {
  */
 @Component({
   selector: 'vm-print-history-page',
-  imports: [DatePipe, NgTemplateOutlet, NgIcon, TranslocoPipe, PluralPipe, ZardButtonComponent],
+  imports: [DatePipe, NgTemplateOutlet, NgIcon, TranslocoPipe, PluralPipe, VmButton],
   viewProviders: [provideIcons({ lucidePrinter, lucideCircleCheck, lucideTriangleAlert, lucideCopy, lucideRepeat, lucideX })],
   changeDetection: ChangeDetectionStrategy.OnPush,
   templateUrl: './print-history-page.html',

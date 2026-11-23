@@ -1,7 +1,7 @@
 import { ChangeDetectionStrategy, Component, input, model, output } from '@angular/core';
 import { TranslocoPipe } from '@jsverse/transloco';
 
-import { ZardButtonComponent } from '@vm-web/ui/zard/components/button';
+import { VmButton } from '@vm-web/ui';
 import { ZardDialogImports } from '@vm-web/ui/zard/components/dialog/dialog.imports';
 
 let nextId = 0;
@@ -13,7 +13,7 @@ let nextId = 0;
  */
 @Component({
   selector: 'vm-form-dialog',
-  imports: [TranslocoPipe, ZardButtonComponent, ZardDialogImports],
+  imports: [TranslocoPipe, VmButton, ZardDialogImports],
   changeDetection: ChangeDetectionStrategy.OnPush,
   // The dialog renders in an overlay; its host must not take up space (or a gap) in the page.
   host: { style: 'display: contents' },
@@ -36,9 +36,9 @@ let nextId = 0;
       </form>
 
       <z-dialog-footer>
-        <button z-button zType="secondary" type="button" (click)="open.set(false)">{{ (submitKey() ? 'common.cancel' : 'common.close') | transloco }}</button>
+        <button vm-button variant="tonal" type="button" (click)="open.set(false)">{{ (submitKey() ? 'common.cancel' : 'common.close') | transloco }}</button>
         @if (submitKey(); as submit) {
-          <button z-button type="submit" [attr.form]="formId" [zLoading]="busy()" [zDisabled]="busy() || !canSubmit()">{{ submit | transloco }}</button>
+          <button vm-button type="submit" [attr.form]="formId" [zLoading]="busy()" [zDisabled]="busy() || !canSubmit()">{{ submit | transloco }}</button>
         }
       </z-dialog-footer>
     </z-dialog>

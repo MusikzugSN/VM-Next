@@ -5,7 +5,7 @@ import { NgIcon, provideIcons } from '@ng-icons/core';
 import { lucidePlus, lucideRotateCcw, lucideX } from '@ng-icons/lucide';
 import { apiUrl, ensemblePrintRulesResponseSchema, printRulesSchema, type PrintMode, type PrintRule } from '@vm-web/shared';
 
-import { ZardButtonComponent } from '@vm-web/ui/zard/components/button';
+import { VmButton, VmIconButton } from '@vm-web/ui';
 import { ZardInputComponent } from '@vm-web/ui/zard/components/input';
 import { ZardNativeSelectDirective } from '@vm-web/ui/zard/components/native-select';
 
@@ -32,7 +32,7 @@ export function ruleEnd(rules: readonly PrintRule[], index: number): number | nu
  */
 @Component({
   selector: 'vm-print-rules-tab',
-  imports: [NgIcon, TranslocoPipe, ZardButtonComponent, ZardInputComponent, ZardNativeSelectDirective, PageProblem],
+  imports: [NgIcon, TranslocoPipe, VmButton, VmIconButton, ZardInputComponent, ZardNativeSelectDirective, PageProblem],
   viewProviders: [provideIcons({ lucidePlus, lucideX, lucideRotateCcw })],
   changeDetection: ChangeDetectionStrategy.OnPush,
   host: { class: 'flex flex-col gap-4' },
@@ -50,11 +50,11 @@ export function ruleEnd(rules: readonly PrintRule[], index: number): number | nu
           @if (canEdit()) {
             <div class="flex flex-col gap-2 md:flex-row">
               @if (info.own) {
-                <button z-button zType="outline" type="button" (click)="reset()">
+                <button vm-button variant="outlined" type="button" (click)="reset()">
                   <ng-icon name="lucideRotateCcw" aria-hidden="true" />{{ 'system.printRules.reset' | transloco }}
                 </button>
               }
-              <button z-button type="button" [zDisabled]="!dirty() || !valid()" (click)="save()">{{ 'common.save' | transloco }}</button>
+              <button vm-button type="button" [zDisabled]="!dirty() || !valid()" (click)="save()">{{ 'common.save' | transloco }}</button>
             </div>
           }
         </div>
@@ -134,7 +134,7 @@ export function ruleEnd(rules: readonly PrintRule[], index: number): number | nu
                   @if (canEdit()) {
                     <td class="px-4 py-2">
                       @if (!first) {
-                        <button z-button zType="ghost" zSize="icon" type="button" (click)="remove(i)" [attr.aria-label]="'system.printRules.remove' | transloco: { range: rangeLabel(rule.fromPages, end) }">
+                        <button vm-icon-button type="button" (click)="remove(i)" [attr.aria-label]="'system.printRules.remove' | transloco: { range: rangeLabel(rule.fromPages, end) }">
                           <ng-icon name="lucideX" aria-hidden="true" />
                         </button>
                       }
@@ -146,7 +146,7 @@ export function ruleEnd(rules: readonly PrintRule[], index: number): number | nu
           </table>
         </div>
         @if (canEdit()) {
-          <button z-button zType="outline" type="button" class="self-start" [zDisabled]="draft().length >= 20" (click)="add()">
+          <button vm-button variant="outlined" type="button" class="self-start" [zDisabled]="draft().length >= 20" (click)="add()">
             <ng-icon name="lucidePlus" aria-hidden="true" />{{ 'system.printRules.add' | transloco }}
           </button>
           @if (!valid()) {

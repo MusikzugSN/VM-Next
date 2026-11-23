@@ -16,7 +16,7 @@ import {
 import { of } from 'rxjs';
 
 import { ZardAlertDialogService } from '@vm-web/ui/zard/components/alert-dialog';
-import { ZardButtonComponent } from '@vm-web/ui/zard/components/button';
+import { VmButton } from '@vm-web/ui';
 import { ZardInputComponent } from '@vm-web/ui/zard/components/input';
 
 import { ApiClient } from '../../core/api/api-client';
@@ -34,7 +34,7 @@ export type TagKind = 'club' | 'personal';
 /** Tags (M-8): club tags and own personal tags as filters; selecting one lists its scores. */
 @Component({
   selector: 'vm-me-tags-page',
-  imports: [RouterLink, NgIcon, TranslocoPipe, ZardButtonComponent, ZardInputComponent, ListState, MemberScoreList, NameDialog],
+  imports: [RouterLink, NgIcon, TranslocoPipe, VmButton, ZardInputComponent, ListState, MemberScoreList, NameDialog],
   viewProviders: [provideIcons({ lucidePlus, lucideSearch, lucidePencil, lucideTrash2 })],
   changeDetection: ChangeDetectionStrategy.OnPush,
   templateUrl: './tags-page.html',

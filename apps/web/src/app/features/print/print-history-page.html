@@ -35,14 +35,14 @@
           {{ 'print.history.steps.origin' | transloco }}
           <span class="flex flex-wrap items-center gap-2">
             <code class="rounded-md bg-muted px-3 py-2 font-mono text-[13px]">{{ origin }}</code>
-            <button z-button zType="ghost" type="button" (click)="copyOrigin()">
+            <button vm-button variant="text" type="button" (click)="copyOrigin()">
               <ng-icon name="lucideCopy" aria-hidden="true" />{{ 'print.history.copy' | transloco }}
             </button>
           </span>
         </li>
         <li>{{ 'print.history.steps.start' | transloco }}</li>
       </ol>
-      <button z-button zType="outline" type="button" class="self-start" (click)="refresh()">
+      <button vm-button variant="outlined" type="button" class="self-start" (click)="refresh()">
         <ng-icon name="lucideRepeat" aria-hidden="true" />{{ 'print.history.recheck' | transloco }}
       </button>
     </section>
@@ -124,11 +124,11 @@
 
 <ng-template #actions let-job>
   @if (isRunning($any(job).status)) {
-    <button z-button zType="ghost" type="button" (click)="cancel(job)" [attr.aria-label]="('print.history.cancel' | transloco) + ': ' + $any(job).source.title">
+    <button vm-button variant="text" type="button" (click)="cancel(job)" [attr.aria-label]="('print.history.cancel' | transloco) + ': ' + $any(job).source.title">
       <ng-icon name="lucideX" aria-hidden="true" />{{ 'print.history.cancel' | transloco }}
     </button>
   } @else if (canRetry($any(job).status)) {
-    <button z-button zType="ghost" type="button" (click)="retry(job)" [attr.aria-label]="('print.history.retry' | transloco) + ': ' + $any(job).source.title">
+    <button vm-button variant="text" type="button" (click)="retry(job)" [attr.aria-label]="('print.history.retry' | transloco) + ': ' + $any(job).source.title">
       <ng-icon name="lucideRepeat" aria-hidden="true" />{{ 'print.history.retry' | transloco }}
     </button>
   }

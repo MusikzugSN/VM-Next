@@ -16,7 +16,7 @@ import {
   type MemberSheet,
 } from '@vm-web/shared';
 
-import { ZardButtonComponent } from '@vm-web/ui/zard/components/button';
+import { VmButton } from '@vm-web/ui';
 import { ZardDropdownImports } from '@vm-web/ui/zard/components/dropdown/dropdown.imports';
 import { ZardSheetImports } from '@vm-web/ui/zard/components/sheet/sheet.imports';
 
@@ -42,7 +42,7 @@ import { valueOr } from '../../core/util/resource-value';
     RouterLink,
     NgIcon,
     TranslocoPipe,
-    ZardButtonComponent,
+    VmButton,
     ZardDropdownImports,
     ZardSheetImports,
     PdfViewer,

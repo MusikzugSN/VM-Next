@@ -16,7 +16,7 @@ import {
   type ScoreCompletenessResponse,
 } from '@vm-web/shared';
 
-import { ZardButtonComponent } from '@vm-web/ui/zard/components/button';
+import { VmButton, VmIconButton } from '@vm-web/ui';
 import { ZardDialogImports } from '@vm-web/ui/zard/components/dialog/dialog.imports';
 import { ZardNativeSelectDirective } from '@vm-web/ui/zard/components/native-select';
 
@@ -71,7 +71,7 @@ export function groupCompleteness(
     NgIcon,
     TranslocoPipe,
     PluralPipe,
-    ZardButtonComponent,
+    VmButton, VmIconButton,
     ZardDialogImports,
     ZardNativeSelectDirective,
     PdfViewer,

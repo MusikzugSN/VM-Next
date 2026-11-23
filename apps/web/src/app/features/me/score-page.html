@@ -50,7 +50,7 @@
     </section>
 
     @if (viewport.isMobile()) {
-      <button z-button zType="outline" type="button" class="w-full" (click)="detailsOpen.set(true)">{{ 'me.score.details' | transloco }}</button>
+      <button vm-button variant="outlined" type="button" class="w-full" (click)="detailsOpen.set(true)">{{ 'me.score.details' | transloco }}</button>
       <z-sheet [(zVisible)]="detailsOpen" zSide="bottom" class="max-h-[85dvh] rounded-t-2xl">
         <z-sheet-header>
           <h2 z-sheet-title>{{ score.title }}</h2>
@@ -70,18 +70,18 @@
     <div class="flex flex-col gap-6">
       <div class="flex flex-col gap-2">
         @if (downloadUrl(); as url) {
-          <a z-button [href]="url" download class="w-full"><ng-icon name="lucideDownload" aria-hidden="true" />{{ 'common.download' | transloco }}</a>
-          <button z-button zType="outline" type="button" class="w-full" (click)="print()">
+          <a vm-button [href]="url" download class="w-full"><ng-icon name="lucideDownload" aria-hidden="true" />{{ 'common.download' | transloco }}</a>
+          <button vm-button variant="outlined" type="button" class="w-full" (click)="print()">
             <ng-icon name="lucidePrinter" aria-hidden="true" />{{ 'common.print' | transloco }}
           </button>
         }
         @if (canUpload()) {
           @for (voice of score.missingVoices; track voice.id) {
-            <button z-button zType="outline" type="button" class="w-full" (click)="upload(voice.id)">
+            <button vm-button variant="outlined" type="button" class="w-full" (click)="upload(voice.id)">
               <ng-icon name="lucideUpload" aria-hidden="true" />{{ 'me.score.uploadMissing' | transloco: { voice: voice.name } }}
             </button>
           }
-          <button z-button zType="ghost" type="button" class="w-full" (click)="upload()">
+          <button vm-button variant="text" type="button" class="w-full" (click)="upload()">
             <ng-icon name="lucideUpload" aria-hidden="true" />{{ 'me.score.uploadOther' | transloco }}
           </button>
         }

@@ -3,18 +3,18 @@ import { TranslocoPipe } from '@jsverse/transloco';
 import { NgIcon, provideIcons } from '@ng-icons/core';
 import { lucideX } from '@ng-icons/lucide';
 
-import { ZardButtonComponent } from '@vm-web/ui/zard/components/button';
+import { VmButton, VmIconButton } from '@vm-web/ui';
 
 import { PluralPipe } from '../../core/i18n/plural.pipe';
 
 /**
  * Floating bar for actions on selected list rows (M-6, M-7): appears at the bottom while something
  * is selected, above the phone navigation. It floats, so the list does not move when it appears.
- * The actions are projected: `<vm-selection-bar [count]="n" (cleared)="…"><button z-button …>`.
+ * The actions are projected: `<vm-selection-bar [count]="n" (cleared)="…"><button vm-button …>`.
  */
 @Component({
   selector: 'vm-selection-bar',
-  imports: [NgIcon, TranslocoPipe, PluralPipe, ZardButtonComponent],
+  imports: [NgIcon, TranslocoPipe, PluralPipe, VmButton, VmIconButton],
   viewProviders: [provideIcons({ lucideX })],
   changeDetection: ChangeDetectionStrategy.OnPush,
   host: { style: 'display: contents' },
@@ -27,7 +27,7 @@ import { PluralPipe } from '../../core/i18n/plural.pipe';
       >
         <span class="flex-1 font-medium whitespace-nowrap md:me-4" aria-live="polite">{{ 'common.selection.count' | tPlural: count() }}</span>
         <ng-content />
-        <button z-button zType="ghost" zSize="icon" type="button" (click)="cleared.emit()" [attr.aria-label]="'common.selection.clear' | transloco">
+        <button vm-icon-button type="button" (click)="cleared.emit()" [attr.aria-label]="'common.selection.clear' | transloco">
           <ng-icon name="lucideX" aria-hidden="true" />
         </button>
       </div>

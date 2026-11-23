@@ -6,7 +6,7 @@
     }
   </div>
   @if (canUpload()) {
-    <button z-button type="button" class="hidden md:inline-flex" (click)="upload()">
+    <button vm-button type="button" class="hidden md:inline-flex" (click)="upload()">
       <ng-icon name="lucideUpload" aria-hidden="true" />{{ 'me.start.uploadVoice' | transloco }}
     </button>
   }
@@ -99,7 +99,7 @@
 </section>
 
 @if (canUpload()) {
-  <button z-button type="button" class="w-full md:hidden" (click)="upload()">
+  <button vm-button type="button" class="w-full md:hidden" (click)="upload()">
     <ng-icon name="lucideUpload" aria-hidden="true" />{{ 'me.start.uploadVoice' | transloco }}
   </button>
 }

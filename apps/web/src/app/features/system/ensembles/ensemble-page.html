@@ -37,7 +37,7 @@
             <span class="font-medium">{{ e.name }}</span>
           </div>
           @if (canEdit()) {
-            <button z-button zType="outline" type="button" (click)="renaming.set(true)">{{ 'common.rename' | transloco }}</button>
+            <button vm-button variant="outlined" type="button" (click)="renaming.set(true)">{{ 'common.rename' | transloco }}</button>
           }
         </div>
         <vm-name-dialog [(open)]="renaming" titleKey="common.rename" labelKey="system.common.name" submitKey="common.save" [initial]="e.name" [save]="rename" />
@@ -79,10 +79,10 @@
           </div>
           @if (canEdit()) {
             <div class="flex flex-col gap-2 md:flex-row">
-              <button z-button zType="outline" type="button" (click)="applyTemplate()">
+              <button vm-button variant="outlined" type="button" (click)="applyTemplate()">
                 <ng-icon name="lucideWandSparkles" aria-hidden="true" />{{ 'system.ensemble.template' | transloco }}
               </button>
-              <button z-button type="button" [zDisabled]="!lineupDirty()" (click)="saveLineup()">{{ 'common.save' | transloco }}</button>
+              <button vm-button type="button" [zDisabled]="!lineupDirty()" (click)="saveLineup()">{{ 'common.save' | transloco }}</button>
             </div>
           }
         </div>

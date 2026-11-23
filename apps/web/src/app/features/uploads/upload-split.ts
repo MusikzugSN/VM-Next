@@ -17,7 +17,7 @@ import { NgIcon, provideIcons } from '@ng-icons/core';
 import { lucideCircleAlert, lucideScissors, lucideX } from '@ng-icons/lucide';
 import type { PDFDocumentProxy } from 'pdfjs-dist';
 
-import { ZardButtonComponent } from '@vm-web/ui/zard/components/button';
+import { VmButton } from '@vm-web/ui';
 
 import { SessionStore } from '../../core/auth/session.store';
 import { VoiceContextStore } from '../../core/voices/voice-context.store';
@@ -59,7 +59,7 @@ const PAGE_WIDTH = 560;
  */
 @Component({
   selector: 'vm-upload-split',
-  imports: [NgIcon, TranslocoPipe, PluralPipe, ZardButtonComponent, ScoreSearchSelect, VoiceSelect],
+  imports: [NgIcon, TranslocoPipe, PluralPipe, VmButton, ScoreSearchSelect, VoiceSelect],
   viewProviders: [provideIcons({ lucideScissors, lucideX, lucideCircleAlert })],
   changeDetection: ChangeDetectionStrategy.OnPush,
   host: { class: 'flex min-h-0 flex-1 flex-col gap-4' },
@@ -145,7 +145,7 @@ const PAGE_WIDTH = 560;
               </div>
             }
             @if (currentPage() > 1 && c.section.start !== currentPage()) {
-              <button z-button zType="outline" type="button" (click)="startAt(currentPage())">
+              <button vm-button variant="outlined" type="button" (click)="startAt(currentPage())">
                 <ng-icon name="lucideScissors" aria-hidden="true" />{{ 'upload.split.newSection' | transloco: { page: currentPage() } }}
               </button>
             }
@@ -181,8 +181,8 @@ const PAGE_WIDTH = 560;
       } @else if (unassigned() > 0) {
         <p class="text-[13px] text-warning-ink md:me-auto">{{ 'upload.split.unassigned' | tPlural: unassigned() }}</p>
       }
-      <button z-button zType="secondary" type="button" [zDisabled]="working()" (click)="cancelled.emit()">{{ 'common.back' | transloco }}</button>
-      <button z-button type="button" [zLoading]="working()" [zDisabled]="working() || state() !== 'ready' || !partCount()" (click)="apply()">
+      <button vm-button variant="tonal" type="button" [zDisabled]="working()" (click)="cancelled.emit()">{{ 'common.back' | transloco }}</button>
+      <button vm-button type="button" [zLoading]="working()" [zDisabled]="working() || state() !== 'ready' || !partCount()" (click)="apply()">
         <ng-icon name="lucideScissors" aria-hidden="true" />{{ 'upload.split.apply' | tPlural: partCount() }}
       </button>
     </div>

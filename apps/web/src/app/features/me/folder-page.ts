@@ -7,7 +7,7 @@ import { NgIcon, provideIcons } from '@ng-icons/core';
 import { lucideChevronLeft, lucideFileArchive, lucidePrinter, lucideSearch, lucideX } from '@ng-icons/lucide';
 import { APP_ROUTES, apiUrl, myFolderOverviewResponseSchema, myFolderScoresResponseSchema } from '@vm-web/shared';
 
-import { ZardButtonComponent } from '@vm-web/ui/zard/components/button';
+import { VmButton } from '@vm-web/ui';
 import { ZardInputComponent } from '@vm-web/ui/zard/components/input';
 
 import { PrintLauncher } from '../../core/actions/pending-features';
@@ -30,7 +30,7 @@ import { selectOr } from '../../core/util/resource-value';
     RouterLink,
     NgIcon,
     TranslocoPipe,
-    ZardButtonComponent,
+    VmButton,
     ZardInputComponent,
     ListState,
     MemberScoreList,
@@ -57,10 +57,10 @@ import { selectOr } from '../../core/util/resource-value';
           </p>
         </div>
         <div class="flex flex-col gap-2 md:flex-row-reverse">
-          <a z-button [href]="zip()" download class="w-full md:w-auto">
+          <a vm-button [href]="zip()" download class="w-full md:w-auto">
             <ng-icon name="lucideFileArchive" aria-hidden="true" />{{ 'me.common.zip' | transloco }}
           </a>
-          <button z-button zType="outline" type="button" class="w-full md:w-auto" (click)="print()">
+          <button vm-button variant="outlined" type="button" class="w-full md:w-auto" (click)="print()">
             <ng-icon name="lucidePrinter" aria-hidden="true" />{{ 'common.print' | transloco }}
           </button>
         </div>

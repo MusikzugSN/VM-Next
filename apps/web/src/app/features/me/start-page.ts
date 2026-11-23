@@ -15,7 +15,7 @@ import {
   upcomingEventsResponseSchema,
 } from '@vm-web/shared';
 
-import { ZardButtonComponent } from '@vm-web/ui/zard/components/button';
+import { VmButton } from '@vm-web/ui';
 
 import { onUploadCompleted } from '../../core/actions/on-upload';
 import { UploadLauncher } from '../../core/actions/pending-features';
@@ -36,7 +36,7 @@ const POSTPONED_KEY = 'vmweb.voiceSelectionPostponed';
     RouterLink,
     NgIcon,
     TranslocoPipe,
-    ZardButtonComponent,
+    VmButton,
     EventDate,
     UploadStatusBadge,
     VoiceSelectionDialog,

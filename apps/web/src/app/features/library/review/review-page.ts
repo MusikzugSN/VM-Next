@@ -26,7 +26,7 @@ import {
 } from '@vm-web/shared';
 import { tap } from 'rxjs';
 
-import { ZardButtonComponent } from '@vm-web/ui/zard/components/button';
+import { VmButton, VmIconButton } from '@vm-web/ui';
 import { ZardTextareaComponent } from '@vm-web/ui/zard/components/textarea';
 
 import { ActionRunner } from '../../../core/actions/action-runner';
@@ -61,7 +61,7 @@ const ZOOM_STEPS = [0.5, 0.75, 1, 1.25, 1.5, 2];
     NgIcon,
     TranslocoPipe,
     PluralPipe,
-    ZardButtonComponent,
+    VmButton, VmIconButton,
     ZardTextareaComponent,
     ListState,
     PageProblem,

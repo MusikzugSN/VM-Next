@@ -14,7 +14,7 @@ import {
   type EnsembleListItem,
 } from '@vm-web/shared';
 
-import { ZardButtonComponent } from '@vm-web/ui/zard/components/button';
+import { VmButton } from '@vm-web/ui';
 import { ZardInputComponent } from '@vm-web/ui/zard/components/input';
 import { ZardNativeSelectDirective } from '@vm-web/ui/zard/components/native-select';
 
@@ -34,7 +34,7 @@ import { selectOr } from '../../../core/util/resource-value';
 /** Ensembles (S-2, F-3): the tree in pre-order, create below a parent, archive and restore. */
 @Component({
   selector: 'vm-system-ensembles-page',
-  imports: [ToggleField, TreeLabelPipe, RouterLink, NgIcon, TranslocoPipe, PluralPipe, ZardButtonComponent, ZardInputComponent, ZardNativeSelectDirective, ListState, ToggleSwitch, FormDialog],
+  imports: [ToggleField, TreeLabelPipe, RouterLink, NgIcon, TranslocoPipe, PluralPipe, VmButton, ZardInputComponent, ZardNativeSelectDirective, ListState, ToggleSwitch, FormDialog],
   viewProviders: [provideIcons({ lucidePlus, lucideArchive, lucideArchiveRestore })],
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
@@ -44,7 +44,7 @@ import { selectOr } from '../../../core/util/resource-value';
         <p class="mt-2 text-muted-foreground">{{ 'system.ensembles.intro' | transloco }}</p>
       </div>
       @if (canCreate()) {
-        <button z-button type="button" class="w-full md:w-auto" (click)="startCreate()">
+        <button vm-button type="button" class="w-full md:w-auto" (click)="startCreate()">
           <ng-icon name="lucidePlus" aria-hidden="true" />{{ 'system.ensembles.create' | transloco }}
         </button>
       }
@@ -98,11 +98,11 @@ import { selectOr } from '../../../core/util/resource-value';
           </span>
           @if (canEdit() && !e.isRoot) {
             @if (e.archived) {
-              <button z-button zType="ghost" type="button" (click)="setArchived(e, false)" [attr.aria-label]="'system.ensembles.unarchiveLabel' | transloco: { name: e.name }">
+              <button vm-button variant="text" type="button" (click)="setArchived(e, false)" [attr.aria-label]="'system.ensembles.unarchiveLabel' | transloco: { name: e.name }">
                 <ng-icon name="lucideArchiveRestore" aria-hidden="true" /><span class="hidden md:inline">{{ 'system.ensembles.unarchive' | transloco }}</span>
               </button>
             } @else {
-              <button z-button zType="ghost" type="button" (click)="setArchived(e, true)" [attr.aria-label]="'system.ensembles.archiveLabel' | transloco: { name: e.name }">
+              <button vm-button variant="text" type="button" (click)="setArchived(e, true)" [attr.aria-label]="'system.ensembles.archiveLabel' | transloco: { name: e.name }">
                 <ng-icon name="lucideArchive" aria-hidden="true" /><span class="hidden md:inline">{{ 'system.ensembles.archive' | transloco }}</span>
               </button>
             }

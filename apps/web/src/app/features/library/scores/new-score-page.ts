@@ -3,7 +3,7 @@ import { Router, RouterLink } from '@angular/router';
 import { TranslocoPipe } from '@jsverse/transloco';
 import { APP_ROUTES, apiUrl, appPath, createdResponseSchema } from '@vm-web/shared';
 
-import { ZardButtonComponent } from '@vm-web/ui/zard/components/button';
+import { VmButton } from '@vm-web/ui';
 
 import { ActionRunner } from '../../../core/actions/action-runner';
 import { fieldProblemHandler } from '../../../core/actions/field-problem-handler';
@@ -16,7 +16,7 @@ import { buildScoreBody, emptyScoreForm, type ScoreFormErrors, type ScoreFormInp
 /** Stück anlegen (N-1, N-2): form with fixed and custom fields; afterwards the new score opens. */
 @Component({
   selector: 'vm-library-new-score-page',
-  imports: [RouterLink, TranslocoPipe, ZardButtonComponent, ScoreForm],
+  imports: [RouterLink, TranslocoPipe, VmButton, ScoreForm],
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
     <form class="flex flex-col gap-6" novalidate (submit)="$event.preventDefault(); save()">
@@ -32,8 +32,8 @@ import { buildScoreBody, emptyScoreForm, type ScoreFormErrors, type ScoreFormInp
       <vm-score-form [(value)]="form" [errors]="errors()" />
 
       <div class="flex flex-col-reverse gap-2 md:flex-row md:justify-end">
-        <a z-button zType="secondary" [routerLink]="scoresPath">{{ 'common.cancel' | transloco }}</a>
-        <button z-button type="submit" [zLoading]="saving()" [zDisabled]="saving() || !options.fieldsLoaded()">
+        <a vm-button variant="tonal" [routerLink]="scoresPath">{{ 'common.cancel' | transloco }}</a>
+        <button vm-button type="submit" [zLoading]="saving()" [zDisabled]="saving() || !options.fieldsLoaded()">
           {{ 'library.form.saveScore' | transloco }}
         </button>
       </div>

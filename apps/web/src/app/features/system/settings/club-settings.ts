@@ -5,7 +5,7 @@ import { NgIcon, provideIcons } from '@ng-icons/core';
 import { lucideImageUp, lucideTrash2 } from '@ng-icons/lucide';
 import { apiUrl, LOGO_FILE_FIELD, LOGO_MAX_BYTES, LOGO_MIME_TYPES, updateClubBodySchema, type ConfigResponse } from '@vm-web/shared';
 
-import { ZardButtonComponent } from '@vm-web/ui/zard/components/button';
+import { VmButton } from '@vm-web/ui';
 import { ZardInputComponent } from '@vm-web/ui/zard/components/input';
 import { ZardSonnerService } from '@vm-web/ui/zard/components/sonner';
 import { ZardTextareaComponent } from '@vm-web/ui/zard/components/textarea';
@@ -28,7 +28,7 @@ type ClubErrors = Partial<Record<keyof ClubForm, string>>;
 /** Tab „Verein & Anmeldung“ (S-4, A-2, F-12): name, legal links, login banner, logo. */
 @Component({
   selector: 'vm-club-settings',
-  imports: [NgIcon, TranslocoPipe, ZardButtonComponent, ZardInputComponent, ZardTextareaComponent, ToggleSwitch],
+  imports: [NgIcon, TranslocoPipe, VmButton, ZardInputComponent, ZardTextareaComponent, ToggleSwitch],
   viewProviders: [provideIcons({ lucideImageUp, lucideTrash2 })],
   changeDetection: ChangeDetectionStrategy.OnPush,
   host: { class: 'flex flex-col gap-6' },
@@ -91,7 +91,7 @@ type ClubErrors = Partial<Record<keyof ClubForm, string>>;
         />
       </div>
       @if (!readonly()) {
-        <button z-button type="submit" class="self-end" [zLoading]="saving()" [zDisabled]="saving()">{{ 'common.save' | transloco }}</button>
+        <button vm-button type="submit" class="self-end" [zLoading]="saving()" [zDisabled]="saving()">{{ 'common.save' | transloco }}</button>
       }
     </form>
 
@@ -111,11 +111,11 @@ type ClubErrors = Partial<Record<keyof ClubForm, string>>;
         @if (!readonly()) {
           <div class="flex flex-col gap-2 md:flex-row">
             <input #file type="file" class="sr-only" tabindex="-1" aria-hidden="true" [accept]="accept" (change)="upload($any($event.target).files)" />
-            <button z-button zType="outline" type="button" [zLoading]="uploading()" [zDisabled]="uploading()" (click)="file.click()">
+            <button vm-button variant="outlined" type="button" [zLoading]="uploading()" [zDisabled]="uploading()" (click)="file.click()">
               <ng-icon name="lucideImageUp" aria-hidden="true" />{{ 'system.settings.club.uploadLogo' | transloco }}
             </button>
             @if (config().club.logoUrl) {
-              <button z-button zType="ghost" type="button" class="text-destructive-ink" (click)="removeLogo()">
+              <button vm-button variant="text" type="button" class="text-destructive-ink" (click)="removeLogo()">
                 <ng-icon name="lucideTrash2" aria-hidden="true" />{{ 'system.settings.club.removeLogo' | transloco }}
               </button>
             }

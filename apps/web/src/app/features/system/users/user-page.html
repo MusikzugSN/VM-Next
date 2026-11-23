@@ -42,7 +42,7 @@
             </select>
           </label>
           @if (canEdit()) {
-            <button z-button zType="ghost" zSize="icon" type="button" (click)="removeMembership(m.ensemble.id, m.ensemble.name)" [attr.aria-label]="'system.user.removeFrom' | transloco: { ensemble: m.ensemble.name }">
+            <button vm-icon-button type="button" (click)="removeMembership(m.ensemble.id, m.ensemble.name)" [attr.aria-label]="'system.user.removeFrom' | transloco: { ensemble: m.ensemble.name }">
               <ng-icon name="lucideX" aria-hidden="true" />
             </button>
           }
@@ -52,7 +52,7 @@
       }
     </ul>
     @if (canEdit() && freeEnsembles().length && options.hasValue()) {
-      <button z-button zType="outline" type="button" class="self-start" (click)="startAdd()">
+      <button vm-button variant="outlined" type="button" class="self-start" (click)="startAdd()">
         <ng-icon name="lucidePlus" aria-hidden="true" />{{ 'system.user.addMembership' | transloco }}
       </button>
       <vm-form-dialog
@@ -106,7 +106,7 @@
         <p class="text-muted-foreground">{{ 'system.user.voicesHint' | transloco: { name: u.name } }}</p>
       </div>
       @if (canEdit()) {
-        <button z-button type="button" [zDisabled]="!voicesDirty()" (click)="saveVoices()">{{ 'common.save' | transloco }}</button>
+        <button vm-button type="button" [zDisabled]="!voicesDirty()" (click)="saveVoices()">{{ 'common.save' | transloco }}</button>
       }
     </div>
     <div class="flex max-h-96 flex-col gap-3 overflow-y-auto">
@@ -151,18 +151,18 @@
       @if (canEdit()) {
         <p class="text-muted-foreground">{{ 'system.user.blockHint' | transloco: { name: u.name } }}</p>
         @if (u.status === 'active') {
-          <button z-button zType="outline" type="button" class="self-start" [zDisabled]="u.isAdmin && !u.canBeDemoted" (click)="setBlocked(true)">
+          <button vm-button variant="outlined" type="button" class="self-start" [zDisabled]="u.isAdmin && !u.canBeDemoted" (click)="setBlocked(true)">
             <ng-icon name="lucideLock" aria-hidden="true" />{{ 'system.user.block' | transloco }}
           </button>
         } @else {
-          <button z-button zType="outline" type="button" class="self-start" (click)="setBlocked(false)">
+          <button vm-button variant="outlined" type="button" class="self-start" (click)="setBlocked(false)">
             <ng-icon name="lucideLockOpen" aria-hidden="true" />{{ 'system.user.unblock' | transloco }}
           </button>
         }
       }
       @if (canDelete()) {
         <p class="text-muted-foreground">{{ 'system.user.deleteHint' | transloco }}</p>
-        <button z-button zType="destructive" type="button" class="self-start" [zDisabled]="u.isAdmin && !u.canBeDemoted" (click)="remove()">
+        <button vm-button variant="danger" type="button" class="self-start" [zDisabled]="u.isAdmin && !u.canBeDemoted" (click)="remove()">
           <ng-icon name="lucideTrash2" aria-hidden="true" />{{ 'system.user.delete' | transloco }}
         </button>
       }
