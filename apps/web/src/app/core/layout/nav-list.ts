@@ -58,7 +58,7 @@ import { canSee, isActive, NAV_SECTIONS } from './nav';
   template: `
     <nav [attr.aria-label]="'nav.label' | transloco" class="flex flex-col gap-0.5">
       @for (section of sections(); track section.labelKey; let first = $first) {
-        <h2 class="px-2 pb-1 text-label-medium text-muted-foreground" [class.pt-3]="!first">
+        <h2 class="px-spacing-md pb-1 text-label-medium text-on-surface-variant" [class.pt-3]="!first">
           {{ section.labelKey | transloco }}
         </h2>
         <ul class="flex flex-col gap-0.5">
@@ -67,17 +67,15 @@ import { canSee, isActive, NAV_SECTIONS } from './nav';
               <a
                 [routerLink]="item.path"
                 [attr.aria-current]="isActive(item, url()) ? 'page' : null"
-                [class.bg-primary-soft]="isActive(item, url())"
-                [class.text-primary]="isActive(item, url())"
-                [class.font-medium]="isActive(item, url())"
+                [class.bg-primary-container]="isActive(item, url())"
                 (click)="navigate.emit()"
-                class="flex h-control items-center gap-2 rounded-full px-2 text-foreground no-underline hover:bg-accent xl:h-control-compact"
+                class="flex h-control items-center gap-spacing-md rounded-full px-spacing-md text-label-large text-on-surface no-underline transition-colors hover:not-aria-[current=page]:bg-on-surface/8 aria-[current=page]:text-on-primary-container xl:h-control-compact"
               >
                 <ng-icon [name]="item.icon" size="var(--mat-sys-icon-size-md)" aria-hidden="true" />
                 <span class="flex-1">{{ item.labelKey | transloco }}</span>
                 @if (item.badge === 'review' && reviewCount() > 0) {
                   <span
-                    class="min-w-5 rounded-full bg-primary px-1.5 text-center text-label-medium leading-5 text-primary-foreground tabular-nums"
+                    class="min-w-5 rounded-full bg-primary px-1.5 text-center text-label-small leading-5 text-on-primary tabular-nums"
                   >
                     {{ reviewCount() }}
                     <span class="sr-only">{{ 'shell.pendingUploads' | transloco }}</span>
