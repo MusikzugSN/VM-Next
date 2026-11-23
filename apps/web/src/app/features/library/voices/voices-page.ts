@@ -4,7 +4,6 @@ import { TranslocoPipe } from '@jsverse/transloco';
 import { NgIcon, provideIcons } from '@ng-icons/core';
 import { lucideArrowDown, lucideArrowUp, lucidePencil, lucidePlus, lucideTrash2 } from '@ng-icons/lucide';
 import { apiUrl, voiceListResponseSchema, type VoiceListResponse } from '@vm-web/shared';
-import { firstValueFrom } from 'rxjs';
 
 import { ZardButtonComponent } from '@/shared/components/button';
 
@@ -19,6 +18,7 @@ import { SearchField } from '../../../shared/ui/search-field';
 import { VoiceDialog, type VoiceDialogTarget } from './voice-dialog';
 import { moveItem } from '../../../core/util/move-item';
 import { filterGroups } from '../../../core/voices/voice-groups';
+import { selectOr } from '../../../core/util/resource-value';
 
 type Group = VoiceListResponse['groups'][number];
 type Voice = Group['voices'][number];
@@ -48,7 +48,7 @@ export class VoicesPage {
   protected readonly canDelete = computed(() => this.session.can('voice.delete'));
 
   protected readonly list = rxResource({ stream: () => this.api.get(apiUrl('voices', 'voiceList'), voiceListResponseSchema) });
-  protected readonly groups = computed(() => (this.list.hasValue() ? this.list.value().groups : []));
+  protected readonly groups = computed(() => selectOr(this.list, (v) => v.groups, []));
   protected readonly search = signal('');
   protected readonly shown = computed(() => filterVoiceList(this.groups(), this.search()));
   protected readonly voiceCount = computed(() => this.groups().reduce((sum, g) => sum + g.voices.length, 0));
@@ -71,8 +71,7 @@ export class VoicesPage {
   }
 
   protected async remove(voice: Voice): Promise<void> {
-    if (!(await this.confirm.confirmDelete('library.voices.deleteTitle', 'library.voices.deleteText', { name: voice.name }))) return;
-    const done = await this.actions.run(() => firstValueFrom(this.api.postVoid(apiUrl('voices', 'deleteVoice', { voiceId: voice.id }))), {
+    const done = await this.confirm.confirmedDelete('library.voices.deleteTitle', 'library.voices.deleteText', { name: voice.name }, () => this.api.postVoid(apiUrl('voices', 'deleteVoice', { voiceId: voice.id })), {
       success: { key: 'library.voices.deleted', params: { name: voice.name } },
     });
     if (done) this.list.reload();
@@ -86,8 +85,8 @@ export class VoicesPage {
   protected readonly renameInstrument = async (name: string): Promise<boolean> => {
     const group = this.renaming();
     if (!group) return false;
-    const done = await this.actions.run(() =>
-      firstValueFrom(this.api.postVoid(apiUrl('voices', 'renameInstrument', { instrumentId: group.instrument.id }), { name })),
+    const done = await this.actions.runOnce(() =>
+      this.api.postVoid(apiUrl('voices', 'renameInstrument', { instrumentId: group.instrument.id }), { name }),
     );
     if (done) this.list.reload();
     return !!done;
@@ -95,14 +94,14 @@ export class VoicesPage {
 
   protected async moveInstrument(index: number, delta: -1 | 1): Promise<void> {
     const ids = moveItem(this.groups().map((g) => g.instrument.id), index, delta);
-    const done = await this.actions.run(() => firstValueFrom(this.api.postVoid(apiUrl('voices', 'reorderInstruments'), { instrumentIds: ids })));
+    const done = await this.actions.runOnce(() => this.api.postVoid(apiUrl('voices', 'reorderInstruments'), { instrumentIds: ids }));
     if (done) this.list.reload();
   }
 
   protected async moveVoice(group: Group, index: number, delta: -1 | 1): Promise<void> {
     const ids = moveItem(group.voices.map((v) => v.id), index, delta);
-    const done = await this.actions.run(() =>
-      firstValueFrom(this.api.postVoid(apiUrl('voices', 'reorderVoices', { instrumentId: group.instrument.id }), { voiceIds: ids })),
+    const done = await this.actions.runOnce(() =>
+      this.api.postVoid(apiUrl('voices', 'reorderVoices', { instrumentId: group.instrument.id }), { voiceIds: ids }),
     );
     if (done) this.list.reload();
   }

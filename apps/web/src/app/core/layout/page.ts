@@ -1,7 +1,8 @@
 import { DestroyRef, effect, inject, Injectable, signal } from '@angular/core';
 import { Title } from '@angular/platform-browser';
-import { TitleStrategy, type ActivatedRouteSnapshot, type RouterStateSnapshot } from '@angular/router';
+import { TitleStrategy, type ActivatedRouteSnapshot, type CanActivateFn, type Route, type RouterStateSnapshot } from '@angular/router';
 import { TranslocoService } from '@jsverse/transloco';
+import { childSegment, type AppPath } from '@vm-web/shared';
 
 import { BrandingStore } from '../branding/branding.store';
 
@@ -77,4 +78,15 @@ function deepestPageData(route: ActivatedRouteSnapshot): PageData | null {
     if (typeof data.titleKey === 'string') found = data as PageData;
   }
   return found;
+}
+
+/**
+ * Route builder for the pages of one feature area: path below `root`, one guard, title and
+ * breadcrumbs (section plus the list page from `parents`).
+ */
+export function guardedPageFactory(root: AppPath, section: Crumb, parents: Partial<Record<AppPath, Crumb>>) {
+  return (path: AppPath, titleKey: string, guard: CanActivateFn, loadComponent: Route['loadComponent']): Route => {
+    const meta = page(titleKey, section, parents[path]);
+    return { path: childSegment(path, root), canActivate: [guard], title: meta.title, data: meta.data, loadComponent };
+  };
 }

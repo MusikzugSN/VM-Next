@@ -22,7 +22,7 @@ import { ZardButtonComponent } from '@/shared/components/button';
 import { SessionStore } from '../../core/auth/session.store';
 import { VoiceContextStore } from '../../core/voices/voice-context.store';
 import { PluralPipe } from '../../core/i18n/plural.pipe';
-import { loadPdfJs, PDFJS_BASE } from '../../shared/ui/pdf-viewer';
+import { loadPdfJs, PDFJS_ASSETS } from '../../shared/ui/pdf-viewer';
 import { ScoreSearchSelect, type ChosenScore } from '../../shared/ui/score-search-select';
 import { VoiceSelect } from '../../shared/ui/voice-select';
 import {
@@ -333,9 +333,7 @@ export class UploadSplit {
       // pdf.js takes over (detaches) the buffer it gets, so it reads a copy.
       this.doc = await lib.getDocument({
         data: new Uint8Array(this.bytes.slice(0)),
-        wasmUrl: `${PDFJS_BASE}/wasm/`,
-        standardFontDataUrl: `${PDFJS_BASE}/standard_fonts/`,
-        cMapUrl: `${PDFJS_BASE}/cmaps/`,
+        ...PDFJS_ASSETS,
       }).promise;
       this.sections.set(firstSection(this.preset()));
       this.pageCount.set(this.doc.numPages);
