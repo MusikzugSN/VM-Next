@@ -22,6 +22,7 @@ import {
   voiceSubstitutes,
 } from '../db/schema';
 import type { SheetRow } from './sheet-resolution';
+import { replaceRows } from '../db/table-helpers';
 
 /** `( $1, $2, … )` for `in` lists; callers guarantee a non-empty list. */
 const list = (ids: readonly string[]): SQL => sql`(${sql.join(ids.map((id) => sql`${id}::uuid`), sql`, `)})`;
@@ -191,10 +192,7 @@ export class MeRepository {
 
   async replaceProfileVoices(userId: string, voiceIds: readonly string[]): Promise<void> {
     await this.db.transaction(async (tx) => {
-      await tx.delete(userVoices).where(eq(userVoices.userId, userId));
-      if (voiceIds.length) {
-        await tx.insert(userVoices).values(voiceIds.map((voiceId, position) => ({ userId, voiceId, position })));
-      }
+      await replaceRows(tx, userVoices, eq(userVoices.userId, userId), voiceIds.map((voiceId, position) => ({ userId, voiceId, position })));
     });
   }
 

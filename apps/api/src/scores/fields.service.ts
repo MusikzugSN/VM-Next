@@ -7,6 +7,7 @@ import { isUniqueViolation } from '../db/db-errors';
 import { fieldDefinitions, fieldOptions, scores } from '../db/schema';
 import { pruneValues, type FieldDef } from './custom-fields';
 import { ScoresRepository } from './scores.repository';
+import { assertPermutation, nextPosition, replaceRows } from '../db/table-helpers';
 
 const WITH_OPTIONS = new Set(['select', 'multiselect']);
 
@@ -25,8 +26,7 @@ export class FieldsService {
     const id = uuidv7();
     await this.unique(() =>
       this.repo.db.transaction(async (tx) => {
-        const [{ next }] = await tx.select({ next: sql<number>`coalesce(max(${fieldDefinitions.position}) + 1, 0)::int` }).from(fieldDefinitions);
-        await tx.insert(fieldDefinitions).values({ id, name: body.name, type: body.type, required: body.required, position: next });
+        await tx.insert(fieldDefinitions).values({ id, name: body.name, type: body.type, required: body.required, position: await nextPosition(tx, fieldDefinitions.position) });
         if (body.options.length) {
           await tx.insert(fieldOptions).values(body.options.map((o, position) => ({ id: uuidv7(), fieldId: id, label: o.label, position })));
         }
@@ -54,8 +54,7 @@ export class FieldsService {
       this.repo.db.transaction(async (tx) => {
         await tx.update(fieldDefinitions).set({ name: body.name, required: body.required }).where(eq(fieldDefinitions.id, fieldId));
         const options = body.options.map((o, position) => ({ id: o.id ?? uuidv7(), label: o.label, position }));
-        await tx.delete(fieldOptions).where(eq(fieldOptions.fieldId, fieldId));
-        if (options.length) await tx.insert(fieldOptions).values(options.map((o) => ({ ...o, fieldId })));
+        await replaceRows(tx, fieldOptions, eq(fieldOptions.fieldId, fieldId), options.map((o) => ({ ...o, fieldId })));
 
         // remove values of deleted options (N-2)
         const updated: FieldDef = { ...def, name: body.name, required: body.required, options };
@@ -93,8 +92,7 @@ export class FieldsService {
   async reorder(fieldIds: readonly string[]): Promise<void> {
     await this.repo.db.transaction(async (tx) => {
       const current = await tx.select({ id: fieldDefinitions.id }).from(fieldDefinitions).orderBy(asc(fieldDefinitions.position));
-      const same = new Set(fieldIds).size === fieldIds.length && fieldIds.length === current.length && current.every((c) => fieldIds.includes(c.id));
-      if (!same) throw ProblemException.conflict('conflict', 'Field list incomplete or outdated');
+      assertPermutation(current.map((c) => c.id), fieldIds, 'Field list incomplete or outdated');
       for (const [position, id] of fieldIds.entries()) {
         await tx.update(fieldDefinitions).set({ position }).where(eq(fieldDefinitions.id, id));
       }

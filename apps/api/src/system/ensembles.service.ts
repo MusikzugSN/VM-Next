@@ -20,6 +20,7 @@ import { clubSettings, ensembleLineupVoices, ensembles, memberships, roles, user
 import { likePattern } from '../me/me.repository';
 import { lineupTemplateFile } from '../seed/defaults';
 import { importLineupTemplate, loadLineupTemplate } from '../seed/lineup-template';
+import { replaceRows } from '../db/table-helpers';
 
 type Tx = Parameters<Parameters<Database['transaction']>[0]>[0];
 type EnsembleRecord = typeof ensembles.$inferSelect;
@@ -236,8 +237,7 @@ export class EnsemblesService {
 }
 
 async function setLineup(tx: Tx, ensembleId: string, voiceIds: readonly string[]): Promise<void> {
-  await tx.delete(ensembleLineupVoices).where(eq(ensembleLineupVoices.ensembleId, ensembleId));
-  if (voiceIds.length) await tx.insert(ensembleLineupVoices).values(voiceIds.map((voiceId, position) => ({ ensembleId, voiceId, position })));
+  await replaceRows(tx, ensembleLineupVoices, eq(ensembleLineupVoices.ensembleId, ensembleId), voiceIds.map((voiceId, position) => ({ ensembleId, voiceId, position })));
 }
 
 /** All descendants of an ensemble (not including itself). */

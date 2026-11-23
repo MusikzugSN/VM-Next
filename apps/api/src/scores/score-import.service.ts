@@ -9,7 +9,7 @@ import {
   type ScoreImportRow,
   type ValidationError,
 } from '@vm-web/shared';
-import { eq, inArray, sql } from 'drizzle-orm';
+import { eq, inArray } from 'drizzle-orm';
 import type { AccessContext } from '../access/access-context';
 import { uuidv7 } from '../common/ids/uuid-v7';
 import { naturalSortKey } from '../common/natural-sort';
@@ -19,6 +19,7 @@ import { assertActiveEnsemble } from '../library/library-helpers';
 import type { FieldDef } from './custom-fields';
 import { matchKey, parseDuration, parseLabels, parseScalar, parseText, type Parsed } from './score-import-values';
 import { ScoresRepository } from './scores.repository';
+import { nextPosition } from '../db/table-helpers';
 
 const FOLDER_NUMBER_MAX = 10;
 const INSERT_CHUNK = 500;
@@ -361,8 +362,7 @@ export class ScoreImportService {
   private async write(fields: Map<string, FieldPlan>, folderPlans: Map<string, FolderPlan>, states: Map<string, ScoreState>): Promise<void> {
     await this.repo.db.transaction(async (tx) => {
       // new fields and options (N-2)
-      const [{ next }] = await tx.select({ next: sql<number>`coalesce(max(${fieldDefinitions.position}) + 1, 0)::int` }).from(fieldDefinitions);
-      let position = next;
+      let position = await nextPosition(tx, fieldDefinitions.position);
       for (const field of fields.values()) {
         if (field.isNew) await tx.insert(fieldDefinitions).values({ id: field.id, name: field.name, type: field.type, required: false, position: position++ });
         if (!field.added.size) continue;
@@ -371,11 +371,8 @@ export class ScoreImportService {
           .map((o, i) => ({ id: o.id, fieldId: field.id, label: o.label, position: i }))
           .filter((o) => addedIds.has(o.id));
         if (!field.isNew) {
-          const [{ max }] = await tx
-            .select({ max: sql<number>`coalesce(max(${fieldOptions.position}) + 1, 0)::int` })
-            .from(fieldOptions)
-            .where(eq(fieldOptions.fieldId, field.id));
-          values.forEach((v, i) => (v.position = max + i));
+          const first = await nextPosition(tx, fieldOptions.position, eq(fieldOptions.fieldId, field.id));
+          values.forEach((v, i) => (v.position = first + i));
         }
         await tx.insert(fieldOptions).values(values);
       }

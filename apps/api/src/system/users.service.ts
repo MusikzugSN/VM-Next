@@ -15,6 +15,7 @@ import { httpUrlOrNull } from '../common/url';
 import { DATABASE, type Database } from '../db/database';
 import { ensembles, memberships, roles, users, userVoices, voices } from '../db/schema';
 import { likePattern } from '../me/me.repository';
+import { replaceRows } from '../db/table-helpers';
 
 type UserRecord = typeof users.$inferSelect;
 
@@ -93,8 +94,7 @@ export class UsersService {
     const unknown = voiceIds.map((id, i) => [id, i] as const).filter(([id]) => !found.has(id));
     if (unknown.length) throw ProblemException.validation(unknown.map(([, i]) => ({ path: `/body/voiceIds/${i}`, code: 'unknown_voice' })));
     await this.db.transaction(async (tx) => {
-      await tx.delete(userVoices).where(eq(userVoices.userId, userId));
-      if (unique.length) await tx.insert(userVoices).values(unique.map((voiceId, position) => ({ userId, voiceId, position })));
+      await replaceRows(tx, userVoices, eq(userVoices.userId, userId), unique.map((voiceId, position) => ({ userId, voiceId, position })));
     });
   }
 
