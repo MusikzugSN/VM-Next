@@ -13,7 +13,6 @@ import {
   userAssignmentOptionsResponseSchema,
   type EnsembleListItem,
 } from '@vm-web/shared';
-import { firstValueFrom } from 'rxjs';
 
 import { ZardButtonComponent } from '@/shared/components/button';
 import { ZardInputComponent } from '@/shared/components/input';
@@ -157,11 +156,9 @@ export class EnsemblesPage {
   }
 
   private async save(name: string): Promise<boolean> {
-    const done = await this.actions.run(
+    const done = await this.actions.send(
       () =>
-        firstValueFrom(
-          this.api.post(apiUrl('system', 'createEnsemble'), { name, parentId: this.newParentId(), applyLineupTemplate: this.applyTemplate() }, createdResponseSchema),
-        ),
+        this.api.post(apiUrl('system', 'createEnsemble'), { name, parentId: this.newParentId(), applyLineupTemplate: this.applyTemplate() }, createdResponseSchema),
       { success: { key: 'system.ensembles.created', params: { name } } },
     );
     if (done) this.changed();
@@ -170,7 +167,7 @@ export class EnsemblesPage {
 
   protected async setArchived(e: EnsembleListItem, archive: boolean): Promise<void> {
     const route = archive ? 'archiveEnsemble' : 'unarchiveEnsemble';
-    const done = await this.actions.run(() => firstValueFrom(this.api.postVoid(apiUrl('system', route, { ensembleId: e.id }))), {
+    const done = await this.actions.send(() => this.api.postVoid(apiUrl('system', route, { ensembleId: e.id })), {
       success: { key: archive ? 'system.ensembles.archivedDone' : 'system.ensembles.unarchivedDone', params: { name: e.name } },
     });
     if (done) this.changed();

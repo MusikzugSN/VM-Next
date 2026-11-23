@@ -2,7 +2,6 @@ import { ChangeDetectionStrategy, Component, inject, signal } from '@angular/cor
 import { Router, RouterLink } from '@angular/router';
 import { TranslocoPipe } from '@jsverse/transloco';
 import { APP_ROUTES, apiUrl, appPath, createdResponseSchema } from '@vm-web/shared';
-import { firstValueFrom } from 'rxjs';
 
 import { ZardButtonComponent } from '@/shared/components/button';
 
@@ -62,7 +61,7 @@ export class NewScorePage {
       return;
     }
     this.saving.set(true);
-    const done = await this.actions.run(() => firstValueFrom(this.api.post(apiUrl('scores', 'createScore'), body, createdResponseSchema)), {
+    const done = await this.actions.send(() => this.api.post(apiUrl('scores', 'createScore'), body, createdResponseSchema), {
       success: { key: 'library.form.created', params: { title: body.title } },
       onProblem: (problem) => {
         if (isApiProblem(problem) && problem.code === 'validation-failed') {

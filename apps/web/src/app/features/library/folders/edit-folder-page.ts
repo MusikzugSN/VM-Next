@@ -13,7 +13,7 @@ import {
   folderScoreCandidatesResponseSchema,
   type FolderEntry,
 } from '@vm-web/shared';
-import { firstValueFrom, type Observable } from 'rxjs';
+import { type Observable } from 'rxjs';
 
 import { ZardButtonComponent } from '@/shared/components/button';
 import { ZardInputComponent } from '@/shared/components/input';
@@ -106,16 +106,16 @@ export class EditFolderPage {
   protected async rename(name: string): Promise<void> {
     const current = this.details.hasValue() ? this.details.value().name : '';
     if (!name.trim() || name.trim() === current) return;
-    const done = await this.actions.run(
-      () => firstValueFrom(this.api.postVoid(apiUrl('folders', 'renameFolder', { folderId: this.folderId() }), { name: name.trim() })),
+    const done = await this.actions.send(
+      () => this.api.postVoid(apiUrl('folders', 'renameFolder', { folderId: this.folderId() }), { name: name.trim() }),
       { success: { key: 'library.common.savedName' } },
     );
     if (done) this.details.reload();
   }
 
   protected async setVisibility(show: boolean): Promise<void> {
-    const done = await this.actions.run(() =>
-      firstValueFrom(this.api.postVoid(apiUrl('folders', 'setVisibility', { folderId: this.folderId() }), { showInMyArea: show })),
+    const done = await this.actions.send(() =>
+      this.api.postVoid(apiUrl('folders', 'setVisibility', { folderId: this.folderId() }), { showInMyArea: show }),
     );
     if (done) this.details.reload();
   }
@@ -127,8 +127,8 @@ export class EditFolderPage {
       this.numberErrors.update((e) => ({ ...e, [entry.scoreId]: 'library.folder.numberRequired' }));
       return;
     }
-    const done = await this.actions.run(
-      () => firstValueFrom(this.api.postVoid(apiUrl('folders', 'setScoreNumber', { folderId: this.folderId() }), { scoreId: entry.scoreId, number })),
+    const done = await this.actions.send(
+      () => this.api.postVoid(apiUrl('folders', 'setScoreNumber', { folderId: this.folderId() }), { scoreId: entry.scoreId, number }),
       {
         onProblem: (problem) => {
           this.numberErrors.update((e) => ({ ...e, [entry.scoreId]: problemKey(problem) }));
@@ -147,11 +147,9 @@ export class EditFolderPage {
   }
 
   protected async add(picked: PickedScore): Promise<void> {
-    const done = await this.actions.run(
+    const done = await this.actions.send(
       () =>
-        firstValueFrom(
-          this.api.postVoid(apiUrl('folders', 'addScore', { folderId: this.folderId() }), { scoreId: picked.score.id, number: picked.number }),
-        ),
+        this.api.postVoid(apiUrl('folders', 'addScore', { folderId: this.folderId() }), { scoreId: picked.score.id, number: picked.number }),
       { success: { key: 'library.folder.added', params: { title: picked.score.title, number: picked.number } } },
     );
     if (done) {
@@ -161,8 +159,8 @@ export class EditFolderPage {
   }
 
   protected async remove(entry: FolderEntry): Promise<void> {
-    const done = await this.actions.run(
-      () => firstValueFrom(this.api.postVoid(apiUrl('folders', 'removeScore', { folderId: this.folderId() }), { scoreId: entry.scoreId })),
+    const done = await this.actions.send(
+      () => this.api.postVoid(apiUrl('folders', 'removeScore', { folderId: this.folderId() }), { scoreId: entry.scoreId }),
       { success: { key: 'library.folder.removed', params: { title: entry.title } } },
     );
     if (done) {
@@ -174,7 +172,7 @@ export class EditFolderPage {
   protected async deleteFolder(): Promise<void> {
     const name = this.details.hasValue() ? this.details.value().name : '';
     if (!(await this.confirm.confirmDelete('library.folders.deleteTitle', 'library.folders.deleteText', { name }))) return;
-    const done = await this.actions.run(() => firstValueFrom(this.api.postVoid(apiUrl('folders', 'deleteFolder', { folderId: this.folderId() }))), {
+    const done = await this.actions.send(() => this.api.postVoid(apiUrl('folders', 'deleteFolder', { folderId: this.folderId() })), {
       success: { key: 'library.folders.deleted', params: { name } },
     });
     if (done) void this.router.navigateByUrl(this.foldersPath);

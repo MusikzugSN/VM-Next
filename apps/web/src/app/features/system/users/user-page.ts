@@ -6,7 +6,6 @@ import { TranslocoPipe } from '@jsverse/transloco';
 import { NgIcon, provideIcons } from '@ng-icons/core';
 import { lucideCheck, lucideChevronLeft, lucideLock, lucideLockOpen, lucidePlus, lucideTrash2, lucideX } from '@ng-icons/lucide';
 import { APP_ROUTES, apiUrl, userAssignmentOptionsResponseSchema, userDetailsResponseSchema } from '@vm-web/shared';
-import { firstValueFrom } from 'rxjs';
 
 import { ZardButtonComponent } from '@/shared/components/button';
 import { ZardNativeSelectDirective } from '@/shared/components/native-select';
@@ -87,8 +86,8 @@ export class UserPage {
 
   protected async setRole(ensembleId: string, roleId: string): Promise<boolean> {
     if (!roleId) return false;
-    const done = await this.actions.run(
-      () => firstValueFrom(this.api.postVoid(apiUrl('system', 'setMembership', { userId: this.userId() }), { ensembleId, roleId })),
+    const done = await this.actions.send(
+      () => this.api.postVoid(apiUrl('system', 'setMembership', { userId: this.userId() }), { ensembleId, roleId }),
       { success: { key: 'system.user.roleSaved' } },
     );
     if (done) this.changed();
@@ -107,8 +106,8 @@ export class UserPage {
   }
 
   protected async removeMembership(ensembleId: string, name: string): Promise<void> {
-    const done = await this.actions.run(
-      () => firstValueFrom(this.api.postVoid(apiUrl('system', 'removeMembership', { userId: this.userId() }), { ensembleId })),
+    const done = await this.actions.send(
+      () => this.api.postVoid(apiUrl('system', 'removeMembership', { userId: this.userId() }), { ensembleId }),
       { success: { key: 'system.user.membershipRemoved', params: { name } } },
     );
     if (done) this.changed();
@@ -124,16 +123,16 @@ export class UserPage {
   }
 
   protected async saveVoices(): Promise<void> {
-    const done = await this.actions.run(
-      () => firstValueFrom(this.api.postVoid(apiUrl('system', 'setUserVoices', { userId: this.userId() }), { voiceIds: [...this.selectedVoices()] })),
+    const done = await this.actions.send(
+      () => this.api.postVoid(apiUrl('system', 'setUserVoices', { userId: this.userId() }), { voiceIds: [...this.selectedVoices()] }),
       { success: { key: 'system.user.voicesSaved' } },
     );
     if (done) this.details.reload();
   }
 
   protected async setAdmin(isAdmin: boolean): Promise<void> {
-    const done = await this.actions.run(
-      () => firstValueFrom(this.api.postVoid(apiUrl('system', 'setAdmin', { userId: this.userId() }), { isAdmin })),
+    const done = await this.actions.send(
+      () => this.api.postVoid(apiUrl('system', 'setAdmin', { userId: this.userId() }), { isAdmin }),
       { success: { key: isAdmin ? 'system.user.adminOn' : 'system.user.adminOff' } },
     );
     if (done) this.changed();
@@ -142,7 +141,7 @@ export class UserPage {
   protected async setBlocked(block: boolean): Promise<void> {
     const name = this.user()?.name ?? '';
     const route = block ? 'blockUser' : 'unblockUser';
-    const done = await this.actions.run(() => firstValueFrom(this.api.postVoid(apiUrl('system', route, { userId: this.userId() }))), {
+    const done = await this.actions.send(() => this.api.postVoid(apiUrl('system', route, { userId: this.userId() })), {
       success: { key: block ? 'system.user.blockedDone' : 'system.user.unblockedDone', params: { name } },
     });
     if (done) this.details.reload();
@@ -151,7 +150,7 @@ export class UserPage {
   protected async remove(): Promise<void> {
     const name = this.user()?.name ?? '';
     if (!(await this.confirm.confirmDelete('system.user.deleteTitle', 'system.user.deleteText', { name }))) return;
-    const done = await this.actions.run(() => firstValueFrom(this.api.postVoid(apiUrl('system', 'deleteUser', { userId: this.userId() }))), {
+    const done = await this.actions.send(() => this.api.postVoid(apiUrl('system', 'deleteUser', { userId: this.userId() })), {
       success: { key: 'system.user.deleted', params: { name } },
     });
     if (done) void this.router.navigateByUrl(this.usersPath);

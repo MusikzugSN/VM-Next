@@ -24,7 +24,7 @@ import {
   uploadDetailsResponseSchema,
   type ReviewQueueItem,
 } from '@vm-web/shared';
-import { firstValueFrom, tap } from 'rxjs';
+import { tap } from 'rxjs';
 
 import { ZardButtonComponent } from '@/shared/components/button';
 import { ZardTextareaComponent } from '@/shared/components/textarea';
@@ -212,15 +212,13 @@ export class ReviewPage {
     const voiceId = this.voiceId();
     if (!upload || !score || !voiceId || !this.canApprove()) return;
     this.busy.set(true);
-    const done = await this.actions.run(
+    const done = await this.actions.send(
       () =>
-        firstValueFrom(
-          this.api.post(
+        this.api.post(
             apiUrl('review', 'approve', { uploadId: upload.uploadId }),
             { scoreId: score.id, voiceId, pages: toTransforms(this.pages()), replaceExisting: this.replaceExisting() },
             approveUploadResponseSchema,
           ),
-        ),
       {
         success: { key: 'review.approved', params: { name: upload.fileName } },
         onProblem: (problem) => {
@@ -244,11 +242,9 @@ export class ReviewPage {
       return;
     }
     this.busy.set(true);
-    const done = await this.actions.run(
+    const done = await this.actions.send(
       () =>
-        firstValueFrom(
-          this.api.post(apiUrl('review', 'reject', { uploadId: upload.uploadId }), { reason: this.reason().trim() }, rejectUploadResponseSchema),
-        ),
+        this.api.post(apiUrl('review', 'reject', { uploadId: upload.uploadId }), { reason: this.reason().trim() }, rejectUploadResponseSchema),
       { success: { key: 'review.rejected', params: { name: upload.fileName } } },
     );
     this.busy.set(false);

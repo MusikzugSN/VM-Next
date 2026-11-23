@@ -4,7 +4,6 @@ import { TranslocoPipe, TranslocoService } from '@jsverse/transloco';
 import { NgIcon, provideIcons } from '@ng-icons/core';
 import { lucidePlus, lucideRotateCcw, lucideX } from '@ng-icons/lucide';
 import { apiUrl, ensemblePrintRulesResponseSchema, printRulesSchema, type PrintMode, type PrintRule } from '@vm-web/shared';
-import { firstValueFrom } from 'rxjs';
 
 import { ZardButtonComponent } from '@/shared/components/button';
 import { ZardInputComponent } from '@/shared/components/input';
@@ -235,15 +234,15 @@ export class PrintRulesTab {
   protected async save(): Promise<void> {
     const parsed = printRulesSchema.safeParse(this.draft());
     if (!parsed.success) return;
-    const done = await this.actions.run(
-      () => firstValueFrom(this.api.postVoid(apiUrl('system', 'setPrintRules', { ensembleId: this.ensembleId() }), { rules: parsed.data })),
+    const done = await this.actions.send(
+      () => this.api.postVoid(apiUrl('system', 'setPrintRules', { ensembleId: this.ensembleId() }), { rules: parsed.data }),
       { success: { key: 'system.printRules.saved' } },
     );
     if (done) this.data.reload();
   }
 
   protected async reset(): Promise<void> {
-    const done = await this.actions.run(() => firstValueFrom(this.api.postVoid(apiUrl('system', 'resetPrintRules', { ensembleId: this.ensembleId() }))), {
+    const done = await this.actions.send(() => this.api.postVoid(apiUrl('system', 'resetPrintRules', { ensembleId: this.ensembleId() })), {
       success: { key: 'system.printRules.resetDone' },
     });
     if (done) this.data.reload();

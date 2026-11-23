@@ -1,5 +1,6 @@
 import { inject, Injectable } from '@angular/core';
 import { TranslocoService } from '@jsverse/transloco';
+import { firstValueFrom, type Observable } from 'rxjs';
 
 import { ZardAlertDialogService } from '@/shared/components/alert-dialog';
 import { ZardSonnerService } from '@/shared/components/sonner';
@@ -37,6 +38,11 @@ export class ActionRunner {
       this.sonner.error(this.transloco.translate(isApiProblem(error) ? error.messageKey : 'errors.unknown'));
       return undefined;
     }
+  }
+
+  /** `run` for a single API request; the request is only built inside the error handling. */
+  send<T>(request: () => Observable<T>, options: RunOptions = {}): Promise<{ value: T } | undefined> {
+    return this.run(() => firstValueFrom(request()), options);
   }
 }
 

@@ -165,8 +165,8 @@ export class EditEventPage {
 
   protected async saveSetlist(): Promise<void> {
     const scoreIds = this.items().map((i) => i.scoreId);
-    const done = await this.actions.run(
-      () => firstValueFrom(this.api.postVoid(apiUrl('events', 'setSetlist', { eventId: this.eventId() }), { scoreIds })),
+    const done = await this.actions.send(
+      () => this.api.postVoid(apiUrl('events', 'setSetlist', { eventId: this.eventId() }), { scoreIds }),
       { success: { key: 'library.event.setlistSaved' } },
     );
     if (done) this.saved.set(scoreIds);
@@ -175,16 +175,16 @@ export class EditEventPage {
   protected async saveDetails(): Promise<void> {
     const body = { name: this.name().trim(), date: this.date() };
     if (!body.name || !body.date) return;
-    const done = await this.actions.run(
-      () => firstValueFrom(this.api.postVoid(apiUrl('events', 'updateDetails', { eventId: this.eventId() }), body)),
+    const done = await this.actions.send(
+      () => this.api.postVoid(apiUrl('events', 'updateDetails', { eventId: this.eventId() }), body),
       { success: { key: 'library.form.saved' } },
     );
     if (done) this.details.reload();
   }
 
   protected async setVisibility(show: boolean): Promise<void> {
-    const done = await this.actions.run(() =>
-      firstValueFrom(this.api.postVoid(apiUrl('events', 'setVisibility', { eventId: this.eventId() }), { showInMyArea: show })),
+    const done = await this.actions.send(() =>
+      this.api.postVoid(apiUrl('events', 'setVisibility', { eventId: this.eventId() }), { showInMyArea: show }),
     );
     if (done) this.details.reload();
   }
@@ -192,7 +192,7 @@ export class EditEventPage {
   protected async deleteEvent(): Promise<void> {
     const name = this.details.hasValue() ? this.details.value().name : '';
     if (!(await this.confirm.confirmDelete('library.events.deleteTitle', 'library.events.deleteText', { name }))) return;
-    const done = await this.actions.run(() => firstValueFrom(this.api.postVoid(apiUrl('events', 'deleteEvent', { eventId: this.eventId() }))), {
+    const done = await this.actions.send(() => this.api.postVoid(apiUrl('events', 'deleteEvent', { eventId: this.eventId() })), {
       success: { key: 'library.events.deleted', params: { name } },
     });
     if (done) void this.router.navigateByUrl(this.eventsPath);

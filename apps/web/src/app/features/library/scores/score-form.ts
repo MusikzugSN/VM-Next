@@ -3,7 +3,6 @@ import { TranslocoPipe } from '@jsverse/transloco';
 import { NgIcon, provideIcons } from '@ng-icons/core';
 import { lucidePlus } from '@ng-icons/lucide';
 import { apiUrl, createdResponseSchema, type FieldDefinition } from '@vm-web/shared';
-import { firstValueFrom } from 'rxjs';
 
 import { ZardButtonComponent } from '@/shared/components/button';
 import { ZardInputComponent } from '@/shared/components/input';
@@ -78,7 +77,7 @@ export class ScoreForm {
 
   /** „Feld hinzufügen“ (N-2): creates the custom field for all scores right from the form. */
   protected readonly createField = async (value: FieldDialogValue): Promise<boolean> => {
-    const done = await this.actions.run(() => firstValueFrom(this.api.post(apiUrl('scores', 'createField'), value, createdResponseSchema)), {
+    const done = await this.actions.send(() => this.api.post(apiUrl('scores', 'createField'), value, createdResponseSchema), {
       success: { key: 'library.form.fieldCreated', params: { name: value.name } },
     });
     if (done) this.options.reloadFields();
