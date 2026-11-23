@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, Component, computed, effect, inject, input, model, output, signal, untracked } from '@angular/core';
+import { ChangeDetectionStrategy, Component, computed, inject, input, model, output, signal } from '@angular/core';
 import { TranslocoPipe } from '@jsverse/transloco';
 import { NgIcon, provideIcons } from '@ng-icons/core';
 import { lucideArrowDown, lucideArrowUp, lucideCheck, lucideX } from '@ng-icons/lucide';
@@ -19,6 +19,7 @@ import { focusFirstInvalid } from '../../../core/util/focus-invalid';
 import { ApiClient } from '../../../core/api/api-client';
 import { isApiProblem } from '../../../core/api/api-problem';
 import { instrumentFromVoiceName } from './voice-name';
+import { onOpened } from '../../../core/util/on-opened';
 
 type Voice = VoiceListResponse['groups'][number]['voices'][number];
 
@@ -89,17 +90,14 @@ export class VoiceDialog {
   });
 
   constructor() {
-    effect(() => {
-      if (!this.open()) return;
-      untracked(() => {
-        const target = this.target();
-        // Editing keeps the current instrument; a new voice derives it from the name.
-        this.override.set(target?.instrumentName ?? null);
-        this.choosing.set(false);
-        this.name.set(target?.voice.name ?? '');
-        this.substitutes.set(target?.voice.substitutes.map((s) => ({ id: s.id, name: s.name })) ?? []);
-        this.errors.set({});
-      });
+    onOpened(this.open, () => {
+      const target = this.target();
+      // Editing keeps the current instrument; a new voice derives it from the name.
+      this.override.set(target?.instrumentName ?? null);
+      this.choosing.set(false);
+      this.name.set(target?.voice.name ?? '');
+      this.substitutes.set(target?.voice.substitutes.map((s) => ({ id: s.id, name: s.name })) ?? []);
+      this.errors.set({});
     });
   }
 

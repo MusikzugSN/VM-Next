@@ -1,9 +1,10 @@
-import { ChangeDetectionStrategy, Component, effect, input, model, signal, untracked } from '@angular/core';
+import { ChangeDetectionStrategy, Component, input, model, signal } from '@angular/core';
 import { TranslocoPipe } from '@jsverse/transloco';
 
 import { ZardInputComponent } from '@/shared/components/input';
 
 import { FormDialog, runDialogSave } from './form-dialog';
+import { onOpened } from '../../core/util/on-opened';
 
 /** Max. length of a short name (`shortNameSchema`). */
 export const NAME_MAX = 100;
@@ -50,9 +51,7 @@ export class NameDialog {
   protected readonly busy = signal(false);
 
   constructor() {
-    effect(() => {
-      if (this.open()) untracked(() => this.name.set(this.initial()));
-    });
+    onOpened(this.open, () => this.name.set(this.initial()));
   }
 
   protected submit(): void {

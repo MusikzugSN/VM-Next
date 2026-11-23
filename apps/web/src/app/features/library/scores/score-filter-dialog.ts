@@ -1,5 +1,5 @@
 import { NgTemplateOutlet } from '@angular/common';
-import { ChangeDetectionStrategy, Component, effect, inject, input, model, output, signal, untracked } from '@angular/core';
+import { ChangeDetectionStrategy, Component, inject, input, model, output, signal } from '@angular/core';
 import { TranslocoPipe } from '@jsverse/transloco';
 import type { FieldDefinition } from '@vm-web/shared';
 
@@ -20,6 +20,7 @@ import {
   type ScoreQueryState,
 } from './score-query';
 import { TreeLabelPipe } from '../../../shared/ui/tree-label.pipe';
+import { onOpened } from '../../../core/util/on-opened';
 
 export interface ScoreFilterResult {
   tagId: string | null;
@@ -53,14 +54,11 @@ export class ScoreFilterDialog {
 
   constructor() {
     // Each time the dialog opens it starts from the active filters.
-    effect(() => {
-      if (!this.open()) return;
-      untracked(() => {
-        const state = this.state();
-        this.tagId.set(state.tagId ?? '');
-        this.ensembleId.set(state.ensembleId ?? '');
-        this.draft.set(draftFromFilters(state.filters, this.options.fields()));
-      });
+    onOpened(this.open, () => {
+      const state = this.state();
+      this.tagId.set(state.tagId ?? '');
+      this.ensembleId.set(state.ensembleId ?? '');
+      this.draft.set(draftFromFilters(state.filters, this.options.fields()));
     });
   }
 

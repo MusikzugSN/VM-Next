@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, Component, computed, effect, inject, model, output, signal, untracked } from '@angular/core';
+import { ChangeDetectionStrategy, Component, computed, inject, model, output, signal } from '@angular/core';
 import { TranslocoPipe, TranslocoService } from '@jsverse/transloco';
 import { PluralPipe } from '../../../core/i18n/plural.pipe';
 import { NgIcon, provideIcons } from '@ng-icons/core';
@@ -15,6 +15,7 @@ import { ApiClient } from '../../../core/api/api-client';
 import { isApiProblem } from '../../../core/api/api-problem';
 import { VoiceContextStore } from '../../../core/voices/voice-context.store';
 import { filterVoiceGroups } from '../../../core/voices/voice-groups';
+import { onOpened } from '../../../core/util/on-opened';
 
 export { filterVoiceGroups };
 
@@ -108,12 +109,9 @@ export class VoiceSelectionDialog {
 
   constructor() {
     // Start from the current profile voices each time the dialog opens.
-    effect(() => {
-      if (!this.open()) return;
-      untracked(() => {
-        this.search.set('');
-        this.selected.set(new Set(this.voices.profileVoices().map((voice) => voice.id)));
-      });
+    onOpened(this.open, () => {
+      this.search.set('');
+      this.selected.set(new Set(this.voices.profileVoices().map((voice) => voice.id)));
     });
   }
 

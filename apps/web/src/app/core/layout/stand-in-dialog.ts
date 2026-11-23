@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, Component, computed, effect, inject, model, signal, untracked } from '@angular/core';
+import { ChangeDetectionStrategy, Component, computed, inject, model, signal } from '@angular/core';
 import { TranslocoPipe } from '@jsverse/transloco';
 import { NgIcon, provideIcons } from '@ng-icons/core';
 import { lucideCheck, lucideSearch } from '@ng-icons/lucide';
@@ -9,6 +9,7 @@ import { ZardInputComponent } from '@/shared/components/input';
 
 import { VoiceContextStore } from '../voices/voice-context.store';
 import { filterVoiceGroups } from '../voices/voice-groups';
+import { onOpened } from '../util/on-opened';
 
 /**
  * „Andere Stimme“ (M-2): any voice for Mein Bereich, e.g. to stand in for someone. Only the
@@ -89,9 +90,7 @@ export class StandInDialog {
   });
 
   constructor() {
-    effect(() => {
-      if (this.open()) untracked(() => this.search.set(''));
-    });
+    onOpened(this.open, () => this.search.set(''));
   }
 
   protected choose(voiceId: string): void {

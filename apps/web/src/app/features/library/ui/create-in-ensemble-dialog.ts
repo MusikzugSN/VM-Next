@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, Component, computed, effect, input, model, signal, untracked } from '@angular/core';
+import { ChangeDetectionStrategy, Component, computed, input, model, signal } from '@angular/core';
 import { TranslocoPipe } from '@jsverse/transloco';
 import type { Ref } from '@vm-web/shared';
 
@@ -9,6 +9,7 @@ import { FormDialog, runDialogSave } from '../../../shared/ui/form-dialog';
 import { NAME_MAX } from '../../../shared/ui/name-dialog';
 import { TreeLabelPipe } from '../../../shared/ui/tree-label.pipe';
 import { ToggleField } from '../../../shared/ui/toggle-field';
+import { onOpened } from '../../../core/util/on-opened';
 
 export interface CreateInEnsemble {
   ensembleId: string;
@@ -65,14 +66,11 @@ export class CreateInEnsembleDialog {
   protected readonly valid = computed(() => !!this.name().trim() && !!this.ensembleId() && (!this.withDate() || !!this.date()));
 
   constructor() {
-    effect(() => {
-      if (!this.open()) return;
-      untracked(() => {
-        this.name.set('');
-        this.date.set('');
-        this.show.set(false);
-        this.ensembleId.set(this.ensembles()[0]?.id ?? '');
-      });
+    onOpened(this.open, () => {
+      this.name.set('');
+      this.date.set('');
+      this.show.set(false);
+      this.ensembleId.set(this.ensembles()[0]?.id ?? '');
     });
   }
 
