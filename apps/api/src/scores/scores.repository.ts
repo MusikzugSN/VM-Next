@@ -21,6 +21,7 @@ import {
 } from '../db/schema';
 import type { FieldDef } from './custom-fields';
 import type { SortPlan } from './score-query';
+import { replaceRows } from '../db/table-helpers';
 import { appendTo } from '../common/collections';
 
 export type ScoreRow = typeof scores.$inferSelect;
@@ -105,8 +106,7 @@ export class ScoresRepository {
   async updateScore(id: string, fixed: ScoreFixedFields, customValues: Record<string, unknown>, tagIds: readonly string[]): Promise<void> {
     await this.db.transaction(async (tx) => {
       await tx.update(scores).set({ ...fixed, customValues, updatedAt: new Date() }).where(eq(scores.id, id));
-      await tx.delete(scoreClubTags).where(eq(scoreClubTags.scoreId, id));
-      if (tagIds.length) await tx.insert(scoreClubTags).values(tagIds.map((tagId) => ({ scoreId: id, tagId })));
+      await replaceRows(tx, scoreClubTags, eq(scoreClubTags.scoreId, id), tagIds.map((tagId) => ({ scoreId: id, tagId })));
     });
   }
 

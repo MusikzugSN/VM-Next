@@ -6,6 +6,7 @@ import { ProblemException } from '../common/problem-details/problem.exception';
 import { DATABASE, type Database, type Tx } from '../db/database';
 import { withNameTaken } from '../db/db-errors';
 import { ensembleLineupVoices, instruments, sheets, uploads, userVoices, voices, voiceSubstitutes } from '../db/schema';
+import { assertPermutation, nextPosition, replaceRows } from '../db/table-helpers';
 import { escapeLike, likePattern } from '../common/sql';
 
 
@@ -102,10 +103,7 @@ export class VoicesService {
       if (!found.has(voiceId)) throw ProblemException.notFound();
       const unknown = substituteIds.map((id, i) => [id, i] as const).filter(([id]) => !found.has(id));
       if (unknown.length) throw ProblemException.validation(unknown.map(([, i]) => ({ path: `/body/substituteVoiceIds/${i}`, code: 'unknown_voice' })));
-      await tx.delete(voiceSubstitutes).where(eq(voiceSubstitutes.voiceId, voiceId));
-      if (substituteIds.length) {
-        await tx.insert(voiceSubstitutes).values(substituteIds.map((substituteVoiceId, position) => ({ voiceId, substituteVoiceId, position })));
-      }
+      await replaceRows(tx, voiceSubstitutes, eq(voiceSubstitutes.voiceId, voiceId), substituteIds.map((substituteVoiceId, position) => ({ voiceId, substituteVoiceId, position })));
     });
   }
 
@@ -141,7 +139,7 @@ export class VoicesService {
   async reorderInstruments(ids: readonly string[]): Promise<void> {
     await this.db.transaction(async (tx) => {
       const current = (await tx.select({ id: instruments.id }).from(instruments)).map((r) => r.id);
-      assertPermutation(current, ids);
+      assertPermutation(current, ids, 'List incomplete or outdated');
       for (const [position, id] of ids.entries()) await tx.update(instruments).set({ position }).where(eq(instruments.id, id));
     });
   }
@@ -152,7 +150,7 @@ export class VoicesService {
       const [instrument] = await tx.select({ id: instruments.id }).from(instruments).where(eq(instruments.id, instrumentId));
       if (!instrument) throw ProblemException.notFound();
       const current = (await tx.select({ id: voices.id }).from(voices).where(eq(voices.instrumentId, instrumentId))).map((r) => r.id);
-      assertPermutation(current, ids);
+      assertPermutation(current, ids, 'List incomplete or outdated');
       for (const [position, id] of ids.entries()) await tx.update(voices).set({ position }).where(eq(voices.id, id));
     });
   }
@@ -161,9 +159,8 @@ export class VoicesService {
   private async instrumentFor(tx: Tx, name: string): Promise<{ id: string; created: boolean }> {
     const [existing] = await tx.select({ id: instruments.id }).from(instruments).where(sql`lower(${instruments.name}) = lower(${name})`);
     if (existing) return { id: existing.id, created: false };
-    const [{ next }] = await tx.select({ next: sql<number>`coalesce(max(${instruments.position}) + 1, 0)::int` }).from(instruments);
     const id = uuidv7();
-    await tx.insert(instruments).values({ id, name, position: next });
+    await tx.insert(instruments).values({ id, name, position: await nextPosition(tx, instruments.position) });
     return { id, created: true };
   }
 
@@ -181,19 +178,10 @@ export class VoicesService {
   }
 }
 
-async function nextVoicePosition(tx: Tx, instrumentId: string): Promise<number> {
-  const [{ next }] = await tx
-    .select({ next: sql<number>`coalesce(max(${voices.position}) + 1, 0)::int` })
-    .from(voices)
-    .where(eq(voices.instrumentId, instrumentId));
-  return next;
+function nextVoicePosition(tx: Tx, instrumentId: string): Promise<number> {
+  return nextPosition(tx, voices.position, eq(voices.instrumentId, instrumentId));
 }
 
 async function removeInstrumentIfEmpty(tx: Tx, instrumentId: string): Promise<void> {
   await tx.execute(sql`delete from ${instruments} where id = ${instrumentId}::uuid and not exists (select 1 from ${voices} where instrument_id = ${instrumentId}::uuid)`);
-}
-
-function assertPermutation(current: readonly string[], given: readonly string[]): void {
-  const ok = given.length === current.length && new Set(given).size === given.length && given.every((id) => current.includes(id));
-  if (!ok) throw ProblemException.conflict('conflict', 'List incomplete or outdated');
 }

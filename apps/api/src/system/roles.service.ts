@@ -22,6 +22,7 @@ import { withNameTaken } from '../db/db-errors';
 import { clubSettings, memberships, rolePermissions, roles } from '../db/schema';
 import { loadDefaultRoles, type DefaultRole } from '../seed/default-roles';
 import { rolesFile } from '../seed/defaults';
+import { replaceRows } from '../db/table-helpers';
 import { appendTo } from '../common/collections';
 
 type RoleRecord = typeof roles.$inferSelect;
@@ -186,9 +187,8 @@ export class RolesService {
 }
 
 async function writePermissions(tx: Tx, roleId: string, permissions: readonly Permission[]): Promise<void> {
-  await tx.delete(rolePermissions).where(eq(rolePermissions.roleId, roleId));
   const unique = [...new Set(permissions)];
-  if (unique.length) await tx.insert(rolePermissions).values(unique.map((permission) => ({ roleId, permission })));
+  await replaceRows(tx, rolePermissions, eq(rolePermissions.roleId, roleId), unique.map((permission) => ({ roleId, permission })));
 }
 
 async function freeName(tx: Tx, name: string, ownId: string | undefined): Promise<string> {

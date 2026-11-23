@@ -22,6 +22,7 @@ import {
   voiceSubstitutes,
 } from '../db/schema';
 import type { SheetRow } from './sheet-resolution';
+import { replaceRows } from '../db/table-helpers';
 import { appendTo } from '../common/collections';
 import { hasClubTag, likePattern } from '../common/sql';
 
@@ -207,10 +208,7 @@ export class MeRepository {
 
   async replaceProfileVoices(userId: string, voiceIds: readonly string[]): Promise<void> {
     await this.db.transaction(async (tx) => {
-      await tx.delete(userVoices).where(eq(userVoices.userId, userId));
-      if (voiceIds.length) {
-        await tx.insert(userVoices).values(voiceIds.map((voiceId, position) => ({ userId, voiceId, position })));
-      }
+      await replaceRows(tx, userVoices, eq(userVoices.userId, userId), voiceIds.map((voiceId, position) => ({ userId, voiceId, position })));
     });
   }
 
