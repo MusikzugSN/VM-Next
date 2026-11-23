@@ -55,7 +55,7 @@ export function readCsv(path) {
   } catch {
     text = new TextDecoder('windows-1252').decode(bytes);
   }
-  text = text.replace(/^﻿/, '');
+  text = text.replace(/^\uFEFF/, '');
   const firstLine = text.slice(0, text.search(/\r?\n/) >>> 0);
   const delimiter = (firstLine.match(/;/g) ?? []).length > (firstLine.match(/,/g) ?? []).length ? ';' : ',';
   const rows = [];

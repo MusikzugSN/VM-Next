@@ -1,4 +1,4 @@
-import { Inject, Injectable, Logger } from '@nestjs/common';
+import { Inject, Injectable } from '@nestjs/common';
 import {
   uploadSheetsMetaSchema,
   type Page,
@@ -18,7 +18,8 @@ import { toJsonPointer } from '../common/validation/zod-validation.pipe';
 import { DATABASE, type Database } from '../db/database';
 import { isUniqueViolation } from '../db/db-errors';
 import { instruments, scores, sheets, uploads, voices } from '../db/schema';
-import { MeRepository, likePattern } from '../me/me.repository';
+import { likePattern } from '../common/sql';
+import { MeRepository } from '../me/me.repository';
 import { FILE_STORAGE, type IFileStorage } from '../storage/file-storage';
 import { InvalidPdfError, inspectPdf } from './pdf-tools';
 import { suggestVoice } from './voice-suggestion';
@@ -37,8 +38,6 @@ export const sheetKey = (id: string) => `sheets/${id}.pdf`;
 /** Upload dialog (N-10, N-11, M-9, F-2, F-11). */
 @Injectable()
 export class UploadsService {
-  private readonly logger = new Logger('Uploads');
-
   constructor(
     @Inject(DATABASE) private readonly db: Database,
     @Inject(MeRepository) private readonly me: MeRepository,

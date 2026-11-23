@@ -21,10 +21,10 @@ import { ProblemException } from '../common/problem-details/problem.exception';
 import { ResponseSchema } from '../common/validation/zod-response.interceptor';
 import { ZodValidationPipe as Zod } from '../common/validation/zod-validation.pipe';
 import { DATABASE, type Database } from '../db/database';
-import { isUniqueViolation } from '../db/db-errors';
+import { withNameTaken } from '../db/db-errors';
 import { clubTags } from '../db/schema';
-import { likePattern } from '../me/me.repository';
 import { afterNameAndId } from '../common/pagination/keyset';
+import { likePattern } from '../common/sql';
 
 /** Club tags, maintained by librarians (N-17); separate from personal tags (M-8). */
 @Injectable()
@@ -54,27 +54,18 @@ export class TagsService {
 
   async create(name: string): Promise<{ id: string }> {
     const id = uuidv7();
-    await this.unique(() => this.db.insert(clubTags).values({ id, name }));
+    await withNameTaken(() => this.db.insert(clubTags).values({ id, name }));
     return { id };
   }
 
   async rename(tagId: string, name: string): Promise<void> {
-    const rows = await this.unique(() => this.db.update(clubTags).set({ name }).where(eq(clubTags.id, tagId)).returning({ id: clubTags.id }));
+    const rows = await withNameTaken(() => this.db.update(clubTags).set({ name }).where(eq(clubTags.id, tagId)).returning({ id: clubTags.id }));
     if (!rows.length) throw ProblemException.notFound();
   }
 
   async delete(tagId: string): Promise<void> {
     const rows = await this.db.delete(clubTags).where(eq(clubTags.id, tagId)).returning({ id: clubTags.id });
     if (!rows.length) throw ProblemException.notFound();
-  }
-
-  private async unique<T>(write: () => Promise<T>): Promise<T> {
-    try {
-      return await write();
-    } catch (error) {
-      if (isUniqueViolation(error)) throw ProblemException.conflict('name-taken');
-      throw error;
-    }
   }
 }
 

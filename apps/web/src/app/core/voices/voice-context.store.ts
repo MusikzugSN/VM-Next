@@ -5,6 +5,7 @@ import { apiUrl, voiceContextResponseSchema, voiceOptionsResponseSchema } from '
 import { ApiClient } from '../api/api-client';
 import { SessionStore } from '../auth/session.store';
 import { isStandIn } from './voice-groups';
+import { selectOr, valueOr } from '../util/resource-value';
 
 const OVERRIDE_KEY = 'vmweb.voiceOverride';
 /** API limit for `?voiceId=` (repeatable, max. 20). */
@@ -33,8 +34,8 @@ export class VoiceContextStore {
     stream: () => this.api.get(apiUrl('me', 'voiceOptions'), voiceOptionsResponseSchema),
   });
 
-  readonly context = computed(() => (this.contextResource.hasValue() ? this.contextResource.value() : null));
-  readonly options = computed(() => (this.optionsResource.hasValue() ? this.optionsResource.value().groups : []));
+  readonly context = computed(() => valueOr(this.contextResource, null));
+  readonly options = computed(() => selectOr(this.optionsResource, (v) => v.groups, []));
   readonly activeVoices = computed(() => this.context()?.activeVoices ?? []);
   readonly profileVoices = computed(() => this.context()?.profileVoices ?? []);
   readonly isOverride = computed(() => this.context()?.isOverride ?? false);
