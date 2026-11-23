@@ -13,6 +13,7 @@ import {
   eventScoreCandidatesResponseSchema,
   setlistResponseSchema,
   type SetlistEntry,
+  MAX_SETLIST,
 } from '@vm-web/shared';
 import { firstValueFrom, map, type Observable } from 'rxjs';
 
@@ -31,7 +32,6 @@ import { usePageName } from '../../../core/layout/page';
 import { PrintLauncher } from '../../../core/actions/pending-features';
 
 /** API limit of `set-setlist`. */
-export const MAX_SETLIST = 200;
 
 type Item = Pick<SetlistEntry, 'scoreId' | 'title' | 'composer'>;
 

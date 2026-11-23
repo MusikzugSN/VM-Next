@@ -3,7 +3,7 @@ import { rxResource } from '@angular/core/rxjs-interop';
 import { TranslocoPipe } from '@jsverse/transloco';
 import { NgIcon, provideIcons } from '@ng-icons/core';
 import { lucidePlus, lucideSearch } from '@ng-icons/lucide';
-import { apiUrl, createdResponseSchema, scoreSearchResponseSchema, type ScoreSearchItem } from '@vm-web/shared';
+import { SCORE_TITLE_MAX, apiUrl, createdResponseSchema, scoreSearchResponseSchema, type ScoreSearchItem } from '@vm-web/shared';
 import { firstValueFrom, of } from 'rxjs';
 
 import { ZardInputComponent } from '@/shared/components/input';
@@ -103,7 +103,7 @@ export class ScoreSearchSelect {
 
   /** Creates a score with only the title (the rest is filled in later in the library). */
   protected async create(): Promise<void> {
-    const title = this.query().trim().slice(0, 200);
+    const title = this.query().trim().slice(0, SCORE_TITLE_MAX);
     if (!title) return;
     this.creating.set(true);
     const body = { title, composer: null, arranger: null, publisher: null, publisherNumber: null, durationSeconds: null };

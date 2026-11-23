@@ -3,7 +3,7 @@ import { TranslocoPipe, TranslocoService } from '@jsverse/transloco';
 import { PluralPipe } from '../../../core/i18n/plural.pipe';
 import { NgIcon, provideIcons } from '@ng-icons/core';
 import { lucideCheck, lucideSearch } from '@ng-icons/lucide';
-import { apiUrl } from '@vm-web/shared';
+import { MAX_PROFILE_VOICES, apiUrl } from '@vm-web/shared';
 import { firstValueFrom } from 'rxjs';
 
 import { ZardButtonComponent } from '@/shared/components/button';
@@ -19,7 +19,6 @@ import { filterVoiceGroups } from '../../../core/voices/voice-groups';
 export { filterVoiceGroups };
 
 /** API limit of `set-voices` (`voiceIds` max. 20). */
-export const MAX_PROFILE_VOICES = 20;
 
 /**
  * „Welche Stimmen spielst du?“ (M-1): voices grouped by instrument (N-6) as toggle chips
