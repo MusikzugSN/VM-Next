@@ -6,6 +6,7 @@ import { ProblemException } from '../common/problem-details/problem.exception';
 import { DATABASE, type Database, type Tx } from '../db/database';
 import { withNameTaken } from '../db/db-errors';
 import { ensembleLineupVoices, instruments, sheets, uploads, userVoices, voices, voiceSubstitutes } from '../db/schema';
+import { assertKnownIds } from '../common/validation/id-list';
 import { assertPermutation, nextPosition, replaceRows } from '../db/table-helpers';
 import { escapeLike, likePattern } from '../common/sql';
 
@@ -101,8 +102,7 @@ export class VoicesService {
       const ids = [voiceId, ...substituteIds];
       const found = new Set((await tx.select({ id: voices.id }).from(voices).where(inArray(voices.id, ids))).map((v) => v.id));
       if (!found.has(voiceId)) throw ProblemException.notFound();
-      const unknown = substituteIds.map((id, i) => [id, i] as const).filter(([id]) => !found.has(id));
-      if (unknown.length) throw ProblemException.validation(unknown.map(([, i]) => ({ path: `/body/substituteVoiceIds/${i}`, code: 'unknown_voice' })));
+      assertKnownIds(substituteIds, found, '/body/substituteVoiceIds', 'unknown_voice');
       await replaceRows(tx, voiceSubstitutes, eq(voiceSubstitutes.voiceId, voiceId), substituteIds.map((substituteVoiceId, position) => ({ voiceId, substituteVoiceId, position })));
     });
   }
