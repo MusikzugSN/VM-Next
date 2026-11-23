@@ -4,9 +4,8 @@ import { TranslocoPipe } from '@jsverse/transloco';
 import { NgIcon, provideIcons } from '@ng-icons/core';
 import { lucideSlidersHorizontal, lucideX } from '@ng-icons/lucide';
 import { apiUrl, myTagsResponseSchema } from '@vm-web/shared';
-import { VmBadgeCount } from '@vm-web/ui';
+import { VmBadgeCount, VmMenuImports } from '@vm-web/ui';
 
-import { ZardDropdownImports } from '@vm-web/ui/zard/components/dropdown/dropdown.imports';
 
 import { ApiClient } from '../../../core/api/api-client';
 
@@ -29,14 +28,14 @@ export function decodeTagFilter(value: string | undefined): TagFilterValue {
  */
 @Component({
   selector: 'vm-tag-filter',
-  imports: [VmBadgeCount, NgIcon, TranslocoPipe, ZardDropdownImports],
+  imports: [VmBadgeCount, NgIcon, TranslocoPipe, VmMenuImports],
   viewProviders: [provideIcons({ lucideSlidersHorizontal, lucideX })],
   changeDetection: ChangeDetectionStrategy.OnPush,
   host: { class: 'contents' },
   template: `
     <button
       type="button"
-      z-dropdown
+      vm-menu-trigger
       [zDropdownMenu]="menu"
       [attr.aria-label]="'common.filter' | transloco"
       class="relative flex size-control shrink-0 items-center justify-center rounded-md border border-input bg-background shadow-sm hover:bg-accent xl:size-control-compact"
@@ -47,23 +46,23 @@ export function decodeTagFilter(value: string | undefined): TagFilterValue {
         <span class="sr-only">{{ 'me.filter.active' | transloco }}</span>
       }
     </button>
-    <z-dropdown-menu-content #menu="zDropdownMenuContent" zAlign="end" class="max-h-80 w-64 overflow-y-auto">
-      <z-dropdown-menu-radio-group [zValue]="encoded()" (zValueChange)="select($event)">
-        <z-dropdown-menu-radio-item zValue="">{{ 'me.filter.none' | transloco }}</z-dropdown-menu-radio-item>
+    <vm-menu-content #menu="zDropdownMenuContent" zAlign="end" class="max-h-80 w-64 overflow-y-auto">
+      <vm-menu-radio-group [zValue]="encoded()" (zValueChange)="select($event)">
+        <vm-menu-radio-item zValue="">{{ 'me.filter.none' | transloco }}</vm-menu-radio-item>
         @if (tags.hasValue() && tags.value().clubTags.length) {
-          <z-dropdown-menu-label>{{ 'me.tags.club' | transloco }}</z-dropdown-menu-label>
+          <vm-menu-label>{{ 'me.tags.club' | transloco }}</vm-menu-label>
           @for (tag of tags.value().clubTags; track tag.id) {
-            <z-dropdown-menu-radio-item [zValue]="'club:' + tag.id">{{ tag.name }}</z-dropdown-menu-radio-item>
+            <vm-menu-radio-item [zValue]="'club:' + tag.id">{{ tag.name }}</vm-menu-radio-item>
           }
         }
         @if (tags.hasValue() && tags.value().personalTags.length) {
-          <z-dropdown-menu-label>{{ 'me.tags.personal' | transloco }}</z-dropdown-menu-label>
+          <vm-menu-label>{{ 'me.tags.personal' | transloco }}</vm-menu-label>
           @for (tag of tags.value().personalTags; track tag.id) {
-            <z-dropdown-menu-radio-item [zValue]="'personal:' + tag.id">{{ tag.name }}</z-dropdown-menu-radio-item>
+            <vm-menu-radio-item [zValue]="'personal:' + tag.id">{{ tag.name }}</vm-menu-radio-item>
           }
         }
-      </z-dropdown-menu-radio-group>
-    </z-dropdown-menu-content>
+      </vm-menu-radio-group>
+    </vm-menu-content>
   `,
 })
 export class TagFilter {

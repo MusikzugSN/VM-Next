@@ -7,8 +7,7 @@ import { lucideCheck, lucideCircleAlert, lucideExternalLink, lucidePrinter, luci
 import { APP_ROUTES, PRINT_SERVICE_CONTRACT, apiUrl, printPlanResponseSchema, type PrintMode, type VoiceRef } from '@vm-web/shared';
 import { firstValueFrom, from } from 'rxjs';
 
-import { VmBadge, VmButton, VmCheckbox, VmDialogImports, VmField, VmFieldLabel, VmSelect } from '@vm-web/ui';
-import { ZardSonnerService } from '@vm-web/ui/zard/components/sonner';
+import { VmBadge, VmButton, VmCheckbox, VmDialogImports, VmField, VmFieldLabel, VmSelect, VmToastService } from '@vm-web/ui';
 
 import { PrintLauncher, type PrintRequest } from '../../core/actions/pending-features';
 import { ApiClient } from '../../core/api/api-client';
@@ -43,7 +42,7 @@ export class PrintDialog {
   private readonly api = inject(ApiClient);
   private readonly launcher = inject(PrintLauncher);
   private readonly service = inject(PRINT_SERVICE);
-  private readonly sonner = inject(ZardSonnerService);
+  private readonly sonner = inject(VmToastService);
   private readonly transloco = inject(TranslocoService);
   private readonly voices = inject(VoiceContextStore);
   protected readonly viewport = inject(ViewportService);

@@ -5,8 +5,7 @@ import { NgIcon, provideIcons } from '@ng-icons/core';
 import { lucideCircleCheck, lucideCopy, lucidePrinter, lucideRepeat, lucideTriangleAlert, lucideX } from '@ng-icons/lucide';
 import type { PrintJob, PrintJobStatus } from '@vm-web/shared';
 
-import { VmButton, VmCard } from '@vm-web/ui';
-import { ZardSonnerService } from '@vm-web/ui/zard/components/sonner';
+import { VmButton, VmCard, VmToastService } from '@vm-web/ui';
 
 import { PluralPipe } from '../../core/i18n/plural.pipe';
 import { ViewportService } from '../../core/layout/viewport';
@@ -37,7 +36,7 @@ const STATUS_CLASSES: Record<PrintJobStatus, string> = {
 })
 export class PrintHistoryPage {
   private readonly service = inject(PRINT_SERVICE);
-  private readonly sonner = inject(ZardSonnerService);
+  private readonly sonner = inject(VmToastService);
   private readonly transloco = inject(TranslocoService);
   protected readonly viewport = inject(ViewportService);
 

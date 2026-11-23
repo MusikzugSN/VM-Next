@@ -13,7 +13,7 @@ import type { ZardDropdownMenuContentComponent } from './dropdown-menu-content.c
 import { ZardDropdownService, type ZardDropdownPlacement } from './dropdown.service';
 
 @Directive({
-  selector: '[z-dropdown], [zDropdown]',
+  selector: '[z-dropdown], [zDropdown], [vm-menu-trigger]',
   host: {
     'data-slot': 'dropdown-menu-trigger',
     '[attr.tabindex]': '0',

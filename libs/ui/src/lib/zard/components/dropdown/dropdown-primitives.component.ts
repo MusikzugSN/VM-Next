@@ -30,7 +30,7 @@ const ZARD_DROPDOWN_RADIO_GROUP = new InjectionToken<ZardDropdownRadioGroup>('ZA
 const optionalBooleanAttribute = (value: unknown) => (value === undefined ? undefined : booleanAttribute(value));
 
 @Component({
-  selector: 'z-dropdown-menu-group, [z-dropdown-menu-group]',
+  selector: 'z-dropdown-menu-group, [z-dropdown-menu-group], vm-menu-group, [vm-menu-group]',
   template: `
     <ng-content />
   `,
@@ -50,7 +50,7 @@ export class ZardDropdownMenuGroupComponent {
 }
 
 @Component({
-  selector: 'z-dropdown-menu-separator, [z-dropdown-menu-separator]',
+  selector: 'z-dropdown-menu-separator, [z-dropdown-menu-separator], vm-menu-separator, [vm-menu-separator]',
   template: ``,
   changeDetection: ChangeDetectionStrategy.OnPush,
   encapsulation: ViewEncapsulation.None,
@@ -72,7 +72,7 @@ export class ZardDropdownMenuSeparatorComponent {
 }
 
 @Component({
-  selector: 'z-dropdown-menu-label, [z-dropdown-menu-label]',
+  selector: 'z-dropdown-menu-label, [z-dropdown-menu-label], vm-menu-label, [vm-menu-label]',
   template: `
     <ng-content />
   `,
@@ -95,7 +95,7 @@ export class ZardDropdownMenuLabelComponent {
 }
 
 @Component({
-  selector: 'z-dropdown-menu-shortcut, [z-dropdown-menu-shortcut]',
+  selector: 'z-dropdown-menu-shortcut, [z-dropdown-menu-shortcut], vm-menu-shortcut, [vm-menu-shortcut]',
   template: `
     <ng-content />
   `,
@@ -117,7 +117,7 @@ export class ZardDropdownMenuShortcutComponent {
 }
 
 @Component({
-  selector: 'z-dropdown-menu-checkbox-item, [z-dropdown-menu-checkbox-item]',
+  selector: 'z-dropdown-menu-checkbox-item, [z-dropdown-menu-checkbox-item], vm-menu-checkbox-item, [vm-menu-checkbox-item]',
   template: `
     <span class="pointer-events-none absolute start-1.5 flex size-4 items-center justify-center">
       @if (zChecked()) {
@@ -176,7 +176,7 @@ export class ZardDropdownMenuCheckboxItemComponent {
 }
 
 @Component({
-  selector: 'z-dropdown-menu-radio-group, [z-dropdown-menu-radio-group]',
+  selector: 'z-dropdown-menu-radio-group, [z-dropdown-menu-radio-group], vm-menu-radio-group, [vm-menu-radio-group]',
   template: `
     <ng-content />
   `,
@@ -204,7 +204,7 @@ export class ZardDropdownMenuRadioGroupComponent implements ZardDropdownRadioGro
 }
 
 @Component({
-  selector: 'z-dropdown-menu-radio-item, [z-dropdown-menu-radio-item]',
+  selector: 'z-dropdown-menu-radio-item, [z-dropdown-menu-radio-item], vm-menu-radio-item, [vm-menu-radio-item]',
   template: `
     <span class="pointer-events-none absolute start-1.5 flex size-4 items-center justify-center">
       @if (isChecked()) {

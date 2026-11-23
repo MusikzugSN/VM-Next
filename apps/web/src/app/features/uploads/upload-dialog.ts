@@ -14,8 +14,7 @@ import {
 } from '@vm-web/shared';
 import { filter, firstValueFrom, last, map, tap } from 'rxjs';
 
-import { VmButton, VmDialogImports, VmIconButton } from '@vm-web/ui';
-import { ZardSonnerService } from '@vm-web/ui/zard/components/sonner';
+import { VmButton, VmDialogImports, VmIconButton, VmToastService } from '@vm-web/ui';
 
 import { UploadLauncher } from '../../core/actions/pending-features';
 import { ApiClient } from '../../core/api/api-client';
@@ -47,7 +46,7 @@ export class UploadDialog {
   private readonly launcher = inject(UploadLauncher);
   private readonly session = inject(SessionStore);
   private readonly review = inject(ReviewCountStore);
-  private readonly sonner = inject(ZardSonnerService);
+  private readonly sonner = inject(VmToastService);
   private readonly transloco = inject(TranslocoService);
 
   protected readonly maxFiles = UPLOAD_MAX_FILES;

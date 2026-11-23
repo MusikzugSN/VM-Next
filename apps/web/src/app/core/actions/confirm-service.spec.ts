@@ -1,9 +1,8 @@
 import { TestBed } from '@angular/core/testing';
 import { TranslocoService } from '@jsverse/transloco';
 import { of, throwError } from 'rxjs';
-import { VmConfirmDialogService } from '@vm-web/ui';
+import { VmConfirmDialogService, VmToastService } from '@vm-web/ui';
 
-import { ZardSonnerService } from '@vm-web/ui/zard/components/sonner';
 
 import { ConfirmService } from './action-runner';
 
@@ -22,7 +21,7 @@ describe('ConfirmService.confirmedDelete', () => {
     vi.clearAllMocks();
     TestBed.configureTestingModule({
       providers: [
-        { provide: ZardSonnerService, useValue: sonner },
+        { provide: VmToastService, useValue: sonner },
         { provide: VmConfirmDialogService, useValue: { confirm } },
         { provide: TranslocoService, useValue: { translate: (key: string) => key } },
       ],

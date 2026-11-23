@@ -16,7 +16,7 @@ import { ZardDropdownService } from './dropdown.service';
 import { dropdownItemVariants, type ZardDropdownItemTypeVariants } from './dropdown.variants';
 
 @Component({
-  selector: 'z-dropdown-menu-item, [z-dropdown-menu-item]',
+  selector: 'z-dropdown-menu-item, [z-dropdown-menu-item], vm-menu-item, [vm-menu-item]',
   template: `
     <ng-content />
   `,

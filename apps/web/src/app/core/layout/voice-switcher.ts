@@ -4,8 +4,8 @@ import { TranslocoPipe } from '@jsverse/transloco';
 import { NgIcon, provideIcons } from '@ng-icons/core';
 import { lucideChevronDown, lucideMusic2 } from '@ng-icons/lucide';
 import { APP_ROUTES } from '@vm-web/shared';
+import { VmMenuImports } from '@vm-web/ui';
 
-import { ZardDropdownImports } from '@vm-web/ui/zard/components/dropdown/dropdown.imports';
 
 import { VoiceContextStore } from '../voices/voice-context.store';
 import { StandInDialog } from './stand-in-dialog';
@@ -16,7 +16,7 @@ import { StandInDialog } from './stand-in-dialog';
  */
 @Component({
   selector: 'vm-voice-switcher',
-  imports: [NgIcon, RouterLink, TranslocoPipe, ZardDropdownImports, StandInDialog],
+  imports: [NgIcon, RouterLink, TranslocoPipe, VmMenuImports, StandInDialog],
   viewProviders: [provideIcons({ lucideMusic2, lucideChevronDown })],
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
@@ -30,7 +30,7 @@ import { StandInDialog } from './stand-in-dialog';
     } @else if (store.activeVoices().length > 0) {
       <button
         type="button"
-        z-dropdown
+        vm-menu-trigger
         [zDropdownMenu]="menu"
         [attr.aria-label]="'shell.voice.label' | transloco: { voices: label() }"
         class="inline-flex h-control max-w-72 items-center gap-2 rounded-md border border-primary bg-primary-soft px-3 font-medium text-primary xl:h-8"
@@ -43,18 +43,18 @@ import { StandInDialog } from './stand-in-dialog';
         <ng-icon name="lucideChevronDown" aria-hidden="true" class="shrink-0" />
       </button>
 
-      <z-dropdown-menu-content #menu="zDropdownMenuContent" zAlign="end" class="w-64">
-        <z-dropdown-menu-label>{{ 'shell.voice.menuTitle' | transloco }}</z-dropdown-menu-label>
-        <z-dropdown-menu-radio-group [zValue]="selected()" (zValueChange)="select($event)">
-          <z-dropdown-menu-radio-item zValue="">{{ 'shell.voice.allOwn' | transloco }}</z-dropdown-menu-radio-item>
+      <vm-menu-content #menu="zDropdownMenuContent" zAlign="end" class="w-64">
+        <vm-menu-label>{{ 'shell.voice.menuTitle' | transloco }}</vm-menu-label>
+        <vm-menu-radio-group [zValue]="selected()" (zValueChange)="select($event)">
+          <vm-menu-radio-item zValue="">{{ 'shell.voice.allOwn' | transloco }}</vm-menu-radio-item>
           @for (voice of menuVoices(); track voice.id) {
-            <z-dropdown-menu-radio-item [zValue]="voice.id">{{ voice.name }}</z-dropdown-menu-radio-item>
+            <vm-menu-radio-item [zValue]="voice.id">{{ voice.name }}</vm-menu-radio-item>
           }
-        </z-dropdown-menu-radio-group>
-        <z-dropdown-menu-separator />
-        <button type="button" z-dropdown-menu-item (click)="standInOpen.set(true)">{{ 'shell.voice.other' | transloco }}</button>
-        <a z-dropdown-menu-item [routerLink]="profilePath">{{ 'shell.voice.editProfile' | transloco }}</a>
-      </z-dropdown-menu-content>
+        </vm-menu-radio-group>
+        <vm-menu-separator />
+        <button type="button" vm-menu-item (click)="standInOpen.set(true)">{{ 'shell.voice.other' | transloco }}</button>
+        <a vm-menu-item [routerLink]="profilePath">{{ 'shell.voice.editProfile' | transloco }}</a>
+      </vm-menu-content>
       <vm-stand-in-dialog [(open)]="standInOpen" />
     }
   `,

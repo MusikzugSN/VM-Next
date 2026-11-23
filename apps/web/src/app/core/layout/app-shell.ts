@@ -7,9 +7,8 @@ import { NgIcon, provideIcons } from '@ng-icons/core';
 import { lucideCalendar, lucideFolderOpen, lucideHouse, lucideMenu, lucideUser } from '@ng-icons/lucide';
 import { APP_ROUTES } from '@vm-web/shared';
 import { filter, skip } from 'rxjs';
-import { VmSheetImports } from '@vm-web/ui';
+import { VmSheetImports, VmToaster } from '@vm-web/ui';
 
-import { ZardSonnerComponent } from '@vm-web/ui/zard/components/sonner';
 
 import { PrintDialog } from '../../features/print/print-dialog';
 import { UploadDialog } from '../../features/uploads/upload-dialog';
@@ -42,7 +41,7 @@ import { VoiceSwitcher } from './voice-switcher';
     VoiceSwitcher,
     UploadDialog,
     PrintDialog,
-    ZardSonnerComponent,
+    VmToaster,
   ],
   viewProviders: [provideIcons({ lucideMenu, lucideHouse, lucideFolderOpen, lucideCalendar, lucideUser })],
   changeDetection: ChangeDetectionStrategy.OnPush,

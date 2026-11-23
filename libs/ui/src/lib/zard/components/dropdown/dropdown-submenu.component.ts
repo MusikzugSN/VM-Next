@@ -56,7 +56,7 @@ function isHovered(element: HTMLElement): boolean {
  * declared — it hands a template to the sub-trigger, which opens it in its own overlay.
  */
 @Component({
-  selector: 'z-dropdown-menu-sub-content, [z-dropdown-menu-sub-content]',
+  selector: 'z-dropdown-menu-sub-content, [z-dropdown-menu-sub-content], vm-menu-sub-content, [vm-menu-sub-content]',
   template: `
     <ng-template #contentTemplate>
       <div
@@ -94,7 +94,7 @@ export class ZardDropdownMenuSubContentComponent {
  * `ArrowLeft` and `Escape` close it and hand the focus back to this row.
  */
 @Component({
-  selector: 'z-dropdown-menu-sub-trigger, [z-dropdown-menu-sub-trigger]',
+  selector: 'z-dropdown-menu-sub-trigger, [z-dropdown-menu-sub-trigger], vm-menu-sub-trigger, [vm-menu-sub-trigger]',
   imports: [NgIcon],
   template: `
     <ng-content />

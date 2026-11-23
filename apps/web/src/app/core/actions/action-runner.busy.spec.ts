@@ -1,8 +1,8 @@
 import { signal } from '@angular/core';
 import { TestBed } from '@angular/core/testing';
 import { TranslocoService } from '@jsverse/transloco';
+import { VmToastService } from '@vm-web/ui';
 
-import { ZardSonnerService } from '@vm-web/ui/zard/components/sonner';
 
 import { ActionRunner } from './action-runner';
 
@@ -12,7 +12,7 @@ describe('ActionRunner busy flag', () => {
   beforeEach(() => {
     TestBed.configureTestingModule({
       providers: [
-        { provide: ZardSonnerService, useValue: { success: vi.fn(), error: vi.fn() } },
+        { provide: VmToastService, useValue: { success: vi.fn(), error: vi.fn() } },
         { provide: TranslocoService, useValue: { translate: (key: string) => key } },
       ],
     });

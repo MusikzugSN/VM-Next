@@ -5,8 +5,7 @@ import { NgIcon, provideIcons } from '@ng-icons/core';
 import { lucideImageUp, lucideTrash2 } from '@ng-icons/lucide';
 import { apiUrl, LOGO_FILE_FIELD, LOGO_MAX_BYTES, LOGO_MIME_TYPES, updateClubBodySchema, type ConfigResponse } from '@vm-web/shared';
 
-import { VmButton, VmCard, VmField, VmFieldError, VmFieldLabel, VmInput, VmSwitch, VmTextarea } from '@vm-web/ui';
-import { ZardSonnerService } from '@vm-web/ui/zard/components/sonner';
+import { VmButton, VmCard, VmField, VmFieldError, VmFieldLabel, VmInput, VmSwitch, VmTextarea, VmToastService } from '@vm-web/ui';
 
 import { ActionRunner } from '../../../core/actions/action-runner';
 import { ApiClient } from '../../../core/api/api-client';
@@ -125,7 +124,7 @@ export class ClubSettings {
   private readonly api = inject(ApiClient);
   private readonly http = inject(HttpClient);
   private readonly actions = inject(ActionRunner);
-  private readonly sonner = inject(ZardSonnerService);
+  private readonly sonner = inject(VmToastService);
   private readonly transloco = inject(TranslocoService);
   protected readonly branding = inject(BrandingStore);
 

@@ -1,9 +1,8 @@
 import { inject, Injectable } from '@angular/core';
 import { TranslocoService } from '@jsverse/transloco';
 import { firstValueFrom, type Observable } from 'rxjs';
-import { VmConfirmDialogService } from '@vm-web/ui';
+import { VmConfirmDialogService, VmToastService } from '@vm-web/ui';
 
-import { ZardSonnerService } from '@vm-web/ui/zard/components/sonner';
 
 import { isApiProblem } from '../api/api-problem';
 
@@ -24,7 +23,7 @@ export interface RunOptions {
  */
 @Injectable({ providedIn: 'root' })
 export class ActionRunner {
-  private readonly sonner = inject(ZardSonnerService);
+  private readonly sonner = inject(VmToastService);
   private readonly transloco = inject(TranslocoService);
 
   /** Success toast for results that are only known after the action (e.g. counts). */
