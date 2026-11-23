@@ -4,7 +4,7 @@ import type { AccessContext } from '../access/access-context';
 import { ProblemException } from '../common/problem-details/problem.exception';
 import { activeEnsembleOptions } from '../common/ensemble-tree';
 import type { Database } from '../db/database';
-import { ensembles, scores } from '../db/schema';
+import { ensembles, scores, roles } from '../db/schema';
 import { likePattern } from '../me/me.repository';
 
 /** Non-archived ensembles in which the caller holds `permission` (incl. inherited, F-3), in tree order; 403 if none. */
@@ -15,10 +15,20 @@ export async function ensembleOptions(db: Database, access: AccessContext, permi
 }
 
 /** New folders/events only in existing, non-archived ensembles. */
-export async function assertActiveEnsemble(db: Database, ensembleId: string): Promise<void> {
+export async function assertActiveEnsemble(db: Database, ensembleId: string, path = '/body/ensembleId'): Promise<void> {
   const [row] = await db.select({ archivedAt: ensembles.archivedAt }).from(ensembles).where(eq(ensembles.id, ensembleId));
   if (!row) throw ProblemException.notFound('Unknown ensemble');
-  if (row.archivedAt) throw ProblemException.validation([{ path: '/body/ensembleId', code: 'archived' }]);
+  if (row.archivedAt) throw ProblemException.validation([{ path, code: 'archived' }]);
+}
+
+export async function assertRoleExists(db: Database, roleId: string): Promise<void> {
+  const [row] = await db.select({ id: roles.id }).from(roles).where(eq(roles.id, roleId));
+  if (!row) throw ProblemException.notFound('Unknown role');
+}
+
+/** All roles by name, for selection lists. */
+export function roleOptions(db: Database): Promise<{ id: string; name: string }[]> {
+  return db.select({ id: roles.id, name: roles.name }).from(roles).orderBy(sql`lower(${roles.name})`);
 }
 
 /**

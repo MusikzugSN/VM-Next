@@ -117,13 +117,13 @@ export class ScoresService {
   }
 
   async update(scoreId: string, body: UpdateScoreDetailsBody): Promise<void> {
-    if (!(await this.repo.score(scoreId))) throw ProblemException.notFound();
+    await this.requireScore(scoreId);
     const { customValues, tagIds } = await this.validate(body);
     await this.repo.updateScore(scoreId, fixedOf(body), customValues, tagIds);
   }
 
   async delete(scoreId: string): Promise<void> {
-    if (!(await this.repo.score(scoreId))) throw ProblemException.notFound();
+    await this.requireScore(scoreId);
     const files = await this.repo.deleteScore(scoreId);
     await this.removeFiles(files);
   }
@@ -131,7 +131,7 @@ export class ScoresService {
   // --- completeness, sheets, folders (N-4, N-5, N-9) ----------------------------------------------------------
 
   async completeness(scoreId: string, ensembleId: string | undefined): Promise<ScoreCompletenessResponse> {
-    if (!(await this.repo.score(scoreId))) throw ProblemException.notFound();
+    await this.requireScore(scoreId);
     const ensemble = await this.completenessEnsemble(ensembleId);
     if (!ensemble) return { ensemble: null, summary: { present: 0, substituted: 0, total: 0 }, voices: [] };
     const { lineup, substitutesOf, voiceIds } = await this.lineupWithSubstitutes(ensemble.id);
@@ -141,7 +141,7 @@ export class ScoresService {
   }
 
   async sheets(scoreId: string): Promise<ScoreSheetsResponse> {
-    if (!(await this.repo.score(scoreId))) throw ProblemException.notFound();
+    await this.requireScore(scoreId);
     const [rows, pendingUploadCount] = await Promise.all([this.repo.sheetsOfScore(scoreId), this.repo.pendingUploadCount(scoreId)]);
     return {
       items: rows.map((r) => ({
@@ -156,9 +156,13 @@ export class ScoresService {
   }
 
   async folders(scoreId: string, access: AccessContext): Promise<ScoreFoldersResponse> {
-    if (!(await this.repo.score(scoreId))) throw ProblemException.notFound();
+    await this.requireScore(scoreId);
     const ensembleIds = access.isAdmin ? 'all' : access.ensemblesWith('folder.view');
     return { items: await this.repo.foldersOfScore(scoreId, ensembleIds) };
+  }
+
+  private async requireScore(scoreId: string): Promise<void> {
+    if (!(await this.repo.score(scoreId))) throw ProblemException.notFound();
   }
 
   async sheetFile(sheetId: string): Promise<{ stream: Readable; fileName: string }> {
