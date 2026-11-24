@@ -28,7 +28,7 @@ import {
 import type { ClassValue } from 'clsx';
 import { filter, takeUntil } from 'rxjs';
 
-import { ZardStringTemplateOutletDirective } from '@vm-web/ui/zard/core';
+import { isTopmostOverlay, popOverlay, pushOverlay, ZardStringTemplateOutletDirective } from '@vm-web/ui/zard/core';
 import { mergeClasses } from '@vm-web/ui/zard/utils/merge-classes';
 
 import { nextDialogId, ZardDialogHost } from './dialog-host';
@@ -177,6 +177,7 @@ export class ZardDialogComponent extends ZardDialogHost {
       .subscribe(() => overlayRef.setDirection(this.directionality?.value ?? 'ltr'));
 
     overlayRef.attach(new TemplatePortal(this.panel(), this.viewContainerRef));
+    pushOverlay(this);
 
     overlayRef.backdropClick().subscribe(() => {
       if (this.zMaskClosable()) {
@@ -187,6 +188,7 @@ export class ZardDialogComponent extends ZardDialogHost {
       .keydownEvents()
       .pipe(filter(event => ESCAPE_KEYS.includes(event.key)))
       .subscribe(event => {
+        if (!isTopmostOverlay(this)) return;
         event.preventDefault();
         this.requestClose();
       });
@@ -210,6 +212,7 @@ export class ZardDialogComponent extends ZardDialogHost {
       return;
     }
 
+    popOverlay(this);
     this.overlayRef.dispose();
     this.overlayRef = null;
 

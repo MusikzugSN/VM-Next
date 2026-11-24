@@ -50,6 +50,10 @@ import {
     '[attr.disabled]': 'zDisabled() && !isLinkHost() ? "" : null',
     '[attr.role]': 'isNotInsideOfButtonOrLink() ? "button" : null',
     '[attr.tabindex]': 'isNotInsideOfButtonOrLink() ? "0" : null',
+    // A disabled <a> has no [disabled] (links can't have one); aria-disabled + pointer-events
+    // block the mouse, but the browser still fires a native click on Enter regardless of
+    // pointer-events, so block keyboard activation here too.
+    '(keydown.enter)': 'onLinkKeydown($event)',
   },
   exportAs: 'zButton',
 })
@@ -127,6 +131,10 @@ export class ZardButtonComponent implements OnDestroy {
 
   /** VM-Web: links have no disabled attribute; aria-disabled and pointer-events cover them. */
   protected readonly isLinkHost = computed(() => this.elementRef.nativeElement.tagName === 'A');
+
+  protected onLinkKeydown(event: Event): void {
+    if (this.zDisabled() && this.isLinkHost()) event.preventDefault();
+  }
 
   protected readonly isNotInsideOfButtonOrLink = computed(() => {
     // Evaluated once; assumes component parent doesn't change after mount

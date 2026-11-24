@@ -18,7 +18,6 @@ const PROJECT = '<ng-content />';
 
 /** M3 Basic Dialog, auf Telefonen Vollbild. Öffnen, Schließen und Fokus kommen aus Zard. */
 @Component({
-  // eslint-disable-next-line @angular-eslint/component-selector
   selector: 'vm-dialog',
   imports: [ZardDialogPanelComponent],
   template: `
@@ -46,7 +45,6 @@ const PROJECT = '<ng-content />';
 export class VmDialog extends ZardDialogComponent {}
 
 @Component({
-  // eslint-disable-next-line @angular-eslint/component-selector
   selector: 'vm-dialog-header',
   template: PROJECT,
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -73,7 +71,6 @@ export class VmDialogTitle extends ZardDialogTitleComponent {}
 export class VmDialogDescription extends ZardDialogDescriptionComponent {}
 
 @Component({
-  // eslint-disable-next-line @angular-eslint/component-selector
   selector: 'vm-dialog-footer',
   template: PROJECT,
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -85,7 +82,6 @@ export const VmDialogImports = [VmDialog, VmDialogHeader, VmDialogTitle, VmDialo
 
 /** M3 Side Sheet für die Navigation auf kleinen Bildschirmen. */
 @Component({
-  // eslint-disable-next-line @angular-eslint/component-selector
   selector: 'vm-sheet',
   imports: [ZardSheetPanelComponent],
   template: `
@@ -116,7 +112,6 @@ export const VmDialogImports = [VmDialog, VmDialogHeader, VmDialogTitle, VmDialo
 export class VmSheet extends ZardSheetComponent {}
 
 @Component({
-  // eslint-disable-next-line @angular-eslint/component-selector
   selector: 'vm-sheet-header',
   template: PROJECT,
   changeDetection: ChangeDetectionStrategy.OnPush,

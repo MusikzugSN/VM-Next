@@ -28,7 +28,7 @@ import {
 import type { ClassValue } from 'clsx';
 import { filter, takeUntil } from 'rxjs';
 
-import { ZardStringTemplateOutletDirective } from '@vm-web/ui/zard/core';
+import { isTopmostOverlay, popOverlay, pushOverlay, ZardStringTemplateOutletDirective } from '@vm-web/ui/zard/core';
 import { mergeClasses } from '@vm-web/ui/zard/utils/merge-classes';
 
 import { nextSheetId, ZardSheetHost } from './sheet-host';
@@ -191,6 +191,7 @@ export class ZardSheetComponent extends ZardSheetHost {
       .subscribe(() => overlayRef.setDirection(this.directionality?.value ?? 'ltr'));
 
     overlayRef.attach(new TemplatePortal(this.panel(), this.viewContainerRef));
+    pushOverlay(this);
 
     overlayRef.backdropClick().subscribe(() => {
       if (this.zMaskClosable()) {
@@ -201,6 +202,7 @@ export class ZardSheetComponent extends ZardSheetHost {
       .keydownEvents()
       .pipe(filter(event => ESCAPE_KEYS.includes(event.key)))
       .subscribe(event => {
+        if (!isTopmostOverlay(this)) return;
         event.preventDefault();
         this.requestClose();
       });
@@ -224,6 +226,7 @@ export class ZardSheetComponent extends ZardSheetHost {
       return;
     }
 
+    popOverlay(this);
     this.overlayRef.dispose();
     this.overlayRef = null;
 

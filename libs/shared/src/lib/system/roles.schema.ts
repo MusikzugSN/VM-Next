@@ -1,6 +1,6 @@
 import * as z from 'zod';
 import { idSchema, shortNameSchema } from '../common/ids.schema';
-import { permissionSchema, permissionScopeSchema } from '../common/permissions.schema';
+import { PERMISSION_ACTIONS, permissionSchema, permissionScopeSchema } from '../common/permissions.schema';
 import { pageSchema, cursorQuerySchema } from '../common/pagination.schema';
 
 /**
@@ -28,7 +28,7 @@ export type RoleListResponse = z.infer<typeof roleListResponseSchema>;
  * plus single permissions. `scope` tells the UI how a permission is evaluated. Codes only; labels come from i18n.
  */
 export const permissionCatalogResponseSchema = z.object({
-  actions: z.array(z.enum(['view', 'create', 'edit', 'delete'])),
+  actions: z.array(z.enum(PERMISSION_ACTIONS)),
   areas: z.array(z.object({ area: z.string(), scope: permissionScopeSchema, permissions: z.array(permissionSchema) })),
   singles: z.array(z.object({ permission: permissionSchema, scope: permissionScopeSchema })),
 });

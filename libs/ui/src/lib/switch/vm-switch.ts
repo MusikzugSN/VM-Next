@@ -8,7 +8,6 @@ const MINUS =
 
 /** M3-Checkbox auf dem nativen `<input type="checkbox">`, Bindings und Tastatur bleiben nativ. */
 @Directive({
-  // eslint-disable-next-line @angular-eslint/directive-selector
   selector: 'input[type=checkbox][vm-checkbox]',
   host: {
     class: `size-[18px] shrink-0 cursor-pointer appearance-none rounded-extra-small border-2 border-on-surface-variant bg-transparent bg-center bg-no-repeat bg-size-[14px] transition-colors hover:border-on-surface checked:border-primary checked:bg-primary indeterminate:border-primary indeterminate:bg-primary disabled:cursor-not-allowed disabled:border-on-surface/38 disabled:checked:border-transparent disabled:checked:bg-on-surface/38 ${CHECK} ${MINUS}`,
