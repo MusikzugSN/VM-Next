@@ -6,7 +6,7 @@ import { existsSync, mkdirSync, readdirSync, readFileSync, statSync, writeFileSy
 import { basename, join } from 'node:path';
 
 import { unzipSync } from 'fflate';
-import pg from 'pg';
+import mysql from 'mysql2/promise';
 import { getDocument } from 'pdfjs-dist/legacy/build/pdf.mjs';
 
 import { readJson } from './lib.mjs';
@@ -31,8 +31,8 @@ function check(step, ok, description, expectedValue, actual) {
 }
 
 // --- Datenquellen --------------------------------------------------------------------------------------
-const db = new pg.Client({ connectionString: process.env.DATABASE_URL });
-const q = async (sql, params = []) => (await db.query(sql, params)).rows;
+let db;
+const q = async (sql, params = []) => (await db.query(sql, params))[0];
 const one = async (sql, params = []) => (await q(sql, params))[0] ?? null;
 
 async function keycloakToken() {
@@ -71,17 +71,17 @@ function files(dir, ext) {
 }
 
 // --- Bausteine -------------------------------------------------------------------------------------------
-const user = (name) => one('SELECT * FROM users WHERE lower(email) = $1', [EMAIL(name)]);
-const ensemble = () => one('SELECT * FROM ensembles WHERE name = $1 AND archived_at IS NULL', [spec.ensemble]);
+const user = (name) => one('SELECT * FROM users WHERE lower(email) = ?', [EMAIL(name)]);
+const ensemble = () => one('SELECT * FROM ensembles WHERE name = ? AND archived_at IS NULL', [spec.ensemble]);
 async function roleIn(userId, ensembleId) {
-  return (await one('SELECT r.default_key FROM memberships m JOIN roles r ON r.id = m.role_id WHERE m.user_id = $1 AND m.ensemble_id = $2', [userId, ensembleId]))?.default_key ?? null;
+  return (await one('SELECT r.default_key FROM memberships m JOIN roles r ON r.id = m.role_id WHERE m.user_id = ? AND m.ensemble_id = ?', [userId, ensembleId]))?.default_key ?? null;
 }
-const score = (title) => one('SELECT * FROM scores WHERE lower(title) = lower($1) ORDER BY created_at LIMIT 1', [title]);
+const score = (title) => one('SELECT * FROM scores WHERE lower(title) = lower(?) ORDER BY created_at LIMIT 1', [title]);
 async function sheet(title, voice) {
-  return one('SELECT s.* FROM sheets s JOIN scores sc ON sc.id = s.score_id JOIN voices v ON v.id = s.voice_id WHERE lower(sc.title) = lower($1) AND v.name = $2', [title, voice]);
+  return one('SELECT s.* FROM sheets s JOIN scores sc ON sc.id = s.score_id JOIN voices v ON v.id = s.voice_id WHERE lower(sc.title) = lower(?) AND v.name = ?', [title, voice]);
 }
 async function upload(fileName) {
-  return one('SELECT * FROM uploads WHERE file_name = $1 ORDER BY created_at DESC LIMIT 1', [fileName]);
+  return one('SELECT * FROM uploads WHERE file_name = ? ORDER BY created_at DESC LIMIT 1', [fileName]);
 }
 
 async function musicianAccount(step, name, voice) {
@@ -91,7 +91,7 @@ async function musicianAccount(step, name, voice) {
   check(step, !u.is_admin, `${name} ist kein Admin`, false, u.is_admin);
   check(step, (await roleIn(u.id, ens?.id)) === 'musician', `${name} ist Musiker:in im ${spec.ensemble}`, 'musician', await roleIn(u.id, ens?.id));
   if (voice) {
-    const voices = (await q('SELECT v.name FROM user_voices uv JOIN voices v ON v.id = uv.voice_id WHERE uv.user_id = $1 ORDER BY uv.position', [u.id])).map((r) => r.name);
+    const voices = (await q('SELECT v.name FROM user_voices uv JOIN voices v ON v.id = uv.voice_id WHERE uv.user_id = ? ORDER BY uv.position', [u.id])).map((r) => r.name);
     check(step, voices.includes(voice), `${name} hat Profilstimme ${voice}`, voice, voices);
   }
   return u;
@@ -133,7 +133,7 @@ const checks = {
 
     const admin = await user('admin');
     if (check('E2E-1.2', !!admin, 'Admin hat sich angemeldet', EMAIL('admin'), null)) {
-      check('E2E-1.2', admin.is_admin === true, 'Admin-Kennzeichen gesetzt', true, admin.is_admin);
+      check('E2E-1.2', Boolean(admin.is_admin) === true, 'Admin-Kennzeichen gesetzt', true, admin.is_admin);
       const root = await one('SELECT id FROM ensembles WHERE is_root');
       check('E2E-1.2', (await roleIn(admin.id, root?.id)) === 'admin', 'Rolle admin im Wurzel-Ensemble', 'admin', await roleIn(admin.id, root?.id));
       check('E2E-1.2', !!admin.name?.trim(), 'Name aus Keycloak übernommen', 'nicht leer', admin.name);
@@ -143,7 +143,7 @@ const checks = {
     if (check('E2E-1.3', !!ens, `Ensemble ${spec.ensemble}`, spec.ensemble, null)) {
       const template = readJson(join(E2E, 'defaults/lineup.default.json'));
       const want = template.instruments.flatMap((i) => i.voices.filter((v) => v.lineup !== false).map((v) => v.name)).sort();
-      const have = (await q('SELECT v.name FROM ensemble_lineup_voices l JOIN voices v ON v.id = l.voice_id WHERE l.ensemble_id = $1', [ens.id])).map((r) => r.name).sort();
+      const have = (await q('SELECT v.name FROM ensemble_lineup_voices l JOIN voices v ON v.id = l.voice_id WHERE l.ensemble_id = ?', [ens.id])).map((r) => r.name).sort();
       check('E2E-1.3', JSON.stringify(want) === JSON.stringify(have), 'Besetzung = Vorlage Standard-Blasorchester', want.length, have.length);
     }
     await checks.gate1();
@@ -181,14 +181,14 @@ const checks = {
     check('E2E-3.1/3.2/3.4', scoreCount === expected.scores.final, 'Anzahl Stücke nach beiden Importen und dem neuen Stück', expected.scores.final, scoreCount);
     const genre = await one("SELECT * FROM field_definitions WHERE name = 'Genre'");
     if (check('E2E-3.1', !!genre, 'Eigenes Feld „Genre“ angelegt', 'Genre', null)) {
-      const options = Number((await one('SELECT count(*) AS n FROM field_options WHERE field_id = $1', [genre.id])).n);
+      const options = Number((await one('SELECT count(*) AS n FROM field_options WHERE field_id = ?', [genre.id])).n);
       check('E2E-3.1', options > 0, '„Genre“ hat Auswahloptionen aus der Datei', '> 0', options);
     }
-    const folder = await one('SELECT * FROM folders WHERE name = $1 AND ensemble_id = $2', [spec.folder, ens?.id]);
+    const folder = await one('SELECT * FROM folders WHERE name = ? AND ensemble_id = ?', [spec.folder, ens?.id]);
     if (check('E2E-3.1', !!folder, `Mappe ${spec.folder} im Hauptorchester`, spec.folder, null)) {
-      check('E2E-3.5', folder.show_in_my_area === true, 'Mappe in Mein Bereich angezeigt', true, folder.show_in_my_area);
+      check('E2E-3.5', Boolean(folder.show_in_my_area) === true, 'Mappe in Mein Bereich angezeigt', true, folder.show_in_my_area);
       for (const [title, number] of Object.entries(expected.folderNumbers)) {
-        const row = await one('SELECT fe.number FROM folder_entries fe JOIN scores s ON s.id = fe.score_id WHERE fe.folder_id = $1 AND lower(s.title) = lower($2)', [folder.id, title]);
+        const row = await one('SELECT fe.number FROM folder_entries fe JOIN scores s ON s.id = fe.score_id WHERE fe.folder_id = ? AND lower(s.title) = lower(?)', [folder.id, title]);
         check('E2E-3.1', row?.number === number, `Nummer von „${title}“ in der Mappe`, number, row?.number ?? null);
       }
     }
@@ -202,14 +202,14 @@ const checks = {
       if (check('E2E-3.4', !!row, `Abschnitt ${s.title} / ${s.voice}`, `${s.pages} Seiten`, null)) check('E2E-3.4', row.page_count === s.pages, `Seitenzahl ${s.title} / ${s.voice}`, s.pages, row.page_count);
     }
     const nw = await user('notenwart');
-    const pending = Number((await one("SELECT count(*) AS n FROM uploads WHERE uploaded_by = $1 AND status <> 'approved'", [nw?.id])).n);
+    const pending = Number((await one("SELECT count(*) AS n FROM uploads WHERE uploaded_by = ? AND status <> 'approved'", [nw?.id])).n);
     check('E2E-3.3', pending === 0, 'Uploads der Notenwart:in sofort freigegeben', 0, pending);
 
-    const event = await one('SELECT * FROM events WHERE name = $1 AND ensemble_id = $2', [spec.event.name, ens?.id]);
+    const event = await one('SELECT * FROM events WHERE name = ? AND ensemble_id = ?', [spec.event.name, ens?.id]);
     if (check('E2E-3.5', !!event, `Event ${spec.event.name}`, spec.event.name, null)) {
-      check('E2E-3.5', event.show_in_my_area === true, 'Event in Mein Bereich angezeigt', true, event.show_in_my_area);
+      check('E2E-3.5', Boolean(event.show_in_my_area) === true, 'Event in Mein Bereich angezeigt', true, event.show_in_my_area);
       check('E2E-3.5', new Date(event.date) > new Date(), 'Event liegt in der Zukunft', '> heute', event.date);
-      const setlist = (await q('SELECT s.title FROM setlist_entries e JOIN scores s ON s.id = e.score_id WHERE e.event_id = $1 ORDER BY e.position', [event.id])).map((r) => r.title);
+      const setlist = (await q('SELECT s.title FROM setlist_entries e JOIN scores s ON s.id = e.score_id WHERE e.event_id = ? ORDER BY e.position', [event.id])).map((r) => r.title);
       check('E2E-3.5', JSON.stringify(setlist) === JSON.stringify(spec.event.setlist), 'Setlist in Spielreihenfolge', spec.event.setlist, setlist);
     }
 
@@ -244,9 +244,9 @@ const checks = {
     check('E2E-4.B.2', bPdfs.filter((p) => voiceOf(p) === spec.voices['musiker-b']).length >= 2, 'Mindestens zwei Einzel-PDFs in der eigenen Stimme', 2, bPdfs.map(voiceOf));
     check('E2E-4.B.3', bPdfs.some((p) => voiceOf(p) === spec.voices['musiker-b-switch']), 'Download nach Stimmwechsel', spec.voices['musiker-b-switch'], bPdfs.map(voiceOf));
     if (b) {
-      const tag = await one('SELECT t.id FROM personal_tags t WHERE t.user_id = $1 AND t.name = $2', [b.id, spec.personalTag.name]);
+      const tag = await one('SELECT t.id FROM personal_tags t WHERE t.user_id = ? AND t.name = ?', [b.id, spec.personalTag.name]);
       if (check('E2E-4.B.4', !!tag, `Persönlicher Tag „${spec.personalTag.name}“`, spec.personalTag.name, null)) {
-        const tagged = (await q('SELECT s.title FROM score_personal_tags st JOIN scores s ON s.id = st.score_id WHERE st.personal_tag_id = $1', [tag.id])).map((r) => r.title);
+        const tagged = (await q('SELECT s.title FROM score_personal_tags st JOIN scores s ON s.id = st.score_id WHERE st.personal_tag_id = ?', [tag.id])).map((r) => r.title);
         check('E2E-4.B.4', JSON.stringify(tagged) === JSON.stringify([spec.personalTag.title]), 'Tag hängt genau an einem Stück', [spec.personalTag.title], tagged);
       }
     }
@@ -280,7 +280,7 @@ const checks = {
     const retry = await upload(spec.musicianUploads.retry.file);
     check('E2E-6.2/6.3', retry?.status === 'approved', 'Korrigierter Upload angenommen', 'approved', retry?.status ?? null);
     const c = await user('musiker-c');
-    const counts = Object.fromEntries((await q('SELECT status, count(*)::int AS n FROM uploads WHERE uploaded_by = $1 GROUP BY status', [c?.id])).map((r) => [r.status, r.n]));
+    const counts = Object.fromEntries((await q('SELECT status, count(*) AS n FROM uploads WHERE uploaded_by = ? GROUP BY status', [c?.id])).map((r) => [r.status, r.n]));
     const want = expected.uploads.musicianFinal;
     check('E2E-6.3', (counts.approved ?? 0) === want.approved && (counts.rejected ?? 0) === want.rejected && (counts.pending ?? 0) === want.pending, 'Uploads von Musiker C am Ende', want, counts);
     for (const key of ['good', 'retry']) {
@@ -336,13 +336,13 @@ if (!name || !checks[name]) {
 }
 if (expected.warnings?.length && name !== 'infra') for (const w of expected.warnings) finding('E-5', `expected.json unvollständig: ${w}`, 'keine Warnungen', w);
 try {
-  await db.connect();
+  db = await mysql.createConnection(process.env.DATABASE_URL);
   await checks[name]();
 } catch (error) {
   console.error(`Orakel ${name} fehlgeschlagen:`, error);
   process.exit(2);
 } finally {
-  await db.end().catch(() => undefined);
+  await db?.end().catch(() => undefined);
 }
 mkdirSync(FINDINGS, { recursive: true });
 writeFileSync(join(FINDINGS, `oracle-${name}.json`), `${JSON.stringify({ check: name, at: new Date().toISOString(), findings }, null, 2)}\n`);
