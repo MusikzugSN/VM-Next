@@ -260,7 +260,7 @@ function fixedOf(s: CreateScoreBody | ScoreRow) {
   };
 }
 
-/** Numeric sort values come from postgres as strings; booleans become 'true'/'false'. */
+/** Numeric sort values may come back from the driver as strings; booleans become 'true'/'false'. */
 function cursorValue(value: string | number | boolean | null): string | number | null {
   if (typeof value === 'boolean') return value ? 'true' : 'false';
   return value;

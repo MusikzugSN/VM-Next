@@ -1,5 +1,5 @@
 import { eq } from 'drizzle-orm';
-import { fieldDefinitions, fieldOptions, folderEntries, folders, scores } from '../db/schema';
+import { fieldDefinitions, fieldOptions, folderEntries, folders, scoreFieldValues, scores } from '../db/schema';
 import { MeRepository } from '../me/me.repository';
 import { expandPermissions } from '../seed/default-roles';
 import { ClubSettingsRepository } from '../settings/club-settings.repository';
@@ -13,7 +13,7 @@ import { ScoresController } from './scores.controller';
 import { ScoresRepository } from './scores.repository';
 import { ScoresService } from './scores.service';
 
-/** CSV import of scores (N-19) against a real PostgreSQL (TEST_DATABASE_URL). */
+/** CSV import of scores (N-19) against a real MySQL (TEST_DATABASE_URL). */
 describe.skipIf(!TEST_DATABASE_URL)('CSV-Import (TEST_DATABASE_URL)', () => {
   let testDb: TestDatabase;
   let t: TestApp;
@@ -134,7 +134,9 @@ describe.skipIf(!TEST_DATABASE_URL)('CSV-Import (TEST_DATABASE_URL)', () => {
     const marsch = options.find((o) => o.label === 'Marsch')?.id;
 
     const [schoenfeld] = await testDb.db.select().from(scores).where(eq(scores.id, ids.schoenfeld));
-    expect(schoenfeld).toMatchObject({ composer: 'Carl Michael Ziehrer', publisher: 'Rundel', customValues: { [genre.id]: marsch } });
+    const schoenfeldValues = await testDb.db.select({ fieldId: scoreFieldValues.fieldId, value: scoreFieldValues.value }).from(scoreFieldValues).where(eq(scoreFieldValues.scoreId, ids.schoenfeld));
+    const customValues = Object.fromEntries(schoenfeldValues.map((v) => [v.fieldId, v.value]));
+    expect({ ...schoenfeld, customValues }).toMatchObject({ composer: 'Carl Michael Ziehrer', publisher: 'Rundel', customValues: { [genre.id]: marsch } });
 
     const waldzauber = res.body.rows.find((r: { line: number }) => r.line === 3).scoreId;
     expect(res.body.rows.find((r: { line: number }) => r.line === 4).scoreId).toBe(waldzauber);

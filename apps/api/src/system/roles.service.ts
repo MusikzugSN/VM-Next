@@ -173,7 +173,7 @@ export class RolesService {
   private async assignmentCounts(roleIds: readonly string[]): Promise<Map<string, number>> {
     if (!roleIds.length) return new Map();
     const rows = await this.db
-      .select({ roleId: memberships.roleId, n: sql<number>`count(*)::int` })
+      .select({ roleId: memberships.roleId, n: sql<number>`count(*)` })
       .from(memberships)
       .where(inArray(memberships.roleId, [...roleIds]))
       .groupBy(memberships.roleId);
@@ -196,6 +196,6 @@ async function freeName(tx: Tx, name: string, ownId: string | undefined): Promis
   const [taken] = await tx
     .select({ id: roles.id })
     .from(roles)
-    .where(and(sql`lower(${roles.name}) = lower(${name})`, ownId ? sql`${roles.id} <> ${ownId}::uuid` : undefined));
+    .where(and(sql`lower(${roles.name}) = lower(${name})`, ownId ? sql`${roles.id} <> ${ownId}` : undefined));
   return taken ? `${name} (Standard)` : name;
 }

@@ -1,5 +1,5 @@
 import { Inject, Injectable } from '@nestjs/common';
-import { and, eq, isNull, sql } from 'drizzle-orm';
+import { and, count, eq, isNull } from 'drizzle-orm';
 import { uuidv7 } from '../common/ids/uuid-v7';
 import { DATABASE, type Database, type Tx } from '../db/database';
 import { clubSettings, ensembles, memberships, roles, users } from '../db/schema';
@@ -11,9 +11,6 @@ export interface LoginUser {
   created: boolean;
   isAdmin: boolean;
 }
-
-/** Serializes logins so that exactly one person becomes the first admin (S-5). */
-const FIRST_USER_LOCK = 0x766d7765; // "vmwe"
 
 export const USERS_REPOSITORY = Symbol('UsersRepository');
 
@@ -34,17 +31,24 @@ export class UsersRepository implements IUsersRepository {
     };
 
     return this.db.transaction(async (tx) => {
-      await tx.execute(sql`select pg_advisory_xact_lock(${FIRST_USER_LOCK})`);
+      // The club's single settings row (S-4) doubles as a lock: serializes concurrent first
+      // logins so exactly one person becomes the first admin (S-5). Released on commit/rollback.
+      await tx.select().from(clubSettings).where(eq(clubSettings.id, 1)).for('update');
 
       const [existing] = await tx
-        .update(users)
-        .set({ ...profile, lastLoginAt: now, updatedAt: now })
-        .where(eq(users.oidcSub, claims.sub))
-        .returning({ id: users.id, status: users.status, isAdmin: users.isAdmin });
-      if (existing) return { ...existing, created: false };
+        .select({ id: users.id, status: users.status, isAdmin: users.isAdmin })
+        .from(users)
+        .where(eq(users.oidcSub, claims.sub));
+      if (existing) {
+        await tx
+          .update(users)
+          .set({ ...profile, lastLoginAt: now, updatedAt: now })
+          .where(eq(users.oidcSub, claims.sub));
+        return { ...existing, created: false };
+      }
 
-      const [{ count }] = await tx.select({ count: sql<number>`count(*)::int` }).from(users);
-      const isFirst = count === 0;
+      const [{ total }] = await tx.select({ total: count() }).from(users);
+      const isFirst = total === 0;
       const id = uuidv7();
       await tx.insert(users).values({
         id,

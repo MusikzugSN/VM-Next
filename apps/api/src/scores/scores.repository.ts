@@ -1,8 +1,8 @@
 import { Inject, Injectable } from '@nestjs/common';
 import type { CustomFieldType, EnsembleOption, ScoreFixedFields, VoiceRef } from '@vm-web/shared';
-import { and, asc, eq, inArray, sql, type SQL } from 'drizzle-orm';
+import { and, asc, count, eq, inArray, ne, sql, type SQL } from 'drizzle-orm';
 import { activeEnsembleOptions } from '../common/ensemble-tree';
-import { DATABASE, type Database } from '../db/database';
+import { DATABASE, type Database, type Tx } from '../db/database';
 import {
   clubTags,
   ensembleLineupVoices,
@@ -13,6 +13,7 @@ import {
   folders,
   instruments,
   scoreClubTags,
+  scoreFieldValues,
   scores,
   sheets,
   uploads,
@@ -24,7 +25,7 @@ import type { SortPlan } from './score-query';
 import { replaceRows } from '../db/table-helpers';
 import { appendTo } from '../common/collections';
 
-export type ScoreRow = typeof scores.$inferSelect;
+export type ScoreRow = typeof scores.$inferSelect & { customValues: Record<string, unknown> };
 
 /** Queries of the library (N-1..N-5). Permission checks happen before, in guards and services. */
 @Injectable()
@@ -52,29 +53,49 @@ export class ScoresRepository {
     const [row] = await this.db
       .select({ id: fieldDefinitions.id })
       .from(fieldDefinitions)
-      .where(and(sql`lower(${fieldDefinitions.name}) = lower(${name})`, exceptId ? sql`${fieldDefinitions.id} <> ${exceptId}::uuid` : undefined));
+      .where(and(sql`lower(${fieldDefinitions.name}) = lower(${name})`, exceptId ? ne(fieldDefinitions.id, exceptId) : undefined));
     return !!row;
   }
 
   // --- scores -------------------------------------------------------------------------------------------------
 
   async scoreTable(where: SQL[], plan: SortPlan, limit: number) {
-    return this.db
+    const rows = await this.db
       .select({ score: scores, sortEmpty: plan.emptyFlag, sortValue: sql<string | number | boolean | null>`${plan.value}` })
       .from(scores)
       .where(and(...where))
       .orderBy(...plan.orderBy)
       .limit(limit);
+    const customValues = await this.customValuesOf(rows.map((r) => r.score.id));
+    return rows.map((r) => ({ ...r, score: { ...r.score, customValues: customValues.get(r.score.id) ?? {} } }));
   }
 
   async countScores(where: SQL[]): Promise<number> {
-    const [row] = await this.db.select({ n: sql<number>`count(*)::int` }).from(scores).where(and(...where));
+    const [row] = await this.db.select({ n: count() }).from(scores).where(and(...where));
     return row?.n ?? 0;
   }
 
   async score(id: string): Promise<ScoreRow | undefined> {
     const [row] = await this.db.select().from(scores).where(eq(scores.id, id));
-    return row;
+    if (!row) return undefined;
+    const customValues = await this.customValuesOf([id]);
+    return { ...row, customValues: customValues.get(id) ?? {} };
+  }
+
+  /** Custom field values of the given scores, grouped by score id (N-2). */
+  async customValuesOf(scoreIds: readonly string[]): Promise<Map<string, Record<string, unknown>>> {
+    const result = new Map<string, Record<string, unknown>>();
+    if (!scoreIds.length) return result;
+    const rows = await this.db
+      .select({ scoreId: scoreFieldValues.scoreId, fieldId: scoreFieldValues.fieldId, value: scoreFieldValues.value })
+      .from(scoreFieldValues)
+      .where(inArray(scoreFieldValues.scoreId, [...scoreIds]));
+    for (const r of rows) {
+      const obj = result.get(r.scoreId) ?? {};
+      obj[r.fieldId] = r.value;
+      result.set(r.scoreId, obj);
+    }
+    return result;
   }
 
   async tagsOf(scoreIds: readonly string[]): Promise<Map<string, { id: string; name: string }[]>> {
@@ -98,16 +119,23 @@ export class ScoresRepository {
 
   async insertScore(id: string, fixed: ScoreFixedFields, customValues: Record<string, unknown>, tagIds: readonly string[]): Promise<void> {
     await this.db.transaction(async (tx) => {
-      await tx.insert(scores).values({ id, ...fixed, customValues });
+      await tx.insert(scores).values({ id, ...fixed });
+      await this.writeCustomValues(tx, id, customValues);
       if (tagIds.length) await tx.insert(scoreClubTags).values(tagIds.map((tagId) => ({ scoreId: id, tagId })));
     });
   }
 
   async updateScore(id: string, fixed: ScoreFixedFields, customValues: Record<string, unknown>, tagIds: readonly string[]): Promise<void> {
     await this.db.transaction(async (tx) => {
-      await tx.update(scores).set({ ...fixed, customValues, updatedAt: new Date() }).where(eq(scores.id, id));
+      await tx.update(scores).set({ ...fixed, updatedAt: new Date() }).where(eq(scores.id, id));
+      await this.writeCustomValues(tx, id, customValues);
       await replaceRows(tx, scoreClubTags, eq(scoreClubTags.scoreId, id), tagIds.map((tagId) => ({ scoreId: id, tagId })));
     });
+  }
+
+  async writeCustomValues(tx: Tx, scoreId: string, values: Record<string, unknown>): Promise<void> {
+    const rows = Object.entries(values).map(([fieldId, value]) => ({ scoreId, fieldId, value }));
+    await replaceRows(tx, scoreFieldValues, eq(scoreFieldValues.scoreId, scoreId), rows);
   }
 
   /** Deletes the score with sheets and entries; returns the file keys to remove from storage. */
@@ -142,7 +170,7 @@ export class ScoresRepository {
 
   async pendingUploadCount(scoreId: string): Promise<number> {
     const [row] = await this.db
-      .select({ n: sql<number>`count(*)::int` })
+      .select({ n: count() })
       .from(uploads)
       .where(and(eq(uploads.scoreId, scoreId), eq(uploads.status, 'pending')));
     return row?.n ?? 0;
@@ -159,8 +187,10 @@ export class ScoresRepository {
   }
 
   async deleteSheet(sheetId: string): Promise<string | undefined> {
-    const [row] = await this.db.delete(sheets).where(eq(sheets.id, sheetId)).returning({ key: sheets.fileKey });
-    return row?.key;
+    const [row] = await this.db.select({ key: sheets.fileKey }).from(sheets).where(eq(sheets.id, sheetId));
+    if (!row) return undefined;
+    await this.db.delete(sheets).where(eq(sheets.id, sheetId));
+    return row.key;
   }
 
   /** `scoreId → voiceId → sheetId` for the given scores and voices. */

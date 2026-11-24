@@ -1,6 +1,6 @@
 import { Inject, Injectable } from '@nestjs/common';
 import type { VoiceRef } from '@vm-web/shared';
-import { and, asc, desc, eq, gte, inArray, isNull, lt, sql, type SQL } from 'drizzle-orm';
+import { and, asc, desc, eq, gte, inArray, isNull, like, lt, ne, or, sql, type SQL } from 'drizzle-orm';
 import type { CursorKey } from '../common/pagination/cursor';
 import { DATABASE, type Database } from '../db/database';
 import {
@@ -28,7 +28,7 @@ import { appendTo } from '../common/collections';
 import { hasClubTag, likePattern } from '../common/sql';
 
 /** `( $1, $2, … )` for `in` lists; callers guarantee a non-empty list. */
-const list = (ids: readonly string[]): SQL => sql`(${sql.join(ids.map((id) => sql`${id}::uuid`), sql`, `)})`;
+const list = (ids: readonly string[]): SQL => sql`(${sql.join(ids.map((id) => sql`${id}`), sql`, `)})`;
 
 /** Score ids reachable through released folders and events of the given ensembles (R-2, N-15, F-6). */
 function visibleScoreIds(ensembleIds: readonly string[]): SQL {
@@ -78,8 +78,8 @@ export interface ScoreFilter {
   personalTag?: { userId: string; tagId: string };
 }
 
-const scoreCountOfFolder = sql<number>`(select count(*)::int from folder_entries x where x.folder_id = ${folders.id})`;
-const scoreCountOfEvent = sql<number>`(select count(*)::int from setlist_entries x where x.event_id = ${events.id})`;
+const scoreCountOfFolder = sql<number>`(select count(*) from folder_entries x where x.folder_id = ${folders.id})`;
+const scoreCountOfEvent = sql<number>`(select count(*) from setlist_entries x where x.event_id = ${events.id})`;
 
 /** Read queries of Mein Bereich. Every method is scoped to the caller's member ensembles. */
 const eventColumns = {
@@ -111,12 +111,16 @@ export class MeRepository {
   // --- uploads of the caller (N-14) ---------------------------------------------------------------------------
 
   async uploadSummary(userId: string, since: Date) {
-    const [row] = await this.db.execute<{ pending: number; rejected: number; approved: number }>(sql`
-      select count(*) filter (where status = 'pending')::int as pending,
-             count(*) filter (where status = 'rejected' and decided_at >= ${since.toISOString()}::timestamptz)::int as rejected,
-             count(*) filter (where status = 'approved' and decided_at >= ${since.toISOString()}::timestamptz)::int as approved
-        from uploads where uploaded_by = ${userId}::uuid`).then((r) => r.rows);
-    return { pending: row?.pending ?? 0, recentlyRejected: row?.rejected ?? 0, recentlyApproved: row?.approved ?? 0 };
+    const [row] = await this.db
+      .select({
+        pending: sql<number | null>`sum(case when ${uploads.status} = 'pending' then 1 else 0 end)`,
+        rejected: sql<number | null>`sum(case when ${uploads.status} = 'rejected' and ${uploads.decidedAt} >= ${since} then 1 else 0 end)`,
+        approved: sql<number | null>`sum(case when ${uploads.status} = 'approved' and ${uploads.decidedAt} >= ${since} then 1 else 0 end)`,
+      })
+      .from(uploads)
+      .where(eq(uploads.uploadedBy, userId));
+    // sum() comes back from the driver as a string, not a number.
+    return { pending: Number(row?.pending ?? 0), recentlyRejected: Number(row?.rejected ?? 0), recentlyApproved: Number(row?.approved ?? 0) };
   }
 
   async myUploads(userId: string, status: 'pending' | 'approved' | 'rejected' | undefined, cursor: CursorKey | undefined, limit: number) {
@@ -138,7 +142,7 @@ export class MeRepository {
         and(
           eq(uploads.uploadedBy, userId),
           status ? eq(uploads.status, status) : undefined,
-          cursor ? sql`(${uploads.createdAt}, ${uploads.id}) < (${cursor[0]}::timestamptz, ${cursor[1]}::uuid)` : undefined,
+          cursor ? sql`(${uploads.createdAt}, ${uploads.id}) < (${cursor[0]}, ${cursor[1]})` : undefined,
         ),
       )
       .orderBy(desc(uploads.createdAt), desc(uploads.id))
@@ -238,8 +242,8 @@ export class MeRepository {
     const upcoming = period === 'upcoming';
     const after = cursor
       ? upcoming
-        ? sql`(${events.date}, ${events.id}) > (${cursor[0]}::date, ${cursor[1]}::uuid)`
-        : sql`(${events.date}, ${events.id}) < (${cursor[0]}::date, ${cursor[1]}::uuid)`
+        ? sql`(${events.date}, ${events.id}) > (${cursor[0]}, ${cursor[1]})`
+        : sql`(${events.date}, ${events.id}) < (${cursor[0]}, ${cursor[1]})`
       : undefined;
     return this.db
       .select(eventColumns)
@@ -318,7 +322,7 @@ export class MeRepository {
           eq(folders.showInMyArea, true),
           isNull(ensembles.archivedAt),
           cursor
-            ? sql`(lower(${ensembles.name}), lower(${folders.name}), ${folders.id}) > (${cursor[0]}, ${cursor[1]}, ${cursor[2]}::uuid)`
+            ? sql`(lower(${ensembles.name}), lower(${folders.name}), ${folders.id}) > (${cursor[0]}, ${cursor[1]}, ${cursor[2]})`
             : undefined,
         ),
       )
@@ -358,7 +362,7 @@ export class MeRepository {
         and(
           eq(folderEntries.folderId, folderId),
           ...this.scoreFilter(filter),
-          cursor ? sql`(${folderEntries.numberSortKey}, ${scores.id}) > (${cursor[0]}, ${cursor[1]}::uuid)` : undefined,
+          cursor ? sql`(${folderEntries.numberSortKey}, ${scores.id}) > (${cursor[0]}, ${cursor[1]})` : undefined,
         ),
       )
       .orderBy(asc(folderEntries.numberSortKey), asc(scores.id))
@@ -382,13 +386,13 @@ export class MeRepository {
   // --- tags (M-8) ---------------------------------------------------------------------------------------------
 
   async tagsWithCounts(userId: string, ensembleIds: readonly string[]) {
-    const visible = ensembleIds.length ? visibleScoreIds(ensembleIds) : sql`(select null::uuid where false)`;
+    const visible = ensembleIds.length ? visibleScoreIds(ensembleIds) : sql`(select null where false)`;
     const [club, personal] = await Promise.all([
       this.db
         .select({
           id: clubTags.id,
           name: clubTags.name,
-          scoreCount: sql<number>`(select count(*)::int from score_club_tags x where x.tag_id = ${clubTags.id} and x.score_id in ${visible})`,
+          scoreCount: sql<number>`(select count(*) from score_club_tags x where x.tag_id = ${clubTags.id} and x.score_id in ${visible})`,
         })
         .from(clubTags)
         .orderBy(sql`lower(${clubTags.name})`),
@@ -396,7 +400,7 @@ export class MeRepository {
         .select({
           id: personalTags.id,
           name: personalTags.name,
-          scoreCount: sql<number>`(select count(*)::int from score_personal_tags x where x.personal_tag_id = ${personalTags.id} and x.score_id in ${visible})`,
+          scoreCount: sql<number>`(select count(*) from score_personal_tags x where x.personal_tag_id = ${personalTags.id} and x.score_id in ${visible})`,
         })
         .from(personalTags)
         .where(eq(personalTags.userId, userId))
@@ -480,7 +484,7 @@ export class MeRepository {
         and(
           eq(personalTags.userId, userId),
           sql`lower(${personalTags.name}) = lower(${name})`,
-          exceptId ? sql`${personalTags.id} <> ${exceptId}::uuid` : undefined,
+          exceptId ? ne(personalTags.id, exceptId) : undefined,
         ),
       );
     return !!row;
@@ -499,7 +503,11 @@ export class MeRepository {
   }
 
   async tagScore(tagId: string, scoreId: string): Promise<void> {
-    await this.db.insert(scorePersonalTags).values({ personalTagId: tagId, scoreId }).onConflictDoNothing();
+    // No true "do nothing" upsert in MySQL; a self-assign is a no-op when the row already exists.
+    await this.db
+      .insert(scorePersonalTags)
+      .values({ personalTagId: tagId, scoreId })
+      .onDuplicateKeyUpdate({ set: { personalTagId: sql`${scorePersonalTags.personalTagId}` } });
   }
 
   async untagScore(tagId: string, scoreId: string): Promise<void> {
@@ -510,16 +518,12 @@ export class MeRepository {
 
   private scoreFilter(filter: ScoreFilter): (SQL | undefined)[] {
     return [
-      filter.q
-        ? sql`(${scores.title} ilike ${likePattern(filter.q)} or ${scores.composer} ilike ${likePattern(filter.q)})`
-        : undefined,
-      filter.clubTagId
-        ? hasClubTag(filter.clubTagId)
-        : undefined,
+      filter.q ? or(like(scores.title, likePattern(filter.q)), like(scores.composer, likePattern(filter.q))) : undefined,
+      filter.clubTagId ? hasClubTag(filter.clubTagId) : undefined,
       filter.personalTag
         ? sql`exists (select 1 from score_personal_tags x join personal_tags p on p.id = x.personal_tag_id
-                       where x.score_id = ${scores.id} and p.id = ${filter.personalTag.tagId}::uuid
-                         and p.user_id = ${filter.personalTag.userId}::uuid)`
+                       where x.score_id = ${scores.id} and p.id = ${filter.personalTag.tagId}
+                         and p.user_id = ${filter.personalTag.userId})`
         : undefined,
     ];
   }

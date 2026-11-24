@@ -13,7 +13,7 @@ import {
   type Page,
   type RenameBody,
 } from '@vm-web/shared';
-import { and, asc, eq, sql } from 'drizzle-orm';
+import { and, asc, eq, like, sql } from 'drizzle-orm';
 import { RequirePermission } from '../access/decorators';
 import { uuidv7 } from '../common/ids/uuid-v7';
 import { decodeCursor, toPage } from '../common/pagination/cursor';
@@ -37,16 +37,11 @@ export class TagsService {
       .select({
         id: clubTags.id,
         name: clubTags.name,
-        scoreCount: sql<number>`(select count(*)::int from score_club_tags x where x.tag_id = ${clubTags.id})`,
+        scoreCount: sql<number>`(select count(*) from score_club_tags x where x.tag_id = ${clubTags.id})`,
         sortKey: sql<string>`lower(${clubTags.name})`,
       })
       .from(clubTags)
-      .where(
-        and(
-          query.q ? sql`${clubTags.name} ilike ${likePattern(query.q)}` : undefined,
-          afterNameAndId(clubTags.name, clubTags.id, cursor),
-        ),
-      )
+      .where(and(query.q ? like(clubTags.name, likePattern(query.q)) : undefined, afterNameAndId(clubTags.name, clubTags.id, cursor)))
       .orderBy(sql`lower(${clubTags.name})`, asc(clubTags.id))
       .limit(query.limit + 1);
     return toPage(rows, query.limit, (r) => [r.sortKey, r.id], (r) => ({ id: r.id, name: r.name, scoreCount: r.scoreCount }));
@@ -59,13 +54,13 @@ export class TagsService {
   }
 
   async rename(tagId: string, name: string): Promise<void> {
-    const rows = await withNameTaken(() => this.db.update(clubTags).set({ name }).where(eq(clubTags.id, tagId)).returning({ id: clubTags.id }));
-    if (!rows.length) throw ProblemException.notFound();
+    const [result] = await withNameTaken(() => this.db.update(clubTags).set({ name }).where(eq(clubTags.id, tagId)));
+    if (!result.affectedRows) throw ProblemException.notFound();
   }
 
   async delete(tagId: string): Promise<void> {
-    const rows = await this.db.delete(clubTags).where(eq(clubTags.id, tagId)).returning({ id: clubTags.id });
-    if (!rows.length) throw ProblemException.notFound();
+    const [result] = await this.db.delete(clubTags).where(eq(clubTags.id, tagId));
+    if (!result.affectedRows) throw ProblemException.notFound();
   }
 }
 

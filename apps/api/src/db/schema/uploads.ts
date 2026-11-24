@@ -1,28 +1,28 @@
-import { bigint, index, integer, pgEnum, pgTable, text, timestamp, uuid } from 'drizzle-orm/pg-core';
+import { bigint, timestamp, index, int, mysqlEnum, mysqlTable, text, varchar } from 'drizzle-orm/mysql-core';
 import { scores } from './scores';
 import { users } from './users';
 import { voices } from './voices';
 
-export const uploadStatus = pgEnum('upload_status', ['pending', 'approved', 'rejected']);
+export const UPLOAD_STATUSES = ['pending', 'approved', 'rejected'] as const;
 
 /** Uploaded PDFs until the review decides, then their history (N-10..N-14). */
-export const uploads = pgTable(
+export const uploads = mysqlTable(
   'uploads',
   {
-    id: uuid('id').primaryKey(),
-    uploadedBy: uuid('uploaded_by').references(() => users.id, { onDelete: 'set null' }),
+    id: varchar('id', { length: 36 }).primaryKey(),
+    uploadedBy: varchar('uploaded_by', { length: 36 }).references(() => users.id, { onDelete: 'set null' }),
     fileName: text('file_name').notNull(),
     /** Original file; `null` once it has been cleaned up. */
     fileKey: text('file_key'),
-    pageCount: integer('page_count').notNull(),
+    pageCount: int('page_count').notNull(),
     sizeBytes: bigint('size_bytes', { mode: 'number' }).notNull(),
-    scoreId: uuid('score_id').references(() => scores.id, { onDelete: 'set null' }),
-    voiceId: uuid('voice_id').references(() => voices.id, { onDelete: 'set null' }),
-    status: uploadStatus('status').notNull().default('pending'),
+    scoreId: varchar('score_id', { length: 36 }).references(() => scores.id, { onDelete: 'set null' }),
+    voiceId: varchar('voice_id', { length: 36 }).references(() => voices.id, { onDelete: 'set null' }),
+    status: mysqlEnum('status', UPLOAD_STATUSES).notNull().default('pending'),
     rejectionReason: text('rejection_reason'),
-    decidedBy: uuid('decided_by').references(() => users.id, { onDelete: 'set null' }),
-    decidedAt: timestamp('decided_at', { withTimezone: true }),
-    createdAt: timestamp('created_at', { withTimezone: true }).notNull().defaultNow(),
+    decidedBy: varchar('decided_by', { length: 36 }).references(() => users.id, { onDelete: 'set null' }),
+    decidedAt: timestamp('decided_at', { fsp: 6 }),
+    createdAt: timestamp('created_at', { fsp: 6 }).notNull().defaultNow(),
   },
   (t) => [index('uploads_status_created_idx').on(t.status, t.createdAt, t.id), index('uploads_uploader_idx').on(t.uploadedBy, t.createdAt)],
 );

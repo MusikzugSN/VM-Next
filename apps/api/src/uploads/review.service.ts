@@ -7,8 +7,8 @@ import type {
   ReviewQueueResponse,
   UploadDetailsResponse,
 } from '@vm-web/shared';
-import { and, asc, desc, eq, sql } from 'drizzle-orm';
-import { alias } from 'drizzle-orm/pg-core';
+import { and, asc, count, desc, eq, ne, sql } from 'drizzle-orm';
+import { alias } from 'drizzle-orm/mysql-core';
 import type { Readable } from 'node:stream';
 import type { AccessContext } from '../access/access-context';
 import { uuidv7 } from '../common/ids/uuid-v7';
@@ -53,15 +53,10 @@ export class ReviewService {
         .leftJoin(uploader, eq(uploader.id, uploads.uploadedBy))
         .leftJoin(scores, eq(scores.id, uploads.scoreId))
         .leftJoin(voices, eq(voices.id, uploads.voiceId))
-        .where(
-          and(
-            eq(uploads.status, 'pending'),
-            cursor ? sql`(${uploads.createdAt}, ${uploads.id}) > (${cursor[0]}::timestamptz, ${cursor[1]}::uuid)` : undefined,
-          ),
-        )
+        .where(and(eq(uploads.status, 'pending'), cursor ? sql`(${uploads.createdAt}, ${uploads.id}) > (${cursor[0]}, ${cursor[1]})` : undefined))
         .orderBy(asc(uploads.createdAt), asc(uploads.id))
         .limit(query.limit + 1),
-      this.db.select({ total: sql<number>`count(*)::int` }).from(uploads).where(eq(uploads.status, 'pending')),
+      this.db.select({ total: count() }).from(uploads).where(eq(uploads.status, 'pending')),
     ]);
     const page = rows.slice(0, query.limit);
     const last = page.at(-1);
@@ -203,13 +198,13 @@ export class ReviewService {
     const [ref] = await this.db.select({ createdAt: uploads.createdAt }).from(uploads).where(eq(uploads.id, uploadId));
     if (!ref) return null;
     const created = ref.createdAt.toISOString();
-    const after = sql`(${uploads.createdAt}, ${uploads.id}) > (${created}::timestamptz, ${uploadId}::uuid)`;
-    const before = sql`(${uploads.createdAt}, ${uploads.id}) < (${created}::timestamptz, ${uploadId}::uuid)`;
+    const after = sql`(${uploads.createdAt}, ${uploads.id}) > (${created}, ${uploadId})`;
+    const before = sql`(${uploads.createdAt}, ${uploads.id}) < (${created}, ${uploadId})`;
     const pick = async (cond: ReturnType<typeof sql> | undefined, sort: typeof asc) => {
       const [row] = await this.db
         .select({ id: uploads.id })
         .from(uploads)
-        .where(and(eq(uploads.status, 'pending'), sql`${uploads.id} <> ${uploadId}::uuid`, cond))
+        .where(and(eq(uploads.status, 'pending'), ne(uploads.id, uploadId), cond))
         .orderBy(sort(uploads.createdAt), sort(uploads.id))
         .limit(1);
       return row?.id ?? null;

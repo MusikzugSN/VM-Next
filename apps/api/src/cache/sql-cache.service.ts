@@ -1,5 +1,5 @@
 import { Inject, Injectable, Logger, OnModuleDestroy } from '@nestjs/common';
-import { and, eq, gt, lte, sql } from 'drizzle-orm';
+import { and, eq, gt, lte } from 'drizzle-orm';
 
 import { DATABASE, type Database } from '../db/database';
 import { cacheEntries } from '../db/schema';
@@ -9,13 +9,13 @@ import type { ICacheService } from './cache.service';
 const SWEEP_INTERVAL_MS = 10 * 60_000;
 
 /**
- * `ICacheService` on Postgres (table `cache_entries`): sessions survive restarts and are shared
- * between API instances. Values are stored as JSONB, so they must be plain data (as the interface
- * already requires).
+ * `ICacheService` on the database (table `cache_entries`): sessions survive restarts and are
+ * shared between API instances. Values are stored as JSON, so they must be plain data (as the
+ * interface already requires).
  */
 @Injectable()
-export class PostgresCacheService implements ICacheService, OnModuleDestroy {
-  private readonly logger = new Logger(PostgresCacheService.name);
+export class SqlCacheService implements ICacheService, OnModuleDestroy {
+  private readonly logger = new Logger(SqlCacheService.name);
   private readonly sweeper = setInterval(() => void this.sweep(), SWEEP_INTERVAL_MS);
 
   constructor(@Inject(DATABASE) private readonly db: Database) {
@@ -26,17 +26,17 @@ export class PostgresCacheService implements ICacheService, OnModuleDestroy {
     const [row] = await this.db
       .select({ value: cacheEntries.value })
       .from(cacheEntries)
-      .where(and(eq(cacheEntries.key, key), gt(cacheEntries.expiresAt, sql`now()`)));
+      .where(and(eq(cacheEntries.key, key), gt(cacheEntries.expiresAt, new Date())));
     return row ? (row.value as T) : undefined;
   }
 
   async set<T>(key: string, value: T, ttlSeconds: number): Promise<void> {
     if (!(ttlSeconds > 0)) throw new RangeError(`ttlSeconds must be positive, got ${ttlSeconds}`);
-    const expiresAt = sql`now() + make_interval(secs => ${ttlSeconds})`;
+    const expiresAt = new Date(Date.now() + ttlSeconds * 1000);
     await this.db
       .insert(cacheEntries)
       .values({ key, value: value as unknown, expiresAt })
-      .onConflictDoUpdate({ target: cacheEntries.key, set: { value: value as unknown, expiresAt } });
+      .onDuplicateKeyUpdate({ set: { value: value as unknown, expiresAt } });
   }
 
   async delete(key: string): Promise<void> {
@@ -46,8 +46,8 @@ export class PostgresCacheService implements ICacheService, OnModuleDestroy {
   /** Removes expired entries; returns how many. */
   async sweep(): Promise<number> {
     try {
-      const removed = await this.db.delete(cacheEntries).where(lte(cacheEntries.expiresAt, sql`now()`)).returning({ key: cacheEntries.key });
-      return removed.length;
+      const [result] = await this.db.delete(cacheEntries).where(lte(cacheEntries.expiresAt, new Date()));
+      return result.affectedRows;
     } catch (error) {
       this.logger.warn(`Sweeping expired cache entries failed: ${String(error)}`);
       return 0;

@@ -282,6 +282,7 @@ export class ScoreImportService {
   /** All scores by match key of the title, oldest first. */
   private async scoreIndex(): Promise<Map<string, ScoreState[]>> {
     const rows = await this.repo.db.select().from(scores).orderBy(scores.createdAt, scores.id);
+    const customValues = await this.repo.customValuesOf(rows.map((r) => r.id));
     const index = new Map<string, ScoreState[]>();
     for (const row of rows) {
       const state: ScoreState = {
@@ -294,7 +295,7 @@ export class ScoreImportService {
           publisherNumber: row.publisherNumber,
           durationSeconds: row.durationSeconds,
         },
-        custom: { ...row.customValues },
+        custom: { ...(customValues.get(row.id) ?? {}) },
         isNew: false,
         changed: false,
       };
@@ -330,14 +331,13 @@ export class ScoreImportService {
 
       const created = [...states.values()].filter((s) => s.isNew);
       for (let i = 0; i < created.length; i += INSERT_CHUNK) {
-        await tx.insert(scores).values(created.slice(i, i + INSERT_CHUNK).map((s) => ({ id: s.id, ...s.fixed, customValues: s.custom })));
+        await tx.insert(scores).values(created.slice(i, i + INSERT_CHUNK).map((s) => ({ id: s.id, ...s.fixed })));
       }
+      for (const state of created) await this.repo.writeCustomValues(tx, state.id, state.custom);
       for (const state of states.values()) {
         if (state.isNew || !state.changed) continue;
-        await tx
-          .update(scores)
-          .set({ ...state.fixed, customValues: state.custom, updatedAt: new Date() })
-          .where(eq(scores.id, state.id));
+        await tx.update(scores).set({ ...state.fixed, updatedAt: new Date() }).where(eq(scores.id, state.id));
+        await this.repo.writeCustomValues(tx, state.id, state.custom);
       }
 
       for (const folder of folderPlans.values()) {

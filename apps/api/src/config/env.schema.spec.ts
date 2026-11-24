@@ -2,7 +2,7 @@ import { validateEnv } from './env.schema';
 
 const minimal = {
   PUBLIC_BASE_URL: 'http://localhost:4200',
-  DATABASE_URL: 'postgres://vmweb:vmweb@localhost:5432/vmweb',
+  DATABASE_URL: 'mysql://vmweb:vmweb@localhost:3306/vmweb',
   FILE_STORAGE_PATH: './tmp/storage',
   OIDC_ISSUER_URL: 'http://localhost:1411',
   OIDC_CLIENT_ID: 'client',
@@ -40,7 +40,7 @@ describe('validateEnv', () => {
   });
 
   it('lists every invalid variable in one error', () => {
-    const run = () => validateEnv({ ...minimal, DATABASE_URL: 'mysql://x', OIDC_ISSUER_URL: undefined, PORT: '-1' });
+    const run = () => validateEnv({ ...minimal, DATABASE_URL: 'postgres://x', OIDC_ISSUER_URL: undefined, PORT: '-1' });
     expect(run).toThrow(/^Invalid environment configuration/);
     for (const name of ['DATABASE_URL', 'OIDC_ISSUER_URL', 'PORT']) {
       expect(run).toThrow(new RegExp(`- ${name}:`));

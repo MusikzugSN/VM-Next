@@ -237,11 +237,11 @@ VM-Web bleibt selbst gehostet, ein Verein pro Installation, mit einer Oberfläch
 | Bereich | Anforderung |
 | --- | --- |
 | Oberfläche | Angular mit [Zard UI](https://zardui.com/) (Tailwind CSS v4, Signals), Lightmode; Darkmode später. Gestaltung nach der [VM-Web Design Guideline](https://claude.ai/artifact/LDi95rWoEnHsFZeFaobAWS). |
-| Technik | Nx-Monorepo mit pnpm und Node 24 LTS in einem neuen Repository. Frontend Angular mit Zard UI, Backend NestJS, Datenbank PostgreSQL mit Drizzle. Ein gemeinsames Paket enthält Zod-Schemas für Requests und Responses sowie URL-Konstanten. PDFs erzeugt das Backend mit pdf-lib, die Vorschau im Browser läuft mit pdf.js. Unit-Tests mit Vitest. Ende-zu-Ende prüft ein KI-Testlauf die gebauten Images produktionsnah (Traefik, Keycloak, CUPS-PDF) mit Agenten als Admin, Notenwart:in und Musiker:innen; Akzeptanzkriterien in [e2e-acceptance.md](e2e-acceptance.md), Umgebung in `deploy/e2e`. Druckservice ebenfalls TypeScript/Node. |
+| Technik | Nx-Monorepo mit pnpm und Node 24 LTS in einem neuen Repository. Frontend Angular mit Zard UI, Backend NestJS, Datenbank MySQL mit Drizzle. Ein gemeinsames Paket enthält Zod-Schemas für Requests und Responses sowie URL-Konstanten. PDFs erzeugt das Backend mit pdf-lib, die Vorschau im Browser läuft mit pdf.js. Unit-Tests mit Vitest. Ende-zu-Ende prüft ein KI-Testlauf die gebauten Images produktionsnah (Traefik, Keycloak, CUPS-PDF) mit Agenten als Admin, Notenwart:in und Musiker:innen; Akzeptanzkriterien in [e2e-acceptance.md](e2e-acceptance.md), Umgebung in `deploy/e2e`. Druckservice ebenfalls TypeScript/Node. |
 | Responsiv | Desktop ab 1280 px mit fester Seitenleiste, Tablet 768–1279 px mit ausklappbarer Navigation, Mobil unter 768 px mit Karten statt Tabellen; Tippflächen mindestens 44 px. |
 | Barrierefreiheit | Kontraste nach WCAG 2.2 AA, vollständig per Tastatur bedienbar, echte Buttons, Links und Labels. |
 | Sprache | Deutsch, Texte über i18n-Dateien, damit weitere Sprachen möglich sind. |
-| Betrieb | Ein Verein pro Installation; Auslieferung als Docker Compose mit Web, API und PostgreSQL, PDFs auf einem Dateisystem-Volume hinter einer Speicher-Schnittstelle; TLS über den vorhandenen Reverse Proxy des Vereins; Konfiguration über Umgebungsvariablen. GitHub Actions prüft jeden Pull Request und veröffentlicht Images bei Releases in der GitHub Container Registry. Der Druckservice wird als Einzeldatei (Node SEA) mit Installationsskript für einen systemd-User-Service verteilt. |
+| Betrieb | Ein Verein pro Installation; Auslieferung als Docker Compose mit Web, API und MySQL, PDFs auf einem Dateisystem-Volume hinter einer Speicher-Schnittstelle; TLS über den vorhandenen Reverse Proxy des Vereins; Konfiguration über Umgebungsvariablen. GitHub Actions prüft jeden Pull Request und veröffentlicht Images bei Releases in der GitHub Container Registry. Der Druckservice wird als Einzeldatei (Node SEA) mit Installationsskript für einen systemd-User-Service verteilt. |
 | Datenschutz | Personendaten nur aus dem Identity-Server, Löschen eines Kontos entfernt alle persönlichen Daten (Profilstimmen, persönliche Tags). |
 | Sicherung | Export von Datenbank und PDFs für Backups. |
 | Lizenz | GPLv3, wie bisher. |
@@ -267,7 +267,7 @@ Alle neun offenen Punkte sind entschieden; offen bleibt nur die Feinabstimmung d
 
 | Frage | Entscheidung | Eingearbeitet in |
 | --- | --- | --- |
-| Backend-Stack | TypeScript-Backend mit gemeinsamem Paket für Request-/Response-Modelle und URL-Konstanten, PostgreSQL | Nicht-funktionale Anforderungen |
+| Backend-Stack | TypeScript-Backend mit gemeinsamem Paket für Request-/Response-Modelle und URL-Konstanten, MySQL | Nicht-funktionale Anforderungen |
 | Identity-Server | Beispielkonfigurationen für Keycloak, Authentik und Pocket ID | Anmeldung |
 | Druckservice | Lokal bei jeder Person, nur Linux (CUPS), TypeScript/Node; Windows über eine zweite Umsetzung der Druckschnittstelle vorbereitet; keine entfernten Druckaufträge | D-3, D-4, D-5 |
 | Seitengrenze | Standard 10 Seiten | D-2, S-4 |

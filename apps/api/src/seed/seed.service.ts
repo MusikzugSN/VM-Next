@@ -1,16 +1,15 @@
 import { Inject, Injectable, Logger, OnApplicationBootstrap } from '@nestjs/common';
-import { eq, sql } from 'drizzle-orm';
+import { eq } from 'drizzle-orm';
 import { lineupTemplateFile, rolesFile } from './defaults';
 import { uuidv7 } from '../common/ids/uuid-v7';
 import { DATABASE, type Database, type Tx } from '../db/database';
-import { clubSettings, ensembles, rolePermissions, roles, systemState } from '../db/schema';
+import { clubSettings, ensembles, rolePermissions, roles, seedLock, systemState } from '../db/schema';
 import { loadDefaultRoles, type DefaultRole } from './default-roles';
 import { importLineupTemplate, loadLineupTemplate } from './lineup-template';
 
 export const INITIAL_SEED_KEY = 'seed.initial';
 export const LINEUP_SEED_KEY = 'seed.lineup-template';
 export const ROOT_ENSEMBLE_NAME = 'Verein';
-const SEED_LOCK = 0x76736564; // "vsed"
 
 /**
  * First start without setup wizard (S-5, R-5, F-3, H-3, H-4):
@@ -36,7 +35,7 @@ export class SeedService implements OnApplicationBootstrap {
   async runLineupTemplateSeed(templateFile: string): Promise<boolean> {
     const template = await loadLineupTemplate(templateFile);
     return this.db.transaction(async (tx) => {
-      await tx.execute(sql`select pg_advisory_xact_lock(${SEED_LOCK})`);
+      await tx.select().from(seedLock).where(eq(seedLock.id, 1)).for('update');
       const [done] = await tx.select().from(systemState).where(eq(systemState.key, LINEUP_SEED_KEY));
       if (done) return false;
       const result = await importLineupTemplate(tx, template);
@@ -55,7 +54,7 @@ export class SeedService implements OnApplicationBootstrap {
   async runInitialSeed(rolesFile: string): Promise<boolean> {
     const defaults = await loadDefaultRoles(rolesFile);
     return this.db.transaction(async (tx) => {
-      await tx.execute(sql`select pg_advisory_xact_lock(${SEED_LOCK})`);
+      await tx.select().from(seedLock).where(eq(seedLock.id, 1)).for('update');
       const [done] = await tx.select().from(systemState).where(eq(systemState.key, INITIAL_SEED_KEY));
       if (done) return false;
 

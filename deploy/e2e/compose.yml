@@ -89,17 +89,18 @@ services:
       start_period: 30s
 
   # --- VM-Web ------------------------------------------------------------------------------------------
-  postgres:
-    image: postgres:17-alpine
+  mysql:
+    image: mysql:8.4
     restart: unless-stopped
     environment:
-      POSTGRES_USER: vmnext
-      POSTGRES_PASSWORD: vmnext-e2e
-      POSTGRES_DB: vmnext
+      MYSQL_ROOT_PASSWORD: vmnext-e2e
+      MYSQL_DATABASE: vmnext
+      MYSQL_USER: vmnext
+      MYSQL_PASSWORD: vmnext-e2e
     volumes:
-      - postgres-data:/var/lib/postgresql/data
+      - mysql-data:/var/lib/mysql
     healthcheck:
-      test: ['CMD-SHELL', 'pg_isready -U vmnext -d vmnext']
+      test: ['CMD-SHELL', 'mysqladmin ping -h 127.0.0.1 -u vmnext -pvmnext-e2e --silent']
       interval: 5s
       timeout: 3s
       retries: 20
@@ -111,7 +112,7 @@ services:
       dockerfile: apps/api/Dockerfile
     restart: unless-stopped
     depends_on:
-      postgres:
+      mysql:
         condition: service_healthy
       certs:
         condition: service_completed_successfully
@@ -123,7 +124,7 @@ services:
       LOG_LEVEL: log
       APP_TIMEZONE: Europe/Berlin
       PUBLIC_BASE_URL: https://vm.test
-      DATABASE_URL: postgres://vmnext:vmnext-e2e@postgres:5432/vmnext
+      DATABASE_URL: mysql://vmnext:vmnext-e2e@mysql:3306/vmnext
       DB_MIGRATE_ON_START: 'true'
       FILE_STORAGE_PATH: /data
       UPLOAD_MAX_FILE_MB: 50
@@ -206,7 +207,7 @@ services:
     profiles: [tools]
     environment:
       <<: *node-ca
-      DATABASE_URL: postgres://vmnext:vmnext-e2e@postgres:5432/vmnext
+      DATABASE_URL: mysql://vmnext:vmnext-e2e@mysql:3306/vmnext
       KEYCLOAK_URL: https://auth.vm.test
       KEYCLOAK_ADMIN_USER: ${KEYCLOAK_ADMIN_USER:-kcadmin}
       KEYCLOAK_ADMIN_PASSWORD: ${KEYCLOAK_ADMIN_PASSWORD:-kcadmin-e2e}
@@ -221,6 +222,6 @@ services:
 volumes:
   certs:
   keycloak-db:
-  postgres-data:
+  mysql-data:
   storage:
   print-service-data:

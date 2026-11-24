@@ -1,16 +1,16 @@
 import { ALL_PERMISSIONS } from '@vm-web/shared';
 import { sql } from 'drizzle-orm';
-import { check, pgTable, primaryKey, text, timestamp, uniqueIndex, uuid } from 'drizzle-orm/pg-core';
+import { check, timestamp, mysqlTable, primaryKey, uniqueIndex, varchar } from 'drizzle-orm/mysql-core';
 
 /** Named bundles of permissions (R-3, R-5). `defaultKey` links to `defaults/roles.default.json`. */
-export const roles = pgTable(
+export const roles = mysqlTable(
   'roles',
   {
-    id: uuid('id').primaryKey(),
-    defaultKey: text('default_key').unique(),
-    name: text('name').notNull(),
-    createdAt: timestamp('created_at', { withTimezone: true }).notNull().defaultNow(),
-    updatedAt: timestamp('updated_at', { withTimezone: true }).notNull().defaultNow(),
+    id: varchar('id', { length: 36 }).primaryKey(),
+    defaultKey: varchar('default_key', { length: 255 }).unique(),
+    name: varchar('name', { length: 255 }).notNull(),
+    createdAt: timestamp('created_at', { fsp: 6 }).notNull().defaultNow(),
+    updatedAt: timestamp('updated_at', { fsp: 6 }).notNull().defaultNow(),
   },
   (t) => [uniqueIndex('roles_name_idx').on(sql`lower(${t.name})`)],
 );
@@ -18,13 +18,13 @@ export const roles = pgTable(
 const knownPermissions = sql.raw(ALL_PERMISSIONS.map((p) => `'${p}'`).join(', '));
 
 /** Permissions of a role; the check constraint follows the codes in `@vm-web/shared` (new codes → new migration). */
-export const rolePermissions = pgTable(
+export const rolePermissions = mysqlTable(
   'role_permissions',
   {
-    roleId: uuid('role_id')
+    roleId: varchar('role_id', { length: 36 })
       .notNull()
       .references(() => roles.id, { onDelete: 'cascade' }),
-    permission: text('permission').notNull(),
+    permission: varchar('permission', { length: 255 }).notNull(),
   },
   (t) => [
     primaryKey({ columns: [t.roleId, t.permission] }),

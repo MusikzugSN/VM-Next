@@ -8,7 +8,7 @@ import {
   type ValidationError,
   type VoiceSuggestionsResponse,
 } from '@vm-web/shared';
-import { and, asc, eq, inArray, sql } from 'drizzle-orm';
+import { and, asc, eq, inArray, like, or, sql } from 'drizzle-orm';
 import { readFile, rm } from 'node:fs/promises';
 import type { AccessContext } from '../access/access-context';
 import { uuidv7 } from '../common/ids/uuid-v7';
@@ -74,13 +74,7 @@ export class UploadsService {
         sortKey: sql<string>`lower(${scores.title})`,
       })
       .from(scores)
-      .where(
-        and(
-          sql`(${scores.title} ilike ${pattern} or ${scores.composer} ilike ${pattern} or ${scores.arranger} ilike ${pattern})`,
-          visible,
-          afterNameAndId(scores.title, scores.id, cursor),
-        ),
-      )
+      .where(and(or(like(scores.title, pattern), like(scores.composer, pattern), like(scores.arranger, pattern)), visible, afterNameAndId(scores.title, scores.id, cursor)))
       .orderBy(sql`lower(${scores.title})`, asc(scores.id))
       .limit(query.limit + 1);
     return toPage(rows, query.limit, (r) => [r.sortKey, r.id], (r) => ({ id: r.id, title: r.title, composer: r.composer, arranger: r.arranger }));
