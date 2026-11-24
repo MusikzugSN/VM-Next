@@ -1,10 +1,9 @@
 import { ChangeDetectionStrategy, Component, computed, effect, inject, signal, untracked } from '@angular/core';
 import { rxResource } from '@angular/core/rxjs-interop';
-import { RouterLink } from '@angular/router';
 import { TranslocoPipe, TranslocoService } from '@jsverse/transloco';
 import { NgIcon, provideIcons } from '@ng-icons/core';
-import { lucideCheck, lucideCircleAlert, lucideExternalLink, lucidePrinter, lucideRepeat, lucideShare2, lucideTriangleAlert, lucideX } from '@ng-icons/lucide';
-import { APP_ROUTES, PRINT_SERVICE_CONTRACT, apiUrl, printPlanResponseSchema, type PrintMode, type VoiceRef } from '@vm-web/shared';
+import { lucideCheck, lucideCircleAlert, lucideExternalLink, lucidePrinter, lucideShare2, lucideX } from '@ng-icons/lucide';
+import { PRINT_SERVICE_CONTRACT, apiUrl, printPlanResponseSchema, type PrintMode, type VoiceRef } from '@vm-web/shared';
 import { firstValueFrom, from } from 'rxjs';
 
 import { VmBadge, VmButton, VmCheckbox, VmDialogImports, VmField, VmFieldLabel, VmSelect, VmToastService } from '@vm-web/ui';
@@ -15,13 +14,14 @@ import { PluralPipe } from '../../core/i18n/plural.pipe';
 import { isApiProblem } from '../../core/api/api-problem';
 import { ViewportService } from '../../core/layout/viewport';
 import { openPdfTab, printFileName, printPdf, sharePdf } from '../../core/print/browser-print';
-import { PRINT_SERVICE, PrintServiceFailure } from '../../core/print/print-service-client';
+import { PRINT_SERVICE, PrintServiceFailure, type PrintServiceIssue } from '../../core/print/print-service-client';
 import { VoiceContextStore } from '../../core/voices/voice-context.store';
 import { ToggleField } from '../../shared/ui/toggle-field';
 import { VoiceSelect } from '../../shared/ui/voice-select';
 import { planScores, printQuery, sheetsLabel, type PrintOptions } from './print-model';
 import { toggleSetItem } from '../../core/util/sets';
 import { valueOr } from '../../core/util/resource-value';
+import { PrintServiceGuide } from './print-service-guide';
 
 /**
  * Druckdialog (D-1 bis D-3, M-7): scope, voices, duplex and substitutes; shows how each score lands
@@ -31,8 +31,8 @@ import { valueOr } from '../../core/util/resource-value';
  */
 @Component({
   selector: 'vm-print-dialog',
-  imports: [VmBadge, VmCheckbox, VmField, VmFieldLabel, RouterLink, NgIcon, TranslocoPipe, PluralPipe, VmButton, VmDialogImports, VmSelect, ToggleField, VoiceSelect],
-  viewProviders: [provideIcons({ lucidePrinter, lucideCheck, lucideCircleAlert, lucideTriangleAlert, lucideExternalLink, lucideShare2, lucideRepeat, lucideX })],
+  imports: [VmBadge, VmCheckbox, VmField, VmFieldLabel, NgIcon, TranslocoPipe, PluralPipe, VmButton, VmDialogImports, VmSelect, ToggleField, VoiceSelect, PrintServiceGuide],
+  viewProviders: [provideIcons({ lucidePrinter, lucideCheck, lucideCircleAlert, lucideExternalLink, lucideShare2, lucideX })],
   changeDetection: ChangeDetectionStrategy.OnPush,
   // The dialog renders in an overlay; its host must not take up space in the shell.
   host: { style: 'display: contents' },
@@ -47,7 +47,6 @@ export class PrintDialog {
   private readonly voices = inject(VoiceContextStore);
   protected readonly viewport = inject(ViewportService);
 
-  protected readonly historyPath = APP_ROUTES.print.root;
   protected readonly open = signal(false);
   protected readonly request = signal<PrintRequest | null>(null);
 
@@ -97,6 +96,11 @@ export class PrintDialog {
   protected readonly printers = computed(() => {
     const state = valueOr(this.serviceState, null);
     return state?.kind === 'ready' ? state.status.printers : [];
+  });
+  /** Why the service isn't usable, for the inline install guide (D-3). */
+  protected readonly serviceIssue = computed<PrintServiceIssue | null>(() => {
+    const state = valueOr(this.serviceState, null);
+    return state && state.kind !== 'ready' ? state : null;
   });
   /** What the main button does. */
   protected readonly action = computed<'browser' | 'service' | 'fallback' | 'device' | null>(() => {

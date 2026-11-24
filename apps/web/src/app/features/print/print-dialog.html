@@ -166,21 +166,16 @@
             </div>
           }
           @case ('fallback') {
-            <div role="alert" class="flex flex-col gap-3 rounded-small bg-warning-soft p-4 text-warning-ink">
-              <p class="flex items-start gap-2">
-                <ng-icon name="lucideTriangleAlert" class="mt-0.5 shrink-0" aria-hidden="true" />
-                <span>
-                  <strong class="font-semibold">{{ 'print.serviceMissing' | transloco }}</strong>
-                  {{ 'print.serviceMissingText' | transloco: { pages: 'print.pages' | tPlural: p.totalPages, limit: p.pageLimit } }}
-                </span>
-              </p>
-              <div class="flex flex-wrap gap-2">
-                <a vm-button variant="outlined" [routerLink]="historyPath" (click)="open.set(false)">{{ 'print.installGuide' | transloco }}</a>
-                <button vm-button variant="text" type="button" (click)="recheckService()">
-                  <ng-icon name="lucideRepeat" aria-hidden="true" />{{ 'print.recheck' | transloco }}
-                </button>
-              </div>
-            </div>
+            <p role="note" class="flex items-start gap-2 rounded-small bg-primary-soft p-4 text-primary">
+              <ng-icon name="lucidePrinter" class="mt-0.5 shrink-0" aria-hidden="true" />
+              <span>
+                <strong class="font-semibold">{{ 'print.serviceMissing' | transloco }}</strong>
+                {{ 'print.serviceMissingText' | transloco: { pages: 'print.pages' | tPlural: p.totalPages, limit: p.pageLimit } }}
+              </span>
+            </p>
+            @if (serviceIssue(); as issue) {
+              <vm-print-service-guide [state]="issue" (recheck)="recheckService()" />
+            }
           }
           @case ('device') {
             <p role="note" class="flex items-start gap-2 rounded-small bg-primary-soft p-4 text-primary">

@@ -380,8 +380,6 @@
     "defaultPrinter": "Standard",
     "serviceMissing": "Druckservice nicht erreichbar.",
     "serviceMissingText": "Aufträge über {{ limit }} Seiten druckt der Druckservice auf diesem Computer. Du kannst die {{ pages }} trotzdem über den Browser drucken.",
-    "installGuide": "Installationsanleitung",
-    "recheck": "Erneut prüfen",
     "deviceTitle": "Auf dem Smartphone oder Tablet druckst du über dein Gerät.",
     "deviceText": "Das PDF ist schon fertig aufbereitet.",
     "share": "Teilen",

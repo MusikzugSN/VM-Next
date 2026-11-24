@@ -18,33 +18,8 @@
       </span>
     </div>
   } @else {
-    <section aria-labelledby="h-install" vm-card class="flex flex-col gap-4 p-4 md:p-6">
-      <div role="status" class="flex items-start gap-2 rounded-small bg-warning-soft p-4 text-warning-ink">
-        <ng-icon name="lucideTriangleAlert" class="mt-0.5 shrink-0" aria-hidden="true" />
-        <span>
-          <strong class="font-semibold">{{ (s.kind === 'offline' ? 'print.history.offline' : 'print.history.incompatible.' + s.reason) | transloco }}</strong>
-          @if (s.kind === 'offline') {
-            {{ 'print.history.offlineText' | transloco }}
-          }
-        </span>
-      </div>
-      <h2 id="h-install" class="text-title-large">{{ 'print.history.installTitle' | transloco }}</h2>
-      <ol class="flex list-decimal flex-col gap-3 ps-5">
-        <li>{{ 'print.history.steps.install' | transloco }}</li>
-        <li class="flex flex-col gap-2">
-          {{ 'print.history.steps.origin' | transloco }}
-          <span class="flex flex-wrap items-center gap-2">
-            <code class="rounded-small bg-muted px-3 py-2 font-mono text-body-medium">{{ origin }}</code>
-            <button vm-button variant="text" type="button" (click)="copyOrigin()">
-              <ng-icon name="lucideCopy" aria-hidden="true" />{{ 'print.history.copy' | transloco }}
-            </button>
-          </span>
-        </li>
-        <li>{{ 'print.history.steps.start' | transloco }}</li>
-      </ol>
-      <button vm-button variant="outlined" type="button" class="self-start" (click)="refresh()">
-        <ng-icon name="lucideRepeat" aria-hidden="true" />{{ 'print.history.recheck' | transloco }}
-      </button>
+    <section vm-card class="flex flex-col gap-4 p-4 md:p-6">
+      <vm-print-service-guide [state]="s" (recheck)="refresh()" />
     </section>
   }
 } @else {
