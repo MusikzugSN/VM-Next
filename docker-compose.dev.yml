@@ -1,22 +1,23 @@
-# Local development services: PostgreSQL and Pocket ID (OIDC identity server).
+# Local development services: MySQL and Pocket ID (OIDC identity server).
 # Start:  pnpm dev:up      Stop: pnpm dev:down      (see apps/api/README.md)
 name: vm-web-dev
 
 services:
-  postgres:
-    image: postgres:17-alpine
+  mysql:
+    image: mysql:8.4
     restart: unless-stopped
     environment:
-      POSTGRES_USER: vmweb
-      POSTGRES_PASSWORD: vmweb
-      POSTGRES_DB: vmweb
+      MYSQL_ROOT_PASSWORD: vmweb
+      MYSQL_DATABASE: vmweb
+      MYSQL_USER: vmweb
+      MYSQL_PASSWORD: vmweb
     ports:
-      # 5433 on the host: a local Windows PostgreSQL often occupies 5432
-      - '127.0.0.1:5433:5432'
+      # 3307 on the host: a local MySQL often occupies 3306
+      - '127.0.0.1:3307:3306'
     volumes:
-      - postgres-data:/var/lib/postgresql/data
+      - mysql-data:/var/lib/mysql
     healthcheck:
-      test: ['CMD-SHELL', 'pg_isready -U vmweb -d vmweb']
+      test: ['CMD-SHELL', 'mysqladmin ping -h 127.0.0.1 -uroot -pvmweb --silent']
       interval: 5s
       timeout: 3s
       retries: 10
@@ -36,5 +37,5 @@ services:
       - pocket-id-data:/app/data
 
 volumes:
-  postgres-data:
+  mysql-data:
   pocket-id-data:

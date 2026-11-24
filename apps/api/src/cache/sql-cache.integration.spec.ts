@@ -1,17 +1,15 @@
-import { sql } from 'drizzle-orm';
-
 import { cacheEntries } from '../db/schema';
 import { createTestDatabase, TEST_DATABASE_URL, type TestDatabase } from '../testing/test-database';
-import { PostgresCacheService } from './postgres-cache.service';
+import { SqlCacheService } from './sql-cache.service';
 
-/** Runs against a real PostgreSQL when TEST_DATABASE_URL is set (see apps/api/README.md). */
-describe.skipIf(!TEST_DATABASE_URL)('PostgresCacheService (TEST_DATABASE_URL)', () => {
+/** Runs against a real MySQL when TEST_DATABASE_URL is set (see apps/api/README.md). */
+describe.skipIf(!TEST_DATABASE_URL)('SqlCacheService (TEST_DATABASE_URL)', () => {
   let testDb: TestDatabase;
-  let cache: PostgresCacheService;
+  let cache: SqlCacheService;
 
   beforeAll(async () => {
     testDb = await createTestDatabase('cache');
-    cache = new PostgresCacheService(testDb.db);
+    cache = new SqlCacheService(testDb.db);
   });
 
   afterAll(async () => {
@@ -32,7 +30,7 @@ describe.skipIf(!TEST_DATABASE_URL)('PostgresCacheService (TEST_DATABASE_URL)', 
 
   it('does not return expired entries and sweeps them', async () => {
     await cache.set('login:old', { nonce: 'x' }, 60);
-    await testDb.db.update(cacheEntries).set({ expiresAt: sql`now() - interval '1 second'` });
+    await testDb.db.update(cacheEntries).set({ expiresAt: new Date(Date.now() - 1000) });
     expect(await cache.get('login:old')).toBeUndefined();
     expect(await cache.sweep()).toBeGreaterThanOrEqual(1);
   });

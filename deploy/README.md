@@ -1,6 +1,6 @@
 # Betrieb mit Docker Compose
 
-Ein Verein pro Installation: `web` (Angular auf nginx), `api` (NestJS) und PostgreSQL. TLS übernimmt der vorhandene Reverse Proxy des Vereins; er leitet auf den `web`-Container weiter (Standard `127.0.0.1:8080`). `web` reicht `/internal` und `/health` an die API weiter.
+Ein Verein pro Installation: `web` (Angular auf nginx), `api` (NestJS) und MySQL. TLS übernimmt der vorhandene Reverse Proxy des Vereins; er leitet auf den `web`-Container weiter (Standard `127.0.0.1:8080`). `web` reicht `/internal` und `/health` an die API weiter.
 
 | Image | Inhalt | Port |
 | --- | --- | --- |
@@ -10,7 +10,7 @@ Ein Verein pro Installation: `web` (Angular auf nginx), `api` (NestJS) und Postg
 ## Einrichten
 
 ```bash
-cp .env.example .env     # ausfüllen: PUBLIC_BASE_URL, POSTGRES_PASSWORD, OIDC_*, Images
+cp .env.example .env     # ausfüllen: PUBLIC_BASE_URL, MYSQL_PASSWORD, OIDC_*, Images
 docker compose up -d
 docker compose logs -f api
 ```
@@ -28,7 +28,7 @@ Der Reverse Proxy muss `X-Forwarded-Proto` setzen und Uploads bis `CLIENT_MAX_BO
 Datenbank und Datei-Volume gehören zusammen:
 
 ```bash
-docker compose exec -T postgres pg_dump -U vmnext -Fc vmnext > vmnext.dump
+docker compose exec -T mysql sh -c 'exec mysqldump -u vmnext -p"$MYSQL_PASSWORD" vmnext' > vmnext.sql
 docker run --rm -v vm-next_storage:/data -v "$PWD":/backup alpine tar czf /backup/storage.tgz -C /data .
 ```
 

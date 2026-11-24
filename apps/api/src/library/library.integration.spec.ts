@@ -26,7 +26,7 @@ import { VoicesController } from '../voices/voices.controller';
 import { VoicesService } from '../voices/voices.service';
 
 /**
- * Library management (slice 4) against a real PostgreSQL (TEST_DATABASE_URL).
+ * Library management (slice 4) against a real MySQL (TEST_DATABASE_URL).
  *
  * Tree: root ─┬─ orchestra ── windClass
  *             └─ youth

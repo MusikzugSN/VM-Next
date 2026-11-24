@@ -1,5 +1,5 @@
 import type { Permission, ScoreCandidate } from '@vm-web/shared';
-import { and, asc, eq, sql, type SQL } from 'drizzle-orm';
+import { and, asc, eq, like, or, sql, type SQL } from 'drizzle-orm';
 import type { AccessContext } from '../access/access-context';
 import { ProblemException } from '../common/problem-details/problem.exception';
 import { activeEnsembleOptions } from '../common/ensemble-tree';
@@ -40,7 +40,8 @@ export async function scoreCandidatePage(db: Database, query: { q: string; curso
     id: r.id,
     title: r.title,
     composer: r.composer,
-    alreadyContained: r.alreadyContained,
+    // MySQL's EXISTS(...) yields 0/1, not a real boolean (unlike Postgres).
+    alreadyContained: Boolean(r.alreadyContained),
   }));
 }
 
@@ -65,12 +66,7 @@ export async function scoreCandidates(
       sortKey: sql<string>`lower(${scores.title})`,
     })
     .from(scores)
-    .where(
-      and(
-        sql`(${scores.title} ilike ${pattern} or ${scores.composer} ilike ${pattern})`,
-        afterNameAndId(scores.title, scores.id, cursor),
-      ),
-    )
+    .where(and(or(like(scores.title, pattern), like(scores.composer, pattern)), afterNameAndId(scores.title, scores.id, cursor)))
     .orderBy(sql`lower(${scores.title})`, asc(scores.id))
     .limit(limit + 1);
 }

@@ -1,10 +1,10 @@
 import { Inject, Injectable } from '@nestjs/common';
 import type { CreateFieldBody, FieldDefinitionsResponse, UpdateFieldBody } from '@vm-web/shared';
-import { asc, eq, sql } from 'drizzle-orm';
+import { and, asc, eq } from 'drizzle-orm';
 import { uuidv7 } from '../common/ids/uuid-v7';
 import { ProblemException } from '../common/problem-details/problem.exception';
 import { withNameTaken } from '../db/db-errors';
-import { fieldDefinitions, fieldOptions, scores } from '../db/schema';
+import { fieldDefinitions, fieldOptions, scoreFieldValues } from '../db/schema';
 import { pruneValues, type FieldDef } from './custom-fields';
 import { ScoresRepository } from './scores.repository';
 import { assertPermutation, nextPosition, replaceRows } from '../db/table-helpers';
@@ -59,33 +59,22 @@ export class FieldsService {
         // remove values of deleted options (N-2)
         const updated: FieldDef = { ...def, name: body.name, required: body.required, options };
         if (WITH_OPTIONS.has(def.type)) {
-          const rows = await tx
-            .select({ id: scores.id, values: scores.customValues })
-            .from(scores)
-            .where(sql`jsonb_exists(${scores.customValues}, ${fieldId})`);
+          const rows = await tx.select({ scoreId: scoreFieldValues.scoreId, value: scoreFieldValues.value }).from(scoreFieldValues).where(eq(scoreFieldValues.fieldId, fieldId));
           for (const row of rows) {
-            const value = pruneValues(updated, row.values[fieldId]);
-            if (JSON.stringify(value) === JSON.stringify(row.values[fieldId])) continue;
-            const next = { ...row.values };
-            if (value === null) delete next[fieldId];
-            else next[fieldId] = value;
-            await tx.update(scores).set({ customValues: next }).where(eq(scores.id, row.id));
+            const value = pruneValues(updated, row.value);
+            if (JSON.stringify(value) === JSON.stringify(row.value)) continue;
+            if (value === null) await tx.delete(scoreFieldValues).where(and(eq(scoreFieldValues.scoreId, row.scoreId), eq(scoreFieldValues.fieldId, fieldId)));
+            else await tx.update(scoreFieldValues).set({ value }).where(and(eq(scoreFieldValues.scoreId, row.scoreId), eq(scoreFieldValues.fieldId, fieldId)));
           }
         }
       }),
     );
   }
 
-  /** Deletes the field and its values in all scores. */
+  /** Deletes the field; its values in all scores cascade-delete with it. */
   async delete(fieldId: string): Promise<void> {
-    await this.repo.db.transaction(async (tx) => {
-      const [deleted] = await tx.delete(fieldDefinitions).where(eq(fieldDefinitions.id, fieldId)).returning({ id: fieldDefinitions.id });
-      if (!deleted) throw ProblemException.notFound();
-      await tx
-        .update(scores)
-        .set({ customValues: sql`${scores.customValues} - ${fieldId}::text` })
-        .where(sql`jsonb_exists(${scores.customValues}, ${fieldId})`);
-    });
+    const [result] = await this.repo.db.delete(fieldDefinitions).where(eq(fieldDefinitions.id, fieldId));
+    if (!result.affectedRows) throw ProblemException.notFound();
   }
 
   /** The list must contain every field exactly once (409 `conflict` otherwise). */

@@ -9,7 +9,7 @@ import type {
   FolderScoreCandidatesResponse,
   Page,
 } from '@vm-web/shared';
-import { and, asc, eq, inArray, sql } from 'drizzle-orm';
+import { and, asc, eq, inArray, like, or, sql } from 'drizzle-orm';
 import type { AccessContext } from '../access/access-context';
 import { EnsembleResolvers } from '../access/ensemble-resolvers';
 import { uuidv7 } from '../common/ids/uuid-v7';
@@ -22,7 +22,7 @@ import { ensembles, folderEntries, folders, scores } from '../db/schema';
 import { assertActiveEnsemble, ensembleOptions, listEnsembles, scoreCandidatePage } from '../library/library-helpers';
 import { likePattern } from '../common/sql';
 
-const scoreCount = sql<number>`(select count(*)::int from folder_entries x where x.folder_id = ${folders.id})`;
+const scoreCount = sql<number>`(select count(*) from folder_entries x where x.folder_id = ${folders.id})`;
 
 /** Folders of ensembles with own number per score (N-5, N-15). Permissions: `folder.*` in the folder's ensemble. */
 @Injectable()
@@ -62,8 +62,8 @@ export class FoldersService implements OnModuleInit {
       .where(
         and(
           inArray(folders.ensembleId, ids),
-          query.q ? sql`${folders.name} ilike ${likePattern(query.q)}` : undefined,
-          cursor ? sql`(lower(${ensembles.name}), lower(${folders.name}), ${folders.id}) > (${cursor[0]}, ${cursor[1]}, ${cursor[2]}::uuid)` : undefined,
+          query.q ? like(folders.name, likePattern(query.q)) : undefined,
+          cursor ? sql`(lower(${ensembles.name}), lower(${folders.name}), ${folders.id}) > (${cursor[0]}, ${cursor[1]}, ${cursor[2]})` : undefined,
         ),
       )
       .orderBy(sql`lower(${ensembles.name})`, sql`lower(${folders.name})`, asc(folders.id))
@@ -110,8 +110,8 @@ export class FoldersService implements OnModuleInit {
       .where(
         and(
           eq(folderEntries.folderId, folderId),
-          query.q ? sql`(${scores.title} ilike ${likePattern(query.q)} or ${scores.composer} ilike ${likePattern(query.q)} or ${folderEntries.number} ilike ${likePattern(query.q)})` : undefined,
-          cursor ? sql`(${folderEntries.numberSortKey}, ${scores.id}) > (${cursor[0]}, ${cursor[1]}::uuid)` : undefined,
+          query.q ? or(like(scores.title, likePattern(query.q)), like(scores.composer, likePattern(query.q)), like(folderEntries.number, likePattern(query.q))) : undefined,
+          cursor ? sql`(${folderEntries.numberSortKey}, ${scores.id}) > (${cursor[0]}, ${cursor[1]})` : undefined,
         ),
       )
       .orderBy(asc(folderEntries.numberSortKey), asc(scores.id))
@@ -125,7 +125,7 @@ export class FoldersService implements OnModuleInit {
   }
 
   async candidates(folderId: string, query: { q: string; cursor?: string; limit: number }): Promise<FolderScoreCandidatesResponse> {
-    const contained = sql<boolean>`exists (select 1 from folder_entries x where x.folder_id = ${folderId}::uuid and x.score_id = ${scores.id})`;
+    const contained = sql<boolean>`exists (select 1 from folder_entries x where x.folder_id = ${folderId} and x.score_id = ${scores.id})`;
     const page = await scoreCandidatePage(this.db, query, contained);
     return { ...page, suggestedNumber: await this.suggestedNumber(folderId) };
   }
@@ -157,23 +157,19 @@ export class FoldersService implements OnModuleInit {
   }
 
   async setScoreNumber(folderId: string, scoreId: string, number: string): Promise<void> {
-    const updated = await withNameTaken(() =>
+    const [result] = await withNameTaken(() =>
       this.db
         .update(folderEntries)
         .set({ number, numberSortKey: naturalSortKey(number) })
-        .where(and(eq(folderEntries.folderId, folderId), eq(folderEntries.scoreId, scoreId)))
-        .returning({ scoreId: folderEntries.scoreId }),
+        .where(and(eq(folderEntries.folderId, folderId), eq(folderEntries.scoreId, scoreId))),
     );
-    if (!updated.length) throw ProblemException.notFound();
+    if (!result.affectedRows) throw ProblemException.notFound();
     await this.touch(folderId, {});
   }
 
   async removeScore(folderId: string, scoreId: string): Promise<void> {
-    const removed = await this.db
-      .delete(folderEntries)
-      .where(and(eq(folderEntries.folderId, folderId), eq(folderEntries.scoreId, scoreId)))
-      .returning({ scoreId: folderEntries.scoreId });
-    if (!removed.length) throw ProblemException.notFound();
+    const [result] = await this.db.delete(folderEntries).where(and(eq(folderEntries.folderId, folderId), eq(folderEntries.scoreId, scoreId)));
+    if (!result.affectedRows) throw ProblemException.notFound();
     await this.touch(folderId, {});
   }
 
@@ -183,9 +179,10 @@ export class FoldersService implements OnModuleInit {
 
   /** Highest purely numeric number + 1, `1` for an empty folder. */
   private async suggestedNumber(folderId: string): Promise<string> {
-    const [row] = await this.db.execute<{ max: string | null }>(sql`
-      select max(number::bigint)::text as max from folder_entries
-       where folder_id = ${folderId}::uuid and number ~ '^[0-9]{1,15}$'`).then((r) => r.rows);
+    const [row] = await this.db
+      .select({ max: sql<string | null>`max(cast(${folderEntries.number} as unsigned))` })
+      .from(folderEntries)
+      .where(and(eq(folderEntries.folderId, folderId), sql`${folderEntries.number} regexp '^[0-9]{1,15}$'`));
     if (!row?.max) return '1';
     return String(BigInt(row.max) + BigInt(1));
   }
@@ -196,7 +193,7 @@ export class FoldersService implements OnModuleInit {
   }
 
   private async touch(folderId: string, set: Partial<typeof folders.$inferInsert>): Promise<void> {
-    const [row] = await this.db.update(folders).set({ ...set, updatedAt: new Date() }).where(eq(folders.id, folderId)).returning({ id: folders.id });
-    if (!row) throw ProblemException.notFound();
+    const [result] = await this.db.update(folders).set({ ...set, updatedAt: new Date() }).where(eq(folders.id, folderId));
+    if (!result.affectedRows) throw ProblemException.notFound();
   }
 }

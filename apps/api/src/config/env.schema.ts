@@ -32,7 +32,7 @@ export const envSchema = z.object({
   /** Browser-facing address of VM-Web, e.g. `https://noten.example.org` (redirects, cookies). */
   PUBLIC_BASE_URL: z.url(),
 
-  DATABASE_URL: z.string().regex(/^postgres(ql)?:\/\//, 'must be a postgres:// URL'),
+  DATABASE_URL: z.string().regex(/^mysql:\/\//, 'must be a mysql:// URL'),
   /** Run pending Drizzle migrations when the API starts. */
   DB_MIGRATE_ON_START: booleanString.default(true),
 

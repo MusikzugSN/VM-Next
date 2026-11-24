@@ -1,26 +1,26 @@
 import { sql } from 'drizzle-orm';
-import { index, pgTable, primaryKey, text, timestamp, uniqueIndex, uuid } from 'drizzle-orm/pg-core';
+import { timestamp, index, mysqlTable, primaryKey, uniqueIndex, varchar } from 'drizzle-orm/mysql-core';
 import { scores } from './scores';
 import { users } from './users';
 
 /** Club tags maintained by librarians (N-17); in Mein Bereich only filters (M-8, F-6). */
-export const clubTags = pgTable(
+export const clubTags = mysqlTable(
   'club_tags',
   {
-    id: uuid('id').primaryKey(),
-    name: text('name').notNull(),
-    createdAt: timestamp('created_at', { withTimezone: true }).notNull().defaultNow(),
+    id: varchar('id', { length: 36 }).primaryKey(),
+    name: varchar('name', { length: 255 }).notNull(),
+    createdAt: timestamp('created_at', { fsp: 6 }).notNull().defaultNow(),
   },
   (t) => [uniqueIndex('club_tags_name_idx').on(sql`lower(${t.name})`)],
 );
 
-export const scoreClubTags = pgTable(
+export const scoreClubTags = mysqlTable(
   'score_club_tags',
   {
-    scoreId: uuid('score_id')
+    scoreId: varchar('score_id', { length: 36 })
       .notNull()
       .references(() => scores.id, { onDelete: 'cascade' }),
-    tagId: uuid('tag_id')
+    tagId: varchar('tag_id', { length: 36 })
       .notNull()
       .references(() => clubTags.id, { onDelete: 'cascade' }),
   },
@@ -28,26 +28,26 @@ export const scoreClubTags = pgTable(
 );
 
 /** Personal tags, only visible to their owner (M-8). */
-export const personalTags = pgTable(
+export const personalTags = mysqlTable(
   'personal_tags',
   {
-    id: uuid('id').primaryKey(),
-    userId: uuid('user_id')
+    id: varchar('id', { length: 36 }).primaryKey(),
+    userId: varchar('user_id', { length: 36 })
       .notNull()
       .references(() => users.id, { onDelete: 'cascade' }),
-    name: text('name').notNull(),
-    createdAt: timestamp('created_at', { withTimezone: true }).notNull().defaultNow(),
+    name: varchar('name', { length: 255 }).notNull(),
+    createdAt: timestamp('created_at', { fsp: 6 }).notNull().defaultNow(),
   },
   (t) => [uniqueIndex('personal_tags_user_name_idx').on(t.userId, sql`lower(${t.name})`)],
 );
 
-export const scorePersonalTags = pgTable(
+export const scorePersonalTags = mysqlTable(
   'score_personal_tags',
   {
-    personalTagId: uuid('personal_tag_id')
+    personalTagId: varchar('personal_tag_id', { length: 36 })
       .notNull()
       .references(() => personalTags.id, { onDelete: 'cascade' }),
-    scoreId: uuid('score_id')
+    scoreId: varchar('score_id', { length: 36 })
       .notNull()
       .references(() => scores.id, { onDelete: 'cascade' }),
   },

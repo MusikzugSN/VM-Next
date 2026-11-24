@@ -1,22 +1,22 @@
-import { index, pgTable, primaryKey, timestamp, uuid } from 'drizzle-orm/pg-core';
+import { timestamp, index, mysqlTable, primaryKey, varchar } from 'drizzle-orm/mysql-core';
 import { ensembles } from './ensembles';
 import { roles } from './roles';
 import { users } from './users';
 
 /** A person in an ensemble with exactly one role there (R-1). */
-export const memberships = pgTable(
+export const memberships = mysqlTable(
   'memberships',
   {
-    userId: uuid('user_id')
+    userId: varchar('user_id', { length: 36 })
       .notNull()
       .references(() => users.id, { onDelete: 'cascade' }),
-    ensembleId: uuid('ensemble_id')
+    ensembleId: varchar('ensemble_id', { length: 36 })
       .notNull()
       .references(() => ensembles.id, { onDelete: 'restrict' }),
-    roleId: uuid('role_id')
+    roleId: varchar('role_id', { length: 36 })
       .notNull()
       .references(() => roles.id, { onDelete: 'restrict' }),
-    createdAt: timestamp('created_at', { withTimezone: true }).notNull().defaultNow(),
+    createdAt: timestamp('created_at', { fsp: 6 }).notNull().defaultNow(),
   },
   (t) => [
     primaryKey({ columns: [t.userId, t.ensembleId] }),

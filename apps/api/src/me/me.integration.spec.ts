@@ -9,7 +9,7 @@ import { MeService } from './me.service';
 import { PersonalTagsService } from './personal-tags.service';
 
 /**
- * Mein Bereich against a real PostgreSQL (TEST_DATABASE_URL), see apps/api/README.md.
+ * Mein Bereich against a real MySQL (TEST_DATABASE_URL), see apps/api/README.md.
  *
  * Tree: root ─┬─ orchestra ── windClass
  *             ├─ youth

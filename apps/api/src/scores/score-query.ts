@@ -14,8 +14,8 @@ interface Column {
   /** Value used for ordering; `null` handled by the null flag. */
   sort: SQL;
   /** SQL cast of the sort value in cursors. */
-  cast: 'text' | 'numeric' | 'boolean';
-  /** Whether the value is empty (null or empty string / no stored key). */
+  cast: 'char' | 'decimal' | 'unsigned';
+  /** Whether the value is empty (null or empty string / no stored row). */
   empty: SQL;
   fieldKey?: string;
 }
@@ -43,54 +43,62 @@ export function presentCountSql(ensembleId: string | null): SQL {
   if (!ensembleId) return sql`0`;
   return sql`(select count(*) from ensemble_lineup_voices lv
                 join sheets s on s.voice_id = lv.voice_id and s.score_id = ${scores.id}
-               where lv.ensemble_id = ${ensembleId}::uuid)`;
+               where lv.ensemble_id = ${ensembleId})`;
+}
+
+/** The JSON value of one custom field of this row, via a correlated subquery (no column to join on). */
+function fieldValueSql(key: string): SQL {
+  return sql`(select v.value from score_field_values v where v.score_id = ${scores.id} and v.field_id = ${key})`;
 }
 
 /** Resolves a column name (fixed or `field:<id>`) to SQL, or `undefined` for unknown fields. */
 export function resolveColumn(column: ScoreColumn, fields: ReadonlyMap<string, FieldDef>, ensembleId: string | null): Column | undefined {
   if (column in FIXED_TEXT) {
     const col = FIXED_TEXT[column as keyof typeof FIXED_TEXT];
-    return { kind: 'text', value: sql`${col}`, sort: sql`lower(${col})`, cast: 'text', empty: sql`coalesce(${col}, '') = ''` };
+    return { kind: 'text', value: sql`${col}`, sort: sql`lower(${col})`, cast: 'char', empty: sql`coalesce(${col}, '') = ''` };
   }
   if (column === 'durationSeconds') {
-    return { kind: 'number', value: sql`${scores.durationSeconds}`, sort: sql`${scores.durationSeconds}`, cast: 'numeric', empty: sql`${scores.durationSeconds} is null` };
+    return { kind: 'number', value: sql`${scores.durationSeconds}`, sort: sql`${scores.durationSeconds}`, cast: 'decimal', empty: sql`${scores.durationSeconds} is null` };
   }
   if (column === 'completeness') {
     const present = presentCountSql(ensembleId);
-    return { kind: 'completeness', value: present, sort: present, cast: 'numeric', empty: sql`false` };
+    return { kind: 'completeness', value: present, sort: present, cast: 'decimal', empty: sql`false` };
   }
 
   const key = column.slice('field:'.length);
   const def = fields.get(key);
   if (!def) return undefined;
-  const text = sql`(${scores.customValues} ->> ${key})`;
-  const empty = sql`not jsonb_exists(${scores.customValues}, ${key})`;
+  const raw = fieldValueSql(key);
+  // json_unquote() returns utf8mb4_bin (case-sensitive) regardless of the column's own collation
+  // (there is no column here, it's an extracted JSON scalar) — restore case-insensitive comparison.
+  const text = sql`json_unquote(${raw}) collate utf8mb4_0900_ai_ci`;
+  const empty = sql`not exists (select 1 from score_field_values v where v.score_id = ${scores.id} and v.field_id = ${key})`;
   switch (def.type) {
     case 'text':
     case 'link':
-      return { kind: 'text', value: text, sort: sql`lower(${text})`, cast: 'text', empty, fieldKey: key };
+      return { kind: 'text', value: text, sort: sql`lower(${text})`, cast: 'char', empty, fieldKey: key };
     case 'number':
-      return { kind: 'number', value: sql`${text}::numeric`, sort: sql`${text}::numeric`, cast: 'numeric', empty, fieldKey: key };
+      return { kind: 'number', value: sql`cast(${text} as decimal(20,6))`, sort: sql`cast(${text} as decimal(20,6))`, cast: 'decimal', empty, fieldKey: key };
     case 'date':
-      return { kind: 'date', value: text, sort: text, cast: 'text', empty, fieldKey: key };
+      return { kind: 'date', value: text, sort: text, cast: 'char', empty, fieldKey: key };
     case 'boolean':
-      return { kind: 'boolean', value: sql`${text}::boolean`, sort: sql`${text}::boolean`, cast: 'boolean', empty, fieldKey: key };
+      return { kind: 'boolean', value: sql`cast(${text} as unsigned)`, sort: sql`cast(${text} as unsigned)`, cast: 'unsigned', empty, fieldKey: key };
     case 'select':
       return {
         kind: 'select',
         value: text,
-        sort: sql`(select lower(o.label) from field_options o where o.id::text = ${text})`,
-        cast: 'text',
+        sort: sql`(select lower(o.label) from field_options o where o.id = ${text})`,
+        cast: 'char',
         empty,
         fieldKey: key,
       };
     case 'multiselect':
       return {
         kind: 'multiselect',
-        value: sql`(${scores.customValues} -> ${key})`,
-        sort: sql`(select lower(string_agg(o.label, ', ' order by o.position)) from field_options o
-                    where jsonb_exists(${scores.customValues} -> ${key}, o.id::text))`,
-        cast: 'text',
+        value: raw,
+        sort: sql`(select lower(group_concat(o.label order by o.position separator ', ')) from field_options o
+                    where json_contains(${raw}, json_quote(o.id)))`,
+        cast: 'char',
         empty,
         fieldKey: key,
       };
@@ -115,20 +123,23 @@ function filterSql(f: ScoreFilter, col: Column, index: number): SQL {
   const scalarOk = (x: unknown) =>
     col.kind === 'number' ? isNumber(x) : col.kind === 'date' ? isDate(x) : col.kind === 'boolean' ? typeof x === 'boolean' : isString(x);
   const typed = (x: unknown) =>
-    col.kind === 'number' ? sql`${x}::numeric` : col.kind === 'boolean' ? sql`${x}::boolean` : sql`${x}::text`;
+    col.kind === 'number' ? sql`cast(${x} as decimal(20,6))` : col.kind === 'boolean' ? sql`cast(${x} as unsigned)` : sql`cast(${x} as char)`;
   const caseless = col.kind === 'text';
   const lhs = caseless ? sql`lower(${col.value})` : col.value;
-  const rhs = (x: unknown) => (caseless ? sql`lower(${x}::text)` : typed(x));
+  const rhs = (x: unknown) => (caseless ? sql`lower(cast(${x} as char))` : typed(x));
 
   switch (f.op) {
     case 'contains':
       check(isString(v) && v.length > 0);
-      return sql`${col.value} ilike ${likePattern(v as string)}`;
+      return sql`${col.value} like ${likePattern(v as string)}`;
     case 'eq':
     case 'neq': {
       check(scalarOk(v));
-      if (col.kind === 'multiselect') return sql`jsonb_exists(${col.value}, ${v}::text)`;
-      return f.op === 'eq' ? sql`${lhs} = ${rhs(v)}` : sql`(${lhs} is distinct from ${rhs(v)})`;
+      if (col.kind === 'multiselect') {
+        const has = sql`json_contains(${col.value}, json_quote(${v}))`;
+        return f.op === 'eq' ? has : sql`not (${has})`;
+      }
+      return f.op === 'eq' ? sql`${lhs} = ${rhs(v)}` : sql`not (${lhs} <=> ${rhs(v)})`;
     }
     case 'lt':
     case 'gt':
@@ -143,7 +154,10 @@ function filterSql(f: ScoreFilter, col: Column, index: number): SQL {
       check(Array.isArray(v) && v.length > 0 && v.length <= 50 && v.every(scalarOk));
       const items = v as unknown[];
       if (col.kind === 'multiselect') {
-        return sql`jsonb_exists_any(${col.value}, array[${sql.join(items.map((x) => sql`${x}::text`), sql`, `)}])`;
+        return sql.join(
+          items.map((x) => sql`json_contains(${col.value}, json_quote(${x}))`),
+          sql` or `,
+        );
       }
       return sql`${lhs} in (${sql.join(items.map(rhs), sql`, `)})`;
     }
@@ -161,13 +175,13 @@ export function buildFilters(filters: readonly ScoreFilter[], fields: ReadonlyMa
   });
 }
 
-/** Full text over fixed text fields and text values of custom fields. */
+/** Full text over fixed text fields and string-typed custom field values. */
 export function searchSql(q: string): SQL {
   const p = likePattern(q);
-  return sql`(${scores.title} ilike ${p} or ${scores.composer} ilike ${p} or ${scores.arranger} ilike ${p}
-          or ${scores.publisher} ilike ${p} or ${scores.publisherNumber} ilike ${p}
-          or exists (select 1 from jsonb_each(${scores.customValues}) e
-                      where jsonb_typeof(e.value) = 'string' and e.value #>> '{}' ilike ${p}))`;
+  return sql`(${scores.title} like ${p} or ${scores.composer} like ${p} or ${scores.arranger} like ${p}
+          or ${scores.publisher} like ${p} or ${scores.publisherNumber} like ${p}
+          or exists (select 1 from score_field_values v where v.score_id = ${scores.id}
+                      and json_type(v.value) = 'STRING' and json_unquote(v.value) collate utf8mb4_0900_ai_ci like ${p}))`;
 }
 
 export interface SortPlan {
@@ -198,11 +212,11 @@ export function buildSort(column: ScoreColumn, dir: 'asc' | 'desc', fields: Read
 export function afterCursor(plan: SortPlan, cursor: readonly (string | number | null)[]): SQL {
   const [empty, value, id] = cursor;
   const cmp = plan.dir === 'asc' ? sql`>` : sql`<`;
-  const idAfter = sql`${scores.id} ${cmp} ${id}::uuid`;
+  const idAfter = sql`${scores.id} ${cmp} ${id}`;
   if (empty === 1) {
     // within the empty block only the id decides
     return sql`(${plan.emptyFlag} = 1 and ${idAfter})`;
   }
-  const typed = sql`${value}::${sql.raw(plan.cast)}`;
+  const typed = sql`cast(${value} as ${sql.raw(plan.cast)})`;
   return sql`(${plan.emptyFlag} = 1 or (${plan.value} ${cmp} ${typed}) or (${plan.value} = ${typed} and ${idAfter}))`;
 }

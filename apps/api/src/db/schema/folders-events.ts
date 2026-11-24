@@ -1,20 +1,20 @@
 import { sql } from 'drizzle-orm';
-import { boolean, date, index, integer, pgTable, primaryKey, text, timestamp, unique, uniqueIndex, uuid } from 'drizzle-orm/pg-core';
+import { boolean, date, timestamp, index, int, mysqlTable, primaryKey, unique, uniqueIndex, varchar } from 'drizzle-orm/mysql-core';
 import { ensembles } from './ensembles';
 import { scores } from './scores';
 
 /** Folders of an ensemble with switch „in Mein Bereich anzeigen“ (N-15). */
-export const folders = pgTable(
+export const folders = mysqlTable(
   'folders',
   {
-    id: uuid('id').primaryKey(),
-    ensembleId: uuid('ensemble_id')
+    id: varchar('id', { length: 36 }).primaryKey(),
+    ensembleId: varchar('ensemble_id', { length: 36 })
       .notNull()
       .references(() => ensembles.id, { onDelete: 'restrict' }),
-    name: text('name').notNull(),
+    name: varchar('name', { length: 255 }).notNull(),
     showInMyArea: boolean('show_in_my_area').notNull().default(false),
-    createdAt: timestamp('created_at', { withTimezone: true }).notNull().defaultNow(),
-    updatedAt: timestamp('updated_at', { withTimezone: true }).notNull().defaultNow(),
+    createdAt: timestamp('created_at', { fsp: 6 }).notNull().defaultNow(),
+    updatedAt: timestamp('updated_at', { fsp: 6 }).notNull().defaultNow(),
   },
   (t) => [
     uniqueIndex('folders_ensemble_name_idx').on(t.ensembleId, sql`lower(${t.name})`),
@@ -23,17 +23,17 @@ export const folders = pgTable(
 );
 
 /** Score in a folder with its own number (N-5); `numberSortKey` gives natural order. */
-export const folderEntries = pgTable(
+export const folderEntries = mysqlTable(
   'folder_entries',
   {
-    folderId: uuid('folder_id')
+    folderId: varchar('folder_id', { length: 36 })
       .notNull()
       .references(() => folders.id, { onDelete: 'cascade' }),
-    scoreId: uuid('score_id')
+    scoreId: varchar('score_id', { length: 36 })
       .notNull()
       .references(() => scores.id, { onDelete: 'cascade' }),
-    number: text('number').notNull(),
-    numberSortKey: text('number_sort_key').notNull(),
+    number: varchar('number', { length: 255 }).notNull(),
+    numberSortKey: varchar('number_sort_key', { length: 255 }).notNull(),
   },
   (t) => [
     primaryKey({ columns: [t.folderId, t.scoreId] }),
@@ -43,33 +43,33 @@ export const folderEntries = pgTable(
 );
 
 /** Events of an ensemble with date and setlist (N-15, N-16). */
-export const events = pgTable(
+export const events = mysqlTable(
   'events',
   {
-    id: uuid('id').primaryKey(),
-    ensembleId: uuid('ensemble_id')
+    id: varchar('id', { length: 36 }).primaryKey(),
+    ensembleId: varchar('ensemble_id', { length: 36 })
       .notNull()
       .references(() => ensembles.id, { onDelete: 'restrict' }),
-    name: text('name').notNull(),
+    name: varchar('name', { length: 255 }).notNull(),
     date: date('date', { mode: 'string' }).notNull(),
     showInMyArea: boolean('show_in_my_area').notNull().default(false),
-    createdAt: timestamp('created_at', { withTimezone: true }).notNull().defaultNow(),
-    updatedAt: timestamp('updated_at', { withTimezone: true }).notNull().defaultNow(),
+    createdAt: timestamp('created_at', { fsp: 6 }).notNull().defaultNow(),
+    updatedAt: timestamp('updated_at', { fsp: 6 }).notNull().defaultNow(),
   },
   (t) => [index('events_ensemble_date_idx').on(t.ensembleId, t.date)],
 );
 
 /** Setlist in playing order; each score once per event (N-16). */
-export const setlistEntries = pgTable(
+export const setlistEntries = mysqlTable(
   'setlist_entries',
   {
-    eventId: uuid('event_id')
+    eventId: varchar('event_id', { length: 36 })
       .notNull()
       .references(() => events.id, { onDelete: 'cascade' }),
-    scoreId: uuid('score_id')
+    scoreId: varchar('score_id', { length: 36 })
       .notNull()
       .references(() => scores.id, { onDelete: 'cascade' }),
-    position: integer('position').notNull(),
+    position: int('position').notNull(),
   },
   (t) => [
     primaryKey({ columns: [t.eventId, t.scoreId] }),

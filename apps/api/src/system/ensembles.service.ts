@@ -9,7 +9,7 @@ import type {
   EnsembleMember,
   Page,
 } from '@vm-web/shared';
-import { and, asc, eq, inArray, sql } from 'drizzle-orm';
+import { and, asc, eq, inArray, like, sql } from 'drizzle-orm';
 import { uuidv7 } from '../common/ids/uuid-v7';
 import { decodeCursor, encodeCursor } from '../common/pagination/cursor';
 import { ProblemException } from '../common/problem-details/problem.exception';
@@ -77,7 +77,7 @@ export class EnsemblesService {
       .where(
         and(
           eq(memberships.ensembleId, ensembleId),
-          query.q ? sql`${users.name} ilike ${likePattern(query.q)}` : undefined,
+          query.q ? like(users.name, likePattern(query.q)) : undefined,
           afterNameAndId(users.name, users.id, cursor),
         ),
       )
@@ -189,8 +189,8 @@ export class EnsemblesService {
           parentId: ensembles.parentId,
           isRoot: ensembles.isRoot,
           archivedAt: ensembles.archivedAt,
-          memberCount: sql<number>`(select count(*)::int from memberships m where m.ensemble_id = ${ensembles.id})`,
-          lineupSize: sql<number>`(select count(*)::int from ensemble_lineup_voices l where l.ensemble_id = ${ensembles.id})`,
+          memberCount: sql<number>`(select count(*) from memberships m where m.ensemble_id = ${ensembles.id})`,
+          lineupSize: sql<number>`(select count(*) from ensemble_lineup_voices l where l.ensemble_id = ${ensembles.id})`,
         })
         .from(ensembles),
       this.db.select({ defaultEnsembleId: clubSettings.defaultEnsembleId }).from(clubSettings),

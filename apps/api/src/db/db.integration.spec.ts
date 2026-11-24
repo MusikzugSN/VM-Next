@@ -11,7 +11,7 @@ import type { Database } from './database';
 import * as schema from './schema';
 
 /**
- * Runs against a real PostgreSQL when TEST_DATABASE_URL is set (see apps/api/README.md).
+ * Runs against a real MySQL when TEST_DATABASE_URL is set (see apps/api/README.md).
  * Uses its own freshly created database `<name>_auth`.
  */
 const ROLES_FILE = join(__dirname, '../../defaults/roles.default.json');

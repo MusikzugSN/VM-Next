@@ -9,7 +9,7 @@ import type {
   SetlistEntry,
   UpdateEventDetailsBody,
 } from '@vm-web/shared';
-import { and, asc, desc, eq, gte, inArray, lt, sql } from 'drizzle-orm';
+import { and, asc, desc, eq, gte, inArray, like, lt, sql } from 'drizzle-orm';
 import type { AccessContext } from '../access/access-context';
 import { EnsembleResolvers } from '../access/ensemble-resolvers';
 import { uuidv7 } from '../common/ids/uuid-v7';
@@ -24,7 +24,7 @@ import { assertNoDuplicates } from '../common/validation/id-list';
 import { replaceRows } from '../db/table-helpers';
 import { likePattern } from '../common/sql';
 
-const scoreCount = sql<number>`(select count(*)::int from setlist_entries x where x.event_id = ${events.id})`;
+const scoreCount = sql<number>`(select count(*) from setlist_entries x where x.event_id = ${events.id})`;
 
 /** Events of ensembles with date and setlist (N-15, N-16). Permissions: `event.*` in the event's ensemble. */
 @Injectable()
@@ -68,11 +68,11 @@ export class EventsService implements OnModuleInit {
         and(
           inArray(events.ensembleId, ids),
           upcoming ? gte(events.date, today) : lt(events.date, today),
-          query.q ? sql`${events.name} ilike ${likePattern(query.q)}` : undefined,
+          query.q ? like(events.name, likePattern(query.q)) : undefined,
           cursor
             ? upcoming
-              ? sql`(${events.date}, ${events.id}) > (${cursor[0]}::date, ${cursor[1]}::uuid)`
-              : sql`(${events.date}, ${events.id}) < (${cursor[0]}::date, ${cursor[1]}::uuid)`
+              ? sql`(${events.date}, ${events.id}) > (${cursor[0]}, ${cursor[1]})`
+              : sql`(${events.date}, ${events.id}) < (${cursor[0]}, ${cursor[1]})`
             : undefined,
         ),
       )
@@ -111,7 +111,7 @@ export class EventsService implements OnModuleInit {
   }
 
   async candidates(eventId: string, query: { q: string; cursor?: string; limit: number }): Promise<EventScoreCandidatesResponse> {
-    const contained = sql<boolean>`exists (select 1 from setlist_entries x where x.event_id = ${eventId}::uuid and x.score_id = ${scores.id})`;
+    const contained = sql<boolean>`exists (select 1 from setlist_entries x where x.event_id = ${eventId} and x.score_id = ${scores.id})`;
     return scoreCandidatePage(this.db, query, contained);
   }
 
@@ -148,7 +148,7 @@ export class EventsService implements OnModuleInit {
   }
 
   private async touch(eventId: string, set: Partial<typeof events.$inferInsert>): Promise<void> {
-    const [row] = await this.db.update(events).set({ ...set, updatedAt: new Date() }).where(eq(events.id, eventId)).returning({ id: events.id });
-    if (!row) throw ProblemException.notFound();
+    const [result] = await this.db.update(events).set({ ...set, updatedAt: new Date() }).where(eq(events.id, eventId));
+    if (!result.affectedRows) throw ProblemException.notFound();
   }
 }

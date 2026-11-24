@@ -7,7 +7,7 @@ import type {
   UserTableQuery,
   VoiceRef,
 } from '@vm-web/shared';
-import { and, asc, eq, inArray, sql } from 'drizzle-orm';
+import { and, asc, count, eq, inArray, like, or, sql } from 'drizzle-orm';
 import { activeEnsembleOptions } from '../common/ensemble-tree';
 import { decodeCursor, toPage } from '../common/pagination/cursor';
 import { ProblemException } from '../common/problem-details/problem.exception';
@@ -34,9 +34,9 @@ export class UsersService {
       .from(users)
       .where(
         and(
-          query.q ? sql`(${users.name} ilike ${likePattern(query.q)} or ${users.email} ilike ${likePattern(query.q)})` : undefined,
+          query.q ? or(like(users.name, likePattern(query.q)), like(users.email, likePattern(query.q))) : undefined,
           query.status ? eq(users.status, query.status) : undefined,
-          query.ensembleId ? sql`exists (select 1 from memberships m where m.user_id = ${users.id} and m.ensemble_id = ${query.ensembleId}::uuid)` : undefined,
+          query.ensembleId ? sql`exists (select 1 from memberships m where m.user_id = ${users.id} and m.ensemble_id = ${query.ensembleId})` : undefined,
           afterNameAndId(users.name, users.id, cursor),
         ),
       )
@@ -70,18 +70,12 @@ export class UsersService {
     await this.user(userId);
     await assertActiveEnsemble(this.db, ensembleId);
     await assertRoleExists(this.db, roleId);
-    await this.db
-      .insert(memberships)
-      .values({ userId, ensembleId, roleId })
-      .onConflictDoUpdate({ target: [memberships.userId, memberships.ensembleId], set: { roleId } });
+    await this.db.insert(memberships).values({ userId, ensembleId, roleId }).onDuplicateKeyUpdate({ set: { roleId } });
   }
 
   async removeMembership(userId: string, ensembleId: string): Promise<void> {
-    const removed = await this.db
-      .delete(memberships)
-      .where(and(eq(memberships.userId, userId), eq(memberships.ensembleId, ensembleId)))
-      .returning({ userId: memberships.userId });
-    if (!removed.length) throw ProblemException.notFound();
+    const [result] = await this.db.delete(memberships).where(and(eq(memberships.userId, userId), eq(memberships.ensembleId, ensembleId)));
+    if (!result.affectedRows) throw ProblemException.notFound();
   }
 
   /** Pre-assigns profile voices (S-1, M-1); empty list allowed. */
@@ -136,7 +130,7 @@ export class UsersService {
   private async isLastAdmin(user: UserRecord): Promise<boolean> {
     if (!user.isAdmin || user.status !== 'active') return false;
     const [{ n }] = await this.db
-      .select({ n: sql<number>`count(*)::int` })
+      .select({ n: count() })
       .from(users)
       .where(and(eq(users.isAdmin, true), eq(users.status, 'active')));
     return n <= 1;

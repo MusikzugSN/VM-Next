@@ -1,47 +1,47 @@
 import { sql } from 'drizzle-orm';
-import { check, index, integer, pgTable, primaryKey, text, timestamp, unique, uniqueIndex, uuid } from 'drizzle-orm/pg-core';
+import { check, timestamp, index, int, mysqlTable, primaryKey, unique, uniqueIndex, varchar } from 'drizzle-orm/mysql-core';
 import { users } from './users';
 
 /** Instruments in manually set order (N-6, F-16). */
-export const instruments = pgTable(
+export const instruments = mysqlTable(
   'instruments',
   {
-    id: uuid('id').primaryKey(),
-    name: text('name').notNull(),
-    position: integer('position').notNull(),
-    createdAt: timestamp('created_at', { withTimezone: true }).notNull().defaultNow(),
+    id: varchar('id', { length: 36 }).primaryKey(),
+    name: varchar('name', { length: 255 }).notNull(),
+    position: int('position').notNull(),
+    createdAt: timestamp('created_at', { fsp: 6 }).notNull().defaultNow(),
   },
   (t) => [uniqueIndex('instruments_name_idx').on(sql`lower(${t.name})`)],
 );
 
 /** Voices with their full display name, e.g. „Trompete 1 in B“ (N-6). */
-export const voices = pgTable(
+export const voices = mysqlTable(
   'voices',
   {
-    id: uuid('id').primaryKey(),
-    instrumentId: uuid('instrument_id')
+    id: varchar('id', { length: 36 }).primaryKey(),
+    instrumentId: varchar('instrument_id', { length: 36 })
       .notNull()
       .references(() => instruments.id, { onDelete: 'restrict' }),
-    name: text('name').notNull(),
+    name: varchar('name', { length: 255 }).notNull(),
     /** Order within the instrument (F-16). */
-    position: integer('position').notNull(),
-    createdAt: timestamp('created_at', { withTimezone: true }).notNull().defaultNow(),
-    updatedAt: timestamp('updated_at', { withTimezone: true }).notNull().defaultNow(),
+    position: int('position').notNull(),
+    createdAt: timestamp('created_at', { fsp: 6 }).notNull().defaultNow(),
+    updatedAt: timestamp('updated_at', { fsp: 6 }).notNull().defaultNow(),
   },
   (t) => [uniqueIndex('voices_name_idx').on(sql`lower(${t.name})`), index('voices_instrument_idx').on(t.instrumentId)],
 );
 
 /** Ordered substitutes of a voice (N-9, M-3). */
-export const voiceSubstitutes = pgTable(
+export const voiceSubstitutes = mysqlTable(
   'voice_substitutes',
   {
-    voiceId: uuid('voice_id')
+    voiceId: varchar('voice_id', { length: 36 })
       .notNull()
       .references(() => voices.id, { onDelete: 'cascade' }),
-    substituteVoiceId: uuid('substitute_voice_id')
+    substituteVoiceId: varchar('substitute_voice_id', { length: 36 })
       .notNull()
       .references(() => voices.id, { onDelete: 'cascade' }),
-    position: integer('position').notNull(),
+    position: int('position').notNull(),
   },
   (t) => [
     primaryKey({ columns: [t.voiceId, t.substituteVoiceId] }),
@@ -51,16 +51,16 @@ export const voiceSubstitutes = pgTable(
 );
 
 /** Profile voices of a person (M-1, S-1). */
-export const userVoices = pgTable(
+export const userVoices = mysqlTable(
   'user_voices',
   {
-    userId: uuid('user_id')
+    userId: varchar('user_id', { length: 36 })
       .notNull()
       .references(() => users.id, { onDelete: 'cascade' }),
-    voiceId: uuid('voice_id')
+    voiceId: varchar('voice_id', { length: 36 })
       .notNull()
       .references(() => voices.id, { onDelete: 'restrict' }),
-    position: integer('position').notNull(),
+    position: int('position').notNull(),
   },
   (t) => [primaryKey({ columns: [t.userId, t.voiceId] })],
 );

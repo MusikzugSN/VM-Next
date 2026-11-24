@@ -1,9 +1,9 @@
 import { ProblemException } from '../common/problem-details/problem.exception';
 
-/** PostgreSQL `unique_violation` (23505), also when wrapped by drizzle (`cause`). */
+/** MySQL `ER_DUP_ENTRY` (1062), also when wrapped by drizzle (`cause`). */
 export function isUniqueViolation(error: unknown): boolean {
   for (let e: unknown = error; e && typeof e === 'object'; e = (e as { cause?: unknown }).cause) {
-    if ((e as { code?: unknown }).code === '23505') return true;
+    if ((e as { code?: unknown }).code === 'ER_DUP_ENTRY') return true;
   }
   return false;
 }

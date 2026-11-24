@@ -5,7 +5,7 @@ NestJS-Server für VM-Web. Endpunkte: [docs/api.md](../../docs/api.md), Datenban
 ## Voraussetzungen
 
 - Node 24 LTS und pnpm (siehe `.nvmrc`, `packageManager` in `package.json`)
-- Docker Engine in WSL 2 (für PostgreSQL und Pocket ID)
+- Docker Engine in WSL 2 (für MySQL und Pocket ID)
 
 ### Einmalig: WSL und Docker installieren
 
@@ -29,12 +29,12 @@ wsl --shutdown
 wsl docker run --rm hello-world
 ```
 
-**Wichtig:** WSL 2 fährt die Linux-VM herunter, sobald kein WSL-Prozess mehr läuft – Docker und die Container stoppen dann mit (Symptom: `ECONNREFUSED` auf 5433 oder `500`er mitten in Tests). Abhilfe, eine von beiden:
+**Wichtig:** WSL 2 fährt die Linux-VM herunter, sobald kein WSL-Prozess mehr läuft – Docker und die Container stoppen dann mit (Symptom: `ECONNREFUSED` auf 3307 oder `500`er mitten in Tests). Abhilfe, eine von beiden:
 
 - während der Entwicklung ein Terminal mit `wsl -e sleep infinity` offen lassen, oder
 - in `%UserProfile%\.wslconfig` unter `[wsl2]` die Zeile `vmIdleTimeout=-1` eintragen und einmal `wsl --shutdown` ausführen.
 
-Die Ports aus WSL sind unter Windows automatisch über `localhost` erreichbar: PostgreSQL auf **5433** (5432 ist oft von einem lokal installierten PostgreSQL belegt), Pocket ID auf 1411.
+Die Ports aus WSL sind unter Windows automatisch über `localhost` erreichbar: MySQL auf **3307** (3306 ist oft von einem lokal installierten MySQL belegt), Pocket ID auf 1411.
 
 ## Lokale Entwicklung
 
@@ -44,7 +44,7 @@ Alle Befehle aus dem Workspace-Root in PowerShell.
 
 ```powershell
 pnpm install
-pnpm dev:up          # PostgreSQL :5433, Pocket ID :1411 (wsl docker compose)
+pnpm dev:up          # MySQL :3307, Pocket ID :1411 (wsl docker compose)
 ```
 
 `pnpm dev:logs` zeigt die Logs, `pnpm dev:down` stoppt beide (Daten bleiben in Docker-Volumes).
@@ -104,11 +104,11 @@ Ohne Frontend lässt sich der Login direkt gegen die API testen: in `apps/api/.e
 pnpm nx run-many -t lint test build -p api shared
 ```
 
-Die Datenbank-Integrationstests (`*.integration.spec.ts`) laufen nur, wenn `TEST_DATABASE_URL` gesetzt ist. Jede Testdatei legt daneben ihre eigene, frische Datenbank `<name>_<suffix>` an (z. B. `vmweb_test_me`), damit Dateien parallel laufen können; der Datenbank-Benutzer braucht dafür das Recht `CREATEDB` (im Dev-Container gegeben):
+Die Datenbank-Integrationstests (`*.integration.spec.ts`) laufen nur, wenn `TEST_DATABASE_URL` gesetzt ist. Jede Testdatei legt daneben ihre eigene, frische Datenbank `<name>_<suffix>` an (z. B. `vmweb_test_me`), damit Dateien parallel laufen können; der Datenbank-Benutzer braucht dafür Rechte auf beliebige Datenbanken, nicht nur `CREATE`/`DROP` für die Datenbank selbst, sondern auch für die Migrationstabelle darin (einmalig, im Dev-Container):
 
 ```powershell
-wsl docker compose -f docker-compose.dev.yml exec -T postgres psql -U vmweb -d vmweb -c "create database vmweb_test owner vmweb"
-$env:TEST_DATABASE_URL = 'postgres://vmweb:vmweb@localhost:5433/vmweb_test'
+wsl docker compose -f docker-compose.dev.yml exec -T mysql mysql -uroot -pvmweb -e "CREATE DATABASE IF NOT EXISTS vmweb_test; GRANT ALL PRIVILEGES ON *.* TO 'vmweb'@'%'; FLUSH PRIVILEGES;"
+$env:TEST_DATABASE_URL = 'mysql://vmweb:vmweb@localhost:3307/vmweb_test'
 pnpm nx test api
 ```
 
@@ -118,7 +118,7 @@ pnpm nx test api
 | --- | --- |
 | `src/config/` | Umgebungsvariablen: Zod-Schema (`env.schema.ts`), typisierter Zugriff `AppConfig` |
 | `src/db/` | Drizzle-Anbindung (`DATABASE`-Token), Schema `schema/`, Migrationen beim Start |
-| `src/cache/` | `ICacheService` (`CACHE_SERVICE`-Token): `PostgresCacheService` (Tabelle `cache_entries`) im Betrieb, `InMemoryCacheService` in Tests |
+| `src/cache/` | `ICacheService` (`CACHE_SERVICE`-Token): `SqlCacheService` (Tabelle `cache_entries`) im Betrieb, `InMemoryCacheService` in Tests |
 | `src/storage/` | `IFileStorage` (`FILE_STORAGE`-Token) auf einem Verzeichnis (`FILE_STORAGE_PATH`) |
 | `src/common/problem-details/` | `ProblemException` und globaler Filter für RFC 9457 |
 | `src/common/validation/` | `ZodValidationPipe` (Requests) und `@ResponseSchema` (Responses) mit Schemas aus `@vm-web/shared` |

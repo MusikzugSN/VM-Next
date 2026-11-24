@@ -1,6 +1,6 @@
 import { Inject, Injectable } from '@nestjs/common';
 import type { CreateVoiceBody, CreateVoiceResponse, InstrumentSuggestionsResponse, VoiceListResponse } from '@vm-web/shared';
-import { and, asc, eq, inArray, sql } from 'drizzle-orm';
+import { and, asc, count, countDistinct, eq, inArray, like, ne, sql } from 'drizzle-orm';
 import { uuidv7 } from '../common/ids/uuid-v7';
 import { ProblemException } from '../common/problem-details/problem.exception';
 import { DATABASE, type Database, type Tx } from '../db/database';
@@ -9,7 +9,6 @@ import { ensembleLineupVoices, instruments, sheets, uploads, userVoices, voices,
 import { assertKnownIds } from '../common/validation/id-list';
 import { assertPermutation, nextPosition, replaceRows } from '../db/table-helpers';
 import { escapeLike, likePattern } from '../common/sql';
-
 
 /** Voices and instruments: one list, instrument typed with autocomplete, ordered substitutes (N-6, N-7, N-9, F-16). */
 @Injectable()
@@ -28,9 +27,14 @@ export class VoicesService {
         .from(voiceSubstitutes)
         .innerJoin(voices, eq(voices.id, voiceSubstitutes.substituteVoiceId))
         .orderBy(asc(voiceSubstitutes.position)),
-      this.countBy(sql`select voice_id, count(*)::int as n from sheets group by voice_id`),
-      this.countBy(sql`select voice_id, count(distinct ensemble_id)::int as n from ensemble_lineup_voices group by voice_id`),
+      this.db.select({ voiceId: sheets.voiceId, n: count() }).from(sheets).groupBy(sheets.voiceId),
+      this.db
+        .select({ voiceId: ensembleLineupVoices.voiceId, n: countDistinct(ensembleLineupVoices.ensembleId) })
+        .from(ensembleLineupVoices)
+        .groupBy(ensembleLineupVoices.voiceId),
     ]);
+    const sheetCountMap = new Map(sheetCounts.map((s) => [s.voiceId, s.n]));
+    const lineupCountMap = new Map(lineupCounts.map((l) => [l.voiceId, l.n]));
 
     const groups: VoiceListResponse['groups'] = [];
     for (const r of rows) {
@@ -43,8 +47,8 @@ export class VoicesService {
       group.voices.push({
         ...r.voice,
         substitutes: subs.filter((s) => s.voiceId === r.voice.id).map(({ id, name, instrumentId }) => ({ id, name, instrumentId })),
-        sheetCount: sheetCounts.get(r.voice.id) ?? 0,
-        lineupCount: lineupCounts.get(r.voice.id) ?? 0,
+        sheetCount: sheetCountMap.get(r.voice.id) ?? 0,
+        lineupCount: lineupCountMap.get(r.voice.id) ?? 0,
       });
     }
     return { groups };
@@ -56,8 +60,8 @@ export class VoicesService {
     const items = await this.db
       .select({ id: instruments.id, name: instruments.name })
       .from(instruments)
-      .where(q ? sql`${instruments.name} ilike ${likePattern(q)}` : undefined)
-      .orderBy(sql`(${instruments.name} ilike ${prefix}) desc`, asc(instruments.position))
+      .where(q ? like(instruments.name, likePattern(q)) : undefined)
+      .orderBy(sql`(${instruments.name} like ${prefix}) desc`, asc(instruments.position))
       .limit(20);
     return { items };
   }
@@ -112,12 +116,17 @@ export class VoicesService {
     await this.db.transaction(async (tx) => {
       const [voice] = await tx.select().from(voices).where(eq(voices.id, voiceId));
       if (!voice) throw ProblemException.notFound();
-      const [usage] = await tx.execute<{ used: boolean }>(sql`select
-        exists (select 1 from ${sheets} where voice_id = ${voiceId}::uuid)
-        or exists (select 1 from ${ensembleLineupVoices} where voice_id = ${voiceId}::uuid)
-        or exists (select 1 from ${userVoices} where voice_id = ${voiceId}::uuid)
-        or exists (select 1 from ${uploads} where voice_id = ${voiceId}::uuid and status = 'pending') as used`).then((r) => r.rows);
-      if (usage?.used) throw ProblemException.conflict('in-use');
+      const [usedInSheets, usedInLineup, usedInProfile, usedInPending] = await Promise.all([
+        tx.select({ id: sheets.id }).from(sheets).where(eq(sheets.voiceId, voiceId)).limit(1),
+        tx.select({ id: ensembleLineupVoices.voiceId }).from(ensembleLineupVoices).where(eq(ensembleLineupVoices.voiceId, voiceId)).limit(1),
+        tx.select({ id: userVoices.voiceId }).from(userVoices).where(eq(userVoices.voiceId, voiceId)).limit(1),
+        tx
+          .select({ id: uploads.id })
+          .from(uploads)
+          .where(and(eq(uploads.voiceId, voiceId), eq(uploads.status, 'pending')))
+          .limit(1),
+      ]);
+      if (usedInSheets.length || usedInLineup.length || usedInProfile.length || usedInPending.length) throw ProblemException.conflict('in-use');
       await tx.delete(voices).where(eq(voices.id, voiceId));
       await removeInstrumentIfEmpty(tx, voice.instrumentId);
     });
@@ -128,10 +137,10 @@ export class VoicesService {
       const [taken] = await this.db
         .select({ id: instruments.id })
         .from(instruments)
-        .where(and(sql`lower(${instruments.name}) = lower(${name})`, sql`${instruments.id} <> ${instrumentId}::uuid`));
+        .where(and(sql`lower(${instruments.name}) = lower(${name})`, ne(instruments.id, instrumentId)));
       if (taken) throw ProblemException.conflict('name-taken');
-      const [row] = await this.db.update(instruments).set({ name }).where(eq(instruments.id, instrumentId)).returning({ id: instruments.id });
-      if (!row) throw ProblemException.notFound();
+      const [result] = await this.db.update(instruments).set({ name }).where(eq(instruments.id, instrumentId));
+      if (!result.affectedRows) throw ProblemException.notFound();
     });
   }
 
@@ -168,13 +177,8 @@ export class VoicesService {
     const [taken] = await tx
       .select({ id: voices.id })
       .from(voices)
-      .where(and(sql`lower(${voices.name}) = lower(${name})`, exceptId ? sql`${voices.id} <> ${exceptId}::uuid` : undefined));
+      .where(and(sql`lower(${voices.name}) = lower(${name})`, exceptId ? ne(voices.id, exceptId) : undefined));
     if (taken) throw ProblemException.conflict('name-taken');
-  }
-
-  private async countBy(query: ReturnType<typeof sql>): Promise<Map<string, number>> {
-    const result = await this.db.execute<{ voice_id: string; n: number }>(query);
-    return new Map(result.rows.map((r) => [r.voice_id, r.n]));
   }
 }
 
@@ -183,5 +187,5 @@ function nextVoicePosition(tx: Tx, instrumentId: string): Promise<number> {
 }
 
 async function removeInstrumentIfEmpty(tx: Tx, instrumentId: string): Promise<void> {
-  await tx.execute(sql`delete from ${instruments} where id = ${instrumentId}::uuid and not exists (select 1 from ${voices} where instrument_id = ${instrumentId}::uuid)`);
+  await tx.delete(instruments).where(and(eq(instruments.id, instrumentId), sql`not exists (select 1 from ${voices} where instrument_id = ${instrumentId})`));
 }

@@ -14,6 +14,8 @@ export default defineConfig(() => ({
     include: ['{src,tests}/**/*.{test,spec}.{js,mjs,cjs,ts,mts,cts,jsx,tsx}'],
     passWithNoTests: true,
     reporters: ['default'],
+    testTimeout: 30000,
+    hookTimeout: 30000,
     coverage: {
       reportsDirectory: '../../coverage/apps/api',
       provider: 'v8' as const,
