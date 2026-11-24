@@ -2,7 +2,7 @@ import { DatePipe, NgTemplateOutlet } from '@angular/common';
 import { ChangeDetectionStrategy, Component, computed, DestroyRef, inject, signal } from '@angular/core';
 import { TranslocoPipe, TranslocoService } from '@jsverse/transloco';
 import { NgIcon, provideIcons } from '@ng-icons/core';
-import { lucideCircleCheck, lucideCopy, lucidePrinter, lucideRepeat, lucideTriangleAlert, lucideX } from '@ng-icons/lucide';
+import { lucideCircleCheck, lucidePrinter, lucideRepeat, lucideX } from '@ng-icons/lucide';
 import type { PrintJob, PrintJobStatus } from '@vm-web/shared';
 
 import { VmButton, VmCard, VmTable, VmToastService } from '@vm-web/ui';
@@ -11,6 +11,7 @@ import { PluralPipe } from '../../core/i18n/plural.pipe';
 import { ViewportService } from '../../core/layout/viewport';
 import { PRINT_SERVICE, PrintServiceFailure, type PrintServiceState } from '../../core/print/print-service-client';
 import { canRetry, isRunning, statusChanges } from './print-model';
+import { PrintServiceGuide } from './print-service-guide';
 
 /** Poll interval while the page is visible (docs/print-service.md). */
 export const HISTORY_POLL_MS = 2000;
@@ -29,8 +30,8 @@ const STATUS_CLASSES: Record<PrintJobStatus, string> = {
  */
 @Component({
   selector: 'vm-print-history-page',
-  imports: [VmTable, VmCard, DatePipe, NgTemplateOutlet, NgIcon, TranslocoPipe, PluralPipe, VmButton],
-  viewProviders: [provideIcons({ lucidePrinter, lucideCircleCheck, lucideTriangleAlert, lucideCopy, lucideRepeat, lucideX })],
+  imports: [VmTable, VmCard, DatePipe, NgTemplateOutlet, NgIcon, TranslocoPipe, PluralPipe, VmButton, PrintServiceGuide],
+  viewProviders: [provideIcons({ lucidePrinter, lucideCircleCheck, lucideRepeat, lucideX })],
   changeDetection: ChangeDetectionStrategy.OnPush,
   templateUrl: './print-history-page.html',
 })
@@ -44,7 +45,6 @@ export class PrintHistoryPage {
   protected readonly state = signal<PrintServiceState | null>(null);
   protected readonly jobs = signal<readonly PrintJob[]>([]);
   protected readonly loaded = signal(false);
-  protected readonly origin = typeof location === 'undefined' ? '' : location.origin;
   protected readonly ready = computed(() => this.state()?.kind === 'ready');
   protected readonly defaultPrinter = computed(() => {
     const state = this.state();
@@ -102,15 +102,6 @@ export class PrintHistoryPage {
 
   protected async retry(job: PrintJob): Promise<void> {
     await this.act(() => this.service.retry(job.id), 'print.history.retried');
-  }
-
-  protected async copyOrigin(): Promise<void> {
-    try {
-      await navigator.clipboard.writeText(this.origin);
-      this.sonner.success(this.transloco.translate('print.history.copied'));
-    } catch {
-      // Clipboard blocked: the address is visible on the page anyway.
-    }
   }
 
   protected voices(job: PrintJob): string {

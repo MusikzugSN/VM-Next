@@ -25,6 +25,9 @@ export type PrintServiceState =
   | { kind: 'incompatible'; reason: 'contract' | 'origin' }
   | { kind: 'offline' };
 
+/** The non-ready states, for the install-guide UI that explains and helps fix them. */
+export type PrintServiceIssue = Exclude<PrintServiceState, { kind: 'ready' }>;
+
 /** Error of a job request, with the service's code if it sent one. */
 export class PrintServiceFailure extends Error {
   constructor(readonly code: string) {
