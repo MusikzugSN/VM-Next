@@ -116,6 +116,8 @@ describe.skipIf(!TEST_DATABASE_URL)('Systemverwaltung (TEST_DATABASE_URL)', () =
       ['sara', `users/${ids.mia}/set-admin`, { isAdmin: true }, 403], // admin flag only (R-6)
       ['sara', 'ensemble-list', undefined, 200],
       ['bob', 'ensemble-list', undefined, 403],
+      ['sara', 'ensemble-options', undefined, 200],
+      ['bob', 'ensemble-options', undefined, 403],
       ['bob', `ensembles/${ids.orchestra}/details`, undefined, 200], // member.view (R-3)
       ['bob', `ensembles/${ids.orchestra}/members`, undefined, 200],
       ['bob', `ensembles/${ids.windClass}/members`, undefined, 200], // inherited (F-3)
@@ -179,6 +181,7 @@ describe.skipIf(!TEST_DATABASE_URL)('Systemverwaltung (TEST_DATABASE_URL)', () =
       const options = names((await api('sara', 'user-assignment-options')).body.ensembles);
       expect(options).toContain('Jugendorchester');
       expect(options).not.toContain('Hauptorchester');
+      expect(names((await api('sara', 'ensemble-options')).body.items)).toContain('Hauptorchester');
 
       expect((await api('sara', `users/${ids.mia}/set-membership`, { ensembleId: ids.youth, roleId: ids.role_musician })).status).toBe(204);
       expect((await api('sara', `users/${ids.mia}/remove-membership`, { ensembleId: ids.youth })).status).toBe(204);

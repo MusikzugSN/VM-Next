@@ -7,10 +7,12 @@ import type {
   EnsembleListItem,
   EnsembleListQuery,
   EnsembleMember,
+  EnsembleOptionsResponse,
   Page,
 } from '@vm-web/shared';
 import { and, asc, eq, inArray, like, sql } from 'drizzle-orm';
 import type { AccessContext } from '../access/access-context';
+import { activeEnsembleOptions } from '../common/ensemble-tree';
 import { assertEnsembleInScope } from '../library/library-helpers';
 import { uuidv7 } from '../common/ids/uuid-v7';
 import { decodeCursor, encodeCursor } from '../common/pagination/cursor';
@@ -125,6 +127,10 @@ export class EnsemblesService {
   async rename(ensembleId: string, name: string): Promise<void> {
     await this.ensemble(ensembleId);
     await withNameTaken(() => this.db.update(ensembles).set({ name, updatedAt: new Date() }).where(eq(ensembles.id, ensembleId)));
+  }
+
+  async options(): Promise<EnsembleOptionsResponse> {
+    return { items: await activeEnsembleOptions(this.db) };
   }
 
   /** Moves an ensemble in the tree (F-3); never the root, never below itself. */

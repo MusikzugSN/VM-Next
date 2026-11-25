@@ -11,7 +11,7 @@ import {
   appPath,
   createdResponseSchema,
   ensembleListResponseSchema,
-  userAssignmentOptionsResponseSchema,
+  ensembleOptionsResponseSchema,
   type EnsembleListItem,
 } from '@vm-web/shared';
 
@@ -58,9 +58,9 @@ export class EnsemblesPage {
   });
   /** Active ensembles as possible parents. */
   private readonly options = rxResource({
-    stream: () => this.api.get(apiUrl('system', 'userAssignmentOptions'), userAssignmentOptionsResponseSchema),
+    stream: () => this.api.get(apiUrl('system', 'ensembleOptions'), ensembleOptionsResponseSchema),
   });
-  protected readonly parents = computed(() => selectOr(this.options, (v) => v.ensembles, []));
+  protected readonly parents = computed(() => selectOr(this.options, (v) => v.items, []));
 
   protected link(e: EnsembleListItem): string {
     return appPath(APP_ROUTES.system.ensemble, { ensembleId: e.id });

@@ -13,6 +13,7 @@ import {
   ensembleListQuerySchema,
   ensembleListResponseSchema,
   ensembleMembersQuerySchema,
+  ensembleOptionsResponseSchema,
   ensembleMembersResponseSchema,
   ensembleParamsSchema,
   ensemblePrintRulesResponseSchema,
@@ -162,6 +163,13 @@ export class SystemEnsemblesController {
   @ResponseSchema(ensembleListResponseSchema)
   list(@Query(new Zod(ensembleListQuerySchema)) q: EnsembleListQuery) {
     return this.ensembles.list(q);
+  }
+
+  @RequirePermission('ensemble.view')
+  @Get(R.ensembleOptions.path)
+  @ResponseSchema(ensembleOptionsResponseSchema)
+  options() {
+    return this.ensembles.options();
   }
 
   @RequirePermission(['ensemble.view', 'member.view'], { ensembleFrom: 'param:ensembleId' })
