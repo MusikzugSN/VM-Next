@@ -11,6 +11,7 @@ import {
 import { and, asc, eq, inArray, like, or, sql } from 'drizzle-orm';
 import { readFile, rm } from 'node:fs/promises';
 import type { AccessContext } from '../access/access-context';
+import { uploadTempPath } from '../common/files/upload-temp';
 import { uuidv7 } from '../common/ids/uuid-v7';
 import { decodeCursor, toPage } from '../common/pagination/cursor';
 import { ProblemException } from '../common/problem-details/problem.exception';
@@ -84,7 +85,9 @@ export class UploadsService {
    * Stores the PDFs. With `sheet.approve`, score and voice set and no sheet yet for that pair,
    * an upload is approved at once (N-10, F-11); everything else waits in the review queue.
    */
-  async upload(access: AccessContext, files: readonly UploadedFileInfo[], metaRaw: unknown): Promise<UploadSheetsResponse> {
+  async upload(access: AccessContext, filesRaw: readonly UploadedFileInfo[], metaRaw: unknown): Promise<UploadSheetsResponse> {
+    // multer always hands over an array; checked anyway so `length`/`map` never act on another type
+    const files: readonly UploadedFileInfo[] = Array.isArray(filesRaw) ? filesRaw : [];
     try {
       const meta = this.parseMeta(metaRaw, files.length);
       await this.checkTargets(access, meta.items);
@@ -98,7 +101,7 @@ export class UploadsService {
       }
       return { items };
     } finally {
-      await Promise.all(files.map((f) => rm(f.path, { force: true })));
+      await Promise.all(files.map(async (f) => rm(uploadTempPath(f.path), { force: true })));
     }
   }
 
@@ -221,7 +224,7 @@ export class UploadsService {
     const errors: ValidationError[] = [];
     const result: { bytes: Buffer; pageCount: number }[] = [];
     for (const [i, file] of files.entries()) {
-      const bytes = await readFile(file.path);
+      const bytes = await readFile(uploadTempPath(file.path));
       try {
         result.push({ bytes, pageCount: (await inspectPdf(bytes)).pageCount });
       } catch (error) {

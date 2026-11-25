@@ -7,3 +7,8 @@ allowBuilds:
   lmdb: false
   msgpackr-extract: false
   "@nestjs/core": false
+# Security fixes for transitive dependencies (Dependabot alerts); remove once the parents ship patched ranges.
+overrides:
+  'minimatch@>=7.0.0 <11.0.1': ^11.0.1
+  '@esbuild-kit/core-utils>esbuild': ^0.25.0
+  'sockjs>uuid': ^11.1.1
