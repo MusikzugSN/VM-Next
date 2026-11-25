@@ -10,18 +10,14 @@ import {
   type UpdateDefaultsBody,
   type UpdatePrintBody,
 } from '@vm-web/shared';
-import { eq } from 'drizzle-orm';
 import { readFile, rm } from 'node:fs/promises';
-import { activeEnsembleOptions } from '../common/ensemble-tree';
 import { uploadTempPath } from '../common/files/upload-temp';
 import { uuidv7 } from '../common/ids/uuid-v7';
 import { ProblemException } from '../common/problem-details/problem.exception';
 import { httpUrlOrNull } from '../common/url';
-import { DATABASE, type Database } from '../db/database';
-import { clubSettings, ensembles, rolePermissions, roles } from '../db/schema';
 import { ClubSettingsRepository } from '../settings/club-settings.repository';
 import { FILE_STORAGE, type IFileStorage } from '../storage/file-storage';
-import { assertActiveEnsemble, assertRoleExists, roleOptions } from '../library/library-helpers';
+import { ConfigRepository, type ClubSettingsUpdate } from './config.repository';
 
 const BOM = new RegExp('^' + String.fromCharCode(0xfeff));
 
@@ -59,17 +55,15 @@ export class ConfigService {
   private readonly logger = new Logger('Config');
 
   constructor(
-    @Inject(DATABASE) private readonly db: Database,
+    @Inject(ConfigRepository) private readonly repo: ConfigRepository,
     @Inject(ClubSettingsRepository) private readonly settings: ClubSettingsRepository,
     @Inject(FILE_STORAGE) private readonly storage: IFileStorage,
   ) {}
 
   async get(): Promise<ConfigResponse> {
     const s = await this.settings.get();
-    const [ensemble] = s.defaultEnsembleId
-      ? await this.db.select({ id: ensembles.id, name: ensembles.name }).from(ensembles).where(eq(ensembles.id, s.defaultEnsembleId))
-      : [];
-    const [role] = s.defaultRoleId ? await this.db.select({ id: roles.id, name: roles.name }).from(roles).where(eq(roles.id, s.defaultRoleId)) : [];
+    const ensemble = s.defaultEnsembleId ? await this.repo.ensembleRef(s.defaultEnsembleId) : undefined;
+    const role = s.defaultRoleId ? await this.repo.roleRef(s.defaultRoleId) : undefined;
     const warnings: ConfigWarning[] = [];
     if (s.defaultRoleId && (await this.hasClubPermissions([s.defaultRoleId])).has(s.defaultRoleId)) warnings.push('default-role-has-club-permissions');
     return {
@@ -86,10 +80,7 @@ export class ConfigService {
   }
 
   async defaultOptions(): Promise<ConfigDefaultOptionsResponse> {
-    const [ensembleRows, roleRows] = await Promise.all([
-      activeEnsembleOptions(this.db),
-      roleOptions(this.db),
-    ]);
+    const [ensembleRows, roleRows] = await Promise.all([this.repo.activeEnsembleOptions(), this.repo.roleOptions()]);
     const club = await this.hasClubPermissions(roleRows.map((r) => r.id));
     return { ensembles: ensembleRows, roles: roleRows.map((r) => ({ ...r, hasClubPermissions: club.has(r.id) })) };
   }
@@ -102,11 +93,12 @@ export class ConfigService {
     });
   }
 
-  /** Defaults for new accounts (A-3); archived ensembles are refused. */
   async updateDefaults(body: UpdateDefaultsBody): Promise<void> {
-    if (body.defaultEnsembleId) await assertActiveEnsemble(this.db, body.defaultEnsembleId, '/body/defaultEnsembleId');
-    if (body.defaultRoleId) await assertRoleExists(this.db, body.defaultRoleId);
-    await this.update({ defaultEnsembleId: body.defaultEnsembleId, defaultRoleId: body.defaultRoleId });
+    await this.repo.updateDefaults(body.defaultEnsembleId, body.defaultRoleId, ({ ensemble, roleExists }) => {
+      if (body.defaultEnsembleId && !ensemble) throw ProblemException.notFound('Unknown ensemble');
+      if (ensemble?.archivedAt) throw ProblemException.validation([{ path: '/body/defaultEnsembleId', code: 'archived' }]);
+      if (body.defaultRoleId && !roleExists) throw ProblemException.notFound('Unknown role');
+    });
   }
 
   async updatePrint(body: UpdatePrintBody): Promise<void> {
@@ -137,13 +129,12 @@ export class ConfigService {
     if (old) await this.storage.delete(old).catch(() => undefined);
   }
 
-  private async update(set: Partial<typeof clubSettings.$inferInsert>): Promise<void> {
-    await this.db.update(clubSettings).set({ ...set, updatedAt: new Date() }).where(eq(clubSettings.id, 1));
+  private update(set: ClubSettingsUpdate): Promise<void> {
+    return this.repo.update(set);
   }
 
   private async hasClubPermissions(roleIds: readonly string[]): Promise<Set<string>> {
-    if (!roleIds.length) return new Set();
-    const rows = await this.db.select().from(rolePermissions);
-    return new Set(rows.filter((r) => roleIds.includes(r.roleId) && permissionScope(r.permission as Permission) === 'club').map((r) => r.roleId));
+    const rows = await this.repo.permissionsOf(roleIds);
+    return new Set(rows.filter((r) => permissionScope(r.permission as Permission) === 'club').map((r) => r.roleId));
   }
 }
