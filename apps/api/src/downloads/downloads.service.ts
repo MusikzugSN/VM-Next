@@ -1,19 +1,17 @@
 import { Inject, Injectable, Logger } from '@nestjs/common';
 import { downloadFileName, PRINT_MAX_PAGES, printModeFor, type PrintPlanResponse, type PrintQuery, type SubstituteMode } from '@vm-web/shared';
 import { ZipArchive } from 'archiver';
-import { eq } from 'drizzle-orm';
 import { once } from 'node:events';
 import type { Readable } from 'node:stream';
 import type { AccessContext } from '../access/access-context';
 import { sheetFileName, uniqueNames } from '../common/files/download-names';
 import { ProblemException } from '../common/problem-details/problem.exception';
-import { DATABASE, type Database } from '../db/database';
-import { events, folders, scores, sheets, voices } from '../db/schema';
 import { MeRepository } from '../me/me.repository';
 import { PrintRulesService } from '../print-rules/print-rules.service';
 import { ClubSettingsRepository } from '../settings/club-settings.repository';
 import { FILE_STORAGE, type IFileStorage } from '../storage/file-storage';
 import { streamToBuffer } from '../storage/stream-utils';
+import { DownloadsRepository } from './downloads.repository';
 import { OutputService, type OutputPlan, type OutputScope } from './output.service';
 import { buildPrintPdf, layoutDocuments, printRoute } from './print-layout';
 import { readOrNotFound } from '../storage/read-or-not-found';
@@ -23,13 +21,12 @@ interface FileResult<T = Readable> {
   fileName: string;
 }
 
-/** Downloads (M-6) and print documents (D-1..D-3, M-7). */
 @Injectable()
 export class DownloadsService {
   private readonly logger = new Logger('Downloads');
 
   constructor(
-    @Inject(DATABASE) private readonly db: Database,
+    @Inject(DownloadsRepository) private readonly repo: DownloadsRepository,
     @Inject(MeRepository) private readonly me: MeRepository,
     @Inject(OutputService) private readonly output: OutputService,
     @Inject(ClubSettingsRepository) private readonly settings: ClubSettingsRepository,
@@ -37,14 +34,8 @@ export class DownloadsService {
     @Inject(PrintRulesService) private readonly printRules: PrintRulesService,
   ) {}
 
-  /** One sheet as PDF (M-6): any voice of a score visible in Mein Bereich (M-2 switching). */
   async sheet(access: AccessContext, sheetId: string, folderId: string | undefined): Promise<FileResult> {
-    const [row] = await this.db
-      .select({ scoreId: sheets.scoreId, fileKey: sheets.fileKey, title: scores.title, voice: voices.name })
-      .from(sheets)
-      .innerJoin(scores, eq(scores.id, sheets.scoreId))
-      .innerJoin(voices, eq(voices.id, sheets.voiceId))
-      .where(eq(sheets.id, sheetId));
+    const row = await this.repo.sheetWithNames(sheetId);
     const ensembleIds = access.memberEnsembleIds();
     if (!row || !(await this.me.visibleScore(ensembleIds, row.scoreId))) throw ProblemException.notFound();
 
@@ -56,13 +47,11 @@ export class DownloadsService {
     return { body: await this.read(row.fileKey), fileName: sheetFileName({ number, title: row.title, voice: row.voice }) };
   }
 
-  /** ZIP with one PDF per score and voice, named „Nr – Titel – Stimme.pdf“ (M-6). */
   async zip(access: AccessContext, scope: OutputScope, voiceIds: readonly string[], substitutes: SubstituteMode): Promise<FileResult> {
     const plan = await this.output.plan(access, 'download', scope, voiceIds, substitutes);
     const names = uniqueNames(plan.documents.map((d) => sheetFileName({ number: d.number, title: d.title, voice: d.sheet.voice.name })));
-    const archive = new ZipArchive({ store: true }); // PDFs are compressed already
+    const archive = new ZipArchive({ store: true });
 
-    // append one file at a time so that only one file is open
     void (async () => {
       try {
         for (const [i, doc] of plan.documents.entries()) {
@@ -83,7 +72,6 @@ export class DownloadsService {
     return { body: archive, fileName: downloadFileName(outputName(plan), 'zip') };
   }
 
-  /** Content of the print dialog (D-1, D-2, D-3, D-6). */
   async printPlan(access: AccessContext, query: PrintQuery): Promise<PrintPlanResponse> {
     const plan = await this.output.plan(access, 'print', scopeOf(query), query.voiceId, query.substitutes);
     const pages = plan.documents.map((d) => d.sheet.pageCount);
@@ -114,7 +102,6 @@ export class DownloadsService {
     };
   }
 
-  /** Print-ready PDF, same content and order as the plan (D-1). */
   async printDocument(access: AccessContext, query: PrintQuery): Promise<FileResult<Buffer>> {
     const plan = await this.output.plan(access, 'print', scopeOf(query), query.voiceId, query.substitutes);
     if (!plan.documents.length) throw ProblemException.notFound('Nothing to print');
@@ -132,16 +119,9 @@ export class DownloadsService {
     return { body: Buffer.from(pdf.bytes), fileName: downloadFileName(`Druck – ${outputName(plan)}`, 'pdf') };
   }
 
-  /** Ensemble whose print rules apply: that of the folder or event, otherwise none (main ensemble, D-6). */
   private async contextEnsemble(query: PrintQuery): Promise<string | null> {
-    if (query.folderId) {
-      const [row] = await this.db.select({ ensembleId: folders.ensembleId }).from(folders).where(eq(folders.id, query.folderId));
-      return row?.ensembleId ?? null;
-    }
-    if (query.eventId) {
-      const [row] = await this.db.select({ ensembleId: events.ensembleId }).from(events).where(eq(events.id, query.eventId));
-      return row?.ensembleId ?? null;
-    }
+    if (query.folderId) return (await this.repo.folder(query.folderId))?.ensembleId ?? null;
+    if (query.eventId) return (await this.repo.event(query.eventId))?.ensembleId ?? null;
     return null;
   }
 
@@ -163,7 +143,6 @@ function scopeOf(q: PrintQuery): OutputScope {
   }
 }
 
-/** „Marschbuch – Trompete 1 in B“: scope name plus the active voices. */
 function outputName(plan: OutputPlan): string {
   const voiceNames = plan.activeVoices.map((v) => v.name).join(', ');
   return voiceNames ? `${plan.name} – ${voiceNames}` : plan.name;

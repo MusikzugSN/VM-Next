@@ -16,6 +16,7 @@ import { createTestApp, type TestApp } from '../testing/test-app';
 import { createTestDatabase, TEST_DATABASE_URL, type TestDatabase } from '../testing/test-database';
 import { todayIn } from '../common/time/today';
 import { DownloadsController, PrintController } from './downloads.controller';
+import { DownloadsRepository } from './downloads.repository';
 import { DownloadsService } from './downloads.service';
 import { OutputService } from './output.service';
 
@@ -121,7 +122,7 @@ describe.skipIf(!TEST_DATABASE_URL)('Druck und Download (TEST_DATABASE_URL)', ()
     await b.setlist(ids.concert, [ids.polka, ids.march]);
 
     t = await createTestApp(
-      { controllers: [DownloadsController, PrintController], providers: [DownloadsService, OutputService, MeRepository, MeService, ClubSettingsRepository, PrintRulesService] },
+      { controllers: [DownloadsController, PrintController], providers: [DownloadsRepository, DownloadsService, OutputService, MeRepository, MeService, ClubSettingsRepository, PrintRulesService] },
       { database: testDb.db, providers: [{ provide: FILE_STORAGE, useValue: storage }], config: { APP_TIMEZONE: 'Europe/Berlin' } },
     );
   });
@@ -218,6 +219,14 @@ describe.skipIf(!TEST_DATABASE_URL)('Druck und Download (TEST_DATABASE_URL)', ()
       expect((await fetchAs('ben', `me/events/${ids.concert}/zip`)).status).toBe(404);
     });
 
+    it('keeps view permissions out of ZIP downloads and refuses anonymous calls', async () => {
+      expect((await fetchAs('pia', `me/folders/${ids.youthHidden}/zip`)).status).toBe(404);
+      expect((await fetchAs('pia', 'me/downloads/selection-zip', { scoreIds: [ids.secret] })).status).toBe(404);
+      expect((await fetchAs('ben', 'me/downloads/selection-zip', { scoreIds: [ids.polka], folderId: ids.marschbuch })).status).toBe(404);
+      expect((await fetchAs(null, `me/folders/${ids.marschbuch}/zip`)).status).toBe(401);
+      expect((await fetchAs(null, `me/events/${ids.concert}/zip`)).status).toBe(401);
+    });
+
     it('leaves out files missing in storage instead of failing the whole ZIP', async () => {
       const [row] = await testDb.db.select().from(sheets).where(eq(sheets.id, ids.polkaFlh1));
       const backup = await storage.read(row.fileKey);
@@ -279,6 +288,21 @@ describe.skipIf(!TEST_DATABASE_URL)('Druck und Download (TEST_DATABASE_URL)', ()
       // a plain member prints only Mein Bereich
       expect((await fetchAs('ben', `print/print-plan?scope=score&scoreId=${ids.march}`)).status).toBe(404);
       expect((await fetchAs('anna', `print/print-plan?scope=folder&folderId=${ids.hidden}`)).status).toBe(404);
+    });
+
+    it('prints events and selections only within the caller’s access (F-9)', async () => {
+      const event = json(await fetchAs('anna', `print/print-plan?scope=event&eventId=${ids.concert}`));
+      expect(event.documents.map((d: { number: string; title: string }) => `${d.number} ${d.title}`)).toEqual(['01 Böhmischer Traum', '02 Alte Kameraden']);
+      expect((await fetchAs('anna', `print/document?scope=event&eventId=${ids.concert}`)).status).toBe(200);
+      expect((await fetchAs('pia', `print/print-plan?scope=event&eventId=${ids.concert}`)).status).toBe(404);
+      expect((await fetchAs('ben', `print/document?scope=event&eventId=${ids.concert}`)).status).toBe(404);
+
+      expect((await fetchAs('pia', `print/print-plan?scope=selection&scoreIds=${ids.secret}&voiceId=${ids.tp1}`)).status).toBe(200);
+      expect((await fetchAs('anna', `print/print-plan?scope=selection&scoreIds=${ids.secret}`)).status).toBe(404);
+      expect((await fetchAs('anna', `print/document?scope=selection&scoreIds=${ids.secret}`)).status).toBe(404);
+
+      expect((await fetchAs(null, `print/print-plan?scope=folder&folderId=${ids.marschbuch}`)).status).toBe(401);
+      expect((await fetchAs(null, `print/document?scope=folder&folderId=${ids.marschbuch}`)).status).toBe(401);
     });
 
     it('refuses a print job above the page limit instead of loading every sheet', async () => {
