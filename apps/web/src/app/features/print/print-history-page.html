@@ -88,22 +88,22 @@
 }
 
 <ng-template #statusBadge let-job>
-  <span class="inline-flex items-center rounded-small px-2 py-0.5 text-label-medium whitespace-nowrap" [class]="statusClass($any(job).status)">
-    @if ($any(job).status === 'printing' && $any(job).printedPages !== null) {
-      {{ 'print.history.progress' | transloco: { printed: $any(job).printedPages, pages: $any(job).pages } }}
+  <span class="inline-flex items-center rounded-small px-2 py-0.5 text-label-medium whitespace-nowrap" [class]="statusClass(job.status)">
+    @if (job.status === 'printing' && job.printedPages !== null) {
+      {{ 'print.history.progress' | transloco: { printed: job.printedPages, pages: job.pages } }}
     } @else {
-      {{ 'print.jobStatus.' + $any(job).status | transloco }}
+      {{ 'print.jobStatus.' + job.status | transloco }}
     }
   </span>
 </ng-template>
 
 <ng-template #actions let-job>
-  @if (isRunning($any(job).status)) {
-    <button vm-button variant="text" type="button" (click)="cancel(job)" [attr.aria-label]="('print.history.cancel' | transloco) + ': ' + $any(job).source.title">
+  @if (isRunning(job.status)) {
+    <button vm-button variant="text" type="button" (click)="cancel(job)" [attr.aria-label]="('print.history.cancel' | transloco) + ': ' + job.source.title">
       <ng-icon name="lucideX" aria-hidden="true" />{{ 'print.history.cancel' | transloco }}
     </button>
-  } @else if (canRetry($any(job).status)) {
-    <button vm-button variant="text" type="button" (click)="retry(job)" [attr.aria-label]="('print.history.retry' | transloco) + ': ' + $any(job).source.title">
+  } @else if (canRetry(job.status)) {
+    <button vm-button variant="text" type="button" (click)="retry(job)" [attr.aria-label]="('print.history.retry' | transloco) + ': ' + job.source.title">
       <ng-icon name="lucideRepeat" aria-hidden="true" />{{ 'print.history.retry' | transloco }}
     </button>
   }
