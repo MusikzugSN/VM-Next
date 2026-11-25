@@ -3,9 +3,9 @@ import { API_PREFIX, API_ROUTES } from '@vm-web/shared';
 import type { IncomingMessage } from 'node:http';
 
 /** Default JSON limit (Nest/Express default). */
-export const JSON_BODY_LIMIT = '100kb';
+const JSON_BODY_LIMIT = '100kb';
 /** The CSV import sends up to 5000 rows of raw cells (N-19). */
-export const IMPORT_BODY_LIMIT = '10mb';
+const IMPORT_BODY_LIMIT = '10mb';
 
 const IMPORT_PATH = `${API_PREFIX}/${API_ROUTES.scores.base}/${API_ROUTES.scores.importScores.path}`;
 

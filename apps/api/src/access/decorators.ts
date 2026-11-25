@@ -28,7 +28,7 @@ export type EnsembleSource =
   | { resolver: EnsembleResolverToken; from: `param:${string}` | `body:${string}` | `query:${string}` };
 
 /** Name of a registered `EnsembleResolver` (see `ENSEMBLE_RESOLVERS`). */
-export type EnsembleResolverToken = string;
+type EnsembleResolverToken = string;
 
 export interface PermissionRequirement {
   /** Any of these permissions is enough. */
@@ -82,5 +82,3 @@ export const CurrentAccess = fromAuth<AccessContext>('CurrentAccess', (auth) => 
 /** The caller's account; only on non-public routes. */
 export const CurrentUser = fromAuth<AccessUser>('CurrentUser', (auth) => auth.user);
 
-/** The caller's session; only on non-public routes. */
-export const CurrentSession = fromAuth<SessionData>('CurrentSession', (auth) => auth.session);

@@ -10,7 +10,7 @@ import { selectOr, valueOr } from '../util/resource-value';
 
 const OVERRIDE_KEY = 'vmweb.voiceOverride';
 /** API limit for `?voiceId=` (repeatable, max. 20). */
-export const MAX_OVERRIDE_VOICES = 20;
+const MAX_OVERRIDE_VOICES = 20;
 
 /**
  * Active voices for Mein Bereich (M-1, M-2): the profile voices or a temporary override, e.g.

@@ -5,7 +5,7 @@ import type { Database } from '../db/database';
 import { ensembles } from '../db/schema';
 import { appendTo } from './collections';
 
-export interface TreeNode {
+interface TreeNode {
   id: string;
   name: string;
   parentId: string | null;

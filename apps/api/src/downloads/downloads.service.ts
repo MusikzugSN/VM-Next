@@ -18,7 +18,7 @@ import { OutputService, type OutputPlan, type OutputScope } from './output.servi
 import { buildPrintPdf, layoutDocuments, printRoute } from './print-layout';
 import { readOrNotFound } from '../storage/read-or-not-found';
 
-export interface FileResult<T = Readable> {
+interface FileResult<T = Readable> {
   body: T;
   fileName: string;
 }

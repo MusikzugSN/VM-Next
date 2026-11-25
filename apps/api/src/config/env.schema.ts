@@ -9,7 +9,7 @@ const positiveInt = z.coerce.number().int().positive();
 /**
  * Environment of the API, validated once at startup. Keep `.env.example` in sync.
  */
-export const envSchema = z.object({
+const envSchema = z.object({
   NODE_ENV: z.enum(['development', 'production', 'test']).default('development'),
   HOST: z.string().default('0.0.0.0'),
   PORT: positiveInt.default(3000),
