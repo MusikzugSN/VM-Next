@@ -5,19 +5,25 @@ import {
   PRINT_JOB_META_FIELD,
   PRINT_SERVICE_CONTRACT,
   printJobMetaSchema,
+  printServiceUpdateRequestSchema,
   type PrintServiceError,
   type PrintServiceStatus,
+  type PrintServiceUpdateResult,
 } from '@vm-web/shared';
 
 import type { ServiceConfig } from './config';
 import { JobError, type JobService } from './jobs';
 import type { PrinterBackend } from './printer-backend';
+import { UpdateError, type Updater } from './updater';
 
 export interface ServerDeps {
   config: Pick<ServiceConfig, 'allowedOrigin' | 'maxPdfBytes'>;
   backend: PrinterBackend;
   jobs: JobService;
   version: string;
+  updater: Updater;
+  /** Ends the process after a successful update, so systemd starts the new binary. */
+  restart: () => void;
 }
 
 class HttpError extends Error {
@@ -39,7 +45,7 @@ const JOB_ACTION = /^\/v1\/jobs\/([^/]+)\/(cancel|retry)$/;
 export function createPrintServer(deps: ServerDeps): Server {
   return createServer((req, res) => {
     void handle(deps, req, res).catch((error: unknown) => {
-      if (error instanceof HttpError || error instanceof JobError) send(res, error.status, { code: error.code, message: error.message });
+      if (error instanceof HttpError || error instanceof JobError || error instanceof UpdateError) send(res, error.status, { code: error.code, message: error.message });
       else send(res, 500, { code: 'internal-error', message: error instanceof Error ? error.message : 'Interner Fehler' });
     });
   });
@@ -69,6 +75,7 @@ async function handle(deps: ServerDeps, req: IncomingMessage, res: ServerRespons
   }
   if (req.method === 'GET' && path === '/v1/jobs') return send(res, 200, { items: await deps.jobs.list() });
   if (req.method === 'POST' && path === '/v1/jobs') return send(res, 201, await submit(deps, req));
+  if (req.method === 'POST' && path === '/v1/update') return update(deps, req, res);
   const action = req.method === 'POST' ? JOB_ACTION.exec(path) : null;
   if (action) {
     const id = decodeURIComponent(action[1]);
@@ -103,6 +110,22 @@ async function submit(deps: ServerDeps, req: IncomingMessage) {
   if (pdf.byteLength > deps.config.maxPdfBytes) throw new HttpError(413, 'invalid-job', 'Das PDF ist zu groß.');
   if (!isPdf(pdf)) throw new HttpError(400, 'invalid-job', 'Die Datei ist kein PDF.');
   return deps.jobs.submit(pdf, meta.data);
+}
+
+/** Replaces the binary, answers, and only then restarts (docs/print-service.md › Update). */
+async function update(deps: ServerDeps, req: IncomingMessage, res: ServerResponse): Promise<void> {
+  let json: unknown;
+  try {
+    json = JSON.parse((await readBody(req, 4 * 1024)).toString('utf8'));
+  } catch {
+    throw new HttpError(400, 'update-invalid-version', 'Angaben sind kein JSON.');
+  }
+  const request = printServiceUpdateRequestSchema.safeParse(json);
+  if (!request.success) throw new HttpError(400, 'update-invalid-version', 'Release-Version X.Y.Z erwartet.');
+  await deps.updater.update(request.data.version);
+  res.on('finish', () => deps.restart());
+  const result: PrintServiceUpdateResult = { version: request.data.version };
+  send(res, 200, result);
 }
 
 /** `%PDF-` at the start. */

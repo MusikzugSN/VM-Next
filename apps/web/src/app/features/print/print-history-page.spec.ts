@@ -37,6 +37,8 @@ function fakeService(state: PrintServiceState, jobs: PrintJob[] = []): PrintServ
       return jobs[0];
     },
     retry: async () => jobs[0],
+    update: async () => undefined,
+    seenBefore: () => true,
   };
 }
 

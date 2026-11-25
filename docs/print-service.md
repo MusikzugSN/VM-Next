@@ -24,6 +24,7 @@ Alle Antworten sind JSON. Fehler haben den Body `printServiceErrorSchema` (`code
 | `POST /v1/jobs` | Neuer Auftrag, `multipart/form-data` mit `file` (PDF) und `meta` (JSON, `printJobMetaSchema`) | `201 printJobSchema` |
 | `POST /v1/jobs/{id}/cancel` | Wartenden oder druckenden Auftrag abbrechen | `200 printJobSchema` |
 | `POST /v1/jobs/{id}/retry` | Fertigen oder fehlgeschlagenen Auftrag erneut drucken (gleiches PDF) | `201 printJobSchema` (neuer Auftrag) |
+| `POST /v1/update` | Sich selbst auf ein neueres Release aktualisieren, JSON `printServiceUpdateRequestSchema` (`{ "version": "1.2.3" }`) | `200 printServiceUpdateResultSchema`, danach Neustart |
 
 - `contracts` in `/status` listet die verstandenen Vertragsversionen. VM-Web schickt `meta.contract = 1`; kennt der Dienst sie nicht → `400 contract-unsupported`.
 - `meta.printerId = null` druckt auf den Standarddrucker; ein unbekannter Drucker → `400 printer-not-found`.
@@ -32,6 +33,16 @@ Alle Antworten sind JSON. Fehler haben den Body `printServiceErrorSchema` (`code
 ## Zustände (D-5)
 
 `waiting` → `printing` → `done`, bei Problemen `failed` mit `error` als Klartext für die Anzeige. `cancelled` nach `cancel`. Während `printing` meldet `printedPages` den Fortschritt, wenn CUPS ihn liefert, sonst `null`. Der Verlauf und die PDFs bleiben 30 Tage lokal gespeichert, damit „Erneut senden“ ohne VM-Web funktioniert.
+
+## Update
+
+VM-Web und Druckservice haben dieselbe Release-Version (Root-`package.json`, `.github/scripts/set-version.mjs`).
+
+- **Prüfung beim Start:** Die App-Shell fragt einmal `GET /v1/status` ab und vergleicht `version` mit der eigenen Version. Das passiert nur, wenn der Druckservice in diesem Browser schon einmal erreichbar war (`localStorage`), damit Browser nicht alle Personen nach Zugriff aufs lokale Netzwerk fragen. Entwicklungsstände (`0.0.0`, `0.0.0-dev`) werden nicht geprüft.
+- **Älterer Druckservice** (oder `contracts` ohne den aktuellen Vertrag): Dialog mit „Jetzt aktualisieren“. VM-Web schickt `POST /v1/update { version: <VM-Web-Version> }` und fragt danach `/status` ab, bis die neue Version gemeldet wird (höchstens 60 s), dann „Druckservice aktualisiert“.
+- **Neuerer Druckservice:** nur ein Hinweis, der Druckservice installiert keine älteren Versionen.
+- **Ablauf im Druckservice:** nur `X.Y.Z` und nur neuer als die laufende Version (`400 update-invalid-version`), nur als installierte Binärdatei unter Linux (sonst `400 update-unsupported`), ein Update gleichzeitig (`409 update-running`). Er lädt `SHA256SUMS` und `vm-web-print-<version>-linux-<arch>.tar.gz` aus dem GitHub-Release `v<version>`, prüft die Prüfsumme, ersetzt `~/.local/bin/vm-web-print` atomar, antwortet `200` und beendet sich mit Exit-Code 75. systemd startet ihn wegen `Restart=on-failure` nach 5 s neu. Fehler beim Laden oder Prüfen → `502 update-failed`, die alte Version läuft weiter. Konfiguration, Unit-Datei und Verlauf bleiben unverändert.
+- **Druckservices vor diesem Endpunkt** antworten `404`. VM-Web zeigt dann die Anleitung für ein einmaliges Update von Hand (Archiv aus dem Release, `./install.sh`).
 
 ## Umsetzung
 
