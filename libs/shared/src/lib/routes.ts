@@ -16,6 +16,7 @@ interface RouteDef {
   readonly path: string;
   readonly binary?: true;
   readonly multipart?: true;
+  readonly redirect?: true;
   /** Reachable without session (auth flow, login page). */
   readonly public?: true;
 }
@@ -25,12 +26,13 @@ const post = <P extends string>(path: P) => ({ method: 'POST', path }) as const;
 const binary = <R extends RouteDef>(r: R) => ({ ...r, binary: true }) as const;
 const multipart = <R extends RouteDef>(r: R) => ({ ...r, multipart: true }) as const;
 const pub = <R extends RouteDef>(r: R) => ({ ...r, public: true }) as const;
+const redirect = <R extends RouteDef>(r: R) => ({ ...r, redirect: true }) as const;
 
 export const API_ROUTES = {
   auth: {
     base: 'auth',
-    login: pub(get('login')),
-    callback: pub(get('callback')),
+    login: pub(redirect(get('login'))),
+    callback: pub(redirect(get('callback'))),
     logout: post('logout'),
     session: pub(get('session')),
     loginPage: pub(get('login-page')),
@@ -178,7 +180,6 @@ export const API_ROUTES = {
     deleteUser: post('users/:userId/delete'),
     // ensembles (S-2)
     ensembleList: get('ensemble-list'),
-    ensembleOptions: get('ensemble-options'),
     ensembleDetails: get('ensembles/:ensembleId/details'),
     ensembleLineup: get('ensembles/:ensembleId/lineup'),
     ensembleMembers: get('ensembles/:ensembleId/members'),

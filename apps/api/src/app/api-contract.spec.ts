@@ -4,7 +4,18 @@ import { API_PREFIX, API_ROUTES } from '@vm-web/shared';
 import { ADMIN_KEY, MEMBER_KEY, PERMISSION_KEY, PUBLIC_KEY } from '../access/decorators';
 import { RESPONSE_SCHEMA } from '../common/validation/zod-response.interceptor';
 import { HealthController } from '../health/health.controller';
-import { AppModule } from './app.module';
+
+const CONFIG_REQUIRED_TO_IMPORT_APP_MODULE: Record<string, string> = {
+  APP_TIMEZONE: 'Europe/Berlin',
+  PUBLIC_BASE_URL: 'https://vm-web.invalid',
+  DATABASE_URL: 'mysql://user:pw@127.0.0.1:3306/db',
+  FILE_STORAGE_PATH: '/tmp/vm-web',
+  OIDC_ISSUER_URL: 'https://idp.invalid/realms/vm-web',
+  OIDC_CLIENT_ID: 'vm-web',
+};
+for (const [name, value] of Object.entries(CONFIG_REQUIRED_TO_IMPORT_APP_MODULE)) process.env[name] ??= value;
+
+const { AppModule } = await import('./app.module');
 
 type Ctor = new (...args: never[]) => object;
 interface RouteDef {
