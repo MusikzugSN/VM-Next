@@ -92,7 +92,7 @@ pnpm nx serve api
 ```
 
 - API: <http://localhost:3000/internal/v1/…>
-- Health: <http://localhost:3000/health> (`200 {"status":"ok"}`, ohne Datenbank `503`)
+- Health: <http://localhost:3000/health> (`200 {"status":"ok","version":"dev","revision":"unknown"}`, ohne Datenbank `503`)
 
 ### Anmeldung ausprobieren
 

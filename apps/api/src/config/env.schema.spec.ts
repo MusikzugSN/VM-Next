@@ -20,6 +20,8 @@ describe('validateEnv', () => {
       SESSION_IDLE_TTL_DAYS: 14,
       SESSION_ABSOLUTE_TTL_DAYS: 90,
       OIDC_SCOPES: 'openid profile email',
+      APP_VERSION: 'dev',
+      APP_REVISION: 'unknown',
     });
     expect(env.OIDC_CLIENT_SECRET).toBeUndefined();
   });
