@@ -58,6 +58,10 @@ export const ADMIN_KEY = 'vmweb:admin-only';
 /** Only the admin flag may do this (R-6), no role permission is enough. */
 export const RequireAdmin = () => SetMetadata(ADMIN_KEY, true);
 
+export const MEMBER_KEY = 'vmweb:member-only';
+
+export const RequireMember = () => SetMetadata(MEMBER_KEY, true);
+
 /** Request state set by `SessionGuard`. */
 export interface RequestAuth {
   sessionId: string;

@@ -17,7 +17,7 @@ import {
 } from '@vm-web/shared';
 import type { Readable } from 'node:stream';
 import type { AccessContext } from '../access/access-context';
-import { CurrentAccess } from '../access/decorators';
+import { CurrentAccess, RequireMember } from '../access/decorators';
 import { contentDisposition, pdfFile } from '../common/files/download-names';
 import { ResponseSchema } from '../common/validation/zod-response.interceptor';
 import { ZodValidationPipe as Zod } from '../common/validation/zod-validation.pipe';
@@ -29,6 +29,7 @@ const zipFile = (body: Readable, fileName: string) =>
   new StreamableFile(body, { type: 'application/zip', disposition: contentDisposition('attachment', fileName) });
 
 /** Downloads of Mein Bereich (M-6): membership is enough, only visible scores (R-2). */
+@RequireMember()
 @Controller(ME.base)
 export class DownloadsController {
   constructor(@Inject(DownloadsService) private readonly downloads: DownloadsService) {}
@@ -78,6 +79,7 @@ export class DownloadsController {
 }
 
 /** Printing (D-1..D-3, D-7): every member, no own permission; visibility as in F-9. */
+@RequireMember()
 @Controller(PRINT.base)
 export class PrintController {
   constructor(@Inject(DownloadsService) private readonly downloads: DownloadsService) {}

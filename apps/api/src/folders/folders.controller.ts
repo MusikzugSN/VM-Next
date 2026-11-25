@@ -25,7 +25,7 @@ import {
   type SetVisibilityBody,
 } from '@vm-web/shared';
 import type { AccessContext } from '../access/access-context';
-import { CurrentAccess, RequirePermission, type EnsembleSource } from '../access/decorators';
+import { CurrentAccess, RequireMember, RequirePermission, type EnsembleSource } from '../access/decorators';
 import { ResponseSchema } from '../common/validation/zod-response.interceptor';
 import { ZodValidationPipe as Zod } from '../common/validation/zod-validation.pipe';
 import { FoldersService } from './folders.service';
@@ -41,6 +41,7 @@ export class FoldersController {
   constructor(@Inject(FoldersService) private readonly folders: FoldersService) {}
 
   /** Requires `folder.create` in at least one ensemble (checked in the service). */
+  @RequireMember()
   @Get(R.ensembleOptions.path)
   @ResponseSchema(ensembleOptionsResponseSchema)
   ensembleOptions(@CurrentAccess() access: AccessContext) {
@@ -48,6 +49,7 @@ export class FoldersController {
   }
 
   /** Filtered to ensembles with `folder.view`. */
+  @RequireMember()
   @Get(R.folderList.path)
   @ResponseSchema(folderListResponseSchema)
   list(@CurrentAccess() access: AccessContext, @Query(new Zod(folderListQuerySchema)) q: FolderListQuery) {
