@@ -2,6 +2,10 @@ import { loadConfig } from './config';
 import { CupsBackend } from './cups-backend';
 import { JobService } from './jobs';
 import { createPrintServer } from './server';
+import { ReleaseUpdater, defaultUpdaterDeps } from './updater';
+
+/** Exit code after an update: systemd (`Restart=on-failure`) only restarts on a non-zero code. */
+const EXIT_RESTART = 75;
 
 /** Set by scripts/build-sea.mjs from the release version; absent in `nx build`/`nx serve`. */
 declare const __VMWEB_PRINT_VERSION__: string | undefined;
@@ -23,7 +27,20 @@ function main(): void {
   }
   const backend = new CupsBackend();
   const jobs = new JobService(backend, config.dataDir, config.retentionDays);
-  const server = createPrintServer({ config, backend, jobs, version: VERSION });
+  const updater = new ReleaseUpdater(defaultUpdaterDeps(VERSION));
+  const server = createPrintServer({
+    config,
+    backend,
+    jobs,
+    version: VERSION,
+    updater,
+    restart: () => {
+      console.log('Update installiert – Druckservice startet neu.');
+      server.close(() => process.exit(EXIT_RESTART));
+      // Open keep-alive connections must not hold the restart back
+      setTimeout(() => process.exit(EXIT_RESTART), 2000).unref();
+    },
+  });
 
   server.on('error', (error: NodeJS.ErrnoException) => {
     console.error(error.code === 'EADDRINUSE' ? `Port ${config.port} ist belegt – läuft der Druckservice schon?` : error.message);

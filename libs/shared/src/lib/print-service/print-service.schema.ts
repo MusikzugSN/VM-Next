@@ -22,7 +22,32 @@ export const PRINT_SERVICE_ROUTES = {
   cancel: (jobId: string) => `/jobs/${encodeURIComponent(jobId)}/cancel`,
   /** POST – send a failed or finished job again (same PDF, kept by the service). */
   retry: (jobId: string) => `/jobs/${encodeURIComponent(jobId)}/retry`,
+  /** POST – update the service itself to a newer release (`printServiceUpdateRequestSchema`). */
+  update: '/update',
 } as const;
+
+/** Release of the print service on GitHub; the update loads its archive from here. */
+export const PRINT_SERVICE_RELEASES = 'https://github.com/MusikzugSN/VM-Next/releases';
+
+/** Release versions are plain `X.Y.Z`; anything else (`0.0.0-dev`, `0.0.0`) is a development build. */
+const RELEASE_VERSION = /^(\d+)\.(\d+)\.(\d+)$/;
+
+/** `true` for a published release version (`1.2.3`), `false` for development builds and `0.0.0`. */
+export function isReleaseVersion(version: string): boolean {
+  return RELEASE_VERSION.test(version) && version !== '0.0.0';
+}
+
+/** Compares two `X.Y.Z` versions: negative if `a < b`, 0 if equal, positive if `a > b`. */
+export function compareVersions(a: string, b: string): number {
+  const pa = RELEASE_VERSION.exec(a);
+  const pb = RELEASE_VERSION.exec(b);
+  if (!pa || !pb) throw new Error(`Keine Release-Version: ${pa ? b : a}`);
+  for (let i = 1; i <= 3; i++) {
+    const diff = Number(pa[i]) - Number(pb[i]);
+    if (diff !== 0) return diff;
+  }
+  return 0;
+}
 
 export const printerSchema = z.object({
   /** CUPS queue name on Linux. */
@@ -96,9 +121,41 @@ export type PrintJob = z.infer<typeof printJobSchema>;
 export const printJobListSchema = z.object({ items: z.array(printJobSchema) });
 export type PrintJobList = z.infer<typeof printJobListSchema>;
 
+/**
+ * POST /update – JSON. The service loads `vm-web-print-<version>-linux-<arch>.tar.gz` of release
+ * `v<version>`, checks it against `SHA256SUMS`, replaces its binary and restarts (exit code ≠ 0,
+ * systemd starts it again). Only newer release versions are accepted. → 200 `printServiceUpdateResultSchema`,
+ * sent before the restart.
+ */
+export const printServiceUpdateRequestSchema = z.object({
+  version: z.string().refine(isReleaseVersion, 'Release-Version X.Y.Z erwartet'),
+});
+export type PrintServiceUpdateRequest = z.infer<typeof printServiceUpdateRequestSchema>;
+
+export const printServiceUpdateResultSchema = z.object({
+  /** Version that runs after the restart. */
+  version: z.string(),
+});
+export type PrintServiceUpdateResult = z.infer<typeof printServiceUpdateResultSchema>;
+
 /** Error body of the service for 4xx/5xx. */
 export const printServiceErrorSchema = z.object({
-  code: z.enum(['origin-not-allowed', 'contract-unsupported', 'invalid-job', 'printer-not-found', 'job-not-found', 'internal-error']),
+  code: z.enum([
+    'origin-not-allowed',
+    'contract-unsupported',
+    'invalid-job',
+    'printer-not-found',
+    'job-not-found',
+    'internal-error',
+    /** Not an installed release binary (development, other OS) – update by hand. */
+    'update-unsupported',
+    /** Not a release version or not newer than the running one. */
+    'update-invalid-version',
+    /** Another update is running. */
+    'update-running',
+    /** Download, checksum or replacing the binary failed. */
+    'update-failed',
+  ]),
   message: z.string(),
 });
 export type PrintServiceError = z.infer<typeof printServiceErrorSchema>;

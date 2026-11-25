@@ -464,6 +464,37 @@
     "modes": {
       "simplex": "Einseitig",
       "duplex": "Beidseitig, lange Kante"
+    },
+    "update": {
+      "title": {
+        "older": "Druckservice aktualisieren",
+        "newer": "Druckservice ist neuer als VM-Web",
+        "updating": "Druckservice wird aktualisiert",
+        "done": "Druckservice aktualisiert",
+        "failed": "Update fehlgeschlagen"
+      },
+      "older": "Der Druckservice auf diesem Computer hat Version {{ service }}, VM-Web läuft mit Version {{ app }}. Aktualisiere ihn, damit Drucken zuverlässig funktioniert.",
+      "olderUnknown": "Der Druckservice auf diesem Computer ist zu alt für VM-Web {{ app }}. Aktualisiere ihn, damit du wieder darüber drucken kannst.",
+      "newer": "Der Druckservice auf diesem Computer hat Version {{ service }}, VM-Web läuft noch mit Version {{ app }}. Ältere Versionen installiert der Druckservice nicht. Drucken geht trotzdem; wenn etwas nicht klappt, sprich deinen Verein an.",
+      "updating": "Der Druckservice lädt Version {{ app }} und startet neu. Das kann eine Minute dauern.",
+      "done": "Der Druckservice läuft jetzt mit Version {{ app }}. Du kannst wie gewohnt drucken.",
+      "later": "Später",
+      "start": "Jetzt aktualisieren",
+      "continue": "Weiter",
+      "errors": {
+        "update-unavailable": "Dieser Druckservice kann sich noch nicht selbst aktualisieren. Installiere das Update einmalig von Hand, danach geht es hier per Klick.",
+        "update-unsupported": "Dieser Druckservice kann sich nicht selbst aktualisieren. Installiere das Update von Hand.",
+        "update-failed": "Das Update ließ sich nicht laden oder installieren. Der Druckservice läuft mit der bisherigen Version weiter.",
+        "update-running": "Es läuft schon ein Update. Versuche es gleich noch einmal.",
+        "restart-timeout": "Der Druckservice hat nach dem Update nicht wieder geantwortet. Prüfe, ob er läuft (journalctl --user -u vm-web-print).",
+        "offline": "Der Druckservice ist nicht mehr erreichbar.",
+        "other": "Der Druckservice meldet einen Fehler beim Update."
+      },
+      "manual": {
+        "download": "Archiv für deinen Rechner (linux-x64 oder linux-arm64) laden:",
+        "release": "Release {{ app }}",
+        "install": "Entpacken und im entpackten Ordner ausführen:"
+      }
     }
   },
   "legal": {

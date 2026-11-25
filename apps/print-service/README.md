@@ -19,7 +19,7 @@ Druckt große Aufträge aus VM-Web (ganze Mappen, Events, mehrere Stimmen) direk
    Das Skript legt `~/.local/bin/vm-web-print`, `~/.config/vm-web-print/config.json` und `~/.config/systemd/user/vm-web-print.service` an und startet den Benutzerdienst.
 3. In VM-Web unter Drucken › Druckverlauf prüfen: „Druckservice auf diesem Computer verbunden“.
 
-- **Aktualisieren:** neues Archiv entpacken, `./install.sh` ohne Optionen (Konfiguration bleibt).
+- **Aktualisieren:** VM-Web bietet das Update beim Start an, wenn der Druckservice älter ist (Dialog „Druckservice aktualisieren“). Von Hand: neues Archiv entpacken, `./install.sh` ohne Optionen (Konfiguration bleibt).
 - **Entfernen:** `./install.sh --uninstall` (Verlauf und Konfiguration bleiben).
 - **Log:** `journalctl --user -u vm-web-print`
 - Statt `config.json` geht auch die Umgebungsvariable `VMWEB_PRINT_ORIGIN`.
