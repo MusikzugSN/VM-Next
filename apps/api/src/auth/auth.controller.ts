@@ -17,7 +17,7 @@ import {
   setLoginCookie,
   setSessionCookies,
 } from '../access/cookies';
-import { Public, type AuthenticatedRequest } from '../access/decorators';
+import { Public, RequireMember, type AuthenticatedRequest } from '../access/decorators';
 import { SessionStore, type SessionData } from '../access/session.store';
 import { ProblemException } from '../common/problem-details/problem.exception';
 import { ResponseSchema } from '../common/validation/zod-response.interceptor';
@@ -65,6 +65,7 @@ export class AuthController {
   }
 
   /** A-6 (RP logout) follows later; this ends the VM-Web session. */
+  @RequireMember()
   @Post(R.logout.path)
   @HttpCode(204)
   async logout(@Req() req: AuthenticatedRequest, @Res({ passthrough: true }) res: Response): Promise<void> {

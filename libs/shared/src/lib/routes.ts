@@ -178,6 +178,7 @@ export const API_ROUTES = {
     deleteUser: post('users/:userId/delete'),
     // ensembles (S-2)
     ensembleList: get('ensemble-list'),
+    ensembleOptions: get('ensemble-options'),
     ensembleDetails: get('ensembles/:ensembleId/details'),
     ensembleLineup: get('ensembles/:ensembleId/lineup'),
     ensembleMembers: get('ensembles/:ensembleId/members'),

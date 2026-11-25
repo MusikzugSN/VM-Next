@@ -13,7 +13,7 @@ import { map, type Observable } from 'rxjs';
 import type { z } from 'zod';
 import { ProblemException } from '../problem-details/problem.exception';
 
-const RESPONSE_SCHEMA = 'vmweb:response-schema';
+export const RESPONSE_SCHEMA = 'vmweb:response-schema';
 
 /** Declares the response schema of an endpoint; the returned value is parsed (unknown keys stripped). */
 export const ResponseSchema = (schema: z.ZodType) => SetMetadata(RESPONSE_SCHEMA, schema);

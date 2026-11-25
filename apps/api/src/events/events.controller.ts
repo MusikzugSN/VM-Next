@@ -23,7 +23,7 @@ import {
   type UpdateEventDetailsBody,
 } from '@vm-web/shared';
 import type { AccessContext } from '../access/access-context';
-import { CurrentAccess, RequirePermission, type EnsembleSource } from '../access/decorators';
+import { CurrentAccess, RequireMember, RequirePermission, type EnsembleSource } from '../access/decorators';
 import { ResponseSchema } from '../common/validation/zod-response.interceptor';
 import { ZodValidationPipe as Zod } from '../common/validation/zod-validation.pipe';
 import { EventsService } from './events.service';
@@ -38,6 +38,7 @@ export class EventsController {
   constructor(@Inject(EventsService) private readonly events: EventsService) {}
 
   /** Requires `event.create` in at least one ensemble (checked in the service). */
+  @RequireMember()
   @Get(R.ensembleOptions.path)
   @ResponseSchema(ensembleOptionsResponseSchema)
   ensembleOptions(@CurrentAccess() access: AccessContext) {
@@ -45,6 +46,7 @@ export class EventsController {
   }
 
   /** Filtered to ensembles with `event.view`. */
+  @RequireMember()
   @Get(R.eventList.path)
   @ResponseSchema(eventListResponseSchema)
   list(@CurrentAccess() access: AccessContext, @Query(new Zod(eventListQuerySchema)) q: EventListQuery) {

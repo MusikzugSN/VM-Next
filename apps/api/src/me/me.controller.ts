@@ -46,7 +46,7 @@ import {
 } from '@vm-web/shared';
 import type { AccessContext } from '../access/access-context';
 import type { AccessUser } from '../access/access.repository';
-import { CurrentAccess, CurrentUser } from '../access/decorators';
+import { CurrentAccess, CurrentUser, RequireMember } from '../access/decorators';
 import { ResponseSchema } from '../common/validation/zod-response.interceptor';
 import { ZodValidationPipe as Zod } from '../common/validation/zod-validation.pipe';
 import { MeService } from './me.service';
@@ -58,6 +58,7 @@ const R = API_ROUTES.me;
  * Mein Bereich. No permission needed: a session is enough, content comes only from the
  * caller's ensembles (incl. sub-ensembles) and released folders/events (R-2, H-1, F-6).
  */
+@RequireMember()
 @Controller(R.base)
 export class MeController {
   constructor(
