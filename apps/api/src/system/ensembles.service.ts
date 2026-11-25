@@ -7,9 +7,13 @@ import type {
   EnsembleListItem,
   EnsembleListQuery,
   EnsembleMember,
+  EnsembleOptionsResponse,
   Page,
 } from '@vm-web/shared';
 import { and, asc, eq, inArray, like, sql } from 'drizzle-orm';
+import type { AccessContext } from '../access/access-context';
+import { activeEnsembleOptions } from '../common/ensemble-tree';
+import { assertEnsembleInScope } from '../library/library-helpers';
 import { uuidv7 } from '../common/ids/uuid-v7';
 import { decodeCursor, encodeCursor } from '../common/pagination/cursor';
 import { ProblemException } from '../common/problem-details/problem.exception';
@@ -125,8 +129,13 @@ export class EnsemblesService {
     await withNameTaken(() => this.db.update(ensembles).set({ name, updatedAt: new Date() }).where(eq(ensembles.id, ensembleId)));
   }
 
+  async options(): Promise<EnsembleOptionsResponse> {
+    return { items: await activeEnsembleOptions(this.db) };
+  }
+
   /** Moves an ensemble in the tree (F-3); never the root, never below itself. */
-  async setParent(ensembleId: string, parentId: string): Promise<void> {
+  async setParent(access: AccessContext, ensembleId: string, parentId: string): Promise<void> {
+    assertEnsembleInScope(access, 'ensemble.edit', ensembleId);
     const ensemble = await this.ensemble(ensembleId);
     if (ensemble.isRoot) throw ProblemException.conflict('root-ensemble');
     await this.ensemble(parentId, 'Unknown parent');

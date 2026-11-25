@@ -116,6 +116,8 @@ describe.skipIf(!TEST_DATABASE_URL)('Systemverwaltung (TEST_DATABASE_URL)', () =
       ['sara', `users/${ids.mia}/set-admin`, { isAdmin: true }, 403], // admin flag only (R-6)
       ['sara', 'ensemble-list', undefined, 200],
       ['bob', 'ensemble-list', undefined, 403],
+      ['sara', 'ensemble-options', undefined, 200],
+      ['bob', 'ensemble-options', undefined, 403],
       ['bob', `ensembles/${ids.orchestra}/details`, undefined, 200], // member.view (R-3)
       ['bob', `ensembles/${ids.orchestra}/members`, undefined, 200],
       ['bob', `ensembles/${ids.windClass}/members`, undefined, 200], // inherited (F-3)
@@ -167,6 +169,24 @@ describe.skipIf(!TEST_DATABASE_URL)('Systemverwaltung (TEST_DATABASE_URL)', () =
       expect((await api('sara', `users/${ids.mia}/remove-membership`, { ensembleId: ids.youth })).status).toBe(204);
       expect((await api('sara', `users/${ids.mia}/remove-membership`, { ensembleId: ids.youth })).status).toBe(404);
       expect((await api('sara', `users/${ids.mia}/set-membership`, { ensembleId: ids.youth, roleId: ids.orchestra })).status).toBe(404);
+    });
+
+    it('refuses memberships and moves outside the own ensembles (F-1)', async () => {
+      expect((await api('sara', `users/${ids.sara}/set-membership`, { ensembleId: ids.root, roleId: ids.role_admin })).status).toBe(403);
+      expect((await api('sara', `users/${ids.sara}/set-membership`, { ensembleId: ids.orchestra, roleId: ids.role_admin })).status).toBe(403);
+      expect((await api('sara', `users/${ids.mia}/remove-membership`, { ensembleId: ids.orchestra })).status).toBe(403);
+      expect((await api('sara', `ensembles/${ids.orchestra}/set-parent`, { parentId: ids.youth })).status).toBe(403);
+      expect(await testDb.db.select().from(memberships).where(eq(memberships.userId, ids.sara))).toHaveLength(1);
+
+      const options = names((await api('sara', 'user-assignment-options')).body.ensembles);
+      expect(options).toContain('Jugendorchester');
+      expect(options).not.toContain('Hauptorchester');
+      expect(names((await api('sara', 'ensemble-options')).body.items)).toContain('Hauptorchester');
+
+      expect((await api('sara', `users/${ids.mia}/set-membership`, { ensembleId: ids.youth, roleId: ids.role_musician })).status).toBe(204);
+      expect((await api('sara', `users/${ids.mia}/remove-membership`, { ensembleId: ids.youth })).status).toBe(204);
+      expect((await api('adam', `users/${ids.sara}/set-membership`, { ensembleId: ids.root, roleId: ids.role_admin })).status).toBe(204);
+      expect((await api('adam', `users/${ids.sara}/remove-membership`, { ensembleId: ids.root })).status).toBe(204);
     });
 
     it('pre-assigns profile voices (S-1)', async () => {
@@ -238,10 +258,10 @@ describe.skipIf(!TEST_DATABASE_URL)('Systemverwaltung (TEST_DATABASE_URL)', () =
     });
 
     it('moves ensembles without cycles; the root stays put (F-3)', async () => {
-      expect((await api('sara', `ensembles/${ids.root}/set-parent`, { parentId: ids.youth })).body.code).toBe('root-ensemble');
-      expect((await api('sara', `ensembles/${ids.orchestra}/set-parent`, { parentId: ids.windClass })).body.code).toBe('invalid-hierarchy');
-      expect((await api('sara', `ensembles/${ids.orchestra}/set-parent`, { parentId: ids.orchestra })).body.code).toBe('invalid-hierarchy');
-      expect((await api('sara', `ensembles/${ids.chamber}/set-parent`, { parentId: ids.youth })).status).toBe(204);
+      expect((await api('adam', `ensembles/${ids.root}/set-parent`, { parentId: ids.youth })).body.code).toBe('root-ensemble');
+      expect((await api('adam', `ensembles/${ids.orchestra}/set-parent`, { parentId: ids.windClass })).body.code).toBe('invalid-hierarchy');
+      expect((await api('adam', `ensembles/${ids.orchestra}/set-parent`, { parentId: ids.orchestra })).body.code).toBe('invalid-hierarchy');
+      expect((await api('adam', `ensembles/${ids.chamber}/set-parent`, { parentId: ids.youth })).status).toBe(204);
       expect((await api('sara', `ensembles/${ids.chamber}/details`)).body.parentId).toBe(ids.youth);
     });
 

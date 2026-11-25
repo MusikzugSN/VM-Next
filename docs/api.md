@@ -64,7 +64,7 @@ Dieser Katalog beschreibt alle Endpunkte von `apps/api` für die erste Version (
 
 ### Ensemble-Auswahl
 
-Auswahllisten von Ensembles (`folders/ensemble-options`, `events/ensemble-options`, `scores/ensemble-options`, `system/user-assignment-options`, `system/config/default-options`) kommen in **Baum-Reihenfolge** (F-3): übergeordnetes Ensemble vor seinen Unter-Ensembles, Geschwister nach Name. Jeder Eintrag hat `depth` = Anzahl der ebenfalls enthaltenen Vorfahren (0 = oberste Ebene dieser Liste); das Frontend rückt danach ein. Schema: `ensembleOptionSchema`.
+Auswahllisten von Ensembles (`folders/ensemble-options`, `events/ensemble-options`, `scores/ensemble-options`, `system/ensemble-options`, `system/user-assignment-options`, `system/config/default-options`) kommen in **Baum-Reihenfolge** (F-3): übergeordnetes Ensemble vor seinen Unter-Ensembles, Geschwister nach Name. Jeder Eintrag hat `depth` = Anzahl der ebenfalls enthaltenen Vorfahren (0 = oberste Ebene dieser Liste); das Frontend rückt danach ein. Schema: `ensembleOptionSchema`.
 
 ### Stimmen-Kontext (M-2, M-3)
 
@@ -121,6 +121,8 @@ Gemeinsamer Zeilentyp `MemberScoreRow` (`common/sheet.schema.ts`):
 **Ensemble-Hierarchie (F-3):** Ensembles bilden einen Baum. Die oberste Ebene (Wurzel) wird beim ersten Start automatisch angelegt und kann weder gelöscht, archiviert noch verschoben werden. Rechte ergänzen sich nach unten: Eine Rolle in einem Ensemble gilt auch in allen Unter-Ensembles. Die effektiven Rechte in Ensemble X sind die Vereinigung der Rollen in X und allen Vorfahren.
 
 **Rollen haben keinen eigenen Geltungsbereich (F-1):** Jede Rolle wird pro Mitgliedschaft vergeben und darf beliebige Rechte enthalten. Enthaltene Systemrechte (`user.*`, `role.*`, `ensemble.*`, `config.*`) gelten vereinsweit, unabhängig vom Ensemble der Mitgliedschaft.
+
+**Ausnahme – Bereichsgrenze:** Wo ein Systemrecht den *Geltungsbereich* von Rechten verschiebt, wirkt es nur im eigenen Bereich (eigene Mitgliedschaften samt Nachfahren). Das betrifft `set-membership`, `remove-membership` und `set-parent`. Sonst genügte eine Rolle in einem einzigen Unter-Ensemble, um sich eine Mitgliedschaft im Wurzel-Ensemble zu geben und damit Rechte im ganzen Verein zu erlangen. Das Admin-Kennzeichen (R-6) ist davon ausgenommen.
 
 Das Admin-Kennzeichen besteht jede Prüfung. Sichtbarkeit ohne Recht: Elemente, die eine Person gar nicht sehen darf, antworten mit `404 not-found` (keine Existenz-Leaks); sichtbare Elemente ohne das nötige Schreibrecht mit `403 forbidden`.
 
@@ -1347,7 +1349,7 @@ Benutzerliste mit Ensembles & Rollen, Stimmen, Status, letzter Anmeldung. · S-1
 
 #### `GET /internal/v1/system/user-assignment-options`
 
-- **Zweck:** Auswahlwerte der Benutzerseite: Ensembles (Baum-Reihenfolge) und Rollen (nicht paginiert). · S-1, R-1
+- **Zweck:** Auswahlwerte der Benutzerseite: Ensembles (Baum-Reihenfolge) und Rollen (nicht paginiert). Enthält nur Ensembles, in denen der Aufrufer Mitgliedschaften vergeben darf – die eigenen samt Nachfahren, beim Admin-Kennzeichen alle. Für die Elternauswahl im Ensemble-Baum dient `system/ensemble-options`. · S-1, R-1
 - **Recht:** `user.edit` · Verein
 - **Response 200:** `{ "ensembles": [{ "id": "ens-root", "name": "Verein", "depth": 0 }, { "id": "ens-1", "name": "Hauptorchester", "depth": 1 }], "roles": [{ "id": "role-mus", "name": "Musiker:in" }, { "id": "role-admin", "name": "Administrator:in" }] }`
 
@@ -1361,8 +1363,9 @@ Benutzerliste mit Ensembles & Rollen, Stimmen, Status, letzter Anmeldung. · S-1
 #### `POST /internal/v1/system/users/{userId}/set-membership`
 
 - **Zweck:** Rolle in einem Ensemble zuweisen bzw. Mitgliedschaft anlegen. · S-1, R-1
-- **Recht:** `user.edit` · Verein · **Body:** `{ "ensembleId": "ens-2", "roleId": "role-lib" }`
-- **Response:** `204` · **Fehler:** `404 not-found`
+- **Recht:** `user.edit` · Verein, und `ensembleId` muss im eigenen Bereich liegen (eigene Mitgliedschaften samt Nachfahren)
+- **Body:** `{ "ensembleId": "ens-2", "roleId": "role-lib" }`
+- **Response:** `204` · **Fehler:** `403 forbidden` (Ensemble außerhalb des eigenen Bereichs), `404 not-found`
 
 #### `POST /internal/v1/system/users/{userId}/remove-membership`
 
@@ -1412,6 +1415,12 @@ Benutzerliste mit Ensembles & Rollen, Stimmen, Status, letzter Anmeldung. · S-1
   { "id": "ens-1", "name": "Hauptorchester", "parentId": "ens-root", "depth": 1, "isRoot": false, "archived": false, "isDefault": true, "memberCount": 54, "lineupSize": 24 }
 ], "nextCursor": null }`
 
+#### `GET /internal/v1/system/ensemble-options`
+
+- **Zweck:** Alle aktiven Ensembles in Baum-Reihenfolge, nicht paginiert – Elternauswahl beim Anlegen und Verschieben. Anders als `system/user-assignment-options` ungefiltert, weil der neue Elternteil außerhalb des eigenen Bereichs liegen darf. · S-2, F-3
+- **Recht:** `ensemble.view` · Verein
+- **Response 200:** `{ "items": [{ "id": "ens-root", "name": "Musikzug Beispielstadt", "depth": 0 }, { "id": "ens-1", "name": "Hauptorchester", "depth": 1 }] }`
+
 #### `GET /internal/v1/system/ensembles/{ensembleId}/details`
 
 - **Zweck:** Stammdaten des Ensembles. · S-2
@@ -1447,8 +1456,9 @@ Benutzerliste mit Ensembles & Rollen, Stimmen, Status, letzter Anmeldung. · S-1
 #### `POST /internal/v1/system/ensembles/{ensembleId}/set-parent`
 
 - **Zweck:** Ensemble im Baum verschieben. · F-3
-- **Recht:** `ensemble.edit` · Verein · **Body:** `{ "parentId": "ens-1" }`
-- **Response:** `204` · **Fehler:** `404 not-found`, `409 root-ensemble` (Wurzel), `409 invalid-hierarchy` (Ziel ist das Ensemble selbst oder ein Nachfahre)
+- **Recht:** `ensemble.edit` · Verein, und das **verschobene** Ensemble muss im eigenen Bereich liegen; der neue Elternteil darf außerhalb liegen
+- **Body:** `{ "parentId": "ens-1" }`
+- **Response:** `204` · **Fehler:** `403 forbidden` (verschobenes Ensemble außerhalb des eigenen Bereichs), `404 not-found`, `409 root-ensemble` (Wurzel), `409 invalid-hierarchy` (Ziel ist das Ensemble selbst oder ein Nachfahre)
 
 #### `POST /internal/v1/system/ensembles/{ensembleId}/archive`
 

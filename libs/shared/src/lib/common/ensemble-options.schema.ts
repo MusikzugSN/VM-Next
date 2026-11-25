@@ -10,7 +10,8 @@ export type EnsembleOption = z.infer<typeof ensembleOptionSchema>;
 
 /**
  * GET folders/ensemble-options and GET events/ensemble-options – ensembles in which the caller
- * may create folders resp. events (R-4). Archived ensembles are excluded. Not paginated.
+ * may create folders resp. events (R-4). GET system/ensemble-options – every active ensemble,
+ * for parent selection (S-2). Archived ensembles are excluded. Not paginated.
  */
 export const ensembleOptionsResponseSchema = z.object({ items: z.array(ensembleOptionSchema) });
 export type EnsembleOptionsResponse = z.infer<typeof ensembleOptionsResponseSchema>;

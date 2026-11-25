@@ -13,6 +13,7 @@ import {
   ensembleListQuerySchema,
   ensembleListResponseSchema,
   ensembleMembersQuerySchema,
+  ensembleOptionsResponseSchema,
   ensembleMembersResponseSchema,
   ensembleParamsSchema,
   ensemblePrintRulesResponseSchema,
@@ -88,8 +89,8 @@ export class SystemUsersController {
   @RequirePermission('user.edit')
   @Get(R.userAssignmentOptions.path)
   @ResponseSchema(userAssignmentOptionsResponseSchema)
-  assignmentOptions() {
-    return this.users.assignmentOptions();
+  assignmentOptions(@CurrentAccess() access: AccessContext) {
+    return this.users.assignmentOptions(access);
   }
 
   @RequirePermission('user.view')
@@ -102,15 +103,15 @@ export class SystemUsersController {
   @RequirePermission('user.edit')
   @Post(R.setMembership.path)
   @HttpCode(204)
-  async setMembership(@Param(new Zod(userParamsSchema)) p: UserParams, @Body(new Zod(setMembershipBodySchema)) body: SetMembershipBody) {
-    await this.users.setMembership(p.userId, body.ensembleId, body.roleId);
+  async setMembership(@CurrentAccess() access: AccessContext, @Param(new Zod(userParamsSchema)) p: UserParams, @Body(new Zod(setMembershipBodySchema)) body: SetMembershipBody) {
+    await this.users.setMembership(access, p.userId, body.ensembleId, body.roleId);
   }
 
   @RequirePermission('user.edit')
   @Post(R.removeMembership.path)
   @HttpCode(204)
-  async removeMembership(@Param(new Zod(userParamsSchema)) p: UserParams, @Body(new Zod(removeMembershipBodySchema)) body: RemoveMembershipBody) {
-    await this.users.removeMembership(p.userId, body.ensembleId);
+  async removeMembership(@CurrentAccess() access: AccessContext, @Param(new Zod(userParamsSchema)) p: UserParams, @Body(new Zod(removeMembershipBodySchema)) body: RemoveMembershipBody) {
+    await this.users.removeMembership(access, p.userId, body.ensembleId);
   }
 
   @RequirePermission('user.edit')
@@ -164,6 +165,13 @@ export class SystemEnsemblesController {
     return this.ensembles.list(q);
   }
 
+  @RequirePermission('ensemble.view')
+  @Get(R.ensembleOptions.path)
+  @ResponseSchema(ensembleOptionsResponseSchema)
+  options() {
+    return this.ensembles.options();
+  }
+
   @RequirePermission(['ensemble.view', 'member.view'], { ensembleFrom: 'param:ensembleId' })
   @Get(R.ensembleDetails.path)
   @ResponseSchema(ensembleDetailsResponseSchema)
@@ -202,8 +210,8 @@ export class SystemEnsemblesController {
   @RequirePermission('ensemble.edit')
   @Post(R.moveEnsemble.path)
   @HttpCode(204)
-  async setParent(@Param(new Zod(ensembleParamsSchema)) p: EnsembleParams, @Body(new Zod(setParentBodySchema)) body: SetParentBody) {
-    await this.ensembles.setParent(p.ensembleId, body.parentId);
+  async setParent(@CurrentAccess() access: AccessContext, @Param(new Zod(ensembleParamsSchema)) p: EnsembleParams, @Body(new Zod(setParentBodySchema)) body: SetParentBody) {
+    await this.ensembles.setParent(access, p.ensembleId, body.parentId);
   }
 
   @RequirePermission('ensemble.edit')

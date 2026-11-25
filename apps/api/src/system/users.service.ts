@@ -8,7 +8,7 @@ import type {
   VoiceRef,
 } from '@vm-web/shared';
 import { and, asc, count, eq, inArray, like, or, sql } from 'drizzle-orm';
-import { activeEnsembleOptions } from '../common/ensemble-tree';
+import type { AccessContext } from '../access/access-context';
 import { decodeCursor, toPage } from '../common/pagination/cursor';
 import { ProblemException } from '../common/problem-details/problem.exception';
 import { httpUrlOrNull } from '../common/url';
@@ -18,7 +18,7 @@ import { afterNameAndId } from '../common/pagination/keyset';
 import { assertKnownIds } from '../common/validation/id-list';
 import { replaceRows } from '../db/table-helpers';
 import { likePattern } from '../common/sql';
-import { assertActiveEnsemble, assertRoleExists, roleOptions } from '../library/library-helpers';
+import { assertActiveEnsemble, assertEnsembleInScope, assertRoleExists, ensembleOptions, roleOptions } from '../library/library-helpers';
 
 type UserRecord = typeof users.$inferSelect;
 
@@ -57,23 +57,25 @@ export class UsersService {
     };
   }
 
-  async assignmentOptions(): Promise<UserAssignmentOptionsResponse> {
+  async assignmentOptions(access: AccessContext): Promise<UserAssignmentOptionsResponse> {
     const [ensembleRows, roleRows] = await Promise.all([
-      activeEnsembleOptions(this.db),
+      ensembleOptions(this.db, access, 'user.edit'),
       roleOptions(this.db),
     ]);
     return { ensembles: ensembleRows, roles: roleRows };
   }
 
   /** Creates or changes the membership in one ensemble (R-1); archived ensembles are refused. */
-  async setMembership(userId: string, ensembleId: string, roleId: string): Promise<void> {
+  async setMembership(access: AccessContext, userId: string, ensembleId: string, roleId: string): Promise<void> {
+    assertEnsembleInScope(access, 'user.edit', ensembleId);
     await this.user(userId);
     await assertActiveEnsemble(this.db, ensembleId);
     await assertRoleExists(this.db, roleId);
     await this.db.insert(memberships).values({ userId, ensembleId, roleId }).onDuplicateKeyUpdate({ set: { roleId } });
   }
 
-  async removeMembership(userId: string, ensembleId: string): Promise<void> {
+  async removeMembership(access: AccessContext, userId: string, ensembleId: string): Promise<void> {
+    assertEnsembleInScope(access, 'user.edit', ensembleId);
     const [result] = await this.db.delete(memberships).where(and(eq(memberships.userId, userId), eq(memberships.ensembleId, ensembleId)));
     if (!result.affectedRows) throw ProblemException.notFound();
   }

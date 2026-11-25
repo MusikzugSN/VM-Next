@@ -13,7 +13,7 @@ import {
   ensembleDetailsResponseSchema,
   ensembleLineupResponseSchema,
   ensembleMembersResponseSchema,
-  userAssignmentOptionsResponseSchema,
+  ensembleOptionsResponseSchema,
 } from '@vm-web/shared';
 import { of } from 'rxjs';
 
@@ -83,13 +83,13 @@ export class EnsemblePage {
   // Stammdaten
   protected readonly renaming = signal(false);
   private readonly options = rxResource({
-    stream: () => this.api.get(apiUrl('system', 'userAssignmentOptions'), userAssignmentOptionsResponseSchema),
+    stream: () => this.api.get(apiUrl('system', 'ensembleOptions'), ensembleOptionsResponseSchema),
   });
   /** Possible parents: every active ensemble except this one (the API rejects descendants with `invalid-hierarchy`). */
-  protected readonly parents = computed(() => (this.options.hasValue() ? this.options.value().ensembles.filter((e) => e.id !== this.ensembleId()) : []));
+  protected readonly parents = computed(() => (this.options.hasValue() ? this.options.value().items.filter((e) => e.id !== this.ensembleId()) : []));
   protected readonly parentName = computed(() => {
     const parentId = this.ensemble()?.parentId;
-    return (this.options.hasValue() ? this.options.value().ensembles.find((e) => e.id === parentId)?.name : undefined) ?? '–';
+    return (this.options.hasValue() ? this.options.value().items.find((e) => e.id === parentId)?.name : undefined) ?? '–';
   });
 
   // Besetzung
