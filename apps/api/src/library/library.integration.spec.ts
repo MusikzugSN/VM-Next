@@ -6,6 +6,7 @@ import { todayIn } from '../common/time/today';
 import { EventsController } from '../events/events.controller';
 import { EventsService } from '../events/events.service';
 import { FoldersController } from '../folders/folders.controller';
+import { FoldersRepository } from '../folders/folders.repository';
 import { FoldersService } from '../folders/folders.service';
 import { MeRepository } from '../me/me.repository';
 import { FieldsService } from '../scores/fields.service';
@@ -89,7 +90,7 @@ describe.skipIf(!TEST_DATABASE_URL)('Notenverwaltung (TEST_DATABASE_URL)', () =>
     t = await createTestApp(
       {
         controllers: [ScoresController, VoicesController, FoldersController, EventsController, TagsController],
-        providers: [ScoresRepository, ScoresService, FieldsService, ScoreImportService, MeRepository, VoicesRepository, VoicesService, FoldersService, EventsService, TagsRepository, TagsService, ClubSettingsRepository],
+        providers: [ScoresRepository, ScoresService, FieldsService, ScoreImportService, MeRepository, VoicesRepository, VoicesService, FoldersRepository, FoldersService, EventsService, TagsRepository, TagsService, ClubSettingsRepository],
       },
       { database: testDb.db, providers: [{ provide: FILE_STORAGE, useValue: storage }], config: { APP_TIMEZONE: 'Europe/Berlin' } },
     );

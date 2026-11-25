@@ -1,6 +1,7 @@
 import { Inject, Injectable, OnModuleInit } from '@nestjs/common';
 import type {
   CreateFolderBody,
+  EnsembleOptionsResponse,
   FolderDetailsResponse,
   FolderEntriesQuery,
   FolderEntry,
@@ -9,65 +10,37 @@ import type {
   FolderScoreCandidatesResponse,
   Page,
 } from '@vm-web/shared';
-import { and, asc, eq, inArray, like, or, sql } from 'drizzle-orm';
 import type { AccessContext } from '../access/access-context';
 import { EnsembleResolvers } from '../access/ensemble-resolvers';
 import { uuidv7 } from '../common/ids/uuid-v7';
 import { decodeCursor, toPage } from '../common/pagination/cursor';
 import { ProblemException } from '../common/problem-details/problem.exception';
-import { DATABASE, type Database } from '../db/database';
 import { withNameTaken } from '../db/db-errors';
-import { ensembles, folderEntries, folders, scores } from '../db/schema';
-import { assertActiveEnsemble, ensembleOptions, listEnsembles, scoreCandidatePage } from '../library/library-helpers';
-import { likePattern } from '../common/sql';
-import { displayFolderNumber, folderNumberSortKey } from './folder-number';
+import { listEnsembles } from '../library/library-helpers';
+import { folderNumberSortKey } from './folder-number';
+import { FoldersRepository, type FolderEntryNumber } from './folders.repository';
 
-const scoreCount = sql<number>`(select count(*) from folder_entries x where x.folder_id = ${folders.id})`;
-
-/** Folders of ensembles with own number per score (N-5, N-15). Permissions: `folder.*` in the folder's ensemble. */
 @Injectable()
 export class FoldersService implements OnModuleInit {
   constructor(
-    @Inject(DATABASE) private readonly db: Database,
+    @Inject(FoldersRepository) private readonly repo: FoldersRepository,
     @Inject(EnsembleResolvers) private readonly resolvers: EnsembleResolvers,
   ) {}
 
   onModuleInit(): void {
-    this.resolvers.register('folder', async (id) => {
-      const [row] = await this.db.select({ ensembleId: folders.ensembleId }).from(folders).where(eq(folders.id, id));
-      return row?.ensembleId ?? null;
-    });
+    this.resolvers.register('folder', (id) => this.repo.ensembleOf(id));
   }
 
-  ensembleOptions(access: AccessContext) {
-    return ensembleOptions(this.db, access, 'folder.create').then((items) => ({ items }));
+  async ensembleOptions(access: AccessContext): Promise<EnsembleOptionsResponse> {
+    const ids = access.ensemblesWith('folder.create');
+    if (!ids.length) throw ProblemException.forbidden();
+    return { items: await this.repo.activeEnsembleOptions(ids) };
   }
 
   async list(access: AccessContext, query: FolderListQuery): Promise<Page<FolderListItem>> {
     const ids = listEnsembles(access, 'folder.view', query.ensembleId);
     if (!ids.length) return { items: [], nextCursor: null };
-    const cursor = decodeCursor(query.cursor, 3);
-    const rows = await this.db
-      .select({
-        id: folders.id,
-        name: folders.name,
-        ensemble: { id: ensembles.id, name: ensembles.name },
-        showInMyArea: folders.showInMyArea,
-        scoreCount,
-        sortEnsemble: sql<string>`lower(${ensembles.name})`,
-        sortName: sql<string>`lower(${folders.name})`,
-      })
-      .from(folders)
-      .innerJoin(ensembles, eq(ensembles.id, folders.ensembleId))
-      .where(
-        and(
-          inArray(folders.ensembleId, ids),
-          query.q ? like(folders.name, likePattern(query.q)) : undefined,
-          cursor ? sql`(lower(${ensembles.name}), lower(${folders.name}), ${folders.id}) > (${cursor[0]}, ${cursor[1]}, ${cursor[2]})` : undefined,
-        ),
-      )
-      .orderBy(sql`lower(${ensembles.name})`, sql`lower(${folders.name})`, asc(folders.id))
-      .limit(query.limit + 1);
+    const rows = await this.repo.list(ids, query.q, decodeCursor(query.cursor, 3), query.limit);
     return toPage(rows, query.limit, (r) => [r.sortEnsemble, r.sortName, r.id], (r) => ({
       id: r.id,
       name: r.name,
@@ -78,45 +51,13 @@ export class FoldersService implements OnModuleInit {
   }
 
   async details(folderId: string): Promise<FolderDetailsResponse> {
-    const [row] = await this.db
-      .select({
-        id: folders.id,
-        name: folders.name,
-        ensemble: { id: ensembles.id, name: ensembles.name },
-        showInMyArea: folders.showInMyArea,
-        scoreCount,
-        updatedAt: folders.updatedAt,
-      })
-      .from(folders)
-      .innerJoin(ensembles, eq(ensembles.id, folders.ensembleId))
-      .where(eq(folders.id, folderId));
+    const row = await this.repo.details(folderId);
     if (!row) throw ProblemException.notFound();
     return { ...row, updatedAt: row.updatedAt.toISOString() };
   }
 
-  /** Natural number order (N-5). */
   async entries(folderId: string, query: FolderEntriesQuery): Promise<Page<FolderEntry>> {
-    const cursor = decodeCursor(query.cursor, 2);
-    const rows = await this.db
-      .select({
-        scoreId: scores.id,
-        number: folderEntries.number,
-        numberSuffix: folderEntries.numberSuffix,
-        title: scores.title,
-        composer: scores.composer,
-        sortKey: folderEntries.numberSortKey,
-      })
-      .from(folderEntries)
-      .innerJoin(scores, eq(scores.id, folderEntries.scoreId))
-      .where(
-        and(
-          eq(folderEntries.folderId, folderId),
-          query.q ? or(like(scores.title, likePattern(query.q)), like(scores.composer, likePattern(query.q)), like(displayFolderNumber, likePattern(query.q))) : undefined,
-          cursor ? sql`(${folderEntries.numberSortKey}, ${scores.id}) > (${cursor[0]}, ${cursor[1]})` : undefined,
-        ),
-      )
-      .orderBy(asc(folderEntries.numberSortKey), asc(scores.id))
-      .limit(query.limit + 1);
+    const rows = await this.repo.entries(folderId, query.q, decodeCursor(query.cursor, 2), query.limit);
     return toPage(rows, query.limit, (r) => [r.sortKey, r.scoreId], (r) => ({
       scoreId: r.scoreId,
       number: r.number,
@@ -127,77 +68,52 @@ export class FoldersService implements OnModuleInit {
   }
 
   async candidates(folderId: string, query: { q: string; cursor?: string; limit: number }): Promise<FolderScoreCandidatesResponse> {
-    const contained = sql<boolean>`exists (select 1 from folder_entries x where x.folder_id = ${folderId} and x.score_id = ${scores.id})`;
-    const page = await scoreCandidatePage(this.db, query, contained);
-    return { ...page, suggestedNumber: await this.suggestedNumber(folderId) };
+    const [page, suggestedNumber] = await Promise.all([this.repo.scoreCandidates(folderId, query), this.suggestedNumber(folderId)]);
+    return { ...page, suggestedNumber };
   }
 
   async create(body: CreateFolderBody): Promise<{ id: string }> {
-    await assertActiveEnsemble(this.db, body.ensembleId);
     const id = uuidv7();
-    await withNameTaken(() => this.db.insert(folders).values({ id, ensembleId: body.ensembleId, name: body.name, showInMyArea: body.showInMyArea }));
+    const result = await withNameTaken(() => this.repo.create({ id, ensembleId: body.ensembleId, name: body.name, showInMyArea: body.showInMyArea }));
+    if (result === 'unknown-ensemble') throw ProblemException.notFound('Unknown ensemble');
+    if (result === 'archived-ensemble') throw ProblemException.validation([{ path: '/body/ensembleId', code: 'archived' }]);
     return { id };
   }
 
   async rename(folderId: string, name: string): Promise<void> {
-    await withNameTaken(() => this.touch(folderId, { name }));
+    if (!(await withNameTaken(() => this.repo.update(folderId, { name })))) throw ProblemException.notFound();
   }
 
   async setVisibility(folderId: string, showInMyArea: boolean): Promise<void> {
-    await this.touch(folderId, { showInMyArea });
+    if (!(await this.repo.update(folderId, { showInMyArea }))) throw ProblemException.notFound();
   }
 
   async addScore(folderId: string, scoreId: string, number: string, numberSuffix: string | null = null): Promise<void> {
-    await this.assertScore(scoreId);
-    const [existing] = await this.db
-      .select({ number: folderEntries.number })
-      .from(folderEntries)
-      .where(and(eq(folderEntries.folderId, folderId), eq(folderEntries.scoreId, scoreId)));
-    if (existing) throw ProblemException.conflict('conflict', 'Score already in folder');
-    await withNameTaken(() =>
-      this.db.insert(folderEntries).values({ folderId, scoreId, number, numberSuffix, numberSortKey: folderNumberSortKey(number, numberSuffix) }),
-    );
-    await this.touch(folderId, {});
+    const result = await withNameTaken(() => this.repo.addEntry(folderId, scoreId, entryNumber(number, numberSuffix)));
+    if (result === 'unknown-folder') throw ProblemException.notFound();
+    if (result === 'unknown-score') throw ProblemException.notFound('Unknown score');
+    if (result === 'already-contained') throw ProblemException.conflict('conflict', 'Score already in folder');
   }
 
   async setScoreNumber(folderId: string, scoreId: string, number: string, numberSuffix: string | null = null): Promise<void> {
-    const [result] = await withNameTaken(() =>
-      this.db
-        .update(folderEntries)
-        .set({ number, numberSuffix, numberSortKey: folderNumberSortKey(number, numberSuffix) })
-        .where(and(eq(folderEntries.folderId, folderId), eq(folderEntries.scoreId, scoreId))),
-    );
-    if (!result.affectedRows) throw ProblemException.notFound();
-    await this.touch(folderId, {});
+    if (!(await withNameTaken(() => this.repo.setEntryNumber(folderId, scoreId, entryNumber(number, numberSuffix))))) throw ProblemException.notFound();
   }
 
   async removeScore(folderId: string, scoreId: string): Promise<void> {
-    const [result] = await this.db.delete(folderEntries).where(and(eq(folderEntries.folderId, folderId), eq(folderEntries.scoreId, scoreId)));
-    if (!result.affectedRows) throw ProblemException.notFound();
-    await this.touch(folderId, {});
+    if (!(await this.repo.removeEntry(folderId, scoreId))) throw ProblemException.notFound();
   }
 
   async delete(folderId: string): Promise<void> {
-    await this.db.delete(folders).where(eq(folders.id, folderId));
+    await this.repo.delete(folderId);
   }
 
-  /** Highest purely numeric number + 1, `1` for an empty folder. */
   private async suggestedNumber(folderId: string): Promise<string> {
-    const [row] = await this.db
-      .select({ max: sql<string | null>`max(cast(${folderEntries.number} as unsigned))` })
-      .from(folderEntries)
-      .where(and(eq(folderEntries.folderId, folderId), sql`${folderEntries.number} regexp '^[0-9]{1,15}$'`));
-    if (!row?.max) return '1';
-    return String(BigInt(row.max) + BigInt(1));
+    const max = await this.repo.highestNumericNumber(folderId);
+    if (!max) return '1';
+    return String(BigInt(max) + BigInt(1));
   }
+}
 
-  private async assertScore(scoreId: string): Promise<void> {
-    const [row] = await this.db.select({ id: scores.id }).from(scores).where(eq(scores.id, scoreId));
-    if (!row) throw ProblemException.notFound('Unknown score');
-  }
-
-  private async touch(folderId: string, set: Partial<typeof folders.$inferInsert>): Promise<void> {
-    const [result] = await this.db.update(folders).set({ ...set, updatedAt: new Date() }).where(eq(folders.id, folderId));
-    if (!result.affectedRows) throw ProblemException.notFound();
-  }
+function entryNumber(number: string, numberSuffix: string | null): FolderEntryNumber {
+  return { number, numberSuffix, numberSortKey: folderNumberSortKey(number, numberSuffix) };
 }
