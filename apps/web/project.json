@@ -6,6 +6,20 @@
   "sourceRoot": "apps/web/src",
   "tags": [],
   "targets": {
+    "licenses": {
+      "executor": "nx:run-commands",
+      "cache": true,
+      "inputs": [
+        "{workspaceRoot}/pnpm-lock.yaml",
+        "{projectRoot}/scripts/generate-dependencies.mjs"
+      ],
+      "outputs": [
+        "{workspaceRoot}/dist/generated/web"
+      ],
+      "options": {
+        "command": "node apps/web/scripts/generate-dependencies.mjs dist/generated/web/dependencies.json"
+      }
+    },
     "build": {
       "executor": "@angular/build:application",
       "outputs": [
@@ -43,6 +57,11 @@
             "glob": "*",
             "input": "node_modules/pdfjs-dist/cmaps",
             "output": "pdfjs/cmaps"
+          },
+          {
+            "glob": "dependencies.json",
+            "input": "dist/generated/web",
+            "output": "/"
           }
         ],
         "styles": [
@@ -70,7 +89,11 @@
           "extractLicenses": false,
           "sourceMap": true
         }
-      }
+      },
+      "dependsOn": [
+        "^build",
+        "licenses"
+      ]
     },
     "serve": {
       "continuous": true,
@@ -88,7 +111,8 @@
         }
       },
       "dependsOn": [
-        "api:serve"
+        "api:serve",
+        "licenses"
       ],
       "options": {
         "proxyConfig": "apps/web/proxy.conf.json"

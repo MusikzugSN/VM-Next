@@ -28,6 +28,11 @@ export const appRoutes: Route[] = [
     loadComponent: () => import('./features/legal/legal-page').then((m) => m.LegalPage),
   })),
   {
+    path: childSegment(APP_ROUTES.dependencies, '/'),
+    ...page('legal.dependencies'),
+    loadComponent: () => import('./features/legal/dependencies-page').then((m) => m.DependenciesPage),
+  },
+  {
     path: '',
     loadComponent: () => import('./core/layout/app-shell').then((m) => m.AppShell),
     canActivate: [authGuard],

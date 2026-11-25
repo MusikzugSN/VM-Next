@@ -11,6 +11,8 @@
 export const APP_ROUTES = {
   login: '/login',
   blocked: '/blocked',
+  /** Third-party packages with version and license; public. */
+  dependencies: '/dependencies',
   forbidden: '/forbidden',
   /** Public legal pages (S-7); German paths because they are linked publicly. */
   imprint: '/impressum',

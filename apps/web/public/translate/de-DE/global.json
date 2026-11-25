@@ -485,6 +485,24 @@
       "templateTitle": "Neue Vorlage verfügbar – bitte prüfen",
       "template": "Für Impressum oder Datenschutzerklärung gibt es eine neue Vorlage. Bis du sie übernimmst, bleibt der bisherige Text veröffentlicht.",
       "action": "Zu „Rechtliches“"
+    },
+    "dependencies": "Abhängigkeiten",
+    "dependenciesPage": {
+      "ownBefore": "VM-Web ist freie Software unter der",
+      "ownLicense": "GNU General Public License v3.0",
+      "ownAfter": ".",
+      "sourceBefore": "Den Quellcode findest du",
+      "source": "auf GitHub",
+      "intro": "VM-Web baut auf diesen Open-Source-Paketen auf. Die Liste umfasst alle Pakete, die Web-App und Server zur Laufzeit nutzen – auch indirekt eingebundene.",
+      "search": "Pakete durchsuchen",
+      "searchPlaceholder": "Name oder Lizenz",
+      "count": "{{ shown }} von {{ total }} Paketen",
+      "name": "Paket",
+      "version": "Version",
+      "license": "Lizenz",
+      "linkLabel": "{{ name }} – Projektseite (öffnet in neuem Tab)",
+      "error": "Die Liste konnte nicht geladen werden. Versuche es später erneut.",
+      "empty": "Kein Paket passt zur Suche."
     }
   }
 }

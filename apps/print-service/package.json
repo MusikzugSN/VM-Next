@@ -2,6 +2,7 @@
   "name": "@vm-web/print-service",
   "version": "0.0.1",
   "private": true,
+  "license": "GPL-3.0-only",
   "dependencies": {},
   "description": "VM-Web Druckservice: druckt große Aufträge aus VM-Web auf einen lokalen Drucker (Linux/CUPS), siehe docs/print-service.md"
 }
