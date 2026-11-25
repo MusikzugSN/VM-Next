@@ -1,11 +1,11 @@
 import { Inject, Injectable, Logger } from '@nestjs/common';
-import { printModeFor, type PrintPlanResponse, type PrintQuery, type SubstituteMode } from '@vm-web/shared';
+import { downloadFileName, printModeFor, type PrintPlanResponse, type PrintQuery, type SubstituteMode } from '@vm-web/shared';
 import { ZipArchive } from 'archiver';
 import { eq } from 'drizzle-orm';
 import { once } from 'node:events';
 import type { Readable } from 'node:stream';
 import type { AccessContext } from '../access/access-context';
-import { sanitizeFileName, sheetFileName, uniqueNames } from '../common/files/download-names';
+import { sheetFileName, uniqueNames } from '../common/files/download-names';
 import { ProblemException } from '../common/problem-details/problem.exception';
 import { DATABASE, type Database } from '../db/database';
 import { events, folders, scores, sheets, voices } from '../db/schema';
@@ -80,7 +80,7 @@ export class DownloadsService {
       }
     })();
 
-    return { body: archive, fileName: `${outputName(plan)}.zip` };
+    return { body: archive, fileName: downloadFileName(outputName(plan), 'zip') };
   }
 
   /** Content of the print dialog (D-1, D-2, D-3, D-6). */
@@ -125,7 +125,7 @@ export class DownloadsService {
       sources,
       plan.documents.map((d) => printModeFor(d.sheet.pageCount, rules)),
     );
-    return { body: Buffer.from(pdf.bytes), fileName: `Druck – ${outputName(plan)}.pdf` };
+    return { body: Buffer.from(pdf.bytes), fileName: downloadFileName(`Druck – ${outputName(plan)}`, 'pdf') };
   }
 
   /** Ensemble whose print rules apply: that of the folder or event, otherwise none (main ensemble, D-6). */
@@ -162,5 +162,5 @@ function scopeOf(q: PrintQuery): OutputScope {
 /** „Marschbuch – Trompete 1 in B“: scope name plus the active voices. */
 function outputName(plan: OutputPlan): string {
   const voiceNames = plan.activeVoices.map((v) => v.name).join(', ');
-  return sanitizeFileName(voiceNames ? `${plan.name} – ${voiceNames}` : plan.name).slice(0, 150);
+  return voiceNames ? `${plan.name} – ${voiceNames}` : plan.name;
 }

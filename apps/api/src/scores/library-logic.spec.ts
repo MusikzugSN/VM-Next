@@ -1,7 +1,7 @@
 import type { VoiceRef } from '@vm-web/shared';
 import { join } from 'node:path';
 import { csvCell, csvLine } from '../common/files/csv';
-import { contentDisposition, sanitizeFileName, sheetFileName, uniqueNames } from '../common/files/download-names';
+import { contentDisposition, sheetFileName, uniqueNames } from '../common/files/download-names';
 import { loadLineupTemplate, lineupTemplateSchema } from '../seed/lineup-template';
 import { completenessOf } from './completeness';
 import { displayValue, pruneValues, validateCustomValues, type FieldDef } from './custom-fields';
@@ -118,9 +118,7 @@ describe('download names (M-6)', () => {
     expect(sheetFileName({ title: 'Alte Kameraden', voice: 'Horn 1 in F' })).toBe('Alte Kameraden – Horn 1 in F.pdf');
   });
 
-  it('replaces characters invalid in file names and limits the length', () => {
-    expect(sanitizeFileName('AC/DC: Highway?*  ')).toBe('AC_DC_ Highway__');
-    expect(sanitizeFileName('...')).toBe('Dokument');
+  it('limits the length of the base name', () => {
     expect(sheetFileName({ title: 'x'.repeat(300), voice: 'Tuba' })).toHaveLength(154);
   });
 
