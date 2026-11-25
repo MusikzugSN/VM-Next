@@ -1,11 +1,11 @@
 import { MulterModule } from '@nestjs/platform-express';
 import { and, eq } from 'drizzle-orm';
-import { mkdtemp, rm } from 'node:fs/promises';
+import { mkdtemp, readdir, rm } from 'node:fs/promises';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { degrees, PDFDocument } from 'pdf-lib';
 import { ensureUploadTempDir } from '../common/files/upload-temp';
-import { sheets, uploads } from '../db/schema';
+import { sheets, uploads, voices } from '../db/schema';
 import { MeController } from '../me/me.controller';
 import { MeRepository } from '../me/me.repository';
 import { MeService } from '../me/me.service';
@@ -16,9 +16,12 @@ import { streamToBuffer } from '../storage/stream-utils';
 import { LibraryBuilder } from '../testing/library-builder';
 import { createTestApp, type TestApp } from '../testing/test-app';
 import { createTestDatabase, TEST_DATABASE_URL, type TestDatabase } from '../testing/test-database';
+import { uuidv7 } from '../common/ids/uuid-v7';
 import { ReviewController } from './review.controller';
+import { ReviewRepository } from './review.repository';
 import { ReviewService } from './review.service';
 import { UploadsController } from './uploads.controller';
+import { UploadsRepository } from './uploads.repository';
 import { UploadsService } from './uploads.service';
 
 const MAX_FILE_BYTES = 200 * 1024;
@@ -79,7 +82,7 @@ describe.skipIf(!TEST_DATABASE_URL)('Upload und Prüfung (TEST_DATABASE_URL)', (
       {
         imports: [MulterModule.register({ dest: ensureUploadTempDir(), limits: { fileSize: MAX_FILE_BYTES, files: 50 } })],
         controllers: [UploadsController, ReviewController, MeController],
-        providers: [UploadsService, ReviewService, MeRepository, MeService, PersonalTagsService],
+        providers: [UploadsService, UploadsRepository, ReviewService, ReviewRepository, MeRepository, MeService, PersonalTagsService],
       },
       { database: testDb.db, providers: [{ provide: FILE_STORAGE, useValue: storage }], config: { APP_TIMEZONE: 'Europe/Berlin' } },
     );
@@ -128,6 +131,21 @@ describe.skipIf(!TEST_DATABASE_URL)('Upload und Prüfung (TEST_DATABASE_URL)', (
         get(null, 'review/queue'),
       ]);
       expect(results.map((r) => r.status)).toEqual([200, 403, 403, 403, 200, 200, 401]);
+    });
+
+    it('guards every review endpoint with sheet.approve and answers 404 for unknown uploads', async () => {
+      const unknown = uuidv7();
+      const approveBody = { scoreId: ids.march, voiceId: ids.tp1, pages: [{ sourcePage: 1, rotation: 0, crop: null }] };
+      const call = (who: Who) =>
+        Promise.all([
+          get(who, `review/uploads/${unknown}/details`),
+          get(who, `review/uploads/${unknown}/pdf`),
+          post(who, `review/uploads/${unknown}/approve`, approveBody),
+          post(who, `review/uploads/${unknown}/reject`, { reason: 'x' }),
+        ]);
+      expect((await call('mus')).map((r) => r.status)).toEqual([403, 403, 403, 403]);
+      expect((await call('plain')).map((r) => r.status)).toEqual([403, 403, 403, 403]);
+      expect((await call('lib')).map((r) => r.status)).toEqual([404, 404, 404, 404]);
     });
 
     it('searches only visible scores without score.view (R-2)', async () => {
@@ -301,6 +319,29 @@ describe.skipIf(!TEST_DATABASE_URL)('Upload und Prüfung (TEST_DATABASE_URL)', (
       expect(mine).toEqual([expect.objectContaining({ fileName: 'Kameraden Trp 1.pdf', status: 'rejected', rejectionReason: 'Seite 2 fehlt', decidedAt: expect.any(String) })]);
       expect((await get('mus', 'me/upload-summary')).body).toEqual({ pending: 0, recentlyRejected: 1, recentlyApproved: 1 });
       expect((await get('lib', 'review/queue')).body.totalPending).toBe(1);
+    });
+
+    it('decides a pending upload exactly once when reviewers act at the same time (N-12, F-11)', async () => {
+      const [{ instrumentId }] = await testDb.db.select({ instrumentId: voices.instrumentId }).from(voices).where(eq(voices.id, ids.tp1));
+      const tp3 = await new LibraryBuilder(testDb.db).voice(instrumentId, 'Trompete 3 in B');
+      const approveBody = { scoreId: ids.march, voiceId: tp3, pages: [{ sourcePage: 1, rotation: 0, crop: null }] };
+      const results = await Promise.all([
+        post('lib', `review/uploads/${ids.libLoose}/approve`, approveBody),
+        post('chief', `review/uploads/${ids.libLoose}/approve`, approveBody),
+        post('lib', `review/uploads/${ids.libLoose}/reject`, { reason: 'doppelt' }),
+      ]);
+      const winners = results.filter((r) => r.status === 200);
+      expect(winners).toHaveLength(1);
+      expect(results.filter((r) => r.status !== 200).map((r) => [r.status, r.body.code])).toEqual([
+        [409, 'upload-not-pending'],
+        [409, 'upload-not-pending'],
+      ]);
+
+      const [decided] = await testDb.db.select().from(uploads).where(eq(uploads.id, ids.libLoose));
+      const created = await testDb.db.select().from(sheets).where(and(eq(sheets.scoreId, ids.march), eq(sheets.voiceId, tp3)));
+      expect(created).toHaveLength(decided.status === 'approved' ? 1 : 0);
+      const allSheets = await testDb.db.select({ fileKey: sheets.fileKey }).from(sheets);
+      expect((await readdir(join(storageDir, 'sheets'))).map((f) => `sheets/${f}`).sort()).toEqual(allSheets.map((s) => s.fileKey).sort());
     });
   });
 });
