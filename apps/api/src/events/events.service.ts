@@ -9,146 +9,86 @@ import type {
   SetlistEntry,
   UpdateEventDetailsBody,
 } from '@vm-web/shared';
-import { and, asc, desc, eq, gte, inArray, like, lt, sql } from 'drizzle-orm';
 import type { AccessContext } from '../access/access-context';
 import { EnsembleResolvers } from '../access/ensemble-resolvers';
-import { uuidv7 } from '../common/ids/uuid-v7';
 import { decodeCursor, toPage } from '../common/pagination/cursor';
 import { ProblemException } from '../common/problem-details/problem.exception';
 import { todayIn } from '../common/time/today';
-import { AppConfig } from '../config/app-config.service';
-import { DATABASE, type Database } from '../db/database';
-import { ensembles, events, scores, setlistEntries } from '../db/schema';
-import { assertActiveEnsemble, ensembleOptions, listEnsembles, scoreCandidatePage } from '../library/library-helpers';
 import { assertNoDuplicates } from '../common/validation/id-list';
-import { replaceRows } from '../db/table-helpers';
-import { likePattern } from '../common/sql';
+import { AppConfig } from '../config/app-config.service';
+import { listEnsembles } from '../library/library-helpers';
+import { EventsRepository, type EventChanges } from './events.repository';
 
-const scoreCount = sql<number>`(select count(*) from setlist_entries x where x.event_id = ${events.id})`;
-
-/** Events of ensembles with date and setlist (N-15, N-16). Permissions: `event.*` in the event's ensemble. */
 @Injectable()
 export class EventsService implements OnModuleInit {
   constructor(
-    @Inject(DATABASE) private readonly db: Database,
+    @Inject(EventsRepository) private readonly repo: EventsRepository,
     @Inject(EnsembleResolvers) private readonly resolvers: EnsembleResolvers,
     @Inject(AppConfig) private readonly config: AppConfig,
   ) {}
 
   onModuleInit(): void {
-    this.resolvers.register('event', async (id) => {
-      const [row] = await this.db.select({ ensembleId: events.ensembleId }).from(events).where(eq(events.id, id));
-      return row?.ensembleId ?? null;
-    });
+    this.resolvers.register('event', (id) => this.repo.ensembleIdOf(id));
   }
 
-  ensembleOptions(access: AccessContext) {
-    return ensembleOptions(this.db, access, 'event.create').then((items) => ({ items }));
+  async ensembleOptions(access: AccessContext) {
+    const ids = access.ensemblesWith('event.create');
+    if (!ids.length) throw ProblemException.forbidden();
+    return { items: await this.repo.activeEnsembleOptions(ids) };
   }
 
-  /** `upcoming`: from today, ascending; `past`: descending. */
   async list(access: AccessContext, query: EventListQuery): Promise<Page<EventListItem>> {
-    const ids = listEnsembles(access, 'event.view', query.ensembleId);
-    if (!ids.length) return { items: [], nextCursor: null };
-    const upcoming = query.period === 'upcoming';
-    const today = todayIn(this.config.get('APP_TIMEZONE'));
-    const cursor = decodeCursor(query.cursor, 2);
-    const rows = await this.db
-      .select({
-        id: events.id,
-        name: events.name,
-        date: events.date,
-        ensemble: { id: ensembles.id, name: ensembles.name },
-        showInMyArea: events.showInMyArea,
-        scoreCount,
-      })
-      .from(events)
-      .innerJoin(ensembles, eq(ensembles.id, events.ensembleId))
-      .where(
-        and(
-          inArray(events.ensembleId, ids),
-          upcoming ? gte(events.date, today) : lt(events.date, today),
-          query.q ? like(events.name, likePattern(query.q)) : undefined,
-          cursor
-            ? upcoming
-              ? sql`(${events.date}, ${events.id}) > (${cursor[0]}, ${cursor[1]})`
-              : sql`(${events.date}, ${events.id}) < (${cursor[0]}, ${cursor[1]})`
-            : undefined,
-        ),
-      )
-      .orderBy(...(upcoming ? [asc(events.date), asc(events.id)] : [desc(events.date), desc(events.id)]))
-      .limit(query.limit + 1);
+    const ensembleIds = listEnsembles(access, 'event.view', query.ensembleId);
+    if (!ensembleIds.length) return { items: [], nextCursor: null };
+    const rows = await this.repo.list({
+      ensembleIds,
+      upcoming: query.period === 'upcoming',
+      today: todayIn(this.config.get('APP_TIMEZONE')),
+      q: query.q,
+      cursor: decodeCursor(query.cursor, 2),
+      limit: query.limit,
+    });
     return toPage(rows, query.limit, (r) => [r.date, r.id], (r) => r);
   }
 
   async details(eventId: string): Promise<EventDetailsResponse> {
-    const [row] = await this.db
-      .select({
-        id: events.id,
-        name: events.name,
-        date: events.date,
-        ensemble: { id: ensembles.id, name: ensembles.name },
-        showInMyArea: events.showInMyArea,
-        updatedAt: events.updatedAt,
-      })
-      .from(events)
-      .innerJoin(ensembles, eq(ensembles.id, events.ensembleId))
-      .where(eq(events.id, eventId));
+    const row = await this.repo.details(eventId);
     if (!row) throw ProblemException.notFound();
-    return { ...row, updatedAt: row.updatedAt.toISOString() };
+    return row;
   }
 
   async setlist(eventId: string, query: { cursor?: string; limit: number }): Promise<Page<SetlistEntry>> {
-    const cursor = decodeCursor(query.cursor, 1);
-    const rows = await this.db
-      .select({ position: setlistEntries.position, scoreId: scores.id, title: scores.title, composer: scores.composer })
-      .from(setlistEntries)
-      .innerJoin(scores, eq(scores.id, setlistEntries.scoreId))
-      .where(and(eq(setlistEntries.eventId, eventId), cursor ? sql`${setlistEntries.position} > ${cursor[0]}` : undefined))
-      .orderBy(asc(setlistEntries.position))
-      .limit(query.limit + 1);
+    const rows = await this.repo.setlist(eventId, decodeCursor(query.cursor, 1), query.limit);
     return toPage(rows, query.limit, (r) => [r.position], (r) => r);
   }
 
-  async candidates(eventId: string, query: { q: string; cursor?: string; limit: number }): Promise<EventScoreCandidatesResponse> {
-    const contained = sql<boolean>`exists (select 1 from setlist_entries x where x.event_id = ${eventId} and x.score_id = ${scores.id})`;
-    return scoreCandidatePage(this.db, query, contained);
+  candidates(eventId: string, query: { q: string; cursor?: string; limit: number }): Promise<EventScoreCandidatesResponse> {
+    return this.repo.candidates(eventId, query);
   }
 
   async create(body: CreateEventBody): Promise<{ id: string }> {
-    await assertActiveEnsemble(this.db, body.ensembleId);
-    const id = uuidv7();
-    await this.db.insert(events).values({ id, ensembleId: body.ensembleId, name: body.name, date: body.date, showInMyArea: body.showInMyArea });
+    const id = await this.repo.createInActiveEnsemble({ ensembleId: body.ensembleId, name: body.name, date: body.date, showInMyArea: body.showInMyArea });
     return { id };
   }
 
   async updateDetails(eventId: string, body: UpdateEventDetailsBody): Promise<void> {
-    await this.touch(eventId, { name: body.name, date: body.date });
+    await this.update(eventId, { name: body.name, date: body.date });
   }
 
   async setVisibility(eventId: string, showInMyArea: boolean): Promise<void> {
-    await this.touch(eventId, { showInMyArea });
+    await this.update(eventId, { showInMyArea });
   }
 
-  /** Replaces the whole setlist; order = playing order (N-16). Each score once. */
   async setSetlist(eventId: string, scoreIds: readonly string[]): Promise<void> {
     assertNoDuplicates(scoreIds, '/body/scoreIds');
-    await this.db.transaction(async (tx) => {
-      if (scoreIds.length) {
-        const found = await tx.select({ id: scores.id }).from(scores).where(inArray(scores.id, [...scoreIds]));
-        if (found.length !== scoreIds.length) throw ProblemException.notFound('Unknown score');
-      }
-      await replaceRows(tx, setlistEntries, eq(setlistEntries.eventId, eventId), scoreIds.map((scoreId, i) => ({ eventId, scoreId, position: i + 1 })));
-      await tx.update(events).set({ updatedAt: new Date() }).where(eq(events.id, eventId));
-    });
+    await this.repo.replaceSetlist(eventId, scoreIds);
   }
 
   async delete(eventId: string): Promise<void> {
-    await this.db.delete(events).where(eq(events.id, eventId));
+    await this.repo.delete(eventId);
   }
 
-  private async touch(eventId: string, set: Partial<typeof events.$inferInsert>): Promise<void> {
-    const [result] = await this.db.update(events).set({ ...set, updatedAt: new Date() }).where(eq(events.id, eventId));
-    if (!result.affectedRows) throw ProblemException.notFound();
+  private async update(eventId: string, changes: EventChanges): Promise<void> {
+    if (!(await this.repo.update(eventId, changes))) throw ProblemException.notFound();
   }
 }
