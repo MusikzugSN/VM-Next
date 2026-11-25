@@ -8,6 +8,7 @@ import { events, folderEntries, folders, scores, setlistEntries, sheets } from '
 import { MeRepository } from '../me/me.repository';
 import { MeService } from '../me/me.service';
 import { relevantVoiceIds, resolveSheets, sheetsForOutput } from '../me/sheet-resolution';
+import { displayFolderNumber } from '../folders/folder-number';
 
 /**
  * Who may output what:
@@ -152,7 +153,7 @@ export class OutputService {
 
   private async folderEntries(folderId: string): Promise<OutputEntry[]> {
     return this.db
-      .select({ scoreId: scores.id, title: scores.title, number: folderEntries.number })
+      .select({ scoreId: scores.id, title: scores.title, number: displayFolderNumber })
       .from(folderEntries)
       .innerJoin(scores, eq(scores.id, folderEntries.scoreId))
       .where(eq(folderEntries.folderId, folderId))

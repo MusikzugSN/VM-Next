@@ -100,14 +100,14 @@ export class FoldersController {
   @Post(R.addScore.path)
   @HttpCode(204)
   async addScore(@Param(new Zod(folderParamsSchema)) p: FolderParams, @Body(new Zod(folderScoreNumberBodySchema)) body: FolderScoreNumberBody) {
-    await this.folders.addScore(p.folderId, body.scoreId, body.number);
+    await this.folders.addScore(p.folderId, body.scoreId, body.number, body.numberSuffix);
   }
 
   @RequirePermission('folder.edit', { ensembleFrom: OF_FOLDER })
   @Post(R.setScoreNumber.path)
   @HttpCode(204)
   async setScoreNumber(@Param(new Zod(folderParamsSchema)) p: FolderParams, @Body(new Zod(folderScoreNumberBodySchema)) body: FolderScoreNumberBody) {
-    await this.folders.setScoreNumber(p.folderId, body.scoreId, body.number);
+    await this.folders.setScoreNumber(p.folderId, body.scoreId, body.number, body.numberSuffix);
   }
 
   @RequirePermission('folder.edit', { ensembleFrom: OF_FOLDER })

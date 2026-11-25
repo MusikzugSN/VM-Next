@@ -12,7 +12,6 @@ import {
 import { eq, inArray } from 'drizzle-orm';
 import type { AccessContext } from '../access/access-context';
 import { uuidv7 } from '../common/ids/uuid-v7';
-import { naturalSortKey } from '../common/natural-sort';
 import { ProblemException } from '../common/problem-details/problem.exception';
 import { fieldDefinitions, fieldOptions, folderEntries, folders, scores } from '../db/schema';
 import { assertActiveEnsemble } from '../library/library-helpers';
@@ -20,6 +19,7 @@ import type { FieldDef } from './custom-fields';
 import { matchKey, parseDuration, parseLabels, parseScalar, parseText, type Parsed } from './score-import-values';
 import { ScoresRepository } from './scores.repository';
 import { nextPosition } from '../db/table-helpers';
+import { folderNumberSortKey } from '../folders/folder-number';
 
 const FOLDER_NUMBER_MAX = 10;
 const INSERT_CHUNK = 500;
@@ -59,11 +59,11 @@ interface FolderPlan {
   name: string;
   isNew: boolean;
   touched: boolean;
-  /** scoreId → number */
+  /** scoreId → number key (see `numberKey`) */
   entries: Map<string, string>;
-  /** number → scoreId */
+  /** number key → scoreId */
   numbers: Map<string, string>;
-  added: { scoreId: string; number: string }[];
+  added: { scoreId: string; number: string; numberSuffix: string | null }[];
 }
 
 /**
@@ -174,8 +174,9 @@ export class ScoreImportService {
     const folder = folderPlans.get(matchKey(row.folder?.name ?? ''));
     if (folder) {
       const number = (row.folder?.number ?? '').trim();
-      result.folder = { name: folder.name, number, isNew: folder.isNew };
-      planFolderEntry(folder, state.id, number, warn);
+      const suffix = (row.folder?.numberSuffix ?? '').trim();
+      result.folder = { name: folder.name, number: number + suffix, isNew: folder.isNew };
+      planFolderEntry(folder, state.id, number, suffix, warn);
     }
     return result;
   }
@@ -256,7 +257,12 @@ export class ScoreImportService {
     const ids = [...wanted.keys()].map((k) => existing.get(k)?.id).filter((id): id is string => !!id);
     const entries = ids.length
       ? await this.repo.db
-          .select({ folderId: folderEntries.folderId, scoreId: folderEntries.scoreId, number: folderEntries.number })
+          .select({
+            folderId: folderEntries.folderId,
+            scoreId: folderEntries.scoreId,
+            number: folderEntries.number,
+            numberSuffix: folderEntries.numberSuffix,
+          })
           .from(folderEntries)
           .where(inArray(folderEntries.folderId, ids))
       : [];
@@ -270,8 +276,8 @@ export class ScoreImportService {
         name: found?.name ?? name,
         isNew: !found,
         touched: false,
-        entries: new Map(own.map((e) => [e.scoreId, e.number])),
-        numbers: new Map(own.map((e) => [e.number, e.scoreId])),
+        entries: new Map(own.map((e) => [e.scoreId, numberKey(e.number, e.numberSuffix)])),
+        numbers: new Map(own.map((e) => [numberKey(e.number, e.numberSuffix), e.scoreId])),
         added: [],
       });
     }
@@ -344,7 +350,13 @@ export class ScoreImportService {
         if (!folder.added.length) continue;
         for (let i = 0; i < folder.added.length; i += INSERT_CHUNK) {
           await tx.insert(folderEntries).values(
-            folder.added.slice(i, i + INSERT_CHUNK).map((e) => ({ folderId: folder.id, scoreId: e.scoreId, number: e.number, numberSortKey: naturalSortKey(e.number) })),
+            folder.added.slice(i, i + INSERT_CHUNK).map((e) => ({
+              folderId: folder.id,
+              scoreId: e.scoreId,
+              number: e.number,
+              numberSuffix: e.numberSuffix,
+              numberSortKey: folderNumberSortKey(e.number, e.numberSuffix),
+            })),
           );
         }
         await tx.update(folders).set({ updatedAt: new Date() }).where(eq(folders.id, folder.id));
@@ -417,20 +429,28 @@ function mergeIntoState(state: ScoreState, fixed: Fixed, custom: Record<string, 
 }
 
 /** Plans the folder entry of a row (N-5); problems are warnings, the score is imported anyway. */
-function planFolderEntry(folder: FolderPlan, scoreId: string, number: string, warn: ReportIssue): void {
+function planFolderEntry(folder: FolderPlan, scoreId: string, number: string, suffix: string, warn: ReportIssue): void {
+  const key = numberKey(number, suffix);
   const existing = folder.entries.get(scoreId);
   if (existing !== undefined) {
-    if (existing !== number) warn('folder', 'folder-other-number');
+    if (existing !== key) warn('folder', 'folder-other-number');
   } else if (!number) {
     warn('folder', 'folder-number-missing');
   } else if (number.length > FOLDER_NUMBER_MAX) {
     warn('folder', 'folder-number-invalid');
-  } else if (folder.numbers.has(number)) {
+  } else if (suffix.length > 1) {
+    warn('folder', 'folder-number-suffix-invalid');
+  } else if (folder.numbers.has(key)) {
     warn('folder', 'folder-number-taken');
   } else {
-    folder.entries.set(scoreId, number);
-    folder.numbers.set(number, scoreId);
-    folder.added.push({ scoreId, number });
+    folder.entries.set(scoreId, key);
+    folder.numbers.set(key, scoreId);
+    folder.added.push({ scoreId, number, numberSuffix: suffix || null });
     folder.touched = true;
   }
+}
+
+/** Identity of number + suffix within a folder, matching the unique index (no suffix = empty suffix). */
+function numberKey(number: string, suffix: string | null): string {
+  return JSON.stringify([number, suffix ?? '']);
 }

@@ -68,4 +68,16 @@ describe('CSV import mapping (N-19)', () => {
     expect(without.rows[0].folder).toBeNull();
     expect(without.folderEnsembleId).toBeNull();
   });
+
+  it('sends the number suffix from the mapped column (1a, 1b)', () => {
+    const table = parseCsv('Titel,Nr,Zusatz\nTeil A,1,a\nTeil B,1,b\nGanz,2,');
+    expect(initialMapping(table.headers, []).map((m) => m.target)).toEqual(['fixed:title', 'folderNumber', 'folderNumberSuffix']);
+    const columns = [col('fixed:title'), col('folderNumber'), col('folderNumberSuffix')];
+    const body = buildImportBody(table, { columns, fixedFolder: 'Marschbuch', folderEnsembleId: 'ens' }, new Map(), false);
+    expect(body.rows.map((r) => r.folder)).toEqual([
+      { name: 'Marschbuch', number: '1', numberSuffix: 'a' },
+      { name: 'Marschbuch', number: '1', numberSuffix: 'b' },
+      { name: 'Marschbuch', number: '2', numberSuffix: '' },
+    ]);
+  });
 });
