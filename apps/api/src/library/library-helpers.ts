@@ -71,6 +71,10 @@ export async function scoreCandidates(
     .limit(limit + 1);
 }
 
+export function assertEnsembleInScope(access: AccessContext, permission: Permission, ensembleId: string): void {
+  if (!access.ensemblesWith(permission).includes(ensembleId)) throw ProblemException.forbidden();
+}
+
 /** Ensembles for list filters: the permitted ones, optionally narrowed to one (empty if not permitted). */
 export function listEnsembles(access: AccessContext, permission: Permission, ensembleId: string | undefined): string[] {
   const ids = access.ensemblesWith(permission);

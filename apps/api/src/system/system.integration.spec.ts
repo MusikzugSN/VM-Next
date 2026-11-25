@@ -169,6 +169,23 @@ describe.skipIf(!TEST_DATABASE_URL)('Systemverwaltung (TEST_DATABASE_URL)', () =
       expect((await api('sara', `users/${ids.mia}/set-membership`, { ensembleId: ids.youth, roleId: ids.orchestra })).status).toBe(404);
     });
 
+    it('refuses memberships and moves outside the own ensembles (F-1)', async () => {
+      expect((await api('sara', `users/${ids.sara}/set-membership`, { ensembleId: ids.root, roleId: ids.role_admin })).status).toBe(403);
+      expect((await api('sara', `users/${ids.sara}/set-membership`, { ensembleId: ids.orchestra, roleId: ids.role_admin })).status).toBe(403);
+      expect((await api('sara', `users/${ids.mia}/remove-membership`, { ensembleId: ids.orchestra })).status).toBe(403);
+      expect((await api('sara', `ensembles/${ids.orchestra}/set-parent`, { parentId: ids.youth })).status).toBe(403);
+      expect(await testDb.db.select().from(memberships).where(eq(memberships.userId, ids.sara))).toHaveLength(1);
+
+      const options = names((await api('sara', 'user-assignment-options')).body.ensembles);
+      expect(options).toContain('Jugendorchester');
+      expect(options).not.toContain('Hauptorchester');
+
+      expect((await api('sara', `users/${ids.mia}/set-membership`, { ensembleId: ids.youth, roleId: ids.role_musician })).status).toBe(204);
+      expect((await api('sara', `users/${ids.mia}/remove-membership`, { ensembleId: ids.youth })).status).toBe(204);
+      expect((await api('adam', `users/${ids.sara}/set-membership`, { ensembleId: ids.root, roleId: ids.role_admin })).status).toBe(204);
+      expect((await api('adam', `users/${ids.sara}/remove-membership`, { ensembleId: ids.root })).status).toBe(204);
+    });
+
     it('pre-assigns profile voices (S-1)', async () => {
       expect((await api('sara', `users/${ids.mia}/set-voices`, { voiceIds: [ids.tp2, ids.tp1] })).status).toBe(204);
       expect((await api('sara', `users/${ids.mia}/details`)).body.voices.map((v: { id: string }) => v.id)).toEqual([ids.tp2, ids.tp1]);
@@ -238,10 +255,10 @@ describe.skipIf(!TEST_DATABASE_URL)('Systemverwaltung (TEST_DATABASE_URL)', () =
     });
 
     it('moves ensembles without cycles; the root stays put (F-3)', async () => {
-      expect((await api('sara', `ensembles/${ids.root}/set-parent`, { parentId: ids.youth })).body.code).toBe('root-ensemble');
-      expect((await api('sara', `ensembles/${ids.orchestra}/set-parent`, { parentId: ids.windClass })).body.code).toBe('invalid-hierarchy');
-      expect((await api('sara', `ensembles/${ids.orchestra}/set-parent`, { parentId: ids.orchestra })).body.code).toBe('invalid-hierarchy');
-      expect((await api('sara', `ensembles/${ids.chamber}/set-parent`, { parentId: ids.youth })).status).toBe(204);
+      expect((await api('adam', `ensembles/${ids.root}/set-parent`, { parentId: ids.youth })).body.code).toBe('root-ensemble');
+      expect((await api('adam', `ensembles/${ids.orchestra}/set-parent`, { parentId: ids.windClass })).body.code).toBe('invalid-hierarchy');
+      expect((await api('adam', `ensembles/${ids.orchestra}/set-parent`, { parentId: ids.orchestra })).body.code).toBe('invalid-hierarchy');
+      expect((await api('adam', `ensembles/${ids.chamber}/set-parent`, { parentId: ids.youth })).status).toBe(204);
       expect((await api('sara', `ensembles/${ids.chamber}/details`)).body.parentId).toBe(ids.youth);
     });
 
