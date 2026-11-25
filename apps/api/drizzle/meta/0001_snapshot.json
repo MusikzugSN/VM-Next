@@ -1,7 +1,7 @@
 {
   "version": "5",
   "dialect": "mysql",
-  "id": "69fdaadf-3069-4d1b-b92b-3e73ef381d91",
+  "id": "97403eb4-a41a-4471-a432-bea714c1c8f5",
   "prevId": "f68cf540-52a5-4075-b835-211bd5f3d24c",
   "tables": {
     "system_state": {
@@ -509,20 +509,6 @@
           "type": "text",
           "primaryKey": false,
           "notNull": true,
-          "autoincrement": false
-        },
-        "imprint_url": {
-          "name": "imprint_url",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": false,
-          "autoincrement": false
-        },
-        "privacy_url": {
-          "name": "privacy_url",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": false,
           "autoincrement": false
         },
         "login_banner": {
@@ -1266,13 +1252,6 @@
           "notNull": true,
           "autoincrement": false
         },
-        "number_suffix": {
-          "name": "number_suffix",
-          "type": "varchar(1)",
-          "primaryKey": false,
-          "notNull": false,
-          "autoincrement": false
-        },
         "number_sort_key": {
           "name": "number_sort_key",
           "type": "varchar(255)",
@@ -1282,15 +1261,6 @@
         }
       },
       "indexes": {
-        "folder_entries_number_unique": {
-          "name": "folder_entries_number_unique",
-          "columns": [
-            "folder_id",
-            "number",
-            "coalesce(`number_suffix`, '')"
-          ],
-          "isUnique": true
-        },
         "folder_entries_score_idx": {
           "name": "folder_entries_score_idx",
           "columns": [
@@ -1336,7 +1306,15 @@
           ]
         }
       },
-      "uniqueConstraints": {},
+      "uniqueConstraints": {
+        "folder_entries_number_unique": {
+          "name": "folder_entries_number_unique",
+          "columns": [
+            "folder_id",
+            "number"
+          ]
+        }
+      },
       "checkConstraint": {}
     },
     "folders": {
@@ -2361,6 +2339,141 @@
       },
       "uniqueConstraints": {},
       "checkConstraint": {}
+    },
+    "legal_data": {
+      "name": "legal_data",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "int",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false,
+          "default": 1
+        },
+        "imprint_data": {
+          "name": "imprint_data",
+          "type": "json",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "privacy_data": {
+          "name": "privacy_data",
+          "type": "json",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "updated_at": {
+          "name": "updated_at",
+          "type": "timestamp(6)",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false,
+          "default": "(now())"
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {},
+      "compositePrimaryKeys": {
+        "legal_data_id": {
+          "name": "legal_data_id",
+          "columns": [
+            "id"
+          ]
+        }
+      },
+      "uniqueConstraints": {},
+      "checkConstraint": {
+        "legal_data_single_row_check": {
+          "name": "legal_data_single_row_check",
+          "value": "`legal_data`.`id` = 1"
+        }
+      }
+    },
+    "legal_documents": {
+      "name": "legal_documents",
+      "columns": {
+        "document": {
+          "name": "document",
+          "type": "varchar(16)",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "mode": {
+          "name": "mode",
+          "type": "varchar(16)",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "url": {
+          "name": "url",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "accepted_template": {
+          "name": "accepted_template",
+          "type": "json",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "accepted_at": {
+          "name": "accepted_at",
+          "type": "timestamp(6)",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "published_hash": {
+          "name": "published_hash",
+          "type": "varchar(64)",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "as_of": {
+          "name": "as_of",
+          "type": "date",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "updated_at": {
+          "name": "updated_at",
+          "type": "timestamp(6)",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false,
+          "default": "(now())"
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {},
+      "compositePrimaryKeys": {
+        "legal_documents_document": {
+          "name": "legal_documents_document",
+          "columns": [
+            "document"
+          ]
+        }
+      },
+      "uniqueConstraints": {},
+      "checkConstraint": {
+        "legal_documents_document_check": {
+          "name": "legal_documents_document_check",
+          "value": "`legal_documents`.`document` in ('imprint', 'privacy')"
+        },
+        "legal_documents_mode_check": {
+          "name": "legal_documents_mode_check",
+          "value": "`legal_documents`.`mode` is null or `legal_documents`.`mode` in ('link', 'generated')"
+        }
+      }
     }
   },
   "views": {},
@@ -2410,13 +2523,6 @@
       "voices_name_idx": {
         "columns": {
           "lower(`name`)": {
-            "isExpression": true
-          }
-        }
-      },
-      "folder_entries_number_unique": {
-        "columns": {
-          "coalesce(`number_suffix`, '')": {
             "isExpression": true
           }
         }

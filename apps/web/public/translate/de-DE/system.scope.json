@@ -181,6 +181,7 @@
     "saved": "Einstellungen gespeichert.",
     "tabs": {
       "club": "Verein & Anmeldung",
+      "legal": "Rechtliches",
       "defaults": "Standardwerte",
       "print": "Drucken",
       "fields": "Eigene Felder"
@@ -188,8 +189,6 @@
     "club": {
       "title": "Verein & Anmeldung",
       "clubName": "Vereinsname",
-      "imprintUrl": "Link zum Impressum",
-      "privacyUrl": "Link zur Datenschutzerklärung",
       "loginBanner": "Hinweis auf der Anmeldeseite",
       "loginBannerHint": "Reiner Text, z. B. für Wartungsarbeiten. Leer lassen, wenn kein Hinweis erscheinen soll.",
       "autoRedirect": "Direkt zum Vereins-Login weiterleiten",
@@ -228,6 +227,180 @@
       "deleteText": "Das Feld und alle seine Werte in den Stücken werden endgültig gelöscht.",
       "deleted": "Feld „{{ name }}“ gelöscht.",
       "empty": "Noch keine eigenen Felder angelegt."
+    },
+    "legal": {
+      "disclaimerTitle": "Muster, keine Rechtsberatung",
+      "disclaimer": "VM-Web erzeugt die Texte aus Mustervorlagen. Sie ersetzen keine Rechtsberatung. Der Verein bleibt dafür verantwortlich, dass die Angaben richtig und vollständig sind. Lass die Texte im Zweifel prüfen.",
+      "status": {
+        "not-configured": "Nicht eingerichtet",
+        "incomplete": "Unvollständig – nicht veröffentlicht",
+        "published": "Veröffentlicht"
+      },
+      "openPublic": "Öffentliche Seite öffnen",
+      "mode": {
+        "link": "Link auf eine eigene Seite",
+        "linkHint": "Der Verein hat das Dokument schon auf seiner Website.",
+        "generated": "Aus Vereinsdaten erzeugen",
+        "generatedHint": "VM-Web erstellt das Dokument aus einer Vorlage und den Angaben unten."
+      },
+      "chooseMode": "Bitte wähle, wie das Dokument bereitgestellt wird.",
+      "linkMissing": "Ohne Link wird kein Verweis angezeigt.",
+      "groups": {
+        "club": "Angaben zum Verein",
+        "privacy": "Angaben für die Datenschutzerklärung",
+        "dpo": "Datenschutzbeauftragte:r",
+        "hosting": "Hosting",
+        "identityServer": "Identity-Server (Vereinskonto)",
+        "retention": "Speicherdauer",
+        "authority": "Aufsichtsbehörde",
+        "department": "Abteilung",
+        "parentClub": "Trägerverein (Anbieter)"
+      },
+      "controllerFromImprint": "Verantwortlicher ist der Verein mit den Angaben aus dem Impressum.",
+      "controllerHere": "Diese Angaben erscheinen als Verantwortlicher in der Datenschutzerklärung.",
+      "isRegistered": "Eingetragener Verein (e.V.)",
+      "hasContentResponsible": "Inhaltlich verantwortliche Person angeben",
+      "hasDpo": "Der Verein hat eine:n Datenschutzbeauftragte:n",
+      "operator": {
+        "self": "Der Verein selbst",
+        "provider": "Ein Dienstleister"
+      },
+      "yes": "Ja",
+      "no": "Nein",
+      "hints": {
+        "legalName": "Mit Rechtsform, z. B. „Musikverein Harmonie Talheim e.V.“",
+        "street": "Anschrift des Vereinssitzes, kein Postfach. Optional, wenn eine Person unten eine Anschrift hat.",
+        "representatives": "Vorstand nach § 26 BGB mit Funktion, mindestens eine Person. Kontaktdaten je Person sind optional; sie ersetzen fehlende Angaben des Vereins.",
+        "representativeRole": "z. B. 1. Vorsitzende",
+        "isRegistered": "Dann sind Registergericht und Registernummer Pflicht.",
+        "registerCourt": "z. B. Amtsgericht Stuttgart",
+        "registerNumber": "z. B. VR 123456",
+        "vatId": "Optional, nur wenn der Verein eine hat, z. B. DE123456789.",
+        "contentResponsible": "Optional, nach § 18 Abs. 2 MStV, z. B. bei redaktionellen Inhalten.",
+        "dpo": "Optional. Nur angeben, wenn eine Person benannt ist.",
+        "dpoContact": "E-Mail-Adresse oder Anschrift",
+        "providerAddress": "Anschrift in einer Zeile",
+        "days": "In Tagen",
+        "state": "Daraus ergibt sich die zuständige Datenschutz-Aufsichtsbehörde.",
+        "additionalText": "Optional. Erscheint als eigener Abschnitt „Ergänzungen“ am Ende. Nur Text, Absätze durch Leerzeilen.",
+        "url": "Vollständige Adresse, beginnend mit https://",
+        "serverCountry": "Nur EU und EWR. Für Server außerhalb fehlen in den Vorlagen die Angaben zur Übermittlung in Drittländer.",
+        "isDepartment": "Zum Beispiel der Musikzug eines Schützenvereins: Eingetragen ist nur der Trägerverein. Er ist Anbieter und steht mit Anschrift, Vorstand und Registereintrag im Impressum, die Abteilung mit ihrem Kontakt.",
+        "departmentName": "Name der Abteilung, z. B. „Musikzug Schloß Neuhaus“",
+        "departmentContacts": "Zum Beispiel die Leitung oder der Vorstand der Abteilung.",
+        "departmentRole": "z. B. Vorsitzender des Musikzugs",
+        "contactRule": "Anschrift, E-Mail und Telefon des Vereins sind jeweils optional. Fehlt eine Angabe beim Verein, muss mindestens eine Person unten sie haben.",
+        "parentRepresentatives": "Vorstand des Trägervereins nach § 26 BGB, mindestens eine Person. Kontaktdaten sind hier nicht nötig.",
+        "contactRuleDepartment": "Anschrift des Trägervereins, E-Mail und Telefon der Abteilung sind jeweils optional. Fehlt eine Angabe, muss mindestens ein Ansprechpartner der Abteilung sie haben."
+      },
+      "fields": {
+        "mode": "Bereitstellung",
+        "url": "Link zur Seite",
+        "imprint": {
+          "legalName": "Vollständiger Vereinsname",
+          "address": {
+            "street": "Straße und Hausnummer",
+            "postalCode": "PLZ",
+            "city": "Ort"
+          },
+          "representatives": "Vertretungsberechtigte Personen",
+          "representativeName": "Name",
+          "representativeRole": "Funktion",
+          "email": "E-Mail",
+          "phone": "Telefon",
+          "registerCourt": "Registergericht",
+          "registerNumber": "Registernummer",
+          "vatId": "Umsatzsteuer-Identifikationsnummer",
+          "contentResponsible": {
+            "name": "Inhaltlich verantwortliche Person",
+            "address": "Anschrift der inhaltlich verantwortlichen Person"
+          },
+          "contentResponsibleStreet": "Straße und Hausnummer",
+          "contact": {
+            "address": "Anschrift: beim Verein oder bei mindestens einer Person",
+            "email": "E-Mail: beim Verein oder bei mindestens einer Person",
+            "phone": "Telefon: beim Verein oder bei mindestens einer Person"
+          },
+          "department": {
+            "name": "Name der Abteilung",
+            "contacts": "Ansprechpartner der Abteilung",
+            "contact": {
+              "address": "Anschrift: beim Trägerverein oder bei mindestens einem Ansprechpartner",
+              "email": "E-Mail: bei der Abteilung oder bei mindestens einem Ansprechpartner",
+              "phone": "Telefon: bei der Abteilung oder bei mindestens einem Ansprechpartner"
+            }
+          }
+        },
+        "privacy": {
+          "dataProtectionOfficer": {
+            "name": "Name der/des Datenschutzbeauftragten",
+            "contact": "Kontakt der/des Datenschutzbeauftragten"
+          },
+          "hosting": {
+            "operator": "Wer betreibt den Server?",
+            "provider": {
+              "name": "Name des Hosters",
+              "address": "Anschrift des Hosters"
+            },
+            "serverCountry": "Serverstandort",
+            "dpaConcluded": "Vertrag zur Auftragsverarbeitung mit dem Hoster abgeschlossen?"
+          },
+          "identityServer": {
+            "operator": "Wer betreibt den Identity-Server?",
+            "provider": {
+              "name": "Name des Dienstleisters",
+              "address": "Anschrift des Dienstleisters"
+            },
+            "serverCountry": "Standort des Identity-Servers"
+          },
+          "serverLogRetentionDays": "Speicherdauer der Server-Logs",
+          "backupRetentionDays": "Speicherdauer der Backups",
+          "state": "Bundesland des Vereinssitzes",
+          "supervisoryAuthority": "Aufsichtsbehörde: Anschrift in VM-Web noch nicht geprüft (bitte VM-Web aktualisieren)",
+          "additionalText": "Ergänzungen"
+        }
+      },
+      "states": {
+        "BW": "Baden-Württemberg",
+        "BY": "Bayern",
+        "BE": "Berlin",
+        "BB": "Brandenburg",
+        "HB": "Bremen",
+        "HH": "Hamburg",
+        "HE": "Hessen",
+        "MV": "Mecklenburg-Vorpommern",
+        "NI": "Niedersachsen",
+        "NW": "Nordrhein-Westfalen",
+        "RP": "Rheinland-Pfalz",
+        "SL": "Saarland",
+        "SN": "Sachsen",
+        "ST": "Sachsen-Anhalt",
+        "SH": "Schleswig-Holstein",
+        "TH": "Thüringen"
+      },
+      "preview": "Vorschau",
+      "previewOf": "Vorlage Version {{ version }} vom {{ date }}",
+      "previewFailed": "Die Vorschau konnte nicht geladen werden.",
+      "previewNeedsEdit": "Die Live-Vorschau gibt es nur mit dem Recht, die Konfiguration zu bearbeiten.",
+      "missingTitle": "Noch nicht veröffentlicht. Es fehlen:",
+      "complete": "Alle Pflichtangaben sind vorhanden.",
+      "newTemplate": "Neue Vorlage verfügbar – bitte prüfen",
+      "newTemplateText": "Veröffentlicht ist Version {{ accepted }}. Version {{ available }} vom {{ date }} gilt erst, wenn du sie übernimmst.",
+      "showNew": "Neue Vorlage ansehen",
+      "showCurrent": "Aktuelle Vorlage ansehen",
+      "accept": "Übernehmen",
+      "acceptTitle": "Vorlage Version {{ version }} übernehmen?",
+      "acceptText": "Der veröffentlichte Text ändert sich sofort. Prüfe die Vorschau vorher.",
+      "accepted": "Neue Vorlage übernommen.",
+      "unsaved": "Ungespeicherte Änderungen",
+      "warnings": {
+        "hosting-without-dpa": "Ohne Vertrag zur Auftragsverarbeitung (Art. 28 DSGVO) darf ein Hoster in der Regel keine personenbezogenen Daten für den Verein verarbeiten. Die Datenschutzerklärung wird trotzdem veröffentlicht – bitte den Vertrag abschließen."
+      },
+      "isDepartment": "Wir sind eine Abteilung eines anderen Vereins",
+      "addPerson": "Person hinzufügen",
+      "removePerson": "Person {{ index }} entfernen",
+      "personContact": "Kontaktdaten (optional)",
+      "contactComplete": "Anschrift, E-Mail und Telefon"
     }
   },
   "printRules": {

@@ -13,14 +13,12 @@ import { BrandingStore } from '../../../core/branding/branding.store';
 import { focusFirstInvalid } from '../../../core/util/focus-invalid';
 interface ClubForm {
   clubName: string;
-  imprintUrl: string;
-  privacyUrl: string;
   loginBanner: string;
   loginAutoRedirect: boolean;
 }
 type ClubErrors = Partial<Record<keyof ClubForm, string>>;
 
-/** Tab „Verein & Anmeldung“ (S-4, A-2, F-12): name, legal links, login banner, logo. */
+/** Tab „Verein & Anmeldung“ (S-4, A-2, F-12): name, login banner, logo. Imprint and privacy policy: tab „Rechtliches“ (S-7). */
 @Component({
   selector: 'vm-club-settings',
   imports: [VmSwitch, VmCard, VmField, VmFieldLabel, VmFieldError, NgIcon, TranslocoPipe, VmButton, VmInput, VmTextarea],
@@ -47,27 +45,6 @@ type ClubErrors = Partial<Record<keyof ClubForm, string>>;
           <span vm-field-error id="err-clubName">{{ e | transloco }}</span>
         }
       </label>
-      <div class="grid gap-4 md:grid-cols-2">
-        @for (f of urlFields; track f) {
-          <label vm-field>
-            <span vm-field-label>{{ 'system.settings.club.' + f | transloco }}</span>
-            <input
-              vm-input
-              type="url"
-              maxlength="500"
-              placeholder="https://"
-              [readOnly]="readonly()"
-              [value]="form()[f]"
-              (input)="set(f, $any($event.target).value)"
-              [attr.aria-invalid]="!!errors()[f]"
-              [attr.aria-describedby]="errors()[f] ? 'err-' + f : null"
-            />
-            @if (errors()[f]; as e) {
-              <span vm-field-error [id]="'err-' + f">{{ e | transloco }}</span>
-            }
-          </label>
-        }
-      </div>
       <label vm-field>
         <span vm-field-label>{{ 'system.settings.club.loginBanner' | transloco }}</span>
         <textarea vm-textarea rows="3" maxlength="2000" [readOnly]="readonly()" [value]="form().loginBanner" (input)="set('loginBanner', $any($event.target).value)"></textarea>
@@ -132,9 +109,8 @@ export class ClubSettings {
   readonly readonly = input(false);
   readonly changed = output<void>();
 
-  protected readonly urlFields = ['imprintUrl', 'privacyUrl'] as const;
   protected readonly accept = LOGO_MIME_TYPES.join(',');
-  protected readonly form = signal<ClubForm>({ clubName: '', imprintUrl: '', privacyUrl: '', loginBanner: '', loginAutoRedirect: false });
+  protected readonly form = signal<ClubForm>({ clubName: '', loginBanner: '', loginAutoRedirect: false });
   protected readonly errors = signal<ClubErrors>({});
   protected readonly saving = signal(false);
   protected readonly uploading = signal(false);
@@ -147,8 +123,6 @@ export class ClubSettings {
       untracked(() =>
         this.form.set({
           clubName: club.clubName,
-          imprintUrl: club.imprintUrl ?? '',
-          privacyUrl: club.privacyUrl ?? '',
           loginBanner: club.loginBanner ?? '',
           loginAutoRedirect: club.loginAutoRedirect,
         }),
@@ -165,8 +139,6 @@ export class ClubSettings {
     const f = this.form();
     const body = {
       clubName: f.clubName.trim(),
-      imprintUrl: f.imprintUrl.trim() || null,
-      privacyUrl: f.privacyUrl.trim() || null,
       loginBanner: f.loginBanner.trim() || null,
       loginAutoRedirect: f.loginAutoRedirect,
     };

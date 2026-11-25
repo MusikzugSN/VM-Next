@@ -158,9 +158,18 @@ Die Systemverwaltung schrumpft auf Benutzer, Ensembles, Rollen und eine Konfigur
 1. **S-1 (Muss)** Benutzer: Liste mit Name, E-Mail, Ensembles und Rollen, Stimmen, Status und letzter Anmeldung. Aktionen: Rolle je Ensemble zuweisen, Stimmen vorbelegen, sperren.
 2. **S-2 (Muss)** Ensembles: anlegen, umbenennen, archivieren; je Ensemble eine Besetzung (Stimmenliste) für die Vollständigkeit (N-4) und Druckregeln nach Seitenzahl (D-6).
 3. **S-3 (Muss)** Rollen: Rechte-Matrix (R-7), Standardrollen aus R-5 mit „Auf Standard zurücksetzen“.
-4. **S-4 (Muss)** Konfiguration: Vereinsname, Logo, Anmelde-Banner, Impressum- und Datenschutz-Link, Standard-Ensemble und Standardrolle für neue Konten, Seitengrenze für den Browser-Druck (Standard 10 Seiten), VM-Web-Adresse für die Origin-Prüfung des Druckservice. OIDC-Zugangsdaten kommen aus Umgebungsvariablen.
+4. **S-4 (Muss)** Konfiguration: Vereinsname, Logo, Anmelde-Banner, Impressum und Datenschutzerklärung (je als Link oder aus Vereinsdaten erzeugt, siehe S-7), Standard-Ensemble und Standardrolle für neue Konten, Seitengrenze für den Browser-Druck (Standard 10 Seiten), VM-Web-Adresse für die Origin-Prüfung des Druckservice. OIDC-Zugangsdaten kommen aus Umgebungsvariablen.
 5. **S-5 (Muss)** Kein Setup-Assistent und kein Pseudo-Benutzer „Install“: Beim ersten Start werden Standardrollen und Besetzungs-Vorlage automatisch importiert, die erste angemeldete Person wird Admin und pflegt die Vereinsdaten danach in der Konfiguration.
 6. **S-6 (Soll)** Änderungsprotokoll für Rechte, Freigaben und Löschungen (wer, was, wann).
+7. **S-7 (Muss)** Impressum und Datenschutzerklärung aus Vereinsdaten erzeugen.
+   - **Modus je Dokument**: `link` (externe URL wie bisher) oder `generated`. Ist ein Dokument nicht vollständig eingerichtet, sehen Admins eine Warnung in der Konfiguration und auf ihrer Startseite.
+   - **Impressum (§ 5 DDG)**: vollständiger Vereinsname mit Rechtsform; mindestens eine vertretungsberechtigte Person mit Funktion, je Person optional Anschrift, E-Mail und Telefon; Anschrift des Sitzes (Straße und Hausnummer, PLZ, Ort; Postfächer wie „Postfach“, „PF“, „Postfach 12 34“ werden abgelehnt), E-Mail und Telefon des Vereins – **jede dieser drei Angaben einzeln**: hat der Verein sie, braucht keine Person sie; hat er sie nicht, muss mindestens eine Person sie haben (nicht unbedingt dieselbe). E-Mail und Telefon des Vereins stehen im Impressum direkt unter seiner Anschrift; Registergericht und Registernummer (Pflicht bei e.V., sonst ausblendbar); optional USt-IdNr. und inhaltlich verantwortliche Person nach § 18 Abs. 2 MStV.
+   - **Abteilung eines Trägervereins** (z. B. Musikzug eines Schützenvereins, eingetragen ist nur der Trägerverein): Vereinsname, Anschrift, Vorstand und Registereintrag beschreiben den Trägerverein als Anbieter; dazu kommen Name der Abteilung, ihre E-Mail und ihr Telefon sowie ihre Ansprechpartner. Die Kontaktregel gilt dann mit der Anschrift des Trägervereins und E-Mail/Telefon der Abteilung; einspringen können die Ansprechpartner der Abteilung, der Vorstand des Trägervereins braucht keine Kontaktdaten. Impressum und Datenschutzerklärung nennen den Trägerverein als Anbieter bzw. Verantwortlichen und die Abteilung mit ihrem Kontakt.
+   - **Datenschutzerklärung**: Verantwortlicher aus den Impressumsdaten (keine Doppelerfassung); optional Datenschutzbeauftragte:r; Hosting (selbst oder Hoster mit Name, Anschrift, Serverstandort, AV-Vertrag ja/nein; ohne AV-Vertrag erscheint eine Warnung, die Veröffentlichung bleibt möglich); Identity-Server (Betreiber, ggf. Name/Anschrift, Standort); Serverstandorte nur in EU/EWR; Speicherdauer Server-Logs und Backups in Tagen; Bundesland → zuständige Aufsichtsbehörde (`defaults/legal/supervisory-authorities.json`); optional Freitext als eigener Schlussabschnitt.
+   - **Module (`LegalModule`-Registry)**: Basis (immer: Verantwortlicher, Hosting/Logs, Anmeldung über Identity-Server mit Name, E-Mail, Profilbild, `sub`; technisch notwendiges Session-Cookie; Rechtsgrundlagen; Speicherdauer; Betroffenenrechte; Beschwerderecht), Notenbereich, lokaler Druckservice; vorbereitet und leer: Mitgliederverwaltung, E-Mail-Benachrichtigungen. Abschnitte erscheinen nur, wenn die Funktion aktiv ist.
+   - **Vorlagen**: versioniert unter `defaults/legal/` (Version und Datum je Vorlage), eigener Renderer nur für Platzhalter und Bedingungen; Eingaben werden escaped. Jede Seite zeigt „Stand“ und Vorlagenversion. Eine neue Vorlagenversion gilt erst nach „Übernehmen“ durch Admins (mit Vorschau); übernommene Version und Datum werden gespeichert.
+   - **Öffentlich**: `/impressum` und `/datenschutz` ohne Anmeldung, verlinkt auf Anmeldeseite, im Footer und im Benutzermenü; im Modus `link` Weiterleitung auf die URL; unvollständige erzeugte Dokumente werden nicht veröffentlicht (neutraler Hinweis).
+   - **Hinweis** in der Konfiguration: Die Texte sind Muster, keine Rechtsberatung; der Verein bleibt verantwortlich.
 
 ## Seiten & Unterseiten
 
@@ -177,6 +186,8 @@ Detailseiten (›) öffnen sich aus ihrer Liste; der Druckdialog ist keine eigen
 | Anmeldung | Vereinslogo, Banner, „Mit Vereinskonto anmelden“; optional Direktweiterleitung | `/login` | alle | A-1, A-2 |
 | Konto gesperrt | Hinweis mit Kontakt zum Verein | `/gesperrt` | gesperrte Konten | A-5 |
 | Fehlerseiten | Nicht gefunden, Kein Zugriff | `/404`, `/kein-zugriff` | alle | – |
+| Impressum | Erzeugtes Impressum mit Vereinsname und Logo, „Stand“ und Vorlagenversion; im Modus Link Weiterleitung; unvollständig: neutraler Hinweis | `/impressum` | alle, ohne Anmeldung | S-7 |
+| Datenschutzerklärung | wie Impressum | `/datenschutz` | alle, ohne Anmeldung | S-7 |
 
 ### Mein Bereich
 
@@ -225,7 +236,7 @@ Detailseiten (›) öffnen sich aus ihrer Liste; der Druckdialog ist keine eigen
 | Ensemble | Stammdaten, Besetzung (Stimmenliste), Mitglieder, Druck (Regeln nach Seitenzahl) | `/system/ensembles/:id` | Ensembles: Bearbeiten; Mitglieder auch mit „Mitglieder sehen“ im Ensemble | S-2, N-4, N-8 |
 | Rollen | Liste mit Standardrollen | `/system/rollen` | Rollen: Sehen | S-3, R-5 |
 | Rolle | Rechte-Matrix, Einzelrechte, „Auf Standard zurücksetzen“ | `/system/rollen/:id` | Rollen: Bearbeiten | R-3, R-4, R-7, S-3 |
-| Konfiguration | Tabs: Verein & Anmeldung (Name, Logo, Banner, Impressum, Datenschutz) · Standardwerte (Ensemble, Rolle) · Drucken (Seitengrenze, VM-Web-Adresse für den Druckservice) · Eigene Felder (Name, Typ, Pflicht, Reihenfolge) | `/system/konfiguration` | Konfiguration; Tab Eigene Felder auch für Notenwart:innen | S-4, D-2, D-4, N-2 |
+| Konfiguration | Tabs: Verein & Anmeldung (Name, Logo, Banner) · Rechtliches (Impressum und Datenschutz: Modus, Link oder Vereinsdaten, Live-Vorschau, fehlende Pflichtfelder, neue Vorlagenversion übernehmen) · Standardwerte (Ensemble, Rolle) · Drucken (Seitengrenze, VM-Web-Adresse für den Druckservice) · Eigene Felder (Name, Typ, Pflicht, Reihenfolge) | `/system/konfiguration` | Konfiguration; Tab Eigene Felder auch für Notenwart:innen | S-4, S-7, D-2, D-4, N-2 |
 | Änderungsprotokoll | Rechte, Freigaben, Löschungen: wer, was, wann | `/system/protokoll` | Admin | S-6 (Soll) |
 
 Die Routen sind ein Vorschlag für das Angular-Routing; Seiten ohne Recht werden in der Navigation ausgeblendet. „Hochladen“ ist ein Dialog (N-11) ohne eigenen Pfad.
@@ -242,7 +253,7 @@ VM-Web bleibt selbst gehostet, ein Verein pro Installation, mit einer Oberfläch
 | Barrierefreiheit | Kontraste nach WCAG 2.2 AA, vollständig per Tastatur bedienbar, echte Buttons, Links und Labels. |
 | Sprache | Deutsch, Texte über i18n-Dateien, damit weitere Sprachen möglich sind. |
 | Betrieb | Ein Verein pro Installation; Auslieferung als Docker Compose mit Web, API und MySQL, PDFs auf einem Dateisystem-Volume hinter einer Speicher-Schnittstelle; TLS über den vorhandenen Reverse Proxy des Vereins; Konfiguration über Umgebungsvariablen. GitHub Actions prüft jeden Pull Request und veröffentlicht Images bei Releases in der GitHub Container Registry. Der Druckservice wird als Einzeldatei (Node SEA) mit Installationsskript für einen systemd-User-Service verteilt. |
-| Datenschutz | Personendaten nur aus dem Identity-Server, Löschen eines Kontos entfernt alle persönlichen Daten (Profilstimmen, persönliche Tags). |
+| Datenschutz | Impressum und Datenschutzerklärung erzeugt VM-Web auf Wunsch aus Vereinsdaten (S-7); die Texte sind Muster, keine Rechtsberatung. Personendaten nur aus dem Identity-Server, Löschen eines Kontos entfernt alle persönlichen Daten (Profilstimmen, persönliche Tags). |
 | Sicherung | Export von Datenbank und PDFs für Backups. |
 | Lizenz | GPLv3, wie bisher. |
 
@@ -257,13 +268,13 @@ Die erste Version enthält Mein Bereich, Notenverwaltung mit Prüfung und den Dr
 | Drucken | D-1 bis D-5, D-7, Druckservice für Linux | D-6, Druckservice für Windows |
 | Anmeldung | A-1 bis A-5 | A-6, Rollen aus dem Identity-Server (A-7) |
 | Rechte | R-1 bis R-7 | – |
-| Systemverwaltung | S-1 bis S-5 | Änderungsprotokoll (S-6) |
+| Systemverwaltung | S-1 bis S-5, S-7 | Änderungsprotokoll (S-6); Rechtstexte für Mitgliederverwaltung und E-Mail-Benachrichtigungen (Module vorbereitet) |
 | Oberfläche | Lightmode, responsiv | Darkmode |
 | Daten | Neustart; Stücke und Mappen per CSV-Import (N-19) | Import von Noten-PDFs aus Altdaten |
 
 ## Entscheidungen & Annahmen
 
-Alle neun offenen Punkte sind entschieden; offen bleibt nur die Feinabstimmung der Standardrollen.
+Alle offenen Punkte sind entschieden; offen bleibt nur die Feinabstimmung der Standardrollen.
 
 | Frage | Entscheidung | Eingearbeitet in |
 | --- | --- | --- |
@@ -276,6 +287,11 @@ Alle neun offenen Punkte sind entschieden; offen bleibt nur die Feinabstimmung d
 | Vorstand | Bleibt, pro Ensemble: Mitglieder sehen, Events verwalten | R-3, R-4, Standardrollen |
 | Ablehnung | Erst nur in VM-Web, E-Mail später | N-14 |
 | Altdaten | CSV-Import für Stücke und Mappen mit Spaltenzuordnung; Sammel-PDFs werden im Upload-Dialog aufgeteilt | N-18, N-19, MVP-Umfang |
+| Serverstandort außerhalb EU/EWR | Nicht zugelassen; die Vorlagen enthalten keine Angaben zur Drittlandübermittlung | S-7 |
+| Hoster ohne AV-Vertrag | Warnung in der Konfiguration, Veröffentlichung bleibt möglich | S-7 |
+| Verbraucherstreitbeilegung (§ 36 VSBG) | Kein Hinweis im Impressum; Vereine fallen in der Regel nicht darunter, die EU-OS-Plattform ist eingestellt | S-7 |
+| Speicherdauer Original-Uploads | Erst mit dem Wartungsjob in die Vorlage (Version 2) | S-7 |
+| Impressum/Datenschutz-Seiten | Deutsche Pfade `/impressum`, `/datenschutz`; `Cache-Control: no-cache` mit ETag; Druckservice-Abschnitt, sobald die VM-Web-Adresse gesetzt ist | S-7 |
 
 Zusätzlich geklärt: Alle Mitglieder dürfen den Druckservice nutzen (D-7), die Rechte-Matrix gehört ins MVP (R-7), Hochladen ist ein Dialog, Elemente ohne Ensemble gelten für alle mit dem Recht in mindestens einem Ensemble (R-4), und der Druckverlauf ersetzt die Druckwarteschlange.
 

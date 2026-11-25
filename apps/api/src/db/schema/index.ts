@@ -15,3 +15,4 @@ export * from './uploads';
 export * from './cache-entries';
 export * from './print-rules';
 export * from './seed-lock';
+export * from './legal';

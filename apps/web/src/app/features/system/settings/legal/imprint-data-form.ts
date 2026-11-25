@@ -1,0 +1,263 @@
+import { ChangeDetectionStrategy, Component, input, output } from '@angular/core';
+import { TranslocoPipe } from '@jsverse/transloco';
+import type { ImprintData } from '@vm-web/shared';
+
+import { ToggleField } from '../../../../shared/ui/toggle-field';
+import { LegalField } from './legal-field';
+import { LegalPersonList } from './legal-person-list';
+import { emptyPerson, type FieldChange } from './legal-model';
+
+/**
+ * Club data of the imprint (§ 5 DDG); also the controller of the privacy policy (S-7).
+ * For a department of a parent club: department with its contact, then the parent club as provider.
+ */
+@Component({
+  selector: 'vm-imprint-data-form',
+  imports: [TranslocoPipe, ToggleField, LegalField, LegalPersonList],
+  changeDetection: ChangeDetectionStrategy.OnPush,
+  host: { class: 'flex flex-col gap-4' },
+  template: `
+    @let d = data();
+    <vm-toggle-field
+      [label]="'system.settings.legal.isDepartment' | transloco"
+      [hint]="'system.settings.legal.hints.isDepartment' | transloco"
+      [checked]="!!d.department"
+      [disabled]="readonly()"
+      (toggled)="toggleDepartment($event)"
+    />
+    @if (d.department; as dep) {
+      <section class="flex flex-col gap-4 border-l-2 border-outline-variant pl-4" aria-labelledby="legal-department">
+        <h4 id="legal-department" class="text-title-small">{{ 'system.settings.legal.groups.department' | transloco }}</h4>
+        <vm-legal-field
+          path="imprint.department.name"
+          [required]="true"
+          hintKey="system.settings.legal.hints.departmentName"
+          [value]="dep.name"
+          [error]="err('department/name')"
+          [readonly]="readonly()"
+          (valueChange)="setValue('department.name', $event)"
+        />
+        <div class="grid gap-4 sm:grid-cols-2">
+          <vm-legal-field
+            path="imprint.email"
+            type="email"
+            [value]="dep.email"
+            [error]="err('department/email')"
+            [readonly]="readonly()"
+            (valueChange)="setValue('department.email', $event)"
+          />
+          <vm-legal-field
+            path="imprint.phone"
+            type="tel"
+            [maxlength]="40"
+            [value]="dep.phone"
+            [error]="err('department/phone')"
+            [readonly]="readonly()"
+            (valueChange)="setValue('department.phone', $event)"
+          />
+        </div>
+        <vm-legal-person-list
+          path="department.contacts"
+          legendKey="system.settings.legal.fields.imprint.department.contacts"
+          hintKey="system.settings.legal.hints.departmentContacts"
+          rolePlaceholderKey="system.settings.legal.hints.departmentRole"
+          [persons]="dep.contacts"
+          [errors]="errors()"
+          [readonly]="readonly()"
+          (fieldChange)="fieldChange.emit($event)"
+        />
+      </section>
+      <h4 class="text-title-small">{{ 'system.settings.legal.groups.parentClub' | transloco }}</h4>
+    }
+    <vm-legal-field
+      path="imprint.legalName"
+      [required]="true"
+      hintKey="system.settings.legal.hints.legalName"
+      autocomplete="organization"
+      [value]="d.legalName"
+      [error]="err('legalName')"
+      [readonly]="readonly()"
+      (valueChange)="setValue('legalName', $event)"
+    />
+    <vm-legal-field
+      path="imprint.address.street"
+      hintKey="system.settings.legal.hints.street"
+      autocomplete="street-address"
+      [value]="d.address.street"
+      [error]="err('address/street')"
+      [readonly]="readonly()"
+      (valueChange)="setValue('address.street', $event)"
+    />
+    <div class="grid gap-4 sm:grid-cols-[10rem_1fr]">
+      <vm-legal-field
+        path="imprint.address.postalCode"
+        [maxlength]="5"
+        autocomplete="postal-code"
+        [value]="d.address.postalCode"
+        [error]="err('address/postalCode')"
+        [readonly]="readonly()"
+        (valueChange)="setValue('address.postalCode', $event)"
+      />
+      <vm-legal-field
+        path="imprint.address.city"
+        [maxlength]="100"
+        autocomplete="address-level2"
+        [value]="d.address.city"
+        [error]="err('address/city')"
+        [readonly]="readonly()"
+        (valueChange)="setValue('address.city', $event)"
+      />
+    </div>
+    @if (!d.department) {
+      <div class="grid gap-4 sm:grid-cols-2">
+        <vm-legal-field
+          path="imprint.email"
+          type="email"
+          autocomplete="email"
+          [value]="d.email"
+          [error]="err('email')"
+          [readonly]="readonly()"
+          (valueChange)="setValue('email', $event)"
+        />
+        <vm-legal-field
+          path="imprint.phone"
+          type="tel"
+          [maxlength]="40"
+          autocomplete="tel"
+          [value]="d.phone"
+          [error]="err('phone')"
+          [readonly]="readonly()"
+          (valueChange)="setValue('phone', $event)"
+        />
+      </div>
+    }
+    <p class="text-body-medium text-muted-foreground">{{ (d.department ? 'system.settings.legal.hints.contactRuleDepartment' : 'system.settings.legal.hints.contactRule') | transloco }}</p>
+
+    <vm-legal-person-list
+      path="representatives"
+      legendKey="system.settings.legal.fields.imprint.representatives"
+      [hintKey]="d.department ? 'system.settings.legal.hints.parentRepresentatives' : 'system.settings.legal.hints.representatives'"
+      [required]="true"
+      [persons]="d.representatives"
+      [errors]="errors()"
+      [readonly]="readonly()"
+      (fieldChange)="fieldChange.emit($event)"
+    />
+
+
+    <vm-toggle-field
+      [label]="'system.settings.legal.isRegistered' | transloco"
+      [hint]="'system.settings.legal.hints.isRegistered' | transloco"
+      [checked]="d.isRegistered"
+      [disabled]="readonly()"
+      (toggled)="setValue('isRegistered', $event)"
+    />
+    @if (d.isRegistered) {
+      <div class="grid gap-4 sm:grid-cols-2">
+        <vm-legal-field
+          path="imprint.registerCourt"
+          [required]="true"
+          [maxlength]="100"
+          [placeholder]="'system.settings.legal.hints.registerCourt' | transloco"
+          [value]="d.registerCourt"
+          [error]="err('registerCourt')"
+          [readonly]="readonly()"
+          (valueChange)="setValue('registerCourt', $event)"
+        />
+        <vm-legal-field
+          path="imprint.registerNumber"
+          [required]="true"
+          [maxlength]="50"
+          [placeholder]="'system.settings.legal.hints.registerNumber' | transloco"
+          [value]="d.registerNumber"
+          [error]="err('registerNumber')"
+          [readonly]="readonly()"
+          (valueChange)="setValue('registerNumber', $event)"
+        />
+      </div>
+    }
+
+    <vm-legal-field
+      path="imprint.vatId"
+      [maxlength]="14"
+      hintKey="system.settings.legal.hints.vatId"
+      [value]="d.vatId"
+      [error]="err('vatId')"
+      [readonly]="readonly()"
+      (valueChange)="setValue('vatId', $event)"
+    />
+
+    <vm-toggle-field
+      [label]="'system.settings.legal.hasContentResponsible' | transloco"
+      [hint]="'system.settings.legal.hints.contentResponsible' | transloco"
+      [checked]="!!d.contentResponsible"
+      [disabled]="readonly()"
+      (toggled)="toggleResponsible($event)"
+    />
+    @if (d.contentResponsible; as c) {
+      <div class="flex flex-col gap-4 border-l-2 border-outline-variant pl-4">
+        <vm-legal-field
+          path="imprint.contentResponsible.name"
+          [required]="true"
+          [maxlength]="100"
+          [value]="c.name"
+          [error]="err('contentResponsible/name')"
+          [readonly]="readonly()"
+          (valueChange)="setValue('contentResponsible.name', $event)"
+        />
+        <vm-legal-field
+          path="imprint.contentResponsibleStreet"
+          [required]="true"
+          [value]="c.address.street"
+          [error]="err('contentResponsible/address/street')"
+          [readonly]="readonly()"
+          (valueChange)="setValue('contentResponsible.address.street', $event)"
+        />
+        <div class="grid gap-4 sm:grid-cols-[10rem_1fr]">
+          <vm-legal-field
+            path="imprint.address.postalCode"
+            [required]="true"
+            [maxlength]="5"
+            [value]="c.address.postalCode"
+            [error]="err('contentResponsible/address/postalCode')"
+            [readonly]="readonly()"
+            (valueChange)="setValue('contentResponsible.address.postalCode', $event)"
+          />
+          <vm-legal-field
+            path="imprint.address.city"
+            [required]="true"
+            [maxlength]="100"
+            [value]="c.address.city"
+            [error]="err('contentResponsible/address/city')"
+            [readonly]="readonly()"
+            (valueChange)="setValue('contentResponsible.address.city', $event)"
+          />
+        </div>
+      </div>
+    }
+  `,
+})
+export class ImprintDataForm {
+  readonly data = input.required<ImprintData>();
+  /** Field errors keyed by path below `imprintData/`. */
+  readonly errors = input<Record<string, string>>({});
+  readonly readonly = input(false);
+  /** Only the changed value, applied by the tab to its current state (several changes may come at once, e.g. autofill). */
+  readonly fieldChange = output<FieldChange>();
+
+  protected err(path: string): string | undefined {
+    return this.errors()[`imprintData/${path}`];
+  }
+
+  protected setValue(path: string, value: unknown): void {
+    this.fieldChange.emit({ path, value });
+  }
+
+  protected toggleDepartment(on: boolean): void {
+    this.setValue('department', on ? { name: '', email: '', phone: '', contacts: [emptyPerson()] } : null);
+  }
+
+  protected toggleResponsible(on: boolean): void {
+    this.setValue('contentResponsible', on ? { name: '', address: { street: '', postalCode: '', city: '' } } : null);
+  }
+}

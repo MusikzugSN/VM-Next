@@ -3,14 +3,12 @@ import { boolean, check, timestamp, int, mysqlTable, text, varchar } from 'drizz
 import { ensembles } from './ensembles';
 import { roles } from './roles';
 
-/** Club configuration, exactly one row with `id = 1` (S-4). */
+/** Club configuration, exactly one row with `id = 1` (S-4). Imprint and privacy policy: `legal_*` (S-7). */
 export const clubSettings = mysqlTable(
   'club_settings',
   {
     id: int('id').primaryKey().default(1),
     clubName: text('club_name').notNull(),
-    imprintUrl: text('imprint_url'),
-    privacyUrl: text('privacy_url'),
     loginBanner: text('login_banner'),
     loginAutoRedirect: boolean('login_auto_redirect').notNull().default(false),
     logoFileKey: text('logo_file_key'),

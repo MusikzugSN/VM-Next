@@ -9,12 +9,13 @@ import { idSchema, refSchema } from '../common/ids.schema';
 export const configWarningSchema = z.enum(['default-role-has-club-permissions']);
 export type ConfigWarning = z.infer<typeof configWarningSchema>;
 
-/** GET system/config – configuration page (S-4, D-2, D-4). OIDC settings are environment-only and not included. */
+/**
+ * GET system/config – configuration page (S-4, D-2, D-4). OIDC settings are environment-only and not included.
+ * Imprint and privacy policy: `system/legal/settings` (S-7).
+ */
 export const configResponseSchema = z.object({
   club: z.object({
     clubName: z.string(),
-    imprintUrl: z.url().nullable(),
-    privacyUrl: z.url().nullable(),
     loginAutoRedirect: z.boolean(),
     logoUrl: z.string().nullable(),
     loginBanner: z.string().nullable(),
@@ -42,8 +43,6 @@ export type ConfigDefaultOptionsResponse = z.infer<typeof configDefaultOptionsRe
 /** POST system/config/update-club → 204 (S-4, A-2). */
 export const updateClubBodySchema = z.object({
   clubName: z.string().trim().min(1).max(100),
-  imprintUrl: z.url().max(500).nullable(),
-  privacyUrl: z.url().max(500).nullable(),
   /** Plain text banner on the login page (F-12). */
   loginBanner: z.string().trim().max(2000).nullable(),
   loginAutoRedirect: z.boolean(),

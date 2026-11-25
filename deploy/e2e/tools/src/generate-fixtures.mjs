@@ -151,6 +151,8 @@ const expected = {
   uploads: { musicianFinal: { approved: 2, rejected: 1, pending: 0 } },
   downloads: { 'musiker-a': { folderZip, eventZip } },
   printing: { folderPrint, singlePrints },
+  // S-7: Eingaben und Endstand für E2E-1.6/1.7, unverändert aus spec.json
+  legal: spec.legal,
   warnings,
 };
 writeFileSync(join(dir, 'expected.json'), `${JSON.stringify(expected, null, 2)}\n`);

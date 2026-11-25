@@ -1,4 +1,5 @@
 import * as z from 'zod';
+import { legalLinkSchema } from '../legal/legal.schema';
 
 /** GET auth/login-page – public branding for the login page (A-2, S-4). */
 export const loginPageResponseSchema = z.object({
@@ -7,8 +8,9 @@ export const loginPageResponseSchema = z.object({
   logoUrl: z.string().nullable(),
   /** Banner text written by an admin (F-12); plain text, line breaks allowed. */
   loginBanner: z.string().nullable(),
-  imprintUrl: z.url().nullable(),
-  privacyUrl: z.url().nullable(),
+  /** Imprint and privacy policy: external URL (mode link) or `/impressum`, `/datenschutz` (S-7). */
+  imprint: legalLinkSchema,
+  privacy: legalLinkSchema,
   /** Redirect to the identity server immediately (A-2). */
   autoRedirect: z.boolean(),
 });

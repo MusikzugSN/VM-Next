@@ -355,22 +355,20 @@ describe.skipIf(!TEST_DATABASE_URL)('Systemverwaltung (TEST_DATABASE_URL)', () =
       expect((await api('sara', `ensembles/${ids.orchestra}/archive`, {})).body.code).toBe('in-use');
     });
 
-    it('stores club data, links and print settings', async () => {
+    it('stores club data and print settings', async () => {
       expect(
         (
           await api('sara', 'config/update-club', {
             clubName: 'Musikzug Beispielstadt',
-            imprintUrl: 'https://example.org/impressum',
-            privacyUrl: null,
             loginBanner: 'Willkommen!',
             loginAutoRedirect: true,
           })
         ).status,
       ).toBe(204);
       expect((await api('sara', 'config/update-print', { browserPrintPageLimit: 12, publicBaseUrl: 'https://noten.example.org' })).status).toBe(204);
-      expect((await api('sara', 'config/update-club', { clubName: '', imprintUrl: 'javascript:x', privacyUrl: null, loginBanner: null, loginAutoRedirect: false })).status).toBe(400);
+      expect((await api('sara', 'config/update-club', { clubName: '', loginBanner: null, loginAutoRedirect: false })).status).toBe(400);
       const config = (await api('sara', 'config')).body;
-      expect(config.club).toMatchObject({ clubName: 'Musikzug Beispielstadt', imprintUrl: 'https://example.org/impressum', loginBanner: 'Willkommen!', loginAutoRedirect: true });
+      expect(config.club).toMatchObject({ clubName: 'Musikzug Beispielstadt', loginBanner: 'Willkommen!', loginAutoRedirect: true });
       expect(config.print).toEqual({ browserPrintPageLimit: 12, publicBaseUrl: 'https://noten.example.org/' });
     });
 

@@ -9,6 +9,7 @@ import { AppConfigModule } from '../config/config.module';
 import { DatabaseModule } from '../db/database.module';
 import { DownloadsModule } from '../downloads/downloads.module';
 import { HealthController } from '../health/health.controller';
+import { LegalPagesModule } from '../legal/legal-pages.module';
 import { EventsModule } from '../events/events.module';
 import { FoldersModule } from '../folders/folders.module';
 import { MeModule } from '../me/me.module';
@@ -40,6 +41,7 @@ import { SystemModule } from '../system/system.module';
     UploadsModule,
     DownloadsModule,
     SystemModule,
+    LegalPagesModule,
   ],
   controllers: [HealthController],
   providers: [

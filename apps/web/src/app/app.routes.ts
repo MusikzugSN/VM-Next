@@ -20,6 +20,13 @@ export const appRoutes: Route[] = [
     ...page('auth.blocked.title'),
     loadComponent: () => import('./features/auth/blocked-page').then((m) => m.BlockedPage),
   },
+  // S-7: public, without session and without the app shell
+  ...(['imprint', 'privacy'] as const).map((document) => ({
+    path: childSegment(APP_ROUTES[document], '/'),
+    ...page(`legal.${document}`),
+    data: { ...page(`legal.${document}`).data, document },
+    loadComponent: () => import('./features/legal/legal-page').then((m) => m.LegalPage),
+  })),
   {
     path: '',
     loadComponent: () => import('./core/layout/app-shell').then((m) => m.AppShell),

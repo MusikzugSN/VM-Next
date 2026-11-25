@@ -61,6 +61,12 @@ Die Mappe „Konzertmappe“ enthält nach Phase 3 mindestens ein Stück mit üb
 
 **E2E-1.4 Standardwerte umstellen** (S-4, A-3) · *When* er Standard-Ensemble „Hauptorchester“ und Standardrolle „Musiker:in“ setzt sowie die VM-Web-Adresse `https://vm.test` für den Druckservice einträgt · *Then* `club_settings` enthält genau diese Werte. **Muss vor jeder weiteren Anmeldung abgeschlossen sein**; das Skript gibt Phase 2 erst danach frei.
 
+**E2E-1.5 Rechtliches vor der Einrichtung** (S-7) · *Then* Konfiguration und Startseite des Admins zeigen die Warnung, dass Impressum und Datenschutzerklärung fehlen; `https://vm.test/impressum` zeigt ohne Anmeldung einen neutralen Hinweis statt eines Textes · *Orakel* `GET /internal/v1/public/legal/imprint` → `{ "mode": "unavailable" }`.
+
+**E2E-1.6 Impressum erzeugen** (S-7) · *When* der Admin im Tab „Rechtliches“ beim Impressum „Aus Vereinsdaten erzeugen“ wählt, zuerst „Postfach 12 34“ als Straße einträgt und speichert · *Then* das Feld zeigt den Fehler „kein Postfach“, nichts ist gespeichert · *When* er die Vereinsdaten aus `expected.json` (`legal.imprint`) vollständig einträgt · *Then* die Vorschau neben dem Formular zeigt sie, die Liste fehlender Pflichtfelder ist leer, nach dem Speichern steht „Veröffentlicht“ · *Orakel* `legal_documents` (`imprint`: Modus `generated`, übernommene Vorlagenversion = mitgelieferte), `legal_data.imprint_data` gleich `expected.json`.
+
+**E2E-1.7 Datenschutzerklärung erzeugen** (S-7) · *When* er bei der Datenschutzerklärung „Aus Vereinsdaten erzeugen“ wählt und Hosting (externer Hoster ohne AV-Vertrag), Identity-Server (Verein selbst), Speicherdauern und Bundesland aus `expected.json` (`legal.privacy`) einträgt · *Then* unter der AV-Frage erscheint die Warnung, gespeichert und veröffentlicht wird trotzdem; der Abschnitt „Lokaler Druckservice“ ist in der Vorschau enthalten (VM-Web-Adresse aus E2E-1.4) · *Orakel* `GET /internal/v1/system/legal/settings` → `privacy.status = "published"`, `warnings = ["hosting-without-dpa"]`, `activeModules` enthält `print-service`.
+
 ## Phase 2 – Übergabe Notenwart:in ↔ Admin
 
 **E2E-2.1 Erste Anmeldung Notenwart:in** · *When* `notenwart` sich anmeldet · *Then* landet in Mein Bereich; Mitglied im Hauptorchester mit Rolle Musiker:in; kein Menüpunkt Notenverwaltung; `GET` auf eine Notenverwaltungs-API antwortet 403. Der Agent meldet sich über `state.json` beim Admin.
@@ -101,6 +107,8 @@ Die Mappe „Konzertmappe“ enthält nach Phase 3 mindestens ein Stück mit üb
 5. **B.5** (D-2) Ein Stück drucken · *Then* wie A.4.
 6. **B.6** (NFR Responsiv) Gesamte Phase im Mobil-Viewport · *Then* Karten statt Tabellen, Tippflächen ≥ 44 px, kein horizontales Scrollen.
 
+**E2E-4.D Rechtliches für Mitglieder** (S-7) · für A (Desktop) und B (Mobil) · *When* sie im Footer und im Benutzermenü „Impressum“ und „Datenschutz“ öffnen · *Then* beide Seiten zeigen Vereinsname und Logo ohne Navigation, den erzeugten Text mit „Stand“ und Vorlagenversion, kein horizontales Scrollen; dieselben Links stehen auf der Anmeldeseite und funktionieren ohne Anmeldung (Orakel ruft beide Seiten ohne Cookie ab) · *Orakel* Antwort `mode = "generated"`, HTML enthält den Vereinsnamen aus `expected.json`.
+
 **E2E-4.C Musiker C – Upload fehlender Stimmen**
 1. **C.1** (M-3, M-9) Stück ohne Klarinette 1 in B · *Then* „Stimme fehlt“ mit Upload-Möglichkeit.
 2. **C.2** (N-10, M-9) Passende PDF hochladen · *Then* Status `pending` („Ungeprüft“), für A und B nicht sichtbar.
@@ -129,7 +137,7 @@ Die Mappe „Konzertmappe“ enthält nach Phase 3 mindestens ein Stück mit üb
 
 **E2E-7.1** Keine 5xx-Antworten in den API-Logs, keine Fehler in den Browser-Konsolen aller fünf Kontexte.
 
-**E2E-7.2** Datenbank-Endstand entspricht `expected.json`: Benutzer, Mitgliedschaften und Rollen, Stückzahl, Mappen-Einträge, Blätter je Status, Event-Setlist.
+**E2E-7.2** Datenbank-Endstand entspricht `expected.json`: Benutzer, Mitgliedschaften und Rollen, Stückzahl, Mappen-Einträge, Blätter je Status, Event-Setlist, Rechtliches (`legal_documents`, `legal_data`).
 
 **E2E-7.3** Alle Downloads und alle Dateien in der CUPS-PDF-Ausgabe sind geprüft; es liegt keine unerwartete Datei vor.
 
@@ -140,3 +148,4 @@ Die Mappe „Konzertmappe“ enthält nach Phase 3 mindestens ein Stück mit üb
 - Abmelden beim Identity-Server (A-6, später). Deshalb hat jede Persona einen eigenen Browser-Kontext.
 - Konto sperren (A-5), Rollen-Matrix bearbeiten (S-3) und Vorstand-Rolle. Kandidaten für einen zweiten Lauf.
 - Benachrichtigungen und Offline-Nutzung (M-10).
+- Neue Vorlagenversion übernehmen (S-7): braucht ein Update zwischen zwei Images; abgedeckt durch die API-Tests (`legal.controller.spec.ts`).

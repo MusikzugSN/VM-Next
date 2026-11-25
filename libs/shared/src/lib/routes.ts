@@ -209,6 +209,19 @@ export const API_ROUTES = {
     updatePrint: post('config/update-print'),
     uploadLogo: multipart(post('config/upload-logo')),
     removeLogo: post('config/remove-logo'),
+    // imprint & privacy policy (S-7)
+    legalSettings: get('legal/settings'),
+    legalStatus: get('legal/status'),
+    updateLegalSettings: post('legal/update-settings'),
+    legalPreview: post('legal/preview'),
+    acceptLegalTemplate: post('legal/accept-template-version'),
+  },
+
+  /** Imprint and privacy policy (S-7): the only session-free endpoints outside the auth flow. */
+  publicLegal: {
+    base: 'public/legal',
+    imprint: pub(get('imprint')),
+    privacy: pub(get('privacy')),
   },
 } as const satisfies Record<string, { base: string } & Record<string, RouteDef | string>>;
 
