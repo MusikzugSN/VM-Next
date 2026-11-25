@@ -1,0 +1,4 @@
+<span vm-badge [tone]="style().tone">
+  <ng-icon [name]="style().icon" size="var(--mat-sys-icon-size-xs)" aria-hidden="true" />
+  {{ 'status.' + kind() | transloco: params() }}
+</span>

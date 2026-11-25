@@ -9,15 +9,7 @@ import { lucideClock } from '@ng-icons/lucide';
   imports: [TranslocoPipe, NgIcon],
   viewProviders: [provideIcons({ lucideClock })],
   changeDetection: ChangeDetectionStrategy.OnPush,
-  template: `
-    <h1 class="text-headline-small">{{ titleKey() | transloco }}</h1>
-    <div class="flex flex-col items-center gap-3 rounded-medium border border-dashed p-12 text-center">
-      <span class="flex size-10 items-center justify-center rounded-medium bg-brass-soft text-brass-ink">
-        <ng-icon name="lucideClock" aria-hidden="true" />
-      </span>
-      <p class="text-muted-foreground">{{ 'pages.comingSoon' | transloco: { stage: stage() } }}</p>
-    </div>
-  `,
+  templateUrl: './coming-soon-page.html',
 })
 export class ComingSoonPage {
   /** Route data (router input binding). */

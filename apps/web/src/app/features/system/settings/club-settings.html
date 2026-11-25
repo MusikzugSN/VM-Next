@@ -1,0 +1,69 @@
+<form #clubForm vm-card class="flex flex-col gap-4 p-4 md:p-6" novalidate (submit)="$event.preventDefault(); save()">
+  <h2 class="text-title-large">{{ 'system.settings.club.title' | transloco }}</h2>
+  <label vm-field>
+    <span vm-field-label>{{ 'system.settings.club.clubName' | transloco }} *</span>
+    <input
+      vm-input
+      type="text"
+      maxlength="100"
+      required
+      [readOnly]="readonly()"
+      [value]="form().clubName"
+      (input)="set('clubName', $any($event.target).value)"
+      [attr.aria-invalid]="!!errors().clubName"
+      [attr.aria-describedby]="errors().clubName ? 'err-clubName' : null"
+    />
+    @if (errors().clubName; as e) {
+      <span vm-field-error id="err-clubName">{{ e | transloco }}</span>
+    }
+  </label>
+  <label vm-field>
+    <span vm-field-label>{{ 'system.settings.club.loginBanner' | transloco }}</span>
+    <textarea vm-textarea rows="3" maxlength="2000" [readOnly]="readonly()" [value]="form().loginBanner" (input)="set('loginBanner', $any($event.target).value)"></textarea>
+    <span class="text-body-medium text-muted-foreground">{{ 'system.settings.club.loginBannerHint' | transloco }}</span>
+  </label>
+  <div class="flex items-center justify-between gap-4">
+    <div>
+      <span class="font-medium">{{ 'system.settings.club.autoRedirect' | transloco }}</span>
+      <p class="text-muted-foreground">{{ 'system.settings.club.autoRedirectHint' | transloco }}</p>
+    </div>
+    <vm-switch
+      [checked]="form().loginAutoRedirect"
+      [label]="'system.settings.club.autoRedirect' | transloco"
+      [disabled]="readonly()"
+      (toggled)="set('loginAutoRedirect', $event)"
+    />
+  </div>
+  @if (!readonly()) {
+    <button vm-button type="submit" class="self-end" [zLoading]="saving()" [zDisabled]="saving()">{{ 'common.save' | transloco }}</button>
+  }
+</form>
+
+<section aria-labelledby="h-logo" vm-card class="flex flex-col gap-4 p-4 md:p-6">
+  <div>
+    <h2 id="h-logo" class="text-title-large">{{ 'system.settings.club.logo' | transloco }}</h2>
+    <p class="text-muted-foreground">{{ 'system.settings.club.logoHint' | transloco }}</p>
+  </div>
+  <div class="flex flex-col gap-4 md:flex-row md:items-center">
+    <div class="flex size-24 items-center justify-center rounded-medium border bg-background">
+      @if (config().club.logoUrl; as url) {
+        <img [src]="url" [alt]="'system.settings.club.logoPreview' | transloco" class="max-h-20 max-w-20 object-contain" />
+      } @else {
+        <span class="text-headline-small text-muted-foreground" aria-hidden="true">{{ branding.initials() }}</span>
+      }
+    </div>
+    @if (!readonly()) {
+      <div class="flex flex-col gap-2 md:flex-row">
+        <input #file type="file" class="sr-only" tabindex="-1" aria-hidden="true" [accept]="accept" (change)="upload($any($event.target).files)" />
+        <button vm-button variant="outlined" type="button" [zLoading]="uploading()" [zDisabled]="uploading()" (click)="file.click()">
+          <ng-icon name="lucideImageUp" aria-hidden="true" />{{ 'system.settings.club.uploadLogo' | transloco }}
+        </button>
+        @if (config().club.logoUrl) {
+          <button vm-button variant="text" type="button" class="text-destructive-ink" (click)="removeLogo()">
+            <ng-icon name="lucideTrash2" aria-hidden="true" />{{ 'system.settings.club.removeLogo' | transloco }}
+          </button>
+        }
+      </div>
+    }
+  </div>
+</section>

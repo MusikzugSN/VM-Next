@@ -29,63 +29,7 @@ export { filterVoiceGroups };
   changeDetection: ChangeDetectionStrategy.OnPush,
   // The dialog renders in an overlay; its host must not take up space (or a gap) in the page.
   host: { style: 'display: contents' },
-  template: `
-    <vm-dialog [(zVisible)]="open" zWidth="560px">
-      <vm-dialog-header>
-        <h2 vm-dialog-title>{{ 'me.voices.title' | transloco }}</h2>
-        <p vm-dialog-description>{{ 'me.voices.text' | transloco }}</p>
-      </vm-dialog-header>
-
-      <div class="flex min-h-0 flex-1 flex-col gap-5 overflow-y-auto md:max-h-[60dvh] md:flex-none">
-        <label vm-field>
-          <span vm-field-label>{{ 'me.voices.search' | transloco }}</span>
-          <span class="relative">
-            <ng-icon name="lucideSearch" class="absolute top-1/2 left-3 -translate-y-1/2 text-muted-foreground" aria-hidden="true" />
-            <input
-              vm-input
-              type="search"
-              class="ps-9"
-              [placeholder]="'me.voices.searchPlaceholder' | transloco"
-              [value]="search()"
-              (input)="search.set($any($event.target).value)"
-            />
-          </span>
-        </label>
-
-        @for (group of groups(); track group.instrument.id) {
-          <div role="group" [attr.aria-labelledby]="'grp-' + group.instrument.id" class="flex flex-col gap-2">
-            <span [id]="'grp-' + group.instrument.id" class="text-label-medium text-muted-foreground">{{ group.instrument.name }}</span>
-            <div class="flex flex-wrap gap-2">
-              @for (voice of group.voices; track voice.id) {
-                <button
-                  type="button"
-                  [attr.aria-pressed]="selected().has(voice.id)"
-                  (click)="toggle(voice.id)"
-                  class="inline-flex h-control items-center gap-1.5 rounded-full border px-3 font-medium xl:h-control-compact"
-                  [class]="selected().has(voice.id) ? 'border-primary bg-primary-soft text-primary' : 'border-input bg-background'"
-                >
-                  @if (selected().has(voice.id)) {
-                    <ng-icon name="lucideCheck" aria-hidden="true" />
-                  }
-                  {{ voice.name }}
-                </button>
-              }
-            </div>
-          </div>
-        } @empty {
-          <p class="text-muted-foreground">{{ 'me.voices.noMatch' | transloco }}</p>
-        }
-      </div>
-
-      <vm-dialog-footer class="flex-col-reverse items-stretch gap-2 md:flex-row md:items-center">
-        <span class="text-muted-foreground md:me-auto" aria-live="polite">{{ 'me.voices.count' | tPlural: selected().size }}</span>
-        <button vm-button variant="tonal" type="button" (click)="later()">{{ 'me.voices.later' | transloco }}</button>
-        <button vm-button type="button" [zLoading]="saving()" [zDisabled]="selected().size === 0 || saving()" (click)="save()">
-          {{ 'common.save' | transloco }}
-        </button>
-      </vm-dialog-footer>
-    </vm-dialog>
-  `,
+  templateUrl: './voice-selection-dialog.html',
 })
 export class VoiceSelectionDialog {
   private readonly api = inject(ApiClient);

@@ -2,26 +2,26 @@
 <div role="status" class="flex items-start gap-2 rounded-small bg-warning-soft p-4 text-warning-ink">
   <ng-icon name="lucideTriangleAlert" class="mt-0.5 shrink-0" aria-hidden="true" />
   <span>
-    <strong class="font-semibold">{{ (issue.kind === 'offline' ? 'print.history.offline' : 'print.history.incompatible.' + issue.reason) | transloco }}</strong>
+    <strong class="font-semibold">{{ (issue.kind === 'offline' ? 'print.serviceGuide.offline' : 'print.serviceGuide.incompatible.' + issue.reason) | transloco }}</strong>
     @if (issue.kind === 'offline') {
-      {{ 'print.history.offlineText' | transloco }}
+      {{ 'print.serviceGuide.offlineText' | transloco }}
     }
   </span>
 </div>
-<h3 class="text-title-large">{{ 'print.history.installTitle' | transloco }}</h3>
+<h3 class="text-title-large">{{ 'print.serviceGuide.installTitle' | transloco }}</h3>
 <ol class="flex list-decimal flex-col gap-3 ps-5">
-  <li>{{ 'print.history.steps.install' | transloco }}</li>
+  <li>{{ 'print.serviceGuide.steps.install' | transloco }}</li>
   <li class="flex flex-col gap-2">
-    {{ 'print.history.steps.origin' | transloco }}
+    {{ 'print.serviceGuide.steps.origin' | transloco }}
     <span class="flex flex-wrap items-center gap-2">
       <code class="rounded-small bg-muted px-3 py-2 font-mono text-body-medium">{{ origin }}</code>
       <button vm-button variant="text" type="button" (click)="copyOrigin()">
-        <ng-icon name="lucideCopy" aria-hidden="true" />{{ 'print.history.copy' | transloco }}
+        <ng-icon name="lucideCopy" aria-hidden="true" />{{ 'print.serviceGuide.copy' | transloco }}
       </button>
     </span>
   </li>
-  <li>{{ 'print.history.steps.start' | transloco }}</li>
+  <li>{{ 'print.serviceGuide.steps.start' | transloco }}</li>
 </ol>
 <button vm-button variant="outlined" type="button" class="self-start" (click)="recheck.emit()">
-  <ng-icon name="lucideRepeat" aria-hidden="true" />{{ 'print.history.recheck' | transloco }}
+  <ng-icon name="lucideRepeat" aria-hidden="true" />{{ 'print.serviceGuide.recheck' | transloco }}
 </button>

@@ -7,23 +7,7 @@ import { BrandingStore } from './branding.store';
   selector: 'vm-club-logo',
   changeDetection: ChangeDetectionStrategy.OnPush,
   host: { class: 'inline-flex shrink-0' },
-  template: `
-    @if (branding.logoUrl(); as logo) {
-      <img [src]="logo" [alt]="label() ?? ''" [style.width.px]="size()" [style.height.px]="size()" class="object-contain" />
-    } @else {
-      <span
-        [attr.role]="label() ? 'img' : null"
-        [attr.aria-label]="label()"
-        [attr.aria-hidden]="label() ? null : 'true'"
-        [style.width.px]="size()"
-        [style.height.px]="size()"
-        [style.font-size.px]="fontSize()"
-        [style.border-radius.px]="radius()"
-        class="flex items-center justify-center bg-brass font-semibold text-foreground"
-        >{{ branding.initials() }}</span
-      >
-    }
-  `,
+  templateUrl: './club-logo.html',
 })
 export class ClubLogo {
   protected readonly branding = inject(BrandingStore);

@@ -21,67 +21,7 @@ import { ListState } from '../../shared/ui/list-state';
   imports: [VmTable, VmCard, PluralPipe, RouterLink, NgIcon, TranslocoPipe, VmIconButton, ListState],
   viewProviders: [provideIcons({ lucideChevronRight, lucideFileArchive })],
   changeDetection: ChangeDetectionStrategy.OnPush,
-  template: `
-    <div>
-      <h1 class="text-headline-small">{{ 'nav.me.folders' | transloco }}</h1>
-      @if (voiceNames()) {
-        <p class="mt-2 text-muted-foreground">{{ 'me.folders.intro' | transloco: { voices: voiceNames() } }}</p>
-      }
-    </div>
-
-    @if (viewport.isMobile()) {
-      <ul class="flex flex-col gap-2">
-        @for (folder of list.items(); track folder.id) {
-          <li>
-            <a [routerLink]="link(folder)" vm-card class="flex items-center gap-3 p-4 text-foreground no-underline">
-              <span class="flex min-w-0 flex-1 flex-col gap-1">
-                <span class="text-title-medium font-medium">{{ folder.name }}</span>
-                <span class="text-muted-foreground">
-                  {{ 'me.common.scoreCount' | tPlural: folder.scoreCount }} · {{ folder.ensemble.name }}
-                </span>
-              </span>
-              <ng-icon name="lucideChevronRight" size="var(--mat-sys-icon-size-md)" class="shrink-0 text-muted-foreground" aria-hidden="true" />
-            </a>
-          </li>
-        }
-      </ul>
-    } @else if (list.items().length > 0) {
-      <div vm-card class="overflow-x-auto">
-        <table vm-table>
-          <thead>
-            <tr>
-              <th scope="col" class="px-4 py-3 text-start">{{ 'terms.folder' | transloco }}</th>
-              <th scope="col" class="px-4 py-3 text-start">{{ 'terms.ensemble' | transloco }}</th>
-              <th scope="col" class="w-24 px-4 py-3 text-end">{{ 'me.common.scores' | transloco }}</th>
-              <th scope="col" class="w-28 px-4 py-3 text-end">{{ 'me.list.actions' | transloco }}</th>
-            </tr>
-          </thead>
-          <tbody>
-            @for (folder of list.items(); track folder.id) {
-              <tr>
-                <td class="px-4 py-3"><a [routerLink]="link(folder)" class="font-medium">{{ folder.name }}</a></td>
-                <td class="px-4 py-3 text-muted-foreground">{{ folder.ensemble.name }}</td>
-                <td class="px-4 py-3 text-end tabular-nums">{{ folder.scoreCount }}</td>
-                <td class="px-4 py-3 text-end">
-                  <a
-                    vm-icon-button
-                   
-                    [href]="zip(folder)"
-                    download
-                    [attr.aria-label]="'me.folders.zipLabel' | transloco: { name: folder.name }"
-                  >
-                    <ng-icon name="lucideFileArchive" aria-hidden="true" />
-                  </a>
-                </td>
-              </tr>
-            }
-          </tbody>
-        </table>
-      </div>
-    }
-
-    <vm-list-state [list]="list" emptyKey="me.folders.empty" />
-  `,
+  templateUrl: './folders-page.html',
 })
 export class FoldersPage {
   private readonly api = inject(ApiClient);

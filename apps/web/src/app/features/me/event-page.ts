@@ -27,46 +27,7 @@ import { selectOr } from '../../core/util/resource-value';
   imports: [PluralPipe, DatePipe, RouterLink, NgIcon, TranslocoPipe, VmButton, ListState, MemberScoreList, PageProblem],
   viewProviders: [provideIcons({ lucideChevronLeft, lucideFileArchive, lucidePrinter })],
   changeDetection: ChangeDetectionStrategy.OnPush,
-  template: `
-    <a [routerLink]="eventsPath" class="inline-flex min-h-target items-center gap-1 self-start font-medium no-underline md:hidden">
-      <ng-icon name="lucideChevronLeft" aria-hidden="true" />{{ 'nav.me.events' | transloco }}
-    </a>
-
-    @if (overview.error()) {
-      <vm-page-problem [error]="overview.error()" />
-    } @else if (overview.hasValue()) {
-      @let event = overview.value();
-      <div class="flex flex-col gap-3 md:flex-row md:items-start md:justify-between md:gap-4">
-        <div>
-          <h1 class="text-title-large leading-7 md:text-headline-small md:leading-8">{{ event.name }} · {{ event.date | date: 'EE dd.MM.yyyy' }}</h1>
-          <p class="mt-2 text-muted-foreground">
-            {{ event.ensemble.name }} · {{ 'me.event.setlistCount' | tPlural: event.scoreCount }} ·
-            {{ 'me.list.pages' | tPlural: event.totalPages }}
-          </p>
-        </div>
-        <div class="flex flex-col gap-2 md:flex-row-reverse">
-          <a vm-button [href]="zip()" download class="w-full md:w-auto">
-            <ng-icon name="lucideFileArchive" aria-hidden="true" />{{ 'me.common.zip' | transloco }}
-          </a>
-          <button vm-button variant="outlined" type="button" class="w-full md:w-auto" (click)="print()">
-            <ng-icon name="lucidePrinter" aria-hidden="true" />{{ 'common.print' | transloco }}
-          </button>
-        </div>
-      </div>
-      @if (event.missingCount > 0) {
-        <p class="text-destructive-ink">{{ 'me.common.missingHint' | tPlural: event.missingCount }}</p>
-      }
-    }
-
-    <section aria-labelledby="h-setlist" class="flex flex-col gap-4">
-      <div class="flex items-baseline justify-between gap-2">
-        <h2 id="h-setlist" class="text-title-large">{{ 'me.event.setlist' | transloco }}</h2>
-        <span class="text-muted-foreground">{{ 'me.event.order' | transloco }}</span>
-      </div>
-      <vm-member-score-list [rows]="list.items()" numbering="position" [eventId]="eventId()" [listTitle]="overview.hasValue() ? overview.value().name : ''" />
-      <vm-list-state [list]="list" emptyKey="me.event.empty" />
-    </section>
-  `,
+  templateUrl: './event-page.html',
 })
 export class EventPage {
   /** Breadcrumb and document title show the loaded element's name. */

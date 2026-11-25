@@ -1,0 +1,52 @@
+@if (value(); as chosen) {
+  <div class="flex min-h-target items-center gap-2 rounded-small border border-input px-3 xl:min-h-9">
+    <span class="flex-1 truncate font-medium">{{ chosen.title }}</span>
+    <button type="button" class="font-medium text-primary underline-offset-4 hover:underline" (click)="changed.emit(null)">
+      {{ 'upload.change' | transloco }}
+    </button>
+  </div>
+} @else {
+  <span class="relative">
+    <ng-icon name="lucideSearch" class="absolute top-1/2 left-3 -translate-y-1/2 text-muted-foreground" aria-hidden="true" />
+    <input
+      vm-input
+      type="search"
+      class="ps-9"
+      [id]="controlId()"
+      [placeholder]="'upload.searchScore' | transloco"
+      [value]="search()"
+      (input)="search.set($any($event.target).value)"
+      [attr.aria-describedby]="controlId() ? controlId() + '-hits' : null"
+    />
+  </span>
+  @if (query().trim()) {
+    <ul [id]="controlId() + '-hits'" class="flex flex-col rounded-small border" [attr.aria-label]="'upload.results' | transloco">
+      @if (hits.hasValue()) {
+        @for (score of hits.value().items; track score.id; let first = $first) {
+          <li [class.border-t]="!first">
+            <button type="button" class="flex min-h-target w-full flex-col items-start px-3 py-1.5 text-start hover:bg-accent xl:min-h-9" (click)="choose(score)">
+              <span class="font-medium">{{ score.title }}</span>
+              @if (score.composer || score.arranger) {
+                <span class="text-body-small text-muted-foreground">{{ score.composer ?? score.arranger }}</span>
+              }
+            </button>
+          </li>
+        } @empty {
+          <li class="px-3 py-2 text-muted-foreground">{{ 'upload.noScore' | transloco }}</li>
+        }
+      }
+      @if (allowCreate()) {
+        <li class="border-t">
+          <button
+            type="button"
+            class="flex min-h-target w-full items-center gap-2 px-3 py-1.5 text-start font-medium text-primary hover:bg-accent xl:min-h-9"
+            [disabled]="creating()"
+            (click)="create()"
+          >
+            <ng-icon name="lucidePlus" aria-hidden="true" />{{ 'upload.createScore' | transloco: { title: query().trim() } }}
+          </button>
+        </li>
+      }
+    </ul>
+  }
+}

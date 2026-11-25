@@ -1,0 +1,14 @@
+<footer class="flex min-h-14 flex-wrap items-center justify-center gap-2 text-body-medium text-muted-foreground">
+  @if (branding.branding(); as b) {
+    @for (doc of docs; track doc) {
+      @let link = b[doc];
+      @if (link.kind === 'external') {
+        <a [href]="link.href" class="inline-flex min-h-target items-center px-1">{{ 'legal.' + doc | transloco }}</a>
+      } @else {
+        <a [routerLink]="link.href" class="inline-flex min-h-target items-center px-1">{{ 'legal.' + doc | transloco }}</a>
+      }
+      <span aria-hidden="true">·</span>
+    }
+  }
+  <a [routerLink]="dependenciesPath" class="inline-flex min-h-target items-center px-1">{{ 'legal.dependencies' | transloco }}</a>
+</footer>

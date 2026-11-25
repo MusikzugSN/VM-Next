@@ -1,0 +1,15 @@
+<label class="flex flex-col gap-1.5">
+  <span [class.sr-only]="hideLabel()" class="font-medium">{{ labelKey() | transloco }}</span>
+  <span class="relative">
+    <ng-icon name="lucideSearch" class="absolute top-1/2 left-3 -translate-y-1/2 text-muted-foreground" aria-hidden="true" />
+    <input
+      vm-input
+      type="search"
+      class="ps-9"
+      [attr.cdkFocusInitial]="focusInDialog() ? '' : null"
+      [placeholder]="(placeholderKey() ?? labelKey()) | transloco"
+      [value]="value()"
+      (input)="value.set($any($event.target).value)"
+    />
+  </span>
+</label>

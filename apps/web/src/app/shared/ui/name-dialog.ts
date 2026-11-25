@@ -18,22 +18,7 @@ export const NAME_MAX = 100;
   changeDetection: ChangeDetectionStrategy.OnPush,
   // The dialog renders in an overlay; its host must not take up space (or a gap) in the page.
   host: { style: 'display: contents' },
-  template: `
-    <vm-form-dialog
-      [(open)]="open"
-      [titleKey]="titleKey()"
-      [titleParams]="titleParams()"
-      [submitKey]="submitKey()"
-      [canSubmit]="!!name().trim() && name().trim() !== initial()"
-      [busy]="busy()"
-      (submitted)="submit()"
-    >
-      <label vm-field>
-        <span vm-field-label>{{ labelKey() | transloco }}</span>
-        <input vm-input cdkFocusInitial type="text" required [maxLength]="max" [value]="name()" (input)="name.set($any($event.target).value)" />
-      </label>
-    </vm-form-dialog>
-  `,
+  templateUrl: './name-dialog.html',
 })
 export class NameDialog {
   readonly open = model(false);

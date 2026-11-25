@@ -1,0 +1,67 @@
+@if (user(); as user) {
+  @if (variant() === 'sidebar') {
+    <button
+      type="button"
+      vm-menu-trigger
+      [zDropdownMenu]="menu"
+      [attr.aria-label]="'shell.userMenu' | transloco: { name: user.name }"
+      class="flex w-full items-center gap-2 rounded-small p-2 text-start hover:bg-on-surface/8"
+    >
+      <ng-container [ngTemplateOutlet]="avatar" />
+      <span class="flex min-w-0 flex-col">
+        <span class="truncate font-medium">{{ user.name }}</span>
+        @if (roleLine()) {
+          <span class="truncate text-body-small text-muted-foreground">{{ roleLine() }}</span>
+        }
+      </span>
+    </button>
+  } @else {
+    <button
+      type="button"
+      vm-menu-trigger
+      [zDropdownMenu]="menu"
+      [attr.aria-label]="'shell.userMenu' | transloco: { name: user.name }"
+      class="flex size-control items-center justify-center rounded-full"
+    >
+      <ng-container [ngTemplateOutlet]="avatar" />
+    </button>
+  }
+
+  <ng-template #avatar>
+    @if (user.pictureUrl) {
+      <img [src]="user.pictureUrl" alt="" class="size-8 shrink-0 rounded-full object-cover" />
+    } @else {
+      <span
+        aria-hidden="true"
+        class="flex size-8 shrink-0 items-center justify-center rounded-full bg-primary-soft text-label-medium text-primary font-semibold"
+        >{{ userInitials() }}</span
+      >
+    }
+  </ng-template>
+
+  <vm-menu-content #menu="zDropdownMenuContent" [zSide]="variant() === 'sidebar' ? 'top' : 'bottom'" zAlign="end" class="w-56">
+    <vm-menu-label>
+      <span class="block truncate">{{ user.name }}</span>
+      @if (user.email) {
+        <span class="block truncate text-body-small text-muted-foreground">{{ user.email }}</span>
+      }
+    </vm-menu-label>
+    <vm-menu-separator />
+    <a vm-menu-item [routerLink]="profilePath"><ng-icon name="lucideUser" aria-hidden="true" />{{ 'nav.me.profile' | transloco }}</a>
+    @if (branding.branding(); as b) {
+      <vm-menu-separator />
+      @for (doc of legalDocs; track doc.key) {
+        @let link = b[doc.key];
+        @if (link.kind === 'external') {
+          <a vm-menu-item [href]="link.href"><ng-icon [name]="doc.icon" aria-hidden="true" />{{ 'legal.' + doc.key | transloco }}</a>
+        } @else {
+          <a vm-menu-item [routerLink]="link.href"><ng-icon [name]="doc.icon" aria-hidden="true" />{{ 'legal.' + doc.key | transloco }}</a>
+        }
+      }
+      <vm-menu-separator />
+    }
+    <button type="button" vm-menu-item (click)="logout()">
+      <ng-icon name="lucideLogOut" aria-hidden="true" />{{ 'common.logout' | transloco }}
+    </button>
+  </vm-menu-content>
+}

@@ -1,0 +1,14 @@
+<vm-form-dialog
+  [(open)]="open"
+  [titleKey]="titleKey()"
+  [titleParams]="titleParams()"
+  [submitKey]="submitKey()"
+  [canSubmit]="!!name().trim() && name().trim() !== initial()"
+  [busy]="busy()"
+  (submitted)="submit()"
+>
+  <label vm-field>
+    <span vm-field-label>{{ labelKey() | transloco }}</span>
+    <input vm-input cdkFocusInitial type="text" required [maxLength]="max" [value]="name()" (input)="name.set($any($event.target).value)" />
+  </label>
+</vm-form-dialog>
