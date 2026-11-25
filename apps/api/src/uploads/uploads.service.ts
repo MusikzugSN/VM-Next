@@ -8,7 +8,6 @@ import {
   type ValidationError,
   type VoiceSuggestionsResponse,
 } from '@vm-web/shared';
-import { and, asc, eq, inArray, like, or, sql } from 'drizzle-orm';
 import { readFile, rm } from 'node:fs/promises';
 import type { AccessContext } from '../access/access-context';
 import { uploadTempPath } from '../common/files/upload-temp';
@@ -16,17 +15,11 @@ import { uuidv7 } from '../common/ids/uuid-v7';
 import { decodeCursor, toPage } from '../common/pagination/cursor';
 import { ProblemException } from '../common/problem-details/problem.exception';
 import { toJsonPointer } from '../common/validation/zod-validation.pipe';
-import { DATABASE, type Database } from '../db/database';
-import { isUniqueViolation } from '../db/db-errors';
-import { instruments, scores, sheets, uploads, voices } from '../db/schema';
-import { likePattern } from '../common/sql';
-import { MeRepository } from '../me/me.repository';
 import { FILE_STORAGE, type IFileStorage } from '../storage/file-storage';
 import { InvalidPdfError, inspectPdf } from './pdf-tools';
+import { UploadsRepository, type ScoreVisibility } from './uploads.repository';
 import { suggestVoice } from './voice-suggestion';
-import { afterNameAndId } from '../common/pagination/keyset';
 
-/** What the upload interceptor hands over per file (multer disk storage). */
 export interface UploadedFileInfo {
   originalname: string;
   path: string;
@@ -36,22 +29,15 @@ export interface UploadedFileInfo {
 export const uploadKey = (id: string) => `uploads/${id}.pdf`;
 export const sheetKey = (id: string) => `sheets/${id}.pdf`;
 
-/** Upload dialog (N-10, N-11, M-9, F-2, F-11). */
 @Injectable()
 export class UploadsService {
   constructor(
-    @Inject(DATABASE) private readonly db: Database,
-    @Inject(MeRepository) private readonly me: MeRepository,
+    @Inject(UploadsRepository) private readonly repo: UploadsRepository,
     @Inject(FILE_STORAGE) private readonly storage: IFileStorage,
   ) {}
 
-  /** Voice proposed per file name; ties go to the earlier voice in list order (N-11). */
   async voiceSuggestions(fileNames: readonly string[]): Promise<VoiceSuggestionsResponse> {
-    const candidates = await this.db
-      .select({ id: voices.id, name: voices.name, instrumentId: voices.instrumentId })
-      .from(voices)
-      .innerJoin(instruments, eq(instruments.id, voices.instrumentId))
-      .orderBy(asc(instruments.position), asc(voices.position));
+    const candidates = await this.repo.voiceCandidates();
     return {
       items: fileNames.map((fileName) => {
         const match = suggestVoice(fileName, candidates);
@@ -60,33 +46,14 @@ export class UploadsService {
     };
   }
 
-  /** All scores with `score.view`/`sheet.approve`, otherwise those visible in Mein Bereich (R-2). */
   async scoreSearch(access: AccessContext, query: ScoreSearchQuery): Promise<Page<ScoreSearchItem>> {
-    const visible = this.visibleScoresSql(access);
-    if (visible === null) return { items: [], nextCursor: null };
-    const cursor = decodeCursor(query.cursor, 2);
-    const pattern = likePattern(query.q);
-    const rows = await this.db
-      .select({
-        id: scores.id,
-        title: scores.title,
-        composer: scores.composer,
-        arranger: scores.arranger,
-        sortKey: sql<string>`lower(${scores.title})`,
-      })
-      .from(scores)
-      .where(and(or(like(scores.title, pattern), like(scores.composer, pattern), like(scores.arranger, pattern)), visible, afterNameAndId(scores.title, scores.id, cursor)))
-      .orderBy(sql`lower(${scores.title})`, asc(scores.id))
-      .limit(query.limit + 1);
+    const visibility = scoreVisibility(access);
+    if (visibility === null) return { items: [], nextCursor: null };
+    const rows = await this.repo.searchScores(visibility, query.q, decodeCursor(query.cursor, 2), query.limit + 1);
     return toPage(rows, query.limit, (r) => [r.sortKey, r.id], (r) => ({ id: r.id, title: r.title, composer: r.composer, arranger: r.arranger }));
   }
 
-  /**
-   * Stores the PDFs. With `sheet.approve`, score and voice set and no sheet yet for that pair,
-   * an upload is approved at once (N-10, F-11); everything else waits in the review queue.
-   */
   async upload(access: AccessContext, filesRaw: readonly UploadedFileInfo[], metaRaw: unknown): Promise<UploadSheetsResponse> {
-    // multer always hands over an array; checked anyway so `length`/`map` never act on another type
     const files: readonly UploadedFileInfo[] = Array.isArray(filesRaw) ? filesRaw : [];
     try {
       const meta = this.parseMeta(metaRaw, files.length);
@@ -117,65 +84,26 @@ export class UploadsService {
     try {
       await this.storage.write(uploadKey(uploadId), bytes);
       written.push(uploadKey(uploadId));
-      const autoApprove = canApprove && !!item.scoreId && !!item.voiceId;
-      const sheetId = autoApprove ? uuidv7() : null;
-      if (sheetId) {
-        await this.storage.write(sheetKey(sheetId), bytes);
-        written.push(sheetKey(sheetId));
+      const upload = {
+        id: uploadId,
+        uploadedBy: userId,
+        fileName: item.fileName,
+        fileKey: uploadKey(uploadId),
+        pageCount,
+        sizeBytes: bytes.length,
+        scoreId: item.scoreId,
+        voiceId: item.voiceId,
+      };
+      if (!canApprove || !item.scoreId || !item.voiceId) {
+        await this.repo.insertPending(upload);
+        return { uploadId, fileName: item.fileName, status: 'pending', sheetId: null, pageCount };
       }
-
-      const approved = await this.db.transaction(async (tx) => {
-        const now = new Date();
-        await tx.insert(uploads).values({
-          id: uploadId,
-          uploadedBy: userId,
-          fileName: item.fileName,
-          fileKey: uploadKey(uploadId),
-          pageCount,
-          sizeBytes: bytes.length,
-          scoreId: item.scoreId,
-          voiceId: item.voiceId,
-          createdAt: now,
-        });
-        if (!sheetId || !item.scoreId || !item.voiceId) return false;
-        const [existing] = await tx
-          .select({ id: sheets.id })
-          .from(sheets)
-          .where(and(eq(sheets.scoreId, item.scoreId), eq(sheets.voiceId, item.voiceId)));
-        if (existing) return false; // one document per score and voice: replacing is decided in the review
-        await tx.insert(sheets).values({
-          id: sheetId,
-          scoreId: item.scoreId,
-          voiceId: item.voiceId,
-          fileKey: sheetKey(sheetId),
-          pageCount,
-          sizeBytes: bytes.length,
-          uploadId,
-          approvedBy: userId,
-          approvedAt: now,
-        });
-        await tx.update(uploads).set({ status: 'approved', decidedBy: userId, decidedAt: now }).where(eq(uploads.id, uploadId));
-        return true;
-      }).catch((error: unknown) => {
-        if (isUniqueViolation(error)) return 'retry-pending' as const;
-        throw error;
-      });
-
-      if (approved === 'retry-pending') {
-        // a sheet appeared concurrently: keep the upload pending without the auto-approval
-        await this.db.insert(uploads).values({
-          id: uploadId,
-          uploadedBy: userId,
-          fileName: item.fileName,
-          fileKey: uploadKey(uploadId),
-          pageCount,
-          sizeBytes: bytes.length,
-          scoreId: item.scoreId,
-          voiceId: item.voiceId,
-        });
-      }
-      if (sheetId && approved !== true) await this.storage.delete(sheetKey(sheetId));
-      return { uploadId, fileName: item.fileName, status: approved === true ? 'approved' : 'pending', sheetId: approved === true ? sheetId : null, pageCount };
+      const sheetId = uuidv7();
+      await this.storage.write(sheetKey(sheetId), bytes);
+      written.push(sheetKey(sheetId));
+      const approved = await this.repo.insertAutoApproved(upload, { id: sheetId, scoreId: item.scoreId, voiceId: item.voiceId, fileKey: sheetKey(sheetId) });
+      if (!approved) await this.storage.delete(sheetKey(sheetId));
+      return { uploadId, fileName: item.fileName, status: approved ? 'approved' : 'pending', sheetId: approved ? sheetId : null, pageCount };
     } catch (error) {
       await Promise.all(written.map((key) => this.storage.delete(key).catch(() => undefined)));
       throw error;
@@ -204,22 +132,17 @@ export class UploadsService {
     return result.data;
   }
 
-  /** Scores must be visible to the uploader, voices must exist (404 otherwise). */
   private async checkTargets(access: AccessContext, items: readonly { scoreId: string | null; voiceId: string | null }[]): Promise<void> {
     const scoreIds = [...new Set(items.map((i) => i.scoreId).filter((id): id is string => !!id))];
     const voiceIds = [...new Set(items.map((i) => i.voiceId).filter((id): id is string => !!id))];
     if (scoreIds.length) {
-      const visible = this.visibleScoresSql(access);
-      const found = visible === null ? [] : await this.db.select({ id: scores.id }).from(scores).where(and(inArray(scores.id, scoreIds), visible));
-      if (found.length !== scoreIds.length) throw ProblemException.notFound('Unknown score');
+      const visibility = scoreVisibility(access);
+      const found = visibility === null ? 0 : await this.repo.countVisibleScores(visibility, scoreIds);
+      if (found !== scoreIds.length) throw ProblemException.notFound('Unknown score');
     }
-    if (voiceIds.length) {
-      const found = await this.db.select({ id: voices.id }).from(voices).where(inArray(voices.id, voiceIds));
-      if (found.length !== voiceIds.length) throw ProblemException.notFound('Unknown voice');
-    }
+    if (voiceIds.length && (await this.repo.countVoices(voiceIds)) !== voiceIds.length) throw ProblemException.notFound('Unknown voice');
   }
 
-  /** Reads and checks every file before anything is stored; all problems in one 415. */
   private async readPdfs(files: readonly UploadedFileInfo[]): Promise<{ bytes: Buffer; pageCount: number }[]> {
     const errors: ValidationError[] = [];
     const result: { bytes: Buffer; pageCount: number }[] = [];
@@ -235,12 +158,10 @@ export class UploadsService {
     if (errors.length) throw new ProblemException(415, 'unsupported-media-type', 'Only readable, unencrypted PDFs', errors);
     return result;
   }
+}
 
-  /** `null` = nothing visible. */
-  private visibleScoresSql(access: AccessContext) {
-    if (access.has('score.view') || access.has('sheet.approve')) return sql`true`;
-    const ids = access.memberEnsembleIds();
-    if (!ids.length) return null;
-    return sql`${scores.id} in ${this.me.visibleScoreIdsSql(ids)}`;
-  }
+function scoreVisibility(access: AccessContext): ScoreVisibility | null {
+  if (access.has('score.view') || access.has('sheet.approve')) return 'all';
+  const ids = access.memberEnsembleIds();
+  return ids.length ? ids : null;
 }

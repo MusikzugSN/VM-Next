@@ -9,6 +9,7 @@ import { USERS_REPOSITORY } from '../auth/users.repository';
 import { LegalService } from '../legal/legal.service';
 import { FILE_STORAGE } from '../storage/file-storage';
 import { FsFileStorage } from '../storage/fs-file-storage';
+import { ConfigRepository } from '../system/config.repository';
 import { ConfigService } from '../system/config.service';
 import { SystemConfigController } from '../system/system.controller';
 import { logoMulterOptions } from '../system/system.module';
@@ -55,7 +56,7 @@ describe.skipIf(!TEST_DATABASE_URL)('Vereinseinstellungen (TEST_DATABASE_URL)', 
       {
         imports: [MulterModule.registerAsync({ useFactory: logoMulterOptions })],
         controllers: [AuthController, SystemConfigController],
-        providers: [ClubSettingsRepository, AuthService, ConfigService],
+        providers: [ClubSettingsRepository, AuthService, ConfigRepository, ConfigService],
       },
       {
         database: testDb.db,

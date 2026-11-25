@@ -25,6 +25,7 @@ import { addDays, LibraryBuilder } from '../testing/library-builder';
 import { createTestApp, type TestApp } from '../testing/test-app';
 import { createTestDatabase, TEST_DATABASE_URL, type TestDatabase } from '../testing/test-database';
 import { VoicesController } from '../voices/voices.controller';
+import { VoicesRepository } from '../voices/voices.repository';
 import { VoicesService } from '../voices/voices.service';
 
 /**
@@ -88,7 +89,7 @@ describe.skipIf(!TEST_DATABASE_URL)('Notenverwaltung (TEST_DATABASE_URL)', () =>
     t = await createTestApp(
       {
         controllers: [ScoresController, VoicesController, FoldersController, EventsController, TagsController],
-        providers: [ScoresRepository, ScoresService, FieldsService, ScoreImportService, MeRepository, VoicesService, FoldersService, EventsService, TagsRepository, TagsService, ClubSettingsRepository],
+        providers: [ScoresRepository, ScoresService, FieldsService, ScoreImportService, MeRepository, VoicesRepository, VoicesService, FoldersService, EventsService, TagsRepository, TagsService, ClubSettingsRepository],
       },
       { database: testDb.db, providers: [{ provide: FILE_STORAGE, useValue: storage }], config: { APP_TIMEZONE: 'Europe/Berlin' } },
     );
