@@ -17,6 +17,7 @@ import { createTestDatabase, TEST_DATABASE_URL, type TestDatabase } from '../tes
 import { SystemConfigController, SystemEnsemblesController, SystemRolesController, SystemUsersController } from './system.controller';
 import { logoMulterOptions, SYSTEM_PROVIDERS } from './system.module';
 import { PrintRulesService } from '../print-rules/print-rules.service';
+import { PrintRulesRepository } from '../print-rules/print-rules.repository';
 
 const PNG = Buffer.from([0x89, 0x50, 0x4e, 0x47, 0x0d, 0x0a, 0x1a, 0x0a, 1, 2, 3]);
 
@@ -66,7 +67,7 @@ describe.skipIf(!TEST_DATABASE_URL)('Systemverwaltung (TEST_DATABASE_URL)', () =
       {
         imports: [MulterModule.registerAsync({ useFactory: logoMulterOptions })],
         controllers: [SystemUsersController, SystemEnsemblesController, SystemRolesController, SystemConfigController],
-        providers: [...SYSTEM_PROVIDERS, ClubSettingsRepository, PrintRulesService],
+        providers: [...SYSTEM_PROVIDERS, ClubSettingsRepository, PrintRulesService, PrintRulesRepository],
       },
       { database: testDb.db, providers: [{ provide: FILE_STORAGE, useValue: storage }] },
     );

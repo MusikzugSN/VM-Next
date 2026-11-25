@@ -1,10 +1,10 @@
 import { Module } from '@nestjs/common';
 
+import { PrintRulesRepository } from './print-rules.repository';
 import { PrintRulesService } from './print-rules.service';
 
-/** Print rules per ensemble (S-2, D-6), used by the system pages and by printing. */
 @Module({
-  providers: [PrintRulesService],
+  providers: [PrintRulesRepository, PrintRulesService],
   exports: [PrintRulesService],
 })
 export class PrintRulesModule {}
