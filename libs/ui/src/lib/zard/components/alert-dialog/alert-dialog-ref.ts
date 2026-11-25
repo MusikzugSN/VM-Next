@@ -5,14 +5,6 @@ import { ZardOverlayRefBase } from '@vm-web/ui/zard/core';
 import type { ZardAlertDialogContainerComponent, ZardAlertDialogOptions } from './alert-dialog-container.component';
 import { ALERT_DIALOG_DURATION } from './alert-dialog-panel.component';
 
-/**
- * Reference to an alert dialog opened via {@link ZardAlertDialogService}.
- *
- * An alert dialog answers yes or no, so it closes with no result: `result()`
- * stays undefined and what the footer callbacks return is not forwarded. The
- * rest of the lifecycle lives in {@link ZardOverlayRefBase}, shared with dialog,
- * sheet and drawer.
- */
 export class ZardAlertDialogRef<T = unknown> extends ZardOverlayRefBase<T, void> {
   constructor(
     overlayRef: OverlayRef | null,
@@ -37,11 +29,14 @@ export class ZardAlertDialogRef<T = unknown> extends ZardOverlayRefBase<T, void>
     return this.config.zMaskClosable ?? false;
   }
 
+  protected override closesOnEscape(): boolean {
+    return this.config.zClosable ?? true;
+  }
+
   protected override forwardsCallbackResult(): boolean {
     return false;
   }
 
-  /** There is no content component to hand over, so the callbacks get the dialog's `zData`. */
   protected override callbackArgument(): T {
     return this.config.zData as T;
   }

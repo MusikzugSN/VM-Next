@@ -5,15 +5,6 @@ import { ZardOverlayRefBase } from '@vm-web/ui/zard/core';
 import type { ZardSheetContainerComponent, ZardSheetOptions } from './sheet-container.component';
 import { SHEET_DURATION } from './sheet-panel.component';
 
-/**
- * Reference to a sheet opened via {@link ZardSheetService}.
- *
- * Exposes signals for reactive consumption (`isClosing`, `result`,
- * `componentInstance`) and methods for closing the sheet. The lifecycle itself
- * lives in {@link ZardOverlayRefBase}, shared with dialog, drawer and
- * alert-dialog; only the leave animation and the mask behaviour are the
- * sheet's own.
- */
 export class ZardSheetRef<T = unknown, R = unknown, U = unknown> extends ZardOverlayRefBase<T, R> {
   constructor(
     overlayRef: OverlayRef | null,
@@ -36,5 +27,9 @@ export class ZardSheetRef<T = unknown, R = unknown, U = unknown> extends ZardOve
 
   protected override closesOnOutsidePointer(): boolean {
     return this.config.zMaskClosable ?? true;
+  }
+
+  protected override closesOnEscape(): boolean {
+    return this.config.zClosable ?? true;
   }
 }

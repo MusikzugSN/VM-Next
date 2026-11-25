@@ -13,6 +13,7 @@ import {
   ViewEncapsulation,
 } from '@angular/core';
 
+import { TranslocoPipe } from '@jsverse/transloco';
 import { NgIcon, provideIcons } from '@ng-icons/core';
 import { lucideX } from '@ng-icons/lucide';
 import type { ClassValue } from 'clsx';
@@ -22,22 +23,14 @@ import { mergeClasses } from '@vm-web/ui/zard/utils/merge-classes';
 
 import { sheetVariants, type ZardSheetVariants } from './sheet.variants';
 
-/** How long the enter and leave transitions run, in ms. Mirrors the CSS. */
 export const SHEET_DURATION = 200;
 
 export type ZardSheetSide = NonNullable<ZardSheetVariants['zSide']>;
 export type ZardSheetSize = NonNullable<ZardSheetVariants['zSize']>;
 
-/**
- * The sliding panel of a sheet: styling per side and size, the enter and leave transitions,
- * the focus trap and the corner close button. Shared by the declarative `z-sheet` and by the
- * container the `ZardSheetService` attaches, so both behave identically.
- *
- * @internal Compose `z-sheet` instead of using this directly.
- */
 @Component({
   selector: 'z-sheet-panel',
-  imports: [VmIconButton, NgIcon],
+  imports: [VmIconButton, NgIcon, TranslocoPipe],
   template: `
     @if (zClosable()) {
       <button
@@ -49,7 +42,7 @@ export type ZardSheetSize = NonNullable<ZardSheetVariants['zSize']>;
         (click)="closeRequested.emit()"
       >
         <ng-icon name="lucideX" class="size-4!" />
-        <span class="sr-only">Close</span>
+        <span class="sr-only">{{ 'common.close' | transloco }}</span>
       </button>
     }
     <ng-content />
@@ -124,25 +117,17 @@ export class ZardSheetPanelComponent {
   private readonly focusTrapFactory = inject(FocusTrapFactory);
   private readonly destroyRef = inject(DestroyRef);
 
-  /** Edge of the screen the sheet slides from. */
   readonly zSide = input<ZardSheetSide>('right');
-  /** Preset width (left/right) or height (top/bottom). Ignored once `zWidth` or `zHeight` is set. */
   readonly zSize = input<ZardSheetSize>('default');
-  /** Explicit width, for left/right sheets. */
   readonly zWidth = input<string | undefined>(undefined);
-  /** Explicit height, for top/bottom sheets. */
   readonly zHeight = input<string | undefined>(undefined);
-  /** Renders the close button in the top corner on the inline-end side. */
   readonly zClosable = input(true, { transform: booleanAttribute });
-  /** How long the enter and leave transitions run, in ms. */
   readonly zDuration = input(SHEET_DURATION);
-  /** `closed` plays the leave transition; the owner disposes the overlay once it ends. */
   readonly zState = input<'open' | 'closed'>('open');
   readonly zLabelledBy = input<string | null>(null);
   readonly zDescribedBy = input<string | null>(null);
   readonly class = input<ClassValue>('');
 
-  /** The corner close button was pressed. */
   readonly closeRequested = output<void>();
 
   protected readonly classes = computed(() => {
