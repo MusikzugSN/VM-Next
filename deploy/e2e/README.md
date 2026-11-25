@@ -11,7 +11,7 @@ Alle Passwörter und Schlüssel hier sind feste Testwerte. Nichts davon gehört 
 | `certs` | Erzeugt einmalig eine Test-CA und ein Zertifikat für `vm.test` und `auth.vm.test` |
 | `traefik` | TLS-Endpunkt wie der Reverse Proxy eines Vereins; Netzwerk-Aliase `vm.test`, `auth.vm.test` |
 | `keycloak`, `keycloak-db` | Identity-Server; Realm und Client legt der Admin-Agent in Phase 1 an |
-| `postgres`, `api`, `web` | VM-Web, gebaut aus `apps/api/Dockerfile` und `apps/web/Dockerfile` (`NODE_ENV=production`) |
+| `mysql`, `api`, `web` | VM-Web, gebaut aus `apps/api/Dockerfile` und `apps/web/Dockerfile` (`NODE_ENV=production`) |
 | `browser` | Chromium unter Xvfb, CUPS mit CUPS-PDF als Standarddrucker, je Persona ein Playwright-MCP-Server |
 | `print-service` | Der echte Druckservice (Node SEA) im Netzwerk des Browsers, druckt auf CUPS-PDF |
 | `tools` | Fixture-Generator und Orakel (nur über `run.sh`) |
