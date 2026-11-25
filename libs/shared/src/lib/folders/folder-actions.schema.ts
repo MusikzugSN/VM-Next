@@ -1,6 +1,6 @@
 import * as z from 'zod';
 import { idSchema, shortNameSchema } from '../common/ids.schema';
-import { folderNumberSchema } from './folder-entries.schema';
+import { folderNumberSchema, folderNumberSuffixSchema } from './folder-entries.schema';
 
 /** POST folders/folders/create → 201 `{ id }` (N-15). Requires `folder.create` in `ensembleId`. */
 export const createFolderBodySchema = z.object({
@@ -20,6 +20,8 @@ export type SetVisibilityBody = z.infer<typeof setVisibilityBodySchema>;
 export const folderScoreNumberBodySchema = z.object({
   scoreId: idSchema,
   number: folderNumberSchema,
+  /** Optional one-character suffix (`1a`, `1b`); omitted or empty = none. */
+  numberSuffix: folderNumberSuffixSchema.default(null),
 });
 export type FolderScoreNumberBody = z.infer<typeof folderScoreNumberBodySchema>;
 

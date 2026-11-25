@@ -22,7 +22,10 @@ export const folders = mysqlTable(
   ],
 );
 
-/** Score in a folder with its own number (N-5); `numberSortKey` gives natural order. */
+/**
+ * Score in a folder with its own number (N-5) and an optional one-character suffix (`1a`, `1b`);
+ * `numberSortKey` gives natural order of number + suffix.
+ */
 export const folderEntries = mysqlTable(
   'folder_entries',
   {
@@ -33,11 +36,12 @@ export const folderEntries = mysqlTable(
       .notNull()
       .references(() => scores.id, { onDelete: 'cascade' }),
     number: varchar('number', { length: 255 }).notNull(),
+    numberSuffix: varchar('number_suffix', { length: 1 }),
     numberSortKey: varchar('number_sort_key', { length: 255 }).notNull(),
   },
   (t) => [
     primaryKey({ columns: [t.folderId, t.scoreId] }),
-    unique('folder_entries_number_unique').on(t.folderId, t.number),
+    uniqueIndex('folder_entries_number_unique').on(t.folderId, t.number, sql`coalesce(${t.numberSuffix}, '')`),
     index('folder_entries_score_idx').on(t.scoreId),
   ],
 );

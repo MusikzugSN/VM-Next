@@ -24,6 +24,7 @@ import type { FieldDef } from './custom-fields';
 import type { SortPlan } from './score-query';
 import { replaceRows } from '../db/table-helpers';
 import { appendTo } from '../common/collections';
+import { displayFolderNumber } from '../folders/folder-number';
 
 export type ScoreRow = typeof scores.$inferSelect & { customValues: Record<string, unknown> };
 
@@ -245,7 +246,7 @@ export class ScoresRepository {
       .select({
         folder: { id: folders.id, name: folders.name },
         ensemble: { id: ensembles.id, name: ensembles.name },
-        number: folderEntries.number,
+        number: displayFolderNumber,
       })
       .from(folderEntries)
       .innerJoin(folders, eq(folders.id, folderEntries.folderId))

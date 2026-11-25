@@ -13,7 +13,6 @@ import { and, asc, eq, inArray, like, or, sql } from 'drizzle-orm';
 import type { AccessContext } from '../access/access-context';
 import { EnsembleResolvers } from '../access/ensemble-resolvers';
 import { uuidv7 } from '../common/ids/uuid-v7';
-import { naturalSortKey } from '../common/natural-sort';
 import { decodeCursor, toPage } from '../common/pagination/cursor';
 import { ProblemException } from '../common/problem-details/problem.exception';
 import { DATABASE, type Database } from '../db/database';
@@ -21,6 +20,7 @@ import { withNameTaken } from '../db/db-errors';
 import { ensembles, folderEntries, folders, scores } from '../db/schema';
 import { assertActiveEnsemble, ensembleOptions, listEnsembles, scoreCandidatePage } from '../library/library-helpers';
 import { likePattern } from '../common/sql';
+import { displayFolderNumber, folderNumberSortKey } from './folder-number';
 
 const scoreCount = sql<number>`(select count(*) from folder_entries x where x.folder_id = ${folders.id})`;
 
@@ -101,6 +101,7 @@ export class FoldersService implements OnModuleInit {
       .select({
         scoreId: scores.id,
         number: folderEntries.number,
+        numberSuffix: folderEntries.numberSuffix,
         title: scores.title,
         composer: scores.composer,
         sortKey: folderEntries.numberSortKey,
@@ -110,7 +111,7 @@ export class FoldersService implements OnModuleInit {
       .where(
         and(
           eq(folderEntries.folderId, folderId),
-          query.q ? or(like(scores.title, likePattern(query.q)), like(scores.composer, likePattern(query.q)), like(folderEntries.number, likePattern(query.q))) : undefined,
+          query.q ? or(like(scores.title, likePattern(query.q)), like(scores.composer, likePattern(query.q)), like(displayFolderNumber, likePattern(query.q))) : undefined,
           cursor ? sql`(${folderEntries.numberSortKey}, ${scores.id}) > (${cursor[0]}, ${cursor[1]})` : undefined,
         ),
       )
@@ -119,6 +120,7 @@ export class FoldersService implements OnModuleInit {
     return toPage(rows, query.limit, (r) => [r.sortKey, r.scoreId], (r) => ({
       scoreId: r.scoreId,
       number: r.number,
+      numberSuffix: r.numberSuffix,
       title: r.title,
       composer: r.composer,
     }));
@@ -145,22 +147,24 @@ export class FoldersService implements OnModuleInit {
     await this.touch(folderId, { showInMyArea });
   }
 
-  async addScore(folderId: string, scoreId: string, number: string): Promise<void> {
+  async addScore(folderId: string, scoreId: string, number: string, numberSuffix: string | null = null): Promise<void> {
     await this.assertScore(scoreId);
     const [existing] = await this.db
       .select({ number: folderEntries.number })
       .from(folderEntries)
       .where(and(eq(folderEntries.folderId, folderId), eq(folderEntries.scoreId, scoreId)));
     if (existing) throw ProblemException.conflict('conflict', 'Score already in folder');
-    await withNameTaken(() => this.db.insert(folderEntries).values({ folderId, scoreId, number, numberSortKey: naturalSortKey(number) }));
+    await withNameTaken(() =>
+      this.db.insert(folderEntries).values({ folderId, scoreId, number, numberSuffix, numberSortKey: folderNumberSortKey(number, numberSuffix) }),
+    );
     await this.touch(folderId, {});
   }
 
-  async setScoreNumber(folderId: string, scoreId: string, number: string): Promise<void> {
+  async setScoreNumber(folderId: string, scoreId: string, number: string, numberSuffix: string | null = null): Promise<void> {
     const [result] = await withNameTaken(() =>
       this.db
         .update(folderEntries)
-        .set({ number, numberSortKey: naturalSortKey(number) })
+        .set({ number, numberSuffix, numberSortKey: folderNumberSortKey(number, numberSuffix) })
         .where(and(eq(folderEntries.folderId, folderId), eq(folderEntries.scoreId, scoreId))),
     );
     if (!result.affectedRows) throw ProblemException.notFound();

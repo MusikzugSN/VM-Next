@@ -31,7 +31,10 @@ export const scoreImportRowSchema = z.object({
   /** Raw cell values by custom field id or `new:<key>`. */
   custom: z.record(z.string().max(60), cellSchema).default({}),
   /** Folder entry; folders are looked up by name in `folderEnsembleId` and created when missing. */
-  folder: z.object({ name: cellSchema, number: cellSchema }).nullable().default(null),
+  folder: z
+    .object({ name: cellSchema, number: cellSchema, numberSuffix: cellSchema.optional() })
+    .nullable()
+    .default(null),
   /** Chosen in the preview; without it: `create` without a match, `link` with one. */
   action: scoreImportActionSchema.optional(),
 });
@@ -59,7 +62,7 @@ export type ScoreImportBodyInput = z.input<typeof scoreImportBodySchema>;
  * `target`: `title`, `composer` … , `field:<id>`, `new:<key>` or `folder`.
  * Codes: `required`, `too_big`, `invalid_number`, `invalid_boolean`, `invalid_date`, `invalid_duration`,
  * `invalid_link`, `ambiguous` (several matches, the first is used), `folder-number-missing`,
- * `folder-number-invalid`, `folder-number-taken`, `folder-other-number` (already in the folder with another number).
+ * `folder-number-invalid`, `folder-number-suffix-invalid` (suffix longer than one character), `folder-number-taken`, `folder-other-number` (already in the folder with another number).
  */
 export const scoreImportIssueSchema = z.object({
   target: z.string(),

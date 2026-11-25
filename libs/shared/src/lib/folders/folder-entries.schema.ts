@@ -6,6 +6,20 @@ import { scoreCandidateSchema } from '../common/ensemble-options.schema';
 /** Folder number (N-5): free text such as `12`, `12a`, `A3`; sorted naturally. Unique within a folder. */
 export const folderNumberSchema = z.string().trim().min(1).max(10);
 
+/**
+ * Optional suffix of a folder number (`1a`, `1b`): exactly one character or `null`.
+ * An empty string counts as `null`. Number + suffix are unique within a folder.
+ */
+export const folderNumberSuffixSchema = z.preprocess(
+  (v) => (typeof v === 'string' && v.trim() === '' ? null : v),
+  z.string().trim().length(1).nullable(),
+);
+
+/** Number and suffix as shown, e.g. `1a`. */
+export function formatFolderNumber(number: string, suffix: string | null | undefined): string {
+  return number + (suffix ?? '');
+}
+
 /** GET folders/folders/:folderId/entries – scores with number, sorted naturally by number (N-5). */
 export const folderEntriesQuerySchema = cursorQuerySchema.extend({
   q: z.string().trim().max(100).optional(),
@@ -15,6 +29,7 @@ export type FolderEntriesQuery = z.infer<typeof folderEntriesQuerySchema>;
 export const folderEntrySchema = z.object({
   scoreId: idSchema,
   number: folderNumberSchema,
+  numberSuffix: z.string().nullable(),
   title: z.string(),
   composer: z.string().nullable(),
 });

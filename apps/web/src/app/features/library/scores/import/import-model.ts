@@ -12,9 +12,17 @@ import type { CsvTable } from './csv';
 
 /**
  * Target of one CSV column (N-19), encoded as the value of the native select:
- * `ignore` · `fixed:<field>` · `field:<id>` · `new` (new custom field) · `folder` · `folderNumber`.
+ * `ignore` · `fixed:<field>` · `field:<id>` · `new` (new custom field) · `folder` · `folderNumber` ·
+ * `folderNumberSuffix` (optional one-character suffix of the number, e.g. the `a` of `1a`).
  */
-export type ColumnTarget = 'ignore' | `fixed:${ScoreImportFixedField}` | `field:${string}` | 'new' | 'folder' | 'folderNumber';
+export type ColumnTarget =
+  | 'ignore'
+  | `fixed:${ScoreImportFixedField}`
+  | `field:${string}`
+  | 'new'
+  | 'folder'
+  | 'folderNumber'
+  | 'folderNumberSuffix';
 
 export const FIXED_TARGETS: readonly ScoreImportFixedField[] = ['title', 'composer', 'arranger', 'publisher', 'publisherNumber', 'duration'];
 
@@ -58,6 +66,8 @@ const KNOWN_HEADERS: Record<string, ColumnTarget> = {
   'nr.': 'folderNumber',
   nr: 'folderNumber',
   'mappen-nr.': 'folderNumber',
+  nummerzusatz: 'folderNumberSuffix',
+  zusatz: 'folderNumberSuffix',
 };
 
 interface StoredColumn {
@@ -144,6 +154,7 @@ export function buildImportBody(
   const newKey = (i: number) => `col-${i}`;
   const folderColumn = columns.findIndex((c) => c.target === 'folder');
   const numberColumn = columns.findIndex((c) => c.target === 'folderNumber');
+  const suffixColumn = columns.findIndex((c) => c.target === 'folderNumberSuffix');
   const withFolder = usesFolder(columns, settings);
 
   const rows: ScoreImportRow[] = table.rows.map(({ line, cells }) => {
@@ -155,7 +166,14 @@ export function buildImportBody(
       else if (c.target === 'new') custom[SCORE_IMPORT_NEW_FIELD_PREFIX + newKey(i)] = cells[i];
     });
     const name = folderColumn >= 0 ? cells[folderColumn].trim() : settings.fixedFolder.trim();
-    const folder = withFolder && name ? { name, number: numberColumn >= 0 ? cells[numberColumn] : '' } : null;
+    const folder =
+      withFolder && name
+        ? {
+            name,
+            number: numberColumn >= 0 ? cells[numberColumn] : '',
+            ...(suffixColumn >= 0 ? { numberSuffix: cells[suffixColumn] } : {}),
+          }
+        : null;
     const action = actions.get(line);
     return { line, fixed, custom, folder, ...(action ? { action } : {}) };
   });

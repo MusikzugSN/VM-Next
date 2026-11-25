@@ -165,4 +165,43 @@ describe.skipIf(!TEST_DATABASE_URL)('CSV-Import (TEST_DATABASE_URL)', () => {
 
     expect((await post('lib', body(true, { newFields: [{ key: 'genre', name: 'genre', type: 'text' }] }))).status).toBe(409);
   });
+
+  it('number suffix: 1, 1a and 1b in the same folder; duplicate and too long suffixes are warnings', async () => {
+    const res = await post('lib', {
+      dryRun: false,
+      folderEnsembleId: ids.orchestra,
+      rows: [
+        { line: 2, fixed: { title: 'Teil B' }, folder: { name: 'Zusatzmappe', number: '1', numberSuffix: 'b' } },
+        { line: 3, fixed: { title: 'Ohne Zusatz' }, folder: { name: 'Zusatzmappe', number: '1' } },
+        { line: 4, fixed: { title: 'Teil A' }, folder: { name: 'Zusatzmappe', number: '1', numberSuffix: ' a ' } },
+        { line: 5, fixed: { title: 'Doppelt' }, folder: { name: 'Zusatzmappe', number: '1', numberSuffix: 'a' } },
+        { line: 6, fixed: { title: 'Zu lang' }, folder: { name: 'Zusatzmappe', number: '2', numberSuffix: 'ab' } },
+        { line: 7, fixed: { title: 'Leerer Zusatz' }, folder: { name: 'Zusatzmappe', number: '2', numberSuffix: '' } },
+      ],
+    });
+    expect(res.status).toBe(200);
+    const byLine = Object.fromEntries(res.body.rows.map((r: { line: number }) => [r.line, r]));
+    expect(byLine[2]).toMatchObject({ folder: { number: '1b' }, issues: [] });
+    expect(byLine[4]).toMatchObject({ folder: { number: '1a' }, issues: [] });
+    expect(byLine[5].issues).toEqual([{ target: 'folder', code: 'folder-number-taken', level: 'warning' }]);
+    expect(byLine[6].issues).toEqual([{ target: 'folder', code: 'folder-number-suffix-invalid', level: 'warning' }]);
+
+    const [folder] = await testDb.db.select().from(folders).where(eq(folders.name, 'Zusatzmappe'));
+    const entries = await testDb.db
+      .select({ number: folderEntries.number, suffix: folderEntries.numberSuffix })
+      .from(folderEntries)
+      .where(eq(folderEntries.folderId, folder.id))
+      .orderBy(folderEntries.numberSortKey);
+    expect(entries).toEqual([
+      { number: '1', suffix: null },
+      { number: '1', suffix: 'a' },
+      { number: '1', suffix: 'b' },
+      { number: '2', suffix: null },
+    ]);
+
+    // the database refuses the same number + suffix twice, also without suffix
+    const scoreId = byLine[5].scoreId;
+    await expect(testDb.db.insert(folderEntries).values({ folderId: folder.id, scoreId, number: '1', numberSuffix: 'a', numberSortKey: 'x' })).rejects.toThrow();
+    await expect(testDb.db.insert(folderEntries).values({ folderId: folder.id, scoreId, number: '2', numberSortKey: 'x' })).rejects.toThrow();
+  });
 });

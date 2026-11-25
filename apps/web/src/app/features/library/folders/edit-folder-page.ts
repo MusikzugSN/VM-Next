@@ -118,15 +118,25 @@ export class EditFolderPage {
     if (done) this.details.reload();
   }
 
-  protected async setNumber(entry: FolderEntry, value: string): Promise<void> {
+  /** Blur of the number or suffix field: reads both fields of the row and saves them together. */
+  protected saveNumber(entry: FolderEntry, event: Event): void {
+    const row = (event.target as HTMLElement).closest('[data-number-row]');
+    const number = row?.querySelector<HTMLInputElement>('[data-number]')?.value ?? entry.number;
+    const suffix = row?.querySelector<HTMLInputElement>('[data-number-suffix]')?.value ?? entry.numberSuffix ?? '';
+    void this.setNumber(entry, number, suffix);
+  }
+
+  /** Saves number and optional one-character suffix (`1a`, `1b`) together. */
+  protected async setNumber(entry: FolderEntry, value: string, suffixValue: string): Promise<void> {
     const number = value.trim();
-    if (number === entry.number) return;
+    const numberSuffix = suffixValue.trim() || null;
+    if (number === entry.number && numberSuffix === entry.numberSuffix) return;
     if (!number) {
       this.numberErrors.update((e) => ({ ...e, [entry.scoreId]: 'library.folder.numberRequired' }));
       return;
     }
     const done = await this.actions.runOnce(
-      () => this.api.postVoid(apiUrl('folders', 'setScoreNumber', { folderId: this.folderId() }), { scoreId: entry.scoreId, number }),
+      () => this.api.postVoid(apiUrl('folders', 'setScoreNumber', { folderId: this.folderId() }), { scoreId: entry.scoreId, number, numberSuffix }),
       {
         onProblem: (problem) => {
           this.numberErrors.update((e) => ({ ...e, [entry.scoreId]: problemKey(problem) }));

@@ -15,7 +15,8 @@
     "pagesHeader": "Seiten",
     "pages": { "one": "1 Seite", "other": "{{ count }} Seiten" },
     "actions": "Aktionen",
-    "download": "{{ title }} herunterladen"
+    "download": "{{ title }} herunterladen",
+    "upload": "Notenblatt für {{ title }} hochladen"
   },
   "start": {
     "hello": "Hallo {{ name }}",

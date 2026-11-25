@@ -71,21 +71,40 @@
     <ul vm-card class="overflow-hidden" [class.hidden]="list.items().length === 0">
       @for (entry of list.items(); track entry.scoreId; let first = $first) {
         <li class="flex flex-wrap items-center gap-3 px-4 py-3" [class.border-t]="!first">
-          <label class="flex flex-col gap-1">
-            <span class="sr-only">{{ 'library.folder.numberOf' | transloco: { title: entry.title } }}</span>
-            <input
-              vm-input
-              type="text"
-              maxlength="10"
-              class="w-20 text-center font-semibold text-primary tabular-nums"
-              [readonly]="!canEdit()"
-              [value]="entry.number"
-              (blur)="setNumber(entry, $any($event.target).value)"
-              (keydown.enter)="$any($event.target).blur()"
-              [attr.aria-invalid]="numberErrors()[entry.scoreId] ? 'true' : null"
-              [attr.aria-describedby]="numberErrors()[entry.scoreId] ? 'num-err-' + entry.scoreId : null"
-            />
-          </label>
+          <span class="flex items-center gap-1" data-number-row>
+            <label class="flex flex-col gap-1">
+              <span class="sr-only">{{ 'library.folder.numberOf' | transloco: { title: entry.title } }}</span>
+              <input
+                data-number
+                vm-input
+                type="text"
+                maxlength="10"
+                class="w-20 text-center font-semibold text-primary tabular-nums"
+                [readonly]="!canEdit()"
+                [value]="entry.number"
+                (blur)="saveNumber(entry, $event)"
+                (keydown.enter)="$any($event.target).blur()"
+                [attr.aria-invalid]="numberErrors()[entry.scoreId] ? 'true' : null"
+                [attr.aria-describedby]="numberErrors()[entry.scoreId] ? 'num-err-' + entry.scoreId : null"
+              />
+            </label>
+            <label class="flex flex-col gap-1">
+              <span class="sr-only">{{ 'library.folder.suffixOf' | transloco: { title: entry.title } }}</span>
+              <input
+                data-number-suffix
+                vm-input
+                type="text"
+                maxlength="1"
+                class="w-12 text-center font-semibold text-primary"
+                [readonly]="!canEdit()"
+                [value]="entry.numberSuffix ?? ''"
+                (blur)="saveNumber(entry, $event)"
+                (keydown.enter)="$any($event.target).blur()"
+                [attr.aria-invalid]="numberErrors()[entry.scoreId] ? 'true' : null"
+                [attr.aria-describedby]="numberErrors()[entry.scoreId] ? 'num-err-' + entry.scoreId : null"
+              />
+            </label>
+          </span>
           <span class="flex min-w-0 flex-1 flex-col">
             <a [routerLink]="scoreLink(entry)" class="font-medium">{{ entry.title }}</a>
             @if (entry.composer) {

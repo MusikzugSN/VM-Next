@@ -84,6 +84,9 @@
                     <optgroup [label]="'library.import.groupFolder' | transloco">
                       <option value="folder" [selected]="column.target === 'folder'">{{ 'library.import.folder' | transloco }}</option>
                       <option value="folderNumber" [selected]="column.target === 'folderNumber'">{{ 'library.import.folderNumber' | transloco }}</option>
+                      <option value="folderNumberSuffix" [selected]="column.target === 'folderNumberSuffix'">
+                        {{ 'library.import.folderNumberSuffix' | transloco }}
+                      </option>
                     </optgroup>
                   }
                 </select>

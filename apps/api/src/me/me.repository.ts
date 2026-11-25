@@ -26,6 +26,7 @@ import { afterNameAndId } from '../common/pagination/keyset';
 import { replaceRows } from '../db/table-helpers';
 import { appendTo } from '../common/collections';
 import { hasClubTag, likePattern } from '../common/sql';
+import { displayFolderNumber } from '../folders/folder-number';
 
 /** `( $1, $2, … )` for `in` lists; callers guarantee a non-empty list. */
 const list = (ids: readonly string[]): SQL => sql`(${sql.join(ids.map((id) => sql`${id}`), sql`, `)})`;
@@ -353,7 +354,7 @@ export class MeRepository {
         scoreId: scores.id,
         title: scores.title,
         composer: scores.composer,
-        number: folderEntries.number,
+        number: displayFolderNumber,
         sortKey: folderEntries.numberSortKey,
       })
       .from(folderEntries)
@@ -372,7 +373,7 @@ export class MeRepository {
 
   async folderNumber(folderId: string, scoreId: string): Promise<string | null> {
     const [row] = await this.db
-      .select({ number: folderEntries.number })
+      .select({ number: displayFolderNumber })
       .from(folderEntries)
       .where(and(eq(folderEntries.folderId, folderId), eq(folderEntries.scoreId, scoreId)));
     return row?.number ?? null;
