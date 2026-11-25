@@ -4,6 +4,7 @@ import { mkdtemp, rm } from 'node:fs/promises';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { degrees, PDFDocument } from 'pdf-lib';
+import { ensureUploadTempDir } from '../common/files/upload-temp';
 import { sheets, uploads } from '../db/schema';
 import { MeController } from '../me/me.controller';
 import { MeRepository } from '../me/me.repository';
@@ -36,14 +37,12 @@ describe.skipIf(!TEST_DATABASE_URL)('Upload und Prüfung (TEST_DATABASE_URL)', (
   let testDb: TestDatabase;
   let t: TestApp;
   let storageDir: string;
-  let multerDir: string;
   let storage: FsFileStorage;
   const ids = {} as Record<string, string>;
 
   beforeAll(async () => {
     testDb = await createTestDatabase('uploads');
     storageDir = await mkdtemp(join(tmpdir(), 'vmweb-up-store-'));
-    multerDir = await mkdtemp(join(tmpdir(), 'vmweb-up-tmp-'));
     storage = new FsFileStorage(storageDir);
     await storage.init();
     const b = new LibraryBuilder(testDb.db);
@@ -78,7 +77,7 @@ describe.skipIf(!TEST_DATABASE_URL)('Upload und Prüfung (TEST_DATABASE_URL)', (
 
     t = await createTestApp(
       {
-        imports: [MulterModule.register({ dest: multerDir, limits: { fileSize: MAX_FILE_BYTES, files: 50 } })],
+        imports: [MulterModule.register({ dest: ensureUploadTempDir(), limits: { fileSize: MAX_FILE_BYTES, files: 50 } })],
         controllers: [UploadsController, ReviewController, MeController],
         providers: [UploadsService, ReviewService, MeRepository, MeService, PersonalTagsService],
       },
@@ -89,7 +88,7 @@ describe.skipIf(!TEST_DATABASE_URL)('Upload und Prüfung (TEST_DATABASE_URL)', (
   afterAll(async () => {
     await t?.close();
     await testDb?.close();
-    for (const dir of [storageDir, multerDir]) if (dir) await rm(dir, { recursive: true, force: true });
+    if (storageDir) await rm(storageDir, { recursive: true, force: true });
   });
 
   type Who = 'mus' | 'lib' | 'chief' | 'plain' | 'outsider';
