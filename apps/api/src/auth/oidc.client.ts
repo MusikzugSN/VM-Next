@@ -3,7 +3,7 @@ import { API_PREFIX } from '@vm-web/shared';
 import * as oidc from 'openid-client';
 import { AppConfig } from '../config/app-config.service';
 
-export interface LoginRequest {
+interface LoginRequest {
   url: string;
   state: string;
   nonce: string;

@@ -1,3 +1,4 @@
+import { SHORT_NAME_MAX } from '@vm-web/shared';
 import { ChangeDetectionStrategy, Component, computed, inject, signal } from '@angular/core';
 import { rxResource } from '@angular/core/rxjs-interop';
 import { RouterLink } from '@angular/router';
@@ -23,7 +24,6 @@ import { SessionStore } from '../../../core/auth/session.store';
 import { PluralPipe } from '../../../core/i18n/plural.pipe';
 import { ListState } from '../../../shared/ui/list-state';
 import { FormDialog, runDialogSave } from '../../../shared/ui/form-dialog';
-import { NAME_MAX } from '../../../shared/ui/name-dialog';
 import { TreeLabelPipe } from '../../../shared/ui/tree-label.pipe';
 import { ToggleField } from '../../../shared/ui/toggle-field';
 import { selectOr } from '../../../core/util/resource-value';
@@ -115,7 +115,7 @@ export class EnsemblesPage {
   private readonly actions = inject(ActionRunner);
   private readonly session = inject(SessionStore);
 
-  protected readonly nameMax = NAME_MAX;
+  protected readonly nameMax = SHORT_NAME_MAX;
   protected readonly canCreate = computed(() => this.session.can('ensemble.create'));
   protected readonly canEdit = computed(() => this.session.can('ensemble.edit'));
   protected readonly includeArchived = signal(false);

@@ -32,7 +32,7 @@ const TITLES: Record<ProblemCode, string> = {
 };
 
 /** Code for framework errors (`NotFoundException`, body-parser, multer …). */
-export function codeForStatus(status: number): ProblemCode {
+function codeForStatus(status: number): ProblemCode {
   switch (status) {
     case 400:
       return 'validation-failed';

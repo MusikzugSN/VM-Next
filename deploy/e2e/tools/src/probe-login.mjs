@@ -2,6 +2,8 @@
 // Legt dabei das erste Konto an; danach den Stack mit ./run.sh up neu starten.
 //   node src/probe-login.mjs [mcp-url] [benutzer] [passwort]
 const [url = 'http://browser:8931/mcp', username = 'admin', password = 'Admin-e2e-1'] = process.argv.slice(2);
+/** Value as a JS literal for code sent to `browser_evaluate`; also escapes `<`, `>`, `/` and U+2028/9 (CodeQL js/bad-code-sanitization). */
+const jsLiteral = (value) => JSON.stringify(value).replace(/[<>/\u2028\u2029]/g, (c) => `\\u${c.charCodeAt(0).toString(16).padStart(4, '0')}`);
 let session;
 let id = 0;
 async function rpc(method, params, notify = false) {
@@ -24,7 +26,7 @@ await rpc('notifications/initialized', {}, true);
 console.log('Start:', where(await call('browser_navigate', { url: 'https://vm.test' })));
 console.log('Keycloak:', where(await call('browser_navigate', { url: 'https://vm.test/internal/v1/auth/login?returnTo=%2Fme' })));
 await call('browser_evaluate', {
-  function: `() => { document.querySelector('#username').value = ${JSON.stringify(username)}; document.querySelector('#password').value = ${JSON.stringify(password)}; document.querySelector('form').submit(); return 'ok'; }`,
+  function: `() => { document.querySelector('#username').value = ${jsLiteral(username)}; document.querySelector('#password').value = ${jsLiteral(password)}; document.querySelector('form').submit(); return 'ok'; }`,
 });
 await new Promise((r) => setTimeout(r, 6000));
 const snap = await call('browser_snapshot');

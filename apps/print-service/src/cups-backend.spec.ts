@@ -70,4 +70,9 @@ describe('CupsBackend', () => {
     expect((await backend('', '', line).state('HP-7', 'HP')).status).toBe('done');
     expect((await backend('', '', '').state('HP-7', 'HP')).status).toBe('failed');
   });
+
+  it('reports a failing lpstat instead of declaring the job gone', async () => {
+    const failing: Run = () => Promise.reject(new Error('lpstat: Connection refused'));
+    await expect(new CupsBackend(failing).state('HP-7', 'HP')).rejects.toThrow('Connection refused');
+  });
 });

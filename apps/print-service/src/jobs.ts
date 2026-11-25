@@ -34,6 +34,7 @@ const DAY_MS = 86_400_000;
 export class JobService {
   private jobs: StoredJob[] = [];
   private loaded = false;
+  private chain: Promise<unknown> = Promise.resolve();
 
   constructor(
     private readonly backend: PrinterBackend,
@@ -42,47 +43,65 @@ export class JobService {
     private readonly now: () => Date = () => new Date(),
   ) {}
 
+  /**
+   * Every operation that touches `jobs.json` runs after the previous one: the print dialog polls
+   * `list()` every 2 s, so a poll and a submit overlap as a matter of course (D-5).
+   */
+  private serial<T>(work: () => Promise<T>): Promise<T> {
+    const run = this.chain.then(work, work);
+    this.chain = run.catch(() => undefined);
+    return run;
+  }
+
   /** History, newest first, states refreshed from the printing system. */
   async list(): Promise<PrintJob[]> {
-    await this.load();
-    await this.refresh();
-    return this.jobs.map(toPublic);
+    return this.serial(async () => {
+      await this.load();
+      await this.refresh();
+      return this.jobs.map(toPublic);
+    });
   }
 
   async submit(pdf: Uint8Array, meta: PrintJobMeta): Promise<PrintJob> {
-    await this.load();
-    const printers = await this.backend.listPrinters();
-    if (meta.printerId && !printers.some((p) => p.id === meta.printerId)) throw new JobError('printer-not-found', `Unbekannter Drucker: ${meta.printerId}`);
-    const id = randomUUID();
-    const pdfFile = join(this.dataDir, 'pdf', `${id}.pdf`);
-    await mkdir(join(this.dataDir, 'pdf'), { recursive: true });
-    await writeFile(pdfFile, pdf);
-    const job = await this.print({ id, pdfFile, meta: { source: meta.source, pages: meta.pages, duplex: meta.duplex, copies: meta.copies, printerId: meta.printerId } }, printers);
-    return toPublic(job);
+    return this.serial(async () => {
+      await this.load();
+      const printers = await this.backend.listPrinters();
+      if (meta.printerId && !printers.some((p) => p.id === meta.printerId)) throw new JobError('printer-not-found', `Unbekannter Drucker: ${meta.printerId}`);
+      const id = randomUUID();
+      const pdfFile = join(this.dataDir, 'pdf', `${id}.pdf`);
+      await mkdir(join(this.dataDir, 'pdf'), { recursive: true });
+      await writeFile(pdfFile, pdf);
+      const job = await this.print({ id, pdfFile, meta: { source: meta.source, pages: meta.pages, duplex: meta.duplex, copies: meta.copies, printerId: meta.printerId } }, printers);
+      return toPublic(job);
+    });
   }
 
   async cancel(jobId: string): Promise<PrintJob> {
-    await this.load();
-    const job = this.find(jobId);
-    if (job.status === 'waiting' || job.status === 'printing') {
-      if (job.backendId) await this.backend.cancel(job.backendId).catch(() => undefined);
-      this.update(job, { status: 'cancelled', error: null });
-      await this.save();
-    }
-    return toPublic(job);
+    return this.serial(async () => {
+      await this.load();
+      const job = this.find(jobId);
+      if (job.status === 'waiting' || job.status === 'printing') {
+        if (job.backendId) await this.backend.cancel(job.backendId).catch(() => undefined);
+        this.update(job, { status: 'cancelled', error: null });
+        await this.save();
+      }
+      return toPublic(job);
+    });
   }
 
   /** Prints the same PDF again as a new job. */
   async retry(jobId: string): Promise<PrintJob> {
-    await this.load();
-    const old = this.find(jobId);
-    const printers = await this.backend.listPrinters();
-    const printerId = printers.some((p) => p.id === old.printer.id) ? old.printer.id : null;
-    const job = await this.print(
-      { id: randomUUID(), pdfFile: old.pdfFile, meta: { source: old.source, pages: old.pages, duplex: old.duplex, copies: old.copies, printerId } },
-      printers,
-    );
-    return toPublic(job);
+    return this.serial(async () => {
+      await this.load();
+      const old = this.find(jobId);
+      const printers = await this.backend.listPrinters();
+      const printerId = printers.some((p) => p.id === old.printer.id) ? old.printer.id : null;
+      const job = await this.print(
+        { id: randomUUID(), pdfFile: old.pdfFile, meta: { source: old.source, pages: old.pages, duplex: old.duplex, copies: old.copies, printerId } },
+        printers,
+      );
+      return toPublic(job);
+    });
   }
 
   private async print(
@@ -177,9 +196,14 @@ export class JobService {
   /** Atomic write: a crash never leaves a half-written history. */
   private async save(): Promise<void> {
     await mkdir(this.dataDir, { recursive: true });
-    const tmp = `${this.file}.tmp`;
-    await writeFile(tmp, JSON.stringify(this.jobs, null, 2));
-    await rename(tmp, this.file);
+    const tmp = `${this.file}.${randomUUID()}.tmp`;
+    try {
+      await writeFile(tmp, JSON.stringify(this.jobs, null, 2));
+      await rename(tmp, this.file);
+    } catch (error) {
+      await rm(tmp, { force: true });
+      throw error;
+    }
   }
 }
 

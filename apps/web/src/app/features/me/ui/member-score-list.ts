@@ -4,7 +4,7 @@ import { TranslocoPipe, TranslocoService } from '@jsverse/transloco';
 import { PluralPipe } from '../../../core/i18n/plural.pipe';
 import { NgIcon, provideIcons } from '@ng-icons/core';
 import { lucideDownload, lucideFileArchive, lucidePrinter, lucideUpload } from '@ng-icons/lucide';
-import { APP_ROUTES, apiUrl, appPath, type MemberScoreRow, type MemberSheet } from '@vm-web/shared';
+import { APP_ROUTES, apiUrl, appPath, downloadFileName, type MemberScoreRow, type MemberSheet } from '@vm-web/shared';
 import { firstValueFrom } from 'rxjs';
 
 import { VmButton, VmCard, VmCheckbox, VmIconButton, VmTable } from '@vm-web/ui';
@@ -19,7 +19,6 @@ import { saveBlob } from '../../../core/util/save-blob';
 import { VoiceContextStore } from '../../../core/voices/voice-context.store';
 import { SelectionBar } from '../../../shared/ui/selection-bar';
 import { StatusBadge } from '../../../shared/ui/status-badge';
-import { safeFileName } from '../../../core/util/safe-file-name';
 import { toggleSetItem } from '../../../core/util/sets';
 
 export type ScoreListRow = MemberScoreRow & { position?: number };
@@ -129,7 +128,7 @@ export class MemberScoreList {
           }),
         );
         const title = this.listTitle() || this.transloco.translate('common.selection.title');
-        saveBlob(zip, `${safeFileName(title)}.zip`);
+        saveBlob(zip, downloadFileName(title, 'zip'));
       },
       { fallbackKey: 'common.selection.zipFailed' },
     );

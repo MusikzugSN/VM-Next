@@ -1,3 +1,4 @@
+import { SHORT_NAME_MAX } from '@vm-web/shared';
 import { ChangeDetectionStrategy, Component, computed, effect, inject, input, model, output, signal, untracked } from '@angular/core';
 import { TranslocoPipe } from '@jsverse/transloco';
 import { NgIcon, provideIcons } from '@ng-icons/core';
@@ -54,6 +55,7 @@ export class VoiceDialog {
   readonly saved = output<void>();
 
   protected readonly name = signal('');
+  protected readonly nameMax = SHORT_NAME_MAX;
   /** Instrument chosen by hand; `null` = derived from the voice name. */
   protected readonly override = signal<string | null>(null);
   protected readonly choosing = signal(false);

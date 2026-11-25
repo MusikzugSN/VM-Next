@@ -21,7 +21,7 @@ import { OIDC_CLIENT, type IOidcClient } from './oidc.client';
 import { USERS_REPOSITORY, type IUsersRepository } from './users.repository';
 
 
-export type CallbackResult =
+type CallbackResult =
   | { kind: 'success'; redirect: string; sessionId: string; csrfToken: string }
   | { kind: 'failure'; redirect: string };
 
@@ -49,9 +49,17 @@ export class AuthService {
     await this.sessions.saveLoginState(request.state, {
       codeVerifier: request.codeVerifier,
       nonce: request.nonce,
-      returnTo: returnTo ?? DEFAULT_APP_PATH,
+      returnTo: this.safeReturnTo(returnTo),
     });
     return { redirect: request.url, state: request.state };
+  }
+
+  private safeReturnTo(path: string | undefined): string {
+    if (!path) return DEFAULT_APP_PATH;
+    const base = this.config.get('PUBLIC_BASE_URL');
+    const target = new URL(path, base);
+    if (target.origin !== new URL(base).origin) return DEFAULT_APP_PATH;
+    return `${target.pathname}${target.search}${target.hash}`;
   }
 
   /**

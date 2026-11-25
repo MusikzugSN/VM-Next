@@ -162,6 +162,24 @@ describe('print service HTTP interface', () => {
     expect(await reopened.list()).toHaveLength(1);
   });
 
+  it('runs overlapping prints and polls one after another, so jobs.json stays intact (D-5)', async () => {
+    const order: string[] = [];
+    const slow = new (class extends FakeBackend {
+      override async listPrinters() {
+        order.push('enter');
+        await new Promise((resolve) => setTimeout(resolve, 10));
+        order.push('leave');
+        return this.printers;
+      }
+    })();
+    const jobs = new JobService(slow, dir, 30);
+    const meta = { contract: PRINT_SERVICE_CONTRACT, source: { kind: 'folder' as const, title: 'Marschbuch', voices: [] }, printerId: null, pages: 2, duplex: true, copies: 1 };
+    await Promise.all([jobs.submit(PDF, meta), jobs.list(), jobs.submit(PDF, meta), jobs.list(), jobs.submit(PDF, meta)]);
+    expect(order).toEqual(['enter', 'leave', 'enter', 'leave', 'enter', 'leave']);
+    const reopened = new JobService(backend, dir, 30);
+    expect(await reopened.list()).toHaveLength(3);
+  });
+
   const update = (body: unknown) =>
     call('/update', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body) });
 

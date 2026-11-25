@@ -246,7 +246,7 @@ export class PrintDialog {
     try {
       return await firstValueFrom(this.api.getBlob(apiUrl('print', 'printDocument'), printQuery(request, this.options())));
     } catch (error) {
-      this.toastError(isApiProblem(error) ? error.messageKey : 'errors.unknown');
+      this.toastError(this.errorKey(error));
       return null;
     } finally {
       this.busy.set(false);
@@ -270,6 +270,10 @@ export class PrintDialog {
       if (voice) return { id, name: voice.name, instrumentId: group.instrument.id };
     }
     return { id, name: '–', instrumentId: '' };
+  }
+
+  protected errorKey(error: unknown): string {
+    return isApiProblem(error) ? error.messageKey : 'errors.unknown';
   }
 
   private toastError(key: string): void {

@@ -7,7 +7,7 @@
     <input
       vm-input
       type="text"
-      maxlength="200"
+      [maxLength]="titleMax"
       required
       [value]="value().title"
       (input)="set('title', $any($event.target).value)"
@@ -23,7 +23,7 @@
     @for (f of fixed; track f.key) {
       <label vm-field>
         <span vm-field-label>{{ f.labelKey | transloco }}</span>
-        <input vm-input type="text" maxlength="200" [value]="value()[f.key]" (input)="set(f.key, $any($event.target).value)" />
+        <input vm-input type="text" [maxLength]="titleMax" [value]="value()[f.key]" (input)="set(f.key, $any($event.target).value)" />
       </label>
     }
     <label vm-field>
