@@ -99,7 +99,7 @@
           }
         </div>
         @if (plan.error(); as error) {
-          <p role="alert" class="rounded-small bg-destructive-soft p-4 text-destructive-ink">{{ $any(error).messageKey ?? 'errors.unknown' | transloco }}</p>
+          <p role="alert" class="rounded-small bg-destructive-soft p-4 text-destructive-ink">{{ errorKey(error) | transloco }}</p>
         } @else if (current(); as p) {
           <ul class="flex flex-col rounded-small border text-body-medium">
             @for (doc of p.documents; track doc.scoreId + doc.voice.id; let first = $first) {

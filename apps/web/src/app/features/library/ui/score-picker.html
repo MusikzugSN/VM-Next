@@ -3,7 +3,7 @@
   @if (numbered()) {
     <label vm-field class="md:w-32">
       <span vm-field-label>{{ 'library.picker.number' | transloco }}</span>
-      <input vm-input type="text" maxlength="10" [value]="number()" (input)="number.set($any($event.target).value)" />
+      <input vm-input type="text" [maxLength]="numberMax" [value]="number()" (input)="number.set($any($event.target).value)" />
     </label>
   }
 </div>

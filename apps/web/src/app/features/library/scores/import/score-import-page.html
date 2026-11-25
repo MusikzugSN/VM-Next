@@ -97,7 +97,7 @@
                       [value]="column.newName"
                       (input)="patchColumn(i, { newName: $any($event.target).value })"
                       [attr.aria-label]="'library.import.newFieldName' | transloco: { column: header }"
-                      maxlength="100"
+                      [maxLength]="nameMax"
                     />
                     <select
                       vm-select
@@ -121,7 +121,7 @@
           @if (!hasFolderColumn()) {
             <label vm-field>
               <span vm-field-label>{{ 'library.import.fixedFolder' | transloco }}</span>
-              <input vm-input [value]="fixedFolder()" (input)="setFixedFolder($any($event.target).value)" maxlength="100" />
+              <input vm-input [value]="fixedFolder()" (input)="setFixedFolder($any($event.target).value)" [maxLength]="nameMax" />
               <span class="text-body-medium text-muted-foreground">{{ 'library.import.fixedFolderHint' | transloco }}</span>
             </label>
           }

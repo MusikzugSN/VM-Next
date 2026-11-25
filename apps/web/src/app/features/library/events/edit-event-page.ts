@@ -1,3 +1,4 @@
+import { SHORT_NAME_MAX } from '@vm-web/shared';
 import { CdkDrag, CdkDragHandle, CdkDropList, moveItemInArray, type CdkDragDrop } from '@angular/cdk/drag-drop';
 import { ChangeDetectionStrategy, Component, computed, effect, inject, input, signal, untracked } from '@angular/core';
 import { rxResource } from '@angular/core/rxjs-interop';
@@ -69,6 +70,7 @@ export class EditEventPage {
   readonly eventId = input.required<string>();
 
   protected readonly eventsPath = APP_ROUTES.library.events;
+  protected readonly nameMax = SHORT_NAME_MAX;
   protected readonly max = MAX_SETLIST;
 
   protected readonly details = rxResource({

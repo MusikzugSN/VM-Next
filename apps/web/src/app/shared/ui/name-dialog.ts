@@ -1,3 +1,4 @@
+import { SHORT_NAME_MAX } from '@vm-web/shared';
 import { ChangeDetectionStrategy, Component, effect, input, model, signal, untracked } from '@angular/core';
 import { TranslocoPipe } from '@jsverse/transloco';
 import { VmField, VmFieldLabel, VmInput } from '@vm-web/ui';
@@ -6,7 +7,6 @@ import { VmField, VmFieldLabel, VmInput } from '@vm-web/ui';
 import { FormDialog, runDialogSave } from './form-dialog';
 
 /** Max. length of a short name (`shortNameSchema`). */
-export const NAME_MAX = 100;
 
 /**
  * Dialog with one name field: create or rename tags, instruments, ensembles, roles.
@@ -30,7 +30,7 @@ export class NameDialog {
   readonly initial = input('');
   readonly save = input.required<(name: string) => Promise<boolean>>();
 
-  protected readonly max = NAME_MAX;
+  protected readonly max = SHORT_NAME_MAX;
   protected readonly name = signal('');
   protected readonly busy = signal(false);
 

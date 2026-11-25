@@ -2,7 +2,7 @@ import { sql } from 'drizzle-orm';
 import { boolean, timestamp, index, int, json, mysqlEnum, mysqlTable, primaryKey, uniqueIndex, varchar } from 'drizzle-orm/mysql-core';
 import { scores } from './scores';
 
-export const FIELD_TYPES = ['text', 'number', 'date', 'select', 'multiselect', 'link', 'boolean'] as const;
+const FIELD_TYPES = ['text', 'number', 'date', 'select', 'multiselect', 'link', 'boolean'] as const;
 
 /** Custom fields of scores (N-2, N-3); values live in `score_field_values`. */
 export const fieldDefinitions = mysqlTable(

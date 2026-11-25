@@ -36,7 +36,7 @@
         <input
           vm-input
           type="text"
-          maxlength="100"
+          [maxLength]="nameMax"
           [readonly]="!canEdit()"
           [value]="folder.name"
           (blur)="rename($any($event.target).value)"
@@ -78,7 +78,7 @@
                 data-number
                 vm-input
                 type="text"
-                maxlength="10"
+                [maxLength]="numberMax"
                 class="w-20 text-center font-semibold text-primary tabular-nums"
                 [readonly]="!canEdit()"
                 [value]="entry.number"
@@ -94,7 +94,7 @@
                 data-number-suffix
                 vm-input
                 type="text"
-                maxlength="1"
+                [maxLength]="suffixLength"
                 class="w-12 text-center font-semibold text-primary"
                 [readonly]="!canEdit()"
                 [value]="entry.numberSuffix ?? ''"

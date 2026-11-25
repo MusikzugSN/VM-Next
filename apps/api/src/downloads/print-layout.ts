@@ -6,7 +6,7 @@ export const A4 = { width: 595.28, height: 841.89 } as const;
 export const MARGIN = (5 / 25.4) * 72;
 
 /** Page sequence of one score in the print-ready PDF. */
-export interface DocumentLayout {
+interface DocumentLayout {
   mode: PrintMode;
   /** Source pages and blank pages in output order. */
   slots: ('page' | 'blank')[];

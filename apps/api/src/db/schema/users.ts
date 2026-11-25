@@ -1,7 +1,7 @@
 import { sql } from 'drizzle-orm';
 import { boolean, timestamp, index, mysqlEnum, mysqlTable, text, varchar } from 'drizzle-orm/mysql-core';
 
-export const USER_STATUSES = ['active', 'blocked'] as const;
+const USER_STATUSES = ['active', 'blocked'] as const;
 
 /** Accounts; name, e-mail and picture come from the identity server on every login (A-3, A-4). */
 export const users = mysqlTable(

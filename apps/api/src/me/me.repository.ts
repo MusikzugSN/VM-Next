@@ -1,6 +1,7 @@
 import { Inject, Injectable } from '@nestjs/common';
 import type { VoiceRef } from '@vm-web/shared';
 import { and, asc, desc, eq, gte, inArray, isNull, like, lt, ne, or, sql, type SQL } from 'drizzle-orm';
+import type { MySqlColumn } from 'drizzle-orm/mysql-core';
 import type { CursorKey } from '../common/pagination/cursor';
 import { DATABASE, type Database } from '../db/database';
 import {
@@ -30,6 +31,10 @@ import { displayFolderNumber } from '../folders/folder-number';
 
 /** `( $1, $2, … )` for `in` lists; callers guarantee a non-empty list. */
 const list = (ids: readonly string[]): SQL => sql`(${sql.join(ids.map((id) => sql`${id}`), sql`, `)})`;
+
+function releasedInMyArea(table: { ensembleId: MySqlColumn; showInMyArea: MySqlColumn }, ensembleIds: readonly string[]): SQL | undefined {
+  return and(inArray(table.ensembleId, [...ensembleIds]), eq(table.showInMyArea, true), isNull(ensembles.archivedAt));
+}
 
 /** Score ids reachable through released folders and events of the given ensembles (R-2, N-15, F-6). */
 function visibleScoreIds(ensembleIds: readonly string[]): SQL {
@@ -252,9 +257,7 @@ export class MeRepository {
       .innerJoin(ensembles, eq(ensembles.id, events.ensembleId))
       .where(
         and(
-          inArray(events.ensembleId, [...ensembleIds]),
-          eq(events.showInMyArea, true),
-          isNull(ensembles.archivedAt),
+          releasedInMyArea(events, ensembleIds),
           upcoming ? gte(events.date, today) : lt(events.date, today),
           after,
         ),
@@ -270,12 +273,7 @@ export class MeRepository {
       .from(events)
       .innerJoin(ensembles, eq(ensembles.id, events.ensembleId))
       .where(
-        and(
-          eq(events.id, eventId),
-          inArray(events.ensembleId, [...ensembleIds]),
-          eq(events.showInMyArea, true),
-          isNull(ensembles.archivedAt),
-        ),
+        and(eq(events.id, eventId), releasedInMyArea(events, ensembleIds)),
       );
     return row;
   }
@@ -319,9 +317,7 @@ export class MeRepository {
       .innerJoin(ensembles, eq(ensembles.id, folders.ensembleId))
       .where(
         and(
-          inArray(folders.ensembleId, [...ensembleIds]),
-          eq(folders.showInMyArea, true),
-          isNull(ensembles.archivedAt),
+          releasedInMyArea(folders, ensembleIds),
           cursor
             ? sql`(lower(${ensembles.name}), lower(${folders.name}), ${folders.id}) > (${cursor[0]}, ${cursor[1]}, ${cursor[2]})`
             : undefined,
@@ -338,12 +334,7 @@ export class MeRepository {
       .from(folders)
       .innerJoin(ensembles, eq(ensembles.id, folders.ensembleId))
       .where(
-        and(
-          eq(folders.id, folderId),
-          inArray(folders.ensembleId, [...ensembleIds]),
-          eq(folders.showInMyArea, true),
-          isNull(ensembles.archivedAt),
-        ),
+        and(eq(folders.id, folderId), releasedInMyArea(folders, ensembleIds)),
       );
     return row;
   }

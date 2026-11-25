@@ -33,7 +33,8 @@ export const createdResponseSchema = z.object({ id: idSchema });
 export type CreatedResponse = z.infer<typeof createdResponseSchema>;
 
 /** Names of tags, folders, ensembles, roles, voices … */
-export const shortNameSchema = z.string().trim().min(1).max(100);
+export const SHORT_NAME_MAX = 100;
+export const shortNameSchema = z.string().trim().min(1).max(SHORT_NAME_MAX);
 
 /** Body of every `…/rename` action. */
 export const renameBodySchema = z.object({ name: shortNameSchema });

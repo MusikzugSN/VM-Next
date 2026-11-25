@@ -3,7 +3,7 @@ import { scores } from './scores';
 import { users } from './users';
 import { voices } from './voices';
 
-export const UPLOAD_STATUSES = ['pending', 'approved', 'rejected'] as const;
+const UPLOAD_STATUSES = ['pending', 'approved', 'rejected'] as const;
 
 /** Uploaded PDFs until the review decides, then their history (N-10..N-14). */
 export const uploads = mysqlTable(

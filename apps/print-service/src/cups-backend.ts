@@ -94,12 +94,12 @@ export class CupsBackend implements PrinterBackend {
   }
 
   async state(backendId: string, printerId: string): Promise<BackendJobState> {
-    const open = await this.run('lpstat', ['-W', 'not-completed', '-o', printerId]).catch(() => '');
+    const open = await this.run('lpstat', ['-W', 'not-completed', '-o', printerId]);
     if (listsJob(open, backendId)) {
       const printer = await this.run('lpstat', ['-p', printerId]).catch(() => '');
       return { status: isPrinting(printer, backendId) ? 'printing' : 'waiting', printedPages: null, error: null };
     }
-    const done = await this.run('lpstat', ['-W', 'completed', '-o', printerId]).catch(() => '');
+    const done = await this.run('lpstat', ['-W', 'completed', '-o', printerId]);
     if (listsJob(done, backendId)) return { status: 'done', printedPages: null, error: null };
     return { status: 'failed', printedPages: null, error: 'Der Auftrag ist im Drucksystem nicht mehr vorhanden.' };
   }

@@ -3,7 +3,7 @@ import type { AcceptedLegalTemplate } from '../db/schema';
 import { MODULES_SLOT } from './legal-templates';
 
 /** What decides whether a module is active in this installation. */
-export interface LegalModuleState {
+interface LegalModuleState {
   /** A VM-Web address for the print service is configured (D-4); without it the print service accepts no jobs. */
   printServiceConfigured: boolean;
 }

@@ -1,3 +1,4 @@
+export * from './file-names';
 export * from './ids.schema';
 export * from './pagination.schema';
 export * from './problem-details.schema';

@@ -117,6 +117,14 @@ describe('AuthController (BFF login)', () => {
     expect((await get('login?returnTo=%2F%2Fevil.example')).status).toBe(400);
   });
 
+  it.each(['%2F%5Cevil.example', '%2F%09%2Fevil.example', '%2F%0A%2F%2Fevil.example', '%2F%0D%2Fevil.example'])(
+    'falls back to the default path for returnTo=%s, which the URL parser resolves off-origin',
+    async (returnTo) => {
+      const res = await loginFlow('musician', decodeURIComponent(returnTo));
+      expect(res.headers.get('location')).toBe('http://localhost:4200/me');
+    },
+  );
+
   it('callback creates a session with httpOnly cookie and readable CSRF cookie, then redirects', async () => {
     const res = await loginFlow('musician', '/me/mappen');
     expect(res.status).toBe(302);

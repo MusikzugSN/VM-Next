@@ -1,4 +1,4 @@
-import { safeFileName } from '../util/safe-file-name';
+import { downloadFileName } from '@vm-web/shared';
 
 /**
  * Browser printing (D-2): the print-ready PDF goes into a hidden iframe, then its print dialog
@@ -79,5 +79,5 @@ export async function sharePdf(pdf: Blob, fileName: string): Promise<boolean> {
 export function printFileName(title: string, voices: readonly string[]): string {
   const voice = voices.length === 1 ? voices[0] : voices.length > 1 ? `${voices.length} Stimmen` : '';
   const name = ['Druck', title, voice].filter(Boolean).join(' – ');
-  return `${safeFileName(name)}.pdf`;
+  return downloadFileName(name, 'pdf');
 }
