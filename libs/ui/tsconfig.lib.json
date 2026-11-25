@@ -10,7 +10,6 @@
     "src/**/*.ts"
   ],
   "exclude": [
-    "src/**/*.spec.ts",
-    "vitest.config.mts"
+    "src/**/*.spec.ts"
   ]
 }

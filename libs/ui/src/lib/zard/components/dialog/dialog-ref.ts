@@ -5,14 +5,6 @@ import { ZardOverlayRefBase } from '@vm-web/ui/zard/core';
 import type { ZardDialogContainerComponent, ZardDialogOptions } from './dialog-container.component';
 import { DIALOG_DURATION } from './dialog-panel.component';
 
-/**
- * Reference to a dialog opened via {@link ZardDialogService}.
- *
- * Exposes signals for reactive consumption (`isClosing`, `result`,
- * `componentInstance`) and methods for closing the dialog. The lifecycle itself
- * lives in {@link ZardOverlayRefBase}, shared with sheet, drawer and
- * alert-dialog, so Escape closes the topmost overlay of any kind.
- */
 export class ZardDialogRef<T = unknown, R = unknown, U = unknown> extends ZardOverlayRefBase<T, R> {
   constructor(
     overlayRef: OverlayRef | null,
@@ -35,5 +27,9 @@ export class ZardDialogRef<T = unknown, R = unknown, U = unknown> extends ZardOv
 
   protected override closesOnOutsidePointer(): boolean {
     return this.config.zMaskClosable ?? true;
+  }
+
+  protected override closesOnEscape(): boolean {
+    return this.config.zClosable ?? true;
   }
 }

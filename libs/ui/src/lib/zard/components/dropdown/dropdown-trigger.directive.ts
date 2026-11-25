@@ -1,5 +1,4 @@
 import {
-  afterNextRender,
   booleanAttribute,
   computed,
   Directive,
@@ -10,7 +9,7 @@ import {
 } from '@angular/core';
 
 import type { ZardDropdownMenuContentComponent } from './dropdown-menu-content.component';
-import { ZardDropdownService, type ZardDropdownPlacement } from './dropdown.service';
+import { ZardDropdownService, type ZardDropdownOpenOptions, type ZardDropdownPlacement } from './dropdown.service';
 
 @Directive({
   selector: '[z-dropdown], [zDropdown], [vm-menu-trigger]',
@@ -26,8 +25,9 @@ import { ZardDropdownService, type ZardDropdownPlacement } from './dropdown.serv
     '(click.prevent-with-stop)': 'onClick()',
     '(mouseenter)': 'onHoverToggle($event)',
     '(mouseleave)': 'onHoverToggle($event)',
-    '(keydown.{enter,space}.prevent-with-stop)': 'toggleDropdown()',
-    '(keydown.arrowdown.prevent)': 'openDropdown()',
+    '(keydown.{enter,space}.prevent-with-stop)': 'toggleDropdown("first")',
+    '(keydown.arrowdown.prevent)': 'openDropdown("first")',
+    '(keydown.arrowup.prevent)': 'openDropdown("last")',
   },
   exportAs: 'zDropdown',
 })
@@ -43,18 +43,6 @@ export class ZardDropdownDirective {
   readonly zDropdownMenu = input<ZardDropdownMenuContentComponent>();
   readonly zTrigger = input<'click' | 'hover'>('click');
   readonly zDisabled = input(false, { transform: booleanAttribute });
-
-  constructor() {
-    // Ensure the trigger has an accessible name. This waits for the first render: text the trigger
-    // interpolates (`{{ title() }}`) is not in the DOM yet during ngOnInit.
-    afterNextRender(() => {
-      const element = this.elementRef.nativeElement;
-      if (!element.hasAttribute('aria-label') && !element.hasAttribute('aria-labelledby')) {
-        const label = element.textContent?.trim();
-        element.setAttribute('aria-label', label?.length ? label : 'Open menu');
-      }
-    });
-  }
 
   protected onClick() {
     if (this.zTrigger() !== 'click') {
@@ -76,7 +64,7 @@ export class ZardDropdownDirective {
     }
   }
 
-  protected toggleDropdown() {
+  protected toggleDropdown(initialFocus?: ZardDropdownOpenOptions['initialFocus']) {
     if (this.zDisabled()) {
       return;
     }
@@ -88,11 +76,12 @@ export class ZardDropdownDirective {
         menuContent.contentTemplate(),
         this.viewContainerRef,
         this.placementOf(menuContent),
+        { initialFocus },
       );
     }
   }
 
-  protected openDropdown() {
+  protected openDropdown(initialFocus?: ZardDropdownOpenOptions['initialFocus']) {
     if (this.zDisabled()) {
       return;
     }
@@ -104,11 +93,11 @@ export class ZardDropdownDirective {
         menuContent.contentTemplate(),
         this.viewContainerRef,
         this.placementOf(menuContent),
+        { initialFocus },
       );
     }
   }
 
-  /** The content owns `zSide`/`zAlign`/`zSideOffset`, exactly as `DropdownMenuContent` does in shadcn. */
   private placementOf(menuContent: ZardDropdownMenuContentComponent): ZardDropdownPlacement {
     return {
       side: menuContent.zSide(),

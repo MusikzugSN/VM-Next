@@ -48,24 +48,6 @@ import {
 
 const ESCAPE_KEYS = ['Escape', 'Esc'];
 
-/**
- * A panel that slides in from an edge of the screen, composed in the template.
- *
- * ```html
- * <z-sheet [(zVisible)]="visible" zSide="right">
- *   <z-sheet-header>
- *     <z-sheet-title>Title</z-sheet-title>
- *     <z-sheet-description>Description</z-sheet-description>
- *   </z-sheet-header>
- *   ...content...
- *   <z-sheet-footer>
- *     <button type="button" z-button z-sheet-close>Cancel</button>
- *   </z-sheet-footer>
- * </z-sheet>
- * ```
- *
- * `ZardSheetService.create()` opens the same panel from code.
- */
 @Component({
   selector: 'z-sheet',
   imports: [ZardSheetPanelComponent],
@@ -88,9 +70,6 @@ const ESCAPE_KEYS = ['Escape', 'Esc'];
       </z-sheet-panel>
     </ng-template>
   `,
-  // forwardRef: the decorator is evaluated before the class binding exists, so a bare
-  // reference to ZardSheetComponent here throws "Cannot access before initialization"
-  // whenever the module is evaluated outside the AOT compiler.
   providers: [{ provide: ZardSheetHost, useExisting: forwardRef(() => ZardSheetComponent) }],
   changeDetection: ChangeDetectionStrategy.OnPush,
   encapsulation: ViewEncapsulation.None,
@@ -99,35 +78,23 @@ const ESCAPE_KEYS = ['Escape', 'Esc'];
 })
 export class ZardSheetComponent extends ZardSheetHost {
   private readonly overlay = inject(Overlay);
-  // Optional: the direction of the declaration site, which is where the overlay content takes its dir from.
   private readonly directionality = inject(Directionality, { optional: true });
   private readonly viewContainerRef = inject(ViewContainerRef);
   private readonly platformId = inject(PLATFORM_ID);
   private readonly destroyRef = inject(DestroyRef);
   private readonly panel = viewChild.required<TemplateRef<void>>('panel');
 
-  /** Open state, two-way bound. */
   readonly zVisible = model(false);
-  /** Edge of the screen the sheet slides from. */
   readonly zSide = input<ZardSheetSide>('right');
-  /** Preset width (left/right) or height (top/bottom). Ignored once `zWidth` or `zHeight` is set. */
   readonly zSize = input<ZardSheetSize>('default');
-  /** Explicit width, for left/right sheets. */
   readonly zWidth = input<string | undefined>(undefined);
-  /** Explicit height, for top/bottom sheets. */
   readonly zHeight = input<string | undefined>(undefined);
-  /** Renders the close button in the top corner on the inline-end side. */
   readonly zClosable = input(true, { transform: booleanAttribute });
-  /** Whether a click on the mask closes the sheet. */
   readonly zMaskClosable = input(true, { transform: booleanAttribute });
-  /** How long the enter and leave transitions run, in ms. */
   readonly zDuration = input(SHEET_DURATION);
-  /** Custom classes applied to the panel. */
   readonly class = input<ClassValue>('');
 
-  /** Emitted once the sheet is attached to the DOM. */
   readonly zAfterOpen = output<void>();
-  /** Emitted once the sheet has finished its exit transition and is gone. */
   readonly zAfterClose = output<void>();
 
   readonly titleId = signal<string | null>(null);
@@ -163,7 +130,6 @@ export class ZardSheetComponent extends ZardSheetHost {
       return;
     }
 
-    // Re-opening mid-exit: keep the same overlay and reverse the transition.
     if (this.overlayRef) {
       this.clearDisposeTimer();
       this.state.set('open');
@@ -185,7 +151,6 @@ export class ZardSheetComponent extends ZardSheetHost {
     );
     this.overlayRef = overlayRef;
 
-    // A [dir] switch while the overlay is open updates it in place: the panel keeps its content and mirrors.
     this.directionality?.change
       .pipe(takeUntil(overlayRef.detachments()))
       .subscribe(() => overlayRef.setDirection(this.directionality?.value ?? 'ltr'));
@@ -202,7 +167,7 @@ export class ZardSheetComponent extends ZardSheetHost {
       .keydownEvents()
       .pipe(filter(event => ESCAPE_KEYS.includes(event.key)))
       .subscribe(event => {
-        if (!isTopmostOverlay(this)) return;
+        if (!isTopmostOverlay(this) || !this.zClosable()) return;
         event.preventDefault();
         this.requestClose();
       });
@@ -235,7 +200,6 @@ export class ZardSheetComponent extends ZardSheetHost {
     }
     this.previouslyFocused = null;
 
-    // Teardown disposes the overlay too, but the output is already gone by then.
     if (!this.destroyed) {
       this.zAfterClose.emit();
     }
@@ -301,8 +265,6 @@ export class ZardSheetTitleComponent {
   protected readonly classes = computed(() => mergeClasses(sheetTitleVariants(), this.class()));
 
   constructor() {
-    // Registered after the first render: the panel reads this id through an input binding,
-    // and writing to it mid-render would trip change-detection checks in dev mode.
     afterNextRender(() => this.sheet?.titleId.set(this.id));
 
     inject(DestroyRef).onDestroy(() => {
@@ -371,7 +333,6 @@ export class ZardSheetFooterComponent {
   protected readonly classes = computed(() => mergeClasses(sheetFooterVariants(), this.class()));
 }
 
-/** Closes the sheet it is projected into — declarative or service-opened alike. */
 @Directive({
   selector: '[z-sheet-close]',
   host: {

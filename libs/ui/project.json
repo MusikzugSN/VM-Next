@@ -5,5 +5,24 @@
   "projectType": "library",
   "prefix": "vm",
   "tags": [],
-  "targets": {}
+  "targets": {
+    "test-build": {
+      "executor": "@angular/build:application",
+      "options": {
+        "browser": "libs/ui/src/index.ts",
+        "tsConfig": "libs/ui/tsconfig.spec.json",
+        "outputPath": "dist/libs/ui-test",
+        "optimization": false,
+        "sourceMap": true
+      }
+    },
+    "test": {
+      "executor": "@angular/build:unit-test",
+      "options": {
+        "buildTarget": "ui:test-build",
+        "tsConfig": "libs/ui/tsconfig.spec.json",
+        "watch": false
+      }
+    }
+  }
 }
