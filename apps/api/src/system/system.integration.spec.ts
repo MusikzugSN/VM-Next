@@ -14,12 +14,8 @@ import { FsFileStorage } from '../storage/fs-file-storage';
 import { LibraryBuilder } from '../testing/library-builder';
 import { createTestApp, type TestApp } from '../testing/test-app';
 import { createTestDatabase, TEST_DATABASE_URL, type TestDatabase } from '../testing/test-database';
-import { ConfigService } from './config.service';
-import { EnsemblesService } from './ensembles.service';
-import { RolesService } from './roles.service';
 import { SystemConfigController, SystemEnsemblesController, SystemRolesController, SystemUsersController } from './system.controller';
-import { logoMulterOptions } from './system.module';
-import { UsersService } from './users.service';
+import { logoMulterOptions, SYSTEM_PROVIDERS } from './system.module';
 import { PrintRulesService } from '../print-rules/print-rules.service';
 
 const PNG = Buffer.from([0x89, 0x50, 0x4e, 0x47, 0x0d, 0x0a, 0x1a, 0x0a, 1, 2, 3]);
@@ -70,7 +66,7 @@ describe.skipIf(!TEST_DATABASE_URL)('Systemverwaltung (TEST_DATABASE_URL)', () =
       {
         imports: [MulterModule.registerAsync({ useFactory: logoMulterOptions })],
         controllers: [SystemUsersController, SystemEnsemblesController, SystemRolesController, SystemConfigController],
-        providers: [UsersService, EnsemblesService, RolesService, ConfigService, ClubSettingsRepository, PrintRulesService],
+        providers: [...SYSTEM_PROVIDERS, ClubSettingsRepository, PrintRulesService],
       },
       { database: testDb.db, providers: [{ provide: FILE_STORAGE, useValue: storage }] },
     );
@@ -131,6 +127,39 @@ describe.skipIf(!TEST_DATABASE_URL)('Systemverwaltung (TEST_DATABASE_URL)', () =
       ['sara', 'config', undefined, 200],
       ['bob', 'config', undefined, 403],
       ['mia', 'config/update-print', { browserPrintPageLimit: 5, publicBaseUrl: null }, 403],
+      ['sara', `users/${ids.bob}/details`, undefined, 200],
+      ['mia', `users/${ids.bob}/details`, undefined, 403],
+      ['mia', `users/${ids.bob}/set-membership`, { ensembleId: ids.youth, roleId: ids.role_musician }, 403],
+      ['mia', `users/${ids.bob}/remove-membership`, { ensembleId: ids.orchestra }, 403],
+      ['mia', `users/${ids.bob}/set-voices`, { voiceIds: [] }, 403],
+      ['mia', `users/${ids.bob}/block`, {}, 403],
+      ['mia', `users/${ids.bob}/unblock`, {}, 403],
+      ['bob', `users/${ids.mia}/delete`, {}, 403],
+      ['mia', `ensembles/${ids.youth}/details`, undefined, 404],
+      ['bob', `ensembles/${ids.orchestra}/rename`, { name: 'x' }, 403],
+      ['bob', `ensembles/${ids.windClass}/set-parent`, { parentId: ids.youth }, 403],
+      ['bob', `ensembles/${ids.windClass}/archive`, {}, 403],
+      ['bob', `ensembles/${ids.windClass}/unarchive`, {}, 403],
+      ['bob', `ensembles/${ids.orchestra}/set-lineup`, { voiceIds: [] }, 403],
+      ['bob', `ensembles/${ids.orchestra}/apply-lineup-template`, {}, 403],
+      ['sara', `ensembles/${ids.orchestra}/print-rules`, undefined, 200],
+      ['bob', `ensembles/${ids.orchestra}/print-rules`, undefined, 403],
+      ['bob', `ensembles/${ids.orchestra}/set-print-rules`, { rules: [{ fromPages: 1, mode: 'simplex' }] }, 403],
+      ['bob', `ensembles/${ids.orchestra}/reset-print-rules`, {}, 403],
+      ['sara', 'permission-catalog', undefined, 200],
+      ['mia', 'permission-catalog', undefined, 403],
+      ['sara', `roles/${ids.role_board}/details`, undefined, 200],
+      ['mia', `roles/${ids.role_board}/details`, undefined, 403],
+      ['bob', `roles/${ids.role_board}/rename`, { name: 'x' }, 403],
+      ['bob', `roles/${ids.role_board}/set-permissions`, { permissions: [] }, 403],
+      ['bob', `roles/${ids.role_board}/delete`, {}, 403],
+      ['bob', `roles/${ids.role_board}/reset-to-default`, {}, 403],
+      ['bob', 'roles/reset-defaults', {}, 403],
+      ['sara', 'config/default-options', undefined, 200],
+      ['mia', 'config/default-options', undefined, 403],
+      ['mia', 'config/update-club', { clubName: 'x', loginBanner: null, loginAutoRedirect: false }, 403],
+      ['mia', 'config/update-defaults', { defaultEnsembleId: null, defaultRoleId: null }, 403],
+      ['mia', 'config/remove-logo', {}, 403],
     ];
 
     it('allows and forbids as expected', async () => {
@@ -225,6 +254,19 @@ describe.skipIf(!TEST_DATABASE_URL)('Systemverwaltung (TEST_DATABASE_URL)', () =
       expect(await testDb.db.select().from(userVoices).where(eq(userVoices.userId, gone))).toEqual([]);
       expect((await api('sara', `users/${ids.sara}/delete`, {})).body.code).toBe('last-admin');
     });
+
+    it('never lets two admins demote each other at the same time (R-6)', async () => {
+      const results = await Promise.all([
+        api('adam', `users/${ids.sara}/set-admin`, { isAdmin: false }),
+        api('sara', `users/${ids.adam}/set-admin`, { isAdmin: false }),
+      ]);
+      expect(results.map((r) => r.status).sort()).toEqual([204, 409]);
+      const admins = await testDb.db.select({ id: users.id }).from(users).where(eq(users.isAdmin, true));
+      expect(admins).toHaveLength(1);
+      const remaining: Who = admins[0].id === ids.adam ? 'adam' : 'sara';
+      const other = remaining === 'adam' ? ids.sara : ids.adam;
+      expect((await api(remaining, `users/${other}/set-admin`, { isAdmin: true })).status).toBe(204);
+    });
   });
 
   describe('ensembles (S-2, F-3, N-4, N-8)', () => {
@@ -275,6 +317,30 @@ describe.skipIf(!TEST_DATABASE_URL)('Systemverwaltung (TEST_DATABASE_URL)', () =
         { path: '/body/ensembleId', code: 'archived' },
       ]);
       expect((await api('sara', `ensembles/${ids.chamber}/unarchive`, {})).status).toBe(204);
+    });
+
+    it('keeps archived parents closed for new, restored and default ensembles (S-2, A-3)', async () => {
+      const parent = (await api('sara', 'ensembles/create', { name: 'Ehemalige', parentId: ids.root, applyLineupTemplate: false })).body.id;
+      const child = (await api('sara', 'ensembles/create', { name: 'Alte Herren', parentId: parent, applyLineupTemplate: false })).body.id;
+      expect((await api('sara', `ensembles/${child}/archive`, {})).status).toBe(204);
+      expect((await api('sara', `ensembles/${parent}/archive`, {})).status).toBe(204);
+      expect((await api('sara', `ensembles/${child}/unarchive`, {})).body.code).toBe('conflict');
+      expect((await api('sara', 'ensembles/create', { name: 'Neu', parentId: parent, applyLineupTemplate: false })).body.errors).toEqual([
+        { path: '/body/parentId', code: 'archived' },
+      ]);
+      expect((await api('sara', 'config/update-defaults', { defaultEnsembleId: parent, defaultRoleId: null })).body.errors).toEqual([
+        { path: '/body/defaultEnsembleId', code: 'archived' },
+      ]);
+      expect((await api('sara', `ensembles/${parent}/unarchive`, {})).status).toBe(204);
+      expect((await api('sara', `ensembles/${child}/unarchive`, {})).status).toBe(204);
+    });
+
+    it('serializes concurrent moves so that no cycle can arise (F-3)', async () => {
+      const a = (await api('sara', 'ensembles/create', { name: 'Kreis A', parentId: ids.root, applyLineupTemplate: false })).body.id;
+      const b = (await api('sara', 'ensembles/create', { name: 'Kreis B', parentId: ids.root, applyLineupTemplate: false })).body.id;
+      const results = await Promise.all([api('adam', `ensembles/${a}/set-parent`, { parentId: b }), api('adam', `ensembles/${b}/set-parent`, { parentId: a })]);
+      expect(results.map((r) => r.status).sort()).toEqual([204, 409]);
+      expect(results.find((r) => r.status === 409)?.body.code).toBe('invalid-hierarchy');
     });
 
     it('sets the lineup in order and re-applies the template (N-4, N-8)', async () => {
