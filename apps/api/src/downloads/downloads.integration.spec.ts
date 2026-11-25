@@ -1,4 +1,4 @@
-import { CSRF_HEADER } from '@vm-web/shared';
+import { CSRF_HEADER, PRINT_MAX_PAGES } from '@vm-web/shared';
 import { eq } from 'drizzle-orm';
 import { mkdtemp, rm } from 'node:fs/promises';
 import { tmpdir } from 'node:os';
@@ -112,6 +112,11 @@ describe.skipIf(!TEST_DATABASE_URL)('Druck und Download (TEST_DATABASE_URL)', ()
     await b.inFolder(ids.hidden, [[ids.secret, '1']]);
     ids.youthHidden = await b.folder(ids.youth, 'Jugend intern', false);
     await b.inFolder(ids.youthHidden, [[ids.polka, '1']]);
+    ids.huge = await b.score('Sinfonie');
+    await b.sheet(ids.huge, ids.tp1, PRINT_MAX_PAGES + 1);
+    ids.hugeFolder = await b.folder(ids.orchestra, 'Sinfoniekonzert');
+    await b.inFolder(ids.hugeFolder, [[ids.huge, '1']]);
+
     ids.concert = await b.event(ids.orchestra, 'Konzert', addDays(today, 3));
     await b.setlist(ids.concert, [ids.polka, ids.march]);
 
@@ -274,6 +279,13 @@ describe.skipIf(!TEST_DATABASE_URL)('Druck und Download (TEST_DATABASE_URL)', ()
       // a plain member prints only Mein Bereich
       expect((await fetchAs('ben', `print/print-plan?scope=score&scoreId=${ids.march}`)).status).toBe(404);
       expect((await fetchAs('anna', `print/print-plan?scope=folder&folderId=${ids.hidden}`)).status).toBe(404);
+    });
+
+    it('refuses a print job above the page limit instead of loading every sheet', async () => {
+      const res = await fetchAs('anna', `print/document?scope=folder&folderId=${ids.hugeFolder}`);
+      expect(res.status).toBe(413);
+      expect(json(res).code).toBe('print-too-large');
+      expect((await fetchAs('anna', `print/print-plan?scope=folder&folderId=${ids.hugeFolder}`)).status).toBe(200);
     });
 
     it('validates the scope and refuses empty print documents', async () => {

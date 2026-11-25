@@ -1,5 +1,5 @@
 import { Inject, Injectable, Logger } from '@nestjs/common';
-import { printModeFor, type PrintPlanResponse, type PrintQuery, type SubstituteMode } from '@vm-web/shared';
+import { PRINT_MAX_PAGES, printModeFor, type PrintPlanResponse, type PrintQuery, type SubstituteMode } from '@vm-web/shared';
 import { ZipArchive } from 'archiver';
 import { eq } from 'drizzle-orm';
 import { once } from 'node:events';
@@ -118,6 +118,10 @@ export class DownloadsService {
   async printDocument(access: AccessContext, query: PrintQuery): Promise<FileResult<Buffer>> {
     const plan = await this.output.plan(access, 'print', scopeOf(query), query.voiceId, query.substitutes);
     if (!plan.documents.length) throw ProblemException.notFound('Nothing to print');
+    const sourcePages = plan.documents.reduce((sum, d) => sum + d.sheet.pageCount, 0);
+    if (sourcePages > PRINT_MAX_PAGES) {
+      throw new ProblemException(413, 'print-too-large', `Print job of ${sourcePages} pages exceeds the limit of ${PRINT_MAX_PAGES}`);
+    }
     const sources: Uint8Array[] = [];
     for (const doc of plan.documents) sources.push(await streamToBuffer(await this.read(doc.fileKey)));
     const { rules } = await this.printRules.effective(await this.contextEnsemble(query));

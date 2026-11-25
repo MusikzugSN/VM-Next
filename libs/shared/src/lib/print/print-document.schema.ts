@@ -6,4 +6,6 @@ import { printQuerySchema } from './print-plan.schema';
  * file name `Druck – <Mappe|Event|Titel> – <Stimme>.pdf`.
  * The browser prints it itself (D-2) or posts it to the local print service (D-3).
  */
+export const PRINT_MAX_PAGES = 500;
+
 export const printDocumentQuerySchema = printQuerySchema;

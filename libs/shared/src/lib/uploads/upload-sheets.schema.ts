@@ -3,6 +3,7 @@ import { idSchema } from '../common/ids.schema';
 import { uploadStatusSchema } from '../common/sheet.schema';
 
 export const UPLOAD_MAX_FILES = 50;
+export const UPLOAD_MAX_PAGES = 500;
 export const UPLOAD_FILE_FIELD = 'files';
 export const UPLOAD_META_FIELD = 'meta';
 

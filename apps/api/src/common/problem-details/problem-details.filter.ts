@@ -27,6 +27,7 @@ const TITLES: Record<ProblemCode, string> = {
   'invalid-hierarchy': 'Invalid ensemble hierarchy',
   'unsupported-media-type': 'Unsupported media type',
   'payload-too-large': 'Payload too large',
+  'print-too-large': 'Print job too large',
   'login-failed': 'Login failed',
   'internal-error': 'Internal error',
 };

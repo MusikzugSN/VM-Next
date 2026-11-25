@@ -127,6 +127,7 @@
     "invalid-hierarchy": "Ein Ensemble kann nicht unter sich selbst oder einem eigenen Unter-Ensemble stehen.",
     "unsupported-media-type": "Dieses Dateiformat wird nicht unterstützt.",
     "payload-too-large": "Die Datei ist zu groß.",
+    "print-too-large": "Der Druckauftrag ist zu groß. Drucke die Mappe in mehreren Teilen.",
     "login-failed": "Die Anmeldung ist fehlgeschlagen. Bitte versuche es erneut.",
     "internal-error": "Auf dem Server ist ein Fehler aufgetreten. Bitte versuche es später erneut.",
     "network-error": "VM-Web ist gerade nicht erreichbar. Prüfe deine Internetverbindung und versuche es erneut.",
@@ -153,6 +154,7 @@
     "custom": "Ungültiger Wert",
     "po_box": "Bitte die Anschrift des Vereinssitzes angeben, kein Postfach.",
     "too_short": "Zu kurz",
+    "too_many_pages": "Die PDF hat zu viele Seiten.",
     "not_eea": "Nur Standorte in der EU oder im EWR sind möglich."
   },
   "shell": {

@@ -1,3 +1,4 @@
+import { UPLOAD_MAX_PAGES } from '@vm-web/shared';
 import { degrees, PDFDocument } from 'pdf-lib';
 import { buildSheetPdf, cropToUserSpace, inspectPdf, InvalidPdfError } from './pdf-tools';
 import { suggestVoice, tokenize } from './voice-suggestion';
@@ -110,6 +111,11 @@ describe('inspectPdf', () => {
     ['damaged', Buffer.from('%PDF-1.7\nthis is not really a pdf')],
   ])('rejects %s', async (problem, bytes) => {
     await expect(inspectPdf(bytes)).rejects.toEqual(new InvalidPdfError(problem as 'not_pdf'));
+  });
+
+  it('rejects PDFs above the page limit before walking the page tree', async () => {
+    await expect(inspectPdf(await pdfWith(UPLOAD_MAX_PAGES + 1))).rejects.toEqual(new InvalidPdfError('too_many_pages'));
+    await expect(inspectPdf(await pdfWith(UPLOAD_MAX_PAGES))).resolves.toEqual({ pageCount: UPLOAD_MAX_PAGES });
   });
 });
 
