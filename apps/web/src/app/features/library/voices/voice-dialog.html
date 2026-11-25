@@ -11,7 +11,7 @@
           vm-input
           cdkFocusInitial
           type="text"
-          maxlength="100"
+          [maxLength]="nameMax"
           autocomplete="off"
           [placeholder]="'library.voices.namePlaceholder' | transloco"
           [value]="name()"
@@ -75,7 +75,7 @@
             <input
               vm-input
               type="text"
-              maxlength="100"
+              [maxLength]="nameMax"
               autocomplete="off"
               [value]="override() !== null && isNewInstrument() ? override() : ''"
               (input)="override.set($any($event.target).value || null)"

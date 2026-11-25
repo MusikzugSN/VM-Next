@@ -1,3 +1,4 @@
+import { FOLDER_NUMBER_MAX, FOLDER_NUMBER_SUFFIX_LENGTH, SHORT_NAME_MAX } from '@vm-web/shared';
 import { ChangeDetectionStrategy, Component, computed, inject, input, signal } from '@angular/core';
 import { rxResource } from '@angular/core/rxjs-interop';
 import { Router, RouterLink } from '@angular/router';
@@ -67,6 +68,9 @@ export class EditFolderPage {
   readonly folderId = input.required<string>();
 
   protected readonly foldersPath = APP_ROUTES.library.folders;
+  protected readonly nameMax = SHORT_NAME_MAX;
+  protected readonly numberMax = FOLDER_NUMBER_MAX;
+  protected readonly suffixLength = FOLDER_NUMBER_SUFFIX_LENGTH;
   protected readonly search = signal('');
   private readonly query = debounced(this.search);
   protected readonly adding = signal(false);

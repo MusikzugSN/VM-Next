@@ -1,3 +1,4 @@
+import { SHORT_NAME_MAX } from '@vm-web/shared';
 import { ChangeDetectionStrategy, Component, computed, effect, input, model, signal, untracked } from '@angular/core';
 import { TranslocoPipe } from '@jsverse/transloco';
 import { customFieldTypeSchema, type CustomFieldType, type FieldDefinition } from '@vm-web/shared';
@@ -5,7 +6,6 @@ import { VmField, VmFieldLabel, VmInput, VmSelect, VmTextarea } from '@vm-web/ui
 
 
 import { FormDialog, runDialogSave } from '../../../shared/ui/form-dialog';
-import { NAME_MAX } from '../../../shared/ui/name-dialog';
 import { draftFromField, emptyDraft, optionsFromText, type FieldDraft } from './field-draft';
 import { ToggleField } from '../../../shared/ui/toggle-field';
 
@@ -67,7 +67,7 @@ export class FieldDialog {
   readonly field = input<FieldDefinition | null>(null);
   readonly save = input.required<(value: FieldDialogValue) => Promise<boolean>>();
 
-  protected readonly max = NAME_MAX;
+  protected readonly max = SHORT_NAME_MAX;
   protected readonly types = customFieldTypeSchema.options;
   protected readonly draft = signal<FieldDraft>(emptyDraft());
   protected readonly busy = signal(false);

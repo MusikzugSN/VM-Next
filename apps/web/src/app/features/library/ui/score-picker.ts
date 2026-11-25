@@ -1,3 +1,4 @@
+import { FOLDER_NUMBER_MAX } from '@vm-web/shared';
 import { ChangeDetectionStrategy, Component, effect, input, output, signal, untracked } from '@angular/core';
 import { rxResource } from '@angular/core/rxjs-interop';
 import { TranslocoPipe } from '@jsverse/transloco';
@@ -40,7 +41,7 @@ export interface PickedScore {
       @if (numbered()) {
         <label vm-field class="md:w-32">
           <span vm-field-label>{{ 'library.picker.number' | transloco }}</span>
-          <input vm-input type="text" maxlength="10" [value]="number()" (input)="number.set($any($event.target).value)" />
+          <input vm-input type="text" [maxLength]="numberMax" [value]="number()" (input)="number.set($any($event.target).value)" />
         </label>
       }
     </div>
@@ -88,6 +89,7 @@ export class ScorePicker {
   readonly picked = output<PickedScore>();
 
   protected readonly search = signal('');
+  protected readonly numberMax = FOLDER_NUMBER_MAX;
   protected readonly query = debounced(this.search);
   protected readonly number = signal('');
 
