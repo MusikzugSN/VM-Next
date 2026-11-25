@@ -15,9 +15,15 @@ const LOCATION: Record<ArgumentMetadata['type'], string> = {
   custom: 'custom',
 };
 
+/** A refinement whose message is a business code (`po_box`, `too_short`) reports that code instead of `custom`. */
+const BUSINESS_CODE = /^[a-z][a-z0-9_]*$/;
+
 /** Maps Zod issues to Problem Details `errors[]`, prefixed with the request location. */
 export function toValidationErrors(issues: readonly z.core.$ZodIssue[], location: string): ValidationError[] {
-  return issues.map((issue) => ({ path: toJsonPointer([location, ...issue.path]), code: issue.code }));
+  return issues.map((issue) => ({
+    path: toJsonPointer([location, ...issue.path]),
+    code: issue.code === 'custom' && BUSINESS_CODE.test(issue.message) ? issue.message : issue.code,
+  }));
 }
 
 /**

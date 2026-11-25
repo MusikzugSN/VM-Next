@@ -13,3 +13,4 @@ export * from './lib/tags';
 export * from './lib/print';
 export * from './lib/print-service';
 export * from './lib/system';
+export * from './lib/legal';

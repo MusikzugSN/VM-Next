@@ -76,8 +76,6 @@ classDiagram
   class club_settings {
     int id PK = 1
     text club_name
-    text imprint_url null
-    text privacy_url null
     bool login_auto_redirect
     text logo_file_key null
     text logo_mime null
@@ -86,6 +84,24 @@ classDiagram
     varchar(36) default_role_id FK null
     int browser_print_page_limit
     text public_base_url null
+    timestamp updated_at
+  }
+
+  class legal_documents {
+    varchar(16) document PK
+    varchar(16) mode null
+    text url null
+    json accepted_template null
+    timestamp accepted_at null
+    varchar(64) published_hash null
+    date as_of null
+    timestamp updated_at
+  }
+
+  class legal_data {
+    int id PK = 1
+    json imprint_data
+    json privacy_data
     timestamp updated_at
   }
 
@@ -328,7 +344,9 @@ classDiagram
 | `roles` | benannte Rechtebündel | `default_key` UK (z. B. `admin`, `musician`) für Standardrollen; UK `lower(name)` | R-3, R-5, S-3 |
 | `role_permissions` | Rechte einer Rolle | PK `(role_id, permission)`; Check `permission` ∈ Rechte-Codes aus `@vm-web/shared` (bei neuen Codes per Migration erweitert); `CASCADE` | R-3, R-7 |
 | `user_voices` | Profilstimmen | PK `(user_id, voice_id)`; `position` für Anzeige; `user_id` `CASCADE`, `voice_id` `RESTRICT` | M-1, S-1 |
-| `club_settings` | Konfiguration, genau eine Zeile; `login_banner` ist Klartext (F-12) | Check `id = 1`; `default_ensemble_id` `SET NULL`, `default_role_id` `SET NULL` | S-4, A-2, A-3, D-2, D-4 |
+| `club_settings` | Konfiguration, genau eine Zeile; `login_banner` ist Klartext (F-12). Impressum und Datenschutz: `legal_*` (S-7, Migration übernimmt die alten Links als Modus `link`) | Check `id = 1`; `default_ensemble_id` `SET NULL`, `default_role_id` `SET NULL` | S-4, A-2, A-3, D-2, D-4 |
+| `legal_documents` | Impressum und Datenschutzerklärung, eine Zeile je Dokument: Modus, Link, übernommene Vorlage (Version, Datum **und Text**, damit ein Update den veröffentlichten Text nicht ändert), „Stand“ | PK `document` ∈ `imprint`, `privacy`; Check `mode` ∈ `link`, `generated` oder `null`; `published_hash` ist der Hash aller Eingaben des veröffentlichten Texts, ändert er sich, rückt `as_of` auf heute. Zeilen entstehen beim ersten Speichern | S-7 |
+| `legal_data` | Vereinsdaten für die erzeugten Dokumente, genau eine Zeile | Check `id = 1`; JSON, beim Lesen und Schreiben mit `imprintDataSchema` / `privacyDataSchema` geprüft | S-7 |
 | `system_state` | Ablaufdaten wie „Standardrollen importiert“, „Vorlage importiert“ (Version) | Schlüssel z. B. `seed.roles`, `seed.lineup-template`, `seed.root` | R-5, N-8, S-5 |
 | `cache_entries` | Schlüssel-Wert-Speicher mit Ablaufzeit hinter `ICacheService`: Sitzungen, Sitzungsindex je Benutzer, Login-Zustand zwischen `auth/login` und `auth/callback` | Schlüssel nur als Hash (`session:<sha256>`), Wert JSON, `expires_at` mit Index; abgelaufene Einträge werden beim Lesen ignoriert und alle 10 Minuten gelöscht. Sitzungen überstehen so API-Neustarts und mehrere API-Instanzen. | A-1, A-5 |
 

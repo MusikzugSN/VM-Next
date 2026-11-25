@@ -8,7 +8,7 @@ function allPaths(node: unknown): string[] {
 describe('APP_ROUTES', () => {
   const paths = allPaths(APP_ROUTES);
 
-  it('contains only unique, absolute, lower-case English paths', () => {
+  it('contains only unique, absolute, lower-case paths (English, except the German legal pages of S-7)', () => {
     expect(new Set(paths).size).toBe(paths.length);
     for (const path of paths) expect(path).toMatch(/^(\/[a-z-]+|\/:[A-Za-z]+)+$/);
   });

@@ -150,7 +150,10 @@
     "invalid_union": "Ungültiger Wert",
     "invalid_key": "Ungültiger Wert",
     "invalid_element": "Ungültiger Wert",
-    "custom": "Ungültiger Wert"
+    "custom": "Ungültiger Wert",
+    "po_box": "Bitte die Anschrift des Vereinssitzes angeben, kein Postfach.",
+    "too_short": "Zu kurz",
+    "not_eea": "Nur Standorte in der EU oder im EWR sind möglich."
   },
   "shell": {
     "breadcrumbs": "Brotkrumen",
@@ -461,6 +464,27 @@
     "modes": {
       "simplex": "Einseitig",
       "duplex": "Beidseitig, lange Kante"
+    }
+  },
+  "legal": {
+    "imprint": "Impressum",
+    "privacy": "Datenschutz",
+    "imprintLong": "Impressum",
+    "privacyLong": "Datenschutzerklärung",
+    "page": {
+      "redirecting": "Du wirst zur Seite des Vereins weitergeleitet …",
+      "unavailable": "Diese Seite wird vom {{ club }} gerade eingerichtet. Bitte wende dich bei Fragen direkt an den Verein."
+    },
+    "warning": {
+      "title": "Impressum und Datenschutzerklärung fehlen noch",
+      "titleImprint": "Impressum fehlt noch",
+      "titlePrivacy": "Datenschutzerklärung fehlt noch",
+      "both": "Weder Impressum noch Datenschutzerklärung sind vollständig eingerichtet. Ohne sie darf VM-Web nicht öffentlich betrieben werden.",
+      "imprint": "Das Impressum ist noch nicht vollständig eingerichtet und wird deshalb nicht angezeigt.",
+      "privacy": "Die Datenschutzerklärung ist noch nicht vollständig eingerichtet und wird deshalb nicht angezeigt.",
+      "templateTitle": "Neue Vorlage verfügbar – bitte prüfen",
+      "template": "Für Impressum oder Datenschutzerklärung gibt es eine neue Vorlage. Bis du sie übernimmst, bleibt der bisherige Text veröffentlicht.",
+      "action": "Zu „Rechtliches“"
     }
   }
 }

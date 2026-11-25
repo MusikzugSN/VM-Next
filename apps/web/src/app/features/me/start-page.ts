@@ -20,6 +20,7 @@ import { VmButton, VmCard } from '@vm-web/ui';
 import { onUploadCompleted } from '../../core/actions/on-upload';
 import { UploadLauncher } from '../../core/actions/pending-features';
 import { ApiClient } from '../../core/api/api-client';
+import { LegalStatusBanner } from '../../core/legal/legal-status-banner';
 import { SessionStore } from '../../core/auth/session.store';
 import { VoiceContextStore } from '../../core/voices/voice-context.store';
 import { EventDate } from './ui/event-date';
@@ -40,6 +41,7 @@ const POSTPONED_KEY = 'vmweb.voiceSelectionPostponed';
     EventDate,
     UploadStatusBadge,
     VoiceSelectionDialog,
+    LegalStatusBanner,
   ],
   viewProviders: [provideIcons({ lucideUpload, lucideFolderOpen, lucideChevronRight })],
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -60,6 +62,8 @@ export class StartPage {
       .join(', '),
   );
   protected readonly canUpload = computed(() => this.session.can('sheet.upload'));
+  /** Admins see whether imprint and privacy policy are published (S-7). */
+  protected readonly canConfigure = computed(() => this.session.can('config.view'));
   protected readonly selectVoices = signal(false);
 
   protected readonly events = rxResource({

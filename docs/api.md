@@ -210,6 +210,8 @@ In den Endpunkten unten steht unter **Fehler** nur, was über die Standardfehler
 | `not_pdf`, `encrypted`, `damaged`, `empty` | Upload: Datei ist kein PDF, verschlüsselt, nicht lesbar oder ohne Seiten (415, Pfad `/files/<i>`) |
 | `count_mismatch`, `invalid_json` | Upload: `meta` passt nicht zur Zahl der Dateien bzw. ist kein JSON |
 | `not_image` | Logo ist kein PNG, JPEG, WebP oder SVG (415, Pfad `/file`) |
+| `po_box` | Anschrift des Vereinssitzes ist ein Postfach (S-7) |
+| `not_eea` | Serverstandort außerhalb von EU/EWR (S-7) |
 
 ---
 
@@ -285,8 +287,8 @@ Vereinsdaten für die Anmeldeseite. · A-2, S-4
   "clubName": "Musikzug Beispielstadt",
   "logoUrl": "/internal/v1/auth/branding/logo",
   "loginBanner": "Willkommen beim Musikzug! Zugang bekommst du bei der Notenwartin.",
-  "imprintUrl": "https://musikzug.example.org/impressum",
-  "privacyUrl": "https://musikzug.example.org/datenschutz",
+  "imprint": { "kind": "external", "href": "https://musikzug.example.org/impressum" },
+  "privacy": { "kind": "internal", "href": "/datenschutz" },
   "autoRedirect": false
 }
 ```
@@ -1569,7 +1571,7 @@ Je Ensemble eine geordnete Liste „ab `fromPages` Seiten → `simplex` (einseit
 
 ```json
 {
-  "club": { "clubName": "Musikzug Beispielstadt", "imprintUrl": "https://musikzug.example.org/impressum", "privacyUrl": null, "loginAutoRedirect": false, "logoUrl": "/internal/v1/auth/branding/logo", "loginBanner": null },
+  "club": { "clubName": "Musikzug Beispielstadt", "loginAutoRedirect": false, "logoUrl": "/internal/v1/auth/branding/logo", "loginBanner": null },
   "defaults": { "defaultEnsemble": { "id": "ens-1", "name": "Hauptorchester" }, "defaultRole": { "id": "role-mus", "name": "Musiker:in" } },
   "print": { "browserPrintPageLimit": 10, "publicBaseUrl": "https://noten.musikzug.example.org" },
   "warnings": ["default-role-has-club-permissions"]
@@ -1588,7 +1590,7 @@ Je Ensemble eine geordnete Liste „ab `fromPages` Seiten → `simplex` (einseit
 
 - **Zweck:** Tab „Verein & Anmeldung“. · S-4, A-2
 - **Recht:** `config.edit` · Verein
-- **Body:** `{ "clubName": "Musikzug Beispielstadt", "imprintUrl": "https://…/impressum", "privacyUrl": "https://…/datenschutz", "loginBanner": "Willkommen!", "loginAutoRedirect": true }` (`loginBanner`: Klartext, max. 2000 Zeichen, F-12)
+- **Body:** `{ "clubName": "Musikzug Beispielstadt", "loginBanner": "Willkommen!", "loginAutoRedirect": true }` (Impressum und Datenschutz: `system/legal/update-settings`, S-7) (`loginBanner`: Klartext, max. 2000 Zeichen, F-12)
 - **Response:** `204`
 
 #### `POST /internal/v1/system/config/update-defaults`
@@ -1616,6 +1618,142 @@ Je Ensemble eine geordnete Liste „ab `fromPages` Seiten → `simplex` (einseit
 - **Recht:** `config.edit` · Verein · **Body:** keiner
 - **Response:** `204`
 
+### Rechtliches: Impressum & Datenschutz (S-7)
+
+Schemas `libs/shared/src/lib/legal/`, Routen `API_ROUTES.system.legal*` und `API_ROUTES.publicLegal`, Vorlagen unter `apps/api/defaults/legal/`.
+
+**Ablösung der Links aus S-4:** `imprintUrl` und `privacyUrl` wandern aus `system/config` bzw. `config/update-club` in die Legal-Einstellungen (`mode: "link"`, `url`). Die Migration übernimmt vorhandene URLs als Modus `link`. `auth/login-page` liefert statt der beiden URLs die Felder `imprint` und `privacy` als `legalLinkSchema`, also `{ "kind": "external", "href": "https://…" }` oder `{ "kind": "internal", "href": "/impressum" }`. So verlinken Anmeldeseite, Footer und Benutzermenü ohne weitere Abfrage richtig.
+
+**Gespeicherte Daten sind bewusst nachsichtig:** Jedes Feld darf `null` sein, damit Admins ein halb ausgefülltes Formular speichern können. Formatregeln (E-Mail, PLZ, kein Postfach …) greifen, sobald ein Wert da ist (`400 validation-failed`). Ob ein Dokument vollständig ist, prüft der Server getrennt. Er liefert die fehlenden Pflichtfelder als `missingFields` (Codes in `legalMissingFieldSchema`).
+
+**Pflichtfelder für die Veröffentlichung:**
+
+| Dokument | Pflicht |
+| --- | --- |
+| beide | `mode`; bei `link`: `url` |
+| Impressum (`generated`) | `legalName`, mind. eine vertretungsberechtigte Person; Anschrift, `email` und `phone` **je einzeln** beim Verein oder bei mindestens einer Person (eine teilweise ausgefüllte Vereinsanschrift muss vollständig sein; bei `department`: Anschrift des Trägervereins, E-Mail/Telefon der Abteilung, Personen = Ansprechpartner der Abteilung, dazu `department.name`); bei `isRegistered`: `registerCourt`, `registerNumber`; ist `contentResponsible` gesetzt: Name und Anschrift |
+| Datenschutz (`generated`) | Impressums-Pflichtfelder außer Register (Verantwortlicher); `hosting.operator`, `hosting.serverCountry`, bei `provider` zusätzlich Name, Anschrift, `dpaConcluded`; `identityServer.operator`, `identityServer.serverCountry`, bei `provider` Name und Anschrift; `serverLogRetentionDays`, `backupRetentionDays`, `state`; Aufsichtsbehörde des Landes ohne `TODO` in der mitgelieferten Liste; ist `dataProtectionOfficer` gesetzt: Name und Kontakt |
+
+**Vorlagenversion:** Jede Vorlage trägt im Kopf `version` (Ganzzahl) und `date`. Beim ersten Speichern im Modus `generated` übernimmt der Server die mitgelieferte Version automatisch. Beim Übernehmen speichert er Version, Zeitpunkt **und den Vorlagentext selbst** in der Datenbank. Veröffentlicht wird immer aus diesem gespeicherten Text. Ein Update mit neuer Vorlage ändert deshalb nichts, bis Admins `accept-template-version` aufrufen.
+
+**Aktive Module** (`LegalModule`-Registry, Reihenfolge = Reihenfolge in der Erklärung):
+- `base` und `library` (Kern von VM-Web) sind immer aktiv.
+- `print-service` ist aktiv, sobald in der Konfiguration eine VM-Web-Adresse für den Druckservice gesetzt ist. Ohne sie nimmt der Druckservice keine Aufträge an (D-4).
+- `members` und `notifications` sind registriert, aber leer und nie aktiv.
+
+#### `GET /internal/v1/public/legal/imprint` 🌐 · `GET /internal/v1/public/legal/privacy` 🌐
+
+- **Zweck:** Öffentliche Seiten `/impressum` und `/datenschutz`. · S-7
+- **Recht:** Öffentlich. Neben dem Anmeldeablauf (`auth/*`) die einzigen Endpunkte ohne Sitzung.
+- **Response 200** (Modus `generated`, vollständig):
+
+```json
+{
+  "mode": "generated",
+  "html": "<h1>Impressum</h1><h2>Angaben gemäß § 5 DDG</h2><p>Musikverein Harmonie Talheim e.V.<br>Hauptstraße 12<br>74388 Talheim</p>…",
+  "asOf": "2026-11-24",
+  "templateVersion": 1
+}
+```
+
+  Modus `link`: `{ "mode": "link", "url": "https://musikverein-talheim.example/impressum" }`, das Frontend leitet sofort weiter. Nicht eingerichtet oder unvollständig: `{ "mode": "unavailable" }`, die Seite zeigt einen neutralen Hinweis.
+- `asOf` („Stand“) ist das Datum der letzten Änderung von Daten oder übernommener Vorlage. `html` wird auf dem Server gerendert und bereinigt.
+- **Header:** `Cache-Control: public, no-cache` und schwaches `ETag` (von Express): Browser und Proxys dürfen speichern, fragen aber jedes Mal nach und bekommen `304`, wenn sich nichts geändert hat. So ist eine Änderung sofort sichtbar.
+- **Fehler:** keine; auch eine frische Installation liefert `unavailable`.
+
+#### `GET /internal/v1/system/legal/settings`
+
+- **Zweck:** Tab „Rechtliches“ der Konfiguration. · S-7
+- **Recht:** `config.view` · Verein
+- **Response 200:**
+
+```json
+{
+  "imprint": {
+    "mode": "generated", "url": null, "status": "published", "missingFields": [],
+    "template": { "acceptedVersion": 1, "acceptedAt": "2026-11-24T10:12:00Z", "availableVersion": 1, "availableDate": "2026-11-24", "updateAvailable": false }
+  },
+  "privacy": {
+    "mode": "generated", "url": null, "status": "incomplete",
+    "missingFields": ["privacy.hosting.dpaConcluded", "privacy.backupRetentionDays"],
+    "template": { "acceptedVersion": 1, "acceptedAt": "2026-11-24T10:12:00Z", "availableVersion": 2, "availableDate": "2027-03-01", "updateAvailable": true }
+  },
+  "imprintData": {
+    "legalName": "Musikverein Harmonie Talheim e.V.",
+    "address": { "street": "Hauptstraße 12", "postalCode": "74388", "city": "Talheim" },
+    "representatives": [
+      { "name": "Sandra Kessler", "role": "1. Vorsitzende", "address": { "street": "Lindenweg 3", "postalCode": "74388", "city": "Talheim" }, "email": "sandra.kessler@mv-talheim.example", "phone": "+49 7133 222333" },
+      { "name": "Jonas Weber", "role": "2. Vorsitzender", "address": null, "email": null, "phone": null }
+    ],
+    "email": "vorstand@mv-talheim.example",
+    "phone": "+49 7133 123456",
+    "isRegistered": true,
+    "registerCourt": "Amtsgericht Stuttgart",
+    "registerNumber": "VR 123456",
+    "vatId": null,
+    "contentResponsible": null,
+    "department": null
+  },
+  "privacyData": {
+    "dataProtectionOfficer": null,
+    "hosting": { "operator": "provider", "provider": { "name": "Beispiel Hosting GmbH", "address": "Serverweg 1, 90402 Nürnberg" }, "serverCountry": "DE", "dpaConcluded": null },
+    "identityServer": { "operator": "self", "provider": null, "serverCountry": "DE" },
+    "serverLogRetentionDays": 14,
+    "backupRetentionDays": null,
+    "state": "BW",
+    "additionalText": null
+  },
+  "activeModules": ["base", "library", "print-service"],
+  "warnings": [],
+  "updatedAt": "2026-11-24T10:12:00Z"
+}
+```
+
+`imprintData.department` ist gesetzt, wenn der Verein eine Abteilung eines Trägervereins ist; dann beschreiben `legalName`, `address`, `representatives` und der Register den Trägerverein:
+
+```json
+"department": {
+  "name": "Musikzug Schloß Neuhaus",
+  "email": "vorstand@musikzug.example",
+  "phone": null,
+  "contacts": [{ "name": "<Name>", "role": "Vorsitzender", "address": { "street": "<Straße>", "postalCode": "<PLZ>", "city": "<Ort>" }, "email": "vorstand@musikzug.example", "phone": "<Telefon>" }]
+}
+```
+
+Fehlende Kontaktangaben heißen `imprint.contact.address|email|phone` bzw. `imprint.department.contact.address|email|phone`, dazu `imprint.department.name`.
+
+`warnings` sind Hinweise, die die Veröffentlichung nicht verhindern: `hosting-without-dpa`, wenn ein externer Hoster eingetragen ist, aber kein Vertrag zur Auftragsverarbeitung besteht (`dpaConcluded: false`).
+
+#### `GET /internal/v1/system/legal/status`
+
+- **Zweck:** Kleiner Baustein für die Warnungen in der Konfiguration und auf der Startseite von Admins. · S-7
+- **Recht:** `config.view` · Verein (ohne Recht ruft das Frontend ihn nicht auf)
+- **Response 200:** `{ "imprint": "published", "privacy": "incomplete", "templateUpdateAvailable": true }` (`not-configured` | `incomplete` | `published`)
+
+#### `POST /internal/v1/system/legal/update-settings`
+
+- **Zweck:** Formular speichern, beide Dokumente auf einmal. · S-7
+- **Recht:** `config.edit` · Verein
+- **Body:** wie `settings` ohne Status- und Vorlagenfelder: `{ "imprint": { "mode": "generated", "url": null }, "privacy": { "mode": "link", "url": "https://…/datenschutz" }, "imprintData": { … }, "privacyData": { … } }`
+- **Response:** `204`. Wechselt ein Dokument zum ersten Mal nach `generated`, wird die mitgelieferte Vorlagenversion automatisch übernommen.
+- **Fehler:** `400 validation-failed`, z. B. `{ "path": "/body/imprintData/address/street", "code": "po_box" }`. Serverstandorte (`hosting.serverCountry`, `identityServer.serverCountry`) nur in EU/EWR, sonst `not_eea`: Für Drittländer fehlen in den Vorlagen die Angaben nach Art. 44 ff. DSGVO.
+
+#### `POST /internal/v1/system/legal/preview`
+
+- **Zweck:** Live-Vorschau mit noch nicht gespeicherten Daten. Mit `templateVersion: "available"` zeigt sie eine neue Vorlage vor dem Übernehmen. · S-7
+- **Recht:** `config.edit` · Verein
+- **Body:** `{ "document": "privacy", "templateVersion": "accepted", "imprintData": { … }, "privacyData": { … } }`
+- **Response 200:** `{ "html": "<h1>Datenschutzerklärung</h1>…", "templateVersion": 1, "templateDate": "2026-11-24", "missingFields": ["privacy.backupRetentionDays"] }`. Die Vorschau rendert auch unvollständige Daten; fehlende Werte erscheinen als markierter Platzhalter „[fehlt: …]“.
+- Speichert nichts und wird nicht gecacht. Das Frontend ruft sie entprellt auf (ca. 500 ms).
+
+#### `POST /internal/v1/system/legal/accept-template-version`
+
+- **Zweck:** „Neue Vorlage übernehmen“. · S-7
+- **Recht:** `config.edit` · Verein
+- **Body:** `{ "document": "privacy", "version": 2 }`; muss der mitgelieferten Version entsprechen.
+- **Response:** `204`. Speichert Version, Zeitpunkt und Vorlagentext; der veröffentlichte Text ändert sich ab jetzt.
+- **Fehler:** `409 conflict`, wenn die Version nicht die verfügbare ist oder schon übernommen wurde.
+
 ### Betrieb (ohne Katalog-Präfix)
 
 `GET /health` 🌐 – Liveness/Readiness für Docker (DB erreichbar), `200 { "status": "ok" }` bzw. `503`. Kein UI-Baustein, daher außerhalb von `/internal/v1`.
@@ -1636,12 +1774,13 @@ Je Ensemble eine geordnete Liste „ab `fromPages` Seiten → `simplex` (einseit
 | `events` | 5 | 5 | 10 | 0 / 0 |
 | `tags` | 1 | 3 | 4 | 0 / 0 |
 | `print` | 2 | 0 | 2 | 1 / 0 |
-| `system` | 12 | 25 | 37 | 0 / 1 |
-| **Summe** | **66** | **67** | **133** | **9 / 2** |
+| `system` | 14 | 28 | 42 | 0 / 1 |
+| `public/legal` | 2 | 0 | 2 | 0 / 0 |
+| **Summe** | **70** | **70** | **140** | **9 / 2** |
 
 Plus `GET /health`. `POST me/downloads/selection-zip` zählt als POST und als 📄.
 
-Abdeckung der Muss-Anforderungen: R-1 bis R-7, A-1 bis A-5, M-1 bis M-9, N-1 bis N-12, N-14 bis N-17, N-19, D-1 bis D-3, D-7, S-1 bis S-5. Ohne API-Anteil: D-4, D-5 (lokaler Druckservice), N-13 (Tastenkürzel, nur Frontend, nutzt `previousUploadId`/`nextUploadId`), N-18 (Sammel-PDF wird im Browser aufgeteilt und über `uploads/sheets/upload` gesendet). D-6 (Druckregeln) ist inzwischen enthalten. Bewusst nicht enthalten: A-6, A-7, M-10, S-6.
+Abdeckung der Muss-Anforderungen: R-1 bis R-7, A-1 bis A-5, M-1 bis M-9, N-1 bis N-12, N-14 bis N-17, N-19, D-1 bis D-3, D-7, S-1 bis S-5, S-7. Ohne API-Anteil: D-4, D-5 (lokaler Druckservice), N-13 (Tastenkürzel, nur Frontend, nutzt `previousUploadId`/`nextUploadId`), N-18 (Sammel-PDF wird im Browser aufgeteilt und über `uploads/sheets/upload` gesendet). D-6 (Druckregeln) ist inzwischen enthalten. Bewusst nicht enthalten: A-6, A-7, M-10, S-6.
 
 ---
 

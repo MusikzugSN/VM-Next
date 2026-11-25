@@ -9,7 +9,7 @@ import { VmButton, VmCard } from '@vm-web/ui';
 
 import { BrandingStore } from '../../core/branding/branding.store';
 import { ClubLogo } from '../../core/branding/club-logo';
-import { LegalLinks } from './legal-links';
+import { LegalLinks } from '../../core/legal/legal-links';
 
 /**
  * Konto gesperrt (A-5). The API creates no session for blocked accounts, so there is no

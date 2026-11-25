@@ -1,0 +1,145 @@
+<p class="flex items-start gap-3 rounded-medium border border-warning-ink/30 bg-warning-soft p-4 text-warning-ink" role="note">
+  <ng-icon name="lucideInfo" class="mt-0.5 shrink-0" size="var(--mat-sys-icon-size-md)" aria-hidden="true" />
+  <span>
+    <strong class="block">{{ 'system.settings.legal.disclaimerTitle' | transloco }}</strong>
+    {{ 'system.settings.legal.disclaimer' | transloco }}
+  </span>
+</p>
+
+@if (settings.error()) {
+  <vm-page-problem [error]="settings.error()" />
+} @else if (settings.hasValue() && form(); as f) {
+  @let s = settings.value();
+  <form class="flex flex-col gap-6" novalidate (submit)="$event.preventDefault(); save()">
+    @for (doc of docs; track doc) {
+      @let state = s[doc];
+      <section vm-card class="flex flex-col gap-5 p-4 md:p-6" [attr.aria-labelledby]="'legal-title-' + doc">
+        <div class="flex flex-wrap items-center justify-between gap-2">
+          <h2 [id]="'legal-title-' + doc" class="text-title-large">{{ 'legal.' + doc + 'Long' | transloco }}</h2>
+          <span class="flex items-center gap-2">
+            <span vm-badge [tone]="state.status === 'published' ? 'success' : 'warning'">{{ 'system.settings.legal.status.' + state.status | transloco }}</span>
+            @if (state.status === 'published') {
+              <a [href]="doc === 'imprint' ? routes.imprint : routes.privacy" target="_blank" rel="noopener" class="inline-flex min-h-target items-center gap-1 text-body-medium">
+                {{ 'system.settings.legal.openPublic' | transloco }}<ng-icon name="lucideExternalLink" aria-hidden="true" />
+              </a>
+            }
+          </span>
+        </div>
+
+        @if (f[doc].mode === 'generated' && state.template.updateAvailable) {
+          <div class="flex flex-col gap-3 rounded-small bg-primary-soft p-4 text-primary md:flex-row md:items-center md:justify-between" role="status">
+            <p class="flex items-start gap-2">
+              <ng-icon name="lucideSparkles" class="mt-0.5 shrink-0" aria-hidden="true" />
+              <span>
+                <strong class="block">{{ 'system.settings.legal.newTemplate' | transloco }}</strong>
+                {{
+                  'system.settings.legal.newTemplateText'
+                    | transloco
+                      : {
+                          accepted: state.template.acceptedVersion,
+                          available: state.template.availableVersion,
+                          date: (state.template.availableDate | date: 'dd.MM.yyyy'),
+                        }
+                }}
+              </span>
+            </p>
+            <span class="flex flex-wrap gap-2">
+              <button vm-button variant="outlined" type="button" (click)="toggleNewTemplate(doc)" [attr.aria-pressed]="!!showNewTemplate()[doc]">
+                {{ (showNewTemplate()[doc] ? 'system.settings.legal.showCurrent' : 'system.settings.legal.showNew') | transloco }}
+              </button>
+              @if (!readonly()) {
+                <button vm-button type="button" (click)="accept(doc, state.template.availableVersion)">{{ 'system.settings.legal.accept' | transloco }}</button>
+              }
+            </span>
+          </div>
+        }
+
+        <vm-legal-choice
+          legendKey="system.settings.legal.fields.mode"
+          [required]="true"
+          [options]="modes"
+          [value]="f[doc].mode"
+          [readonly]="readonly()"
+          (valueChange)="setMode(doc, $event)"
+        />
+
+        @switch (f[doc].mode) {
+          @case ('link') {
+            <vm-legal-field
+              path="url"
+              type="url"
+              [required]="true"
+              [maxlength]="500"
+              placeholder="https://"
+              [hintKey]="'system.settings.legal.hints.url'"
+              [value]="f[doc].url"
+              [error]="docErrors(doc + '/url')"
+              [readonly]="readonly()"
+              (valueChange)="setUrl(doc, $event)"
+            />
+            @if (linkMissing(doc).length) {
+              <p class="flex items-center gap-2 text-warning-ink" role="status">
+                <ng-icon name="lucideCircleAlert" aria-hidden="true" />{{ 'system.settings.legal.linkMissing' | transloco }}
+              </p>
+            }
+          }
+          @case ('generated') {
+            <div class="grid items-start gap-6 xl:grid-cols-2">
+              <div class="flex min-w-0 flex-col gap-6">
+                @if (imprintPlace() === doc) {
+                  <section class="flex flex-col gap-4" [attr.aria-labelledby]="'legal-club-' + doc">
+                    <h3 [id]="'legal-club-' + doc" class="text-title-medium">{{ 'system.settings.legal.groups.club' | transloco }}</h3>
+                    @if (doc === 'privacy') {
+                      <p class="text-body-medium text-muted-foreground">{{ 'system.settings.legal.controllerHere' | transloco }}</p>
+                    }
+                    <vm-imprint-data-form [data]="f.imprintData" [errors]="errors()" [readonly]="readonly()" (fieldChange)="setField('imprintData', $event)" />
+                  </section>
+                } @else {
+                  <p class="rounded-small border p-4 text-body-medium text-muted-foreground">{{ 'system.settings.legal.controllerFromImprint' | transloco }}</p>
+                }
+                @if (doc === 'privacy') {
+                  <section class="flex flex-col gap-4" aria-labelledby="legal-privacy-data">
+                    <h3 id="legal-privacy-data" class="text-title-medium">{{ 'system.settings.legal.groups.privacy' | transloco }}</h3>
+                    <vm-privacy-data-form [data]="f.privacyData" [errors]="errors()" [readonly]="readonly()" (fieldChange)="setField('privacyData', $event)" />
+                  </section>
+                }
+              </div>
+              <div class="flex min-w-0 flex-col gap-3 xl:sticky xl:top-20">
+                <h3 class="text-title-medium">{{ 'system.settings.legal.preview' | transloco }}</h3>
+                @if (!readonly() && previewData(); as p) {
+                  <vm-legal-preview
+                    [document]="doc"
+                    [imprintData]="p.imprintData"
+                    [privacyData]="p.privacyData"
+                    [templateVersion]="showNewTemplate()[doc] ? 'available' : 'accepted'"
+                  />
+                } @else {
+                  <ul class="list-disc pl-6 text-body-medium">
+                    @for (m of state.missingFields; track m) {
+                      <li>{{ labelKey(m) | transloco }}</li>
+                    }
+                  </ul>
+                  <p class="text-body-medium text-muted-foreground">{{ 'system.settings.legal.previewNeedsEdit' | transloco }}</p>
+                }
+              </div>
+            </div>
+          }
+          @default {
+            <p class="text-body-medium text-muted-foreground">{{ 'system.settings.legal.chooseMode' | transloco }}</p>
+          }
+        }
+      </section>
+    }
+
+    @if (!readonly()) {
+      <div class="sticky bottom-20 z-10 flex md:bottom-4 items-center justify-end gap-3 self-end rounded-full bg-surface/90 p-1 shadow-level2 backdrop-blur">
+        @if (dirty()) {
+          <span class="pl-3 text-body-medium text-muted-foreground" role="status">{{ 'system.settings.legal.unsaved' | transloco }}</span>
+        }
+        <button vm-button type="submit" [zDisabled]="saving()">{{ 'common.save' | transloco }}</button>
+      </div>
+    }
+  </form>
+} @else {
+  <p class="text-muted-foreground" role="status">{{ 'common.loading' | transloco }}</p>
+}

@@ -15,6 +15,7 @@ import type { RequestAuth } from '../access/decorators';
 import { SessionStore } from '../access/session.store';
 import { httpUrlOrNull } from '../common/url';
 import { AppConfig } from '../config/app-config.service';
+import { LegalService } from '../legal/legal.service';
 import { ClubSettingsRepository } from '../settings/club-settings.repository';
 import { OIDC_CLIENT, type IOidcClient } from './oidc.client';
 import { USERS_REPOSITORY, type IUsersRepository } from './users.repository';
@@ -35,6 +36,7 @@ export class AuthService {
     @Inject(SessionStore) private readonly sessions: SessionStore,
     @Inject(ClubSettingsRepository) private readonly settings: ClubSettingsRepository,
     @Inject(AppConfig) private readonly config: AppConfig,
+    @Inject(LegalService) private readonly legal: LegalService,
   ) {}
 
   /** Absolute URL of a frontend path on the public address. */
@@ -125,13 +127,13 @@ export class AuthService {
   }
 
   async loginPage(): Promise<LoginPageResponse> {
-    const s = await this.settings.get();
+    const [s, legal] = await Promise.all([this.settings.get(), this.legal.links()]);
     return {
       clubName: s.clubName,
       logoUrl: s.logoFileKey ? `${API_PREFIX}/auth/branding/logo` : null,
       loginBanner: s.loginBanner,
-      imprintUrl: httpUrlOrNull(s.imprintUrl),
-      privacyUrl: httpUrlOrNull(s.privacyUrl),
+      imprint: legal.imprint,
+      privacy: legal.privacy,
       autoRedirect: s.loginAutoRedirect,
     };
   }

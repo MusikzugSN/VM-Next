@@ -18,6 +18,7 @@ import { ViewportService } from './viewport';
 import { isActive, MOBILE_NAV } from './nav';
 import { NavList } from './nav-list';
 import { CurrentPage } from './page';
+import { LegalLinks } from '../legal/legal-links';
 import { UserMenu } from './user-menu';
 import { VoiceSwitcher } from './voice-switcher';
 
@@ -38,6 +39,7 @@ import { VoiceSwitcher } from './voice-switcher';
     ClubLogo,
     NavList,
     UserMenu,
+    LegalLinks,
     VoiceSwitcher,
     UploadDialog,
     PrintDialog,
