@@ -1,6 +1,6 @@
-import { HttpClient, HttpParams } from '@angular/common/http';
+import { HttpClient, HttpEventType, HttpParams } from '@angular/common/http';
 import { inject, Injectable, isDevMode } from '@angular/core';
-import { map, type Observable } from 'rxjs';
+import { filter, last, map, tap, type Observable } from 'rxjs';
 import type { z } from 'zod';
 
 type QueryValue = string | number | boolean | null | undefined;
@@ -27,6 +27,22 @@ export class ApiClient {
   /** POST without response body (`204 No Content`). */
   postVoid(url: string, body: unknown = {}): Observable<void> {
     return this.http.post<unknown>(url, body).pipe(map(() => undefined));
+  }
+
+  uploadWithProgress<S extends z.ZodType>(
+    url: string,
+    form: FormData,
+    schema: S,
+    onProgress: (loaded: number) => void,
+  ): Observable<z.output<S>> {
+    return this.http.post<unknown>(url, form, { reportProgress: true, observe: 'events' }).pipe(
+      tap((event) => {
+        if (event.type === HttpEventType.UploadProgress) onProgress(event.loaded);
+      }),
+      filter((event) => event.type === HttpEventType.Response),
+      last(),
+      map((event) => schema.parse(event.body)),
+    );
   }
 
   /** GET whose answer is a file (print PDF, D-1). */

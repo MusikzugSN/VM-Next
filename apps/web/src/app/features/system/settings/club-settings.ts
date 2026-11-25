@@ -1,4 +1,3 @@
-import { HttpClient } from '@angular/common/http';
 import { ChangeDetectionStrategy, Component, effect, ElementRef, inject, input, output, signal, untracked, viewChild } from '@angular/core';
 import { TranslocoPipe, TranslocoService } from '@jsverse/transloco';
 import { NgIcon, provideIcons } from '@ng-icons/core';
@@ -29,7 +28,6 @@ type ClubErrors = Partial<Record<keyof ClubForm, string>>;
 })
 export class ClubSettings {
   private readonly api = inject(ApiClient);
-  private readonly http = inject(HttpClient);
   private readonly actions = inject(ActionRunner);
   private readonly sonner = inject(VmToastService);
   private readonly transloco = inject(TranslocoService);
@@ -99,7 +97,7 @@ export class ClubSettings {
     }
     const form = new FormData();
     form.append(LOGO_FILE_FIELD, file, file.name);
-    const done = await this.actions.runOnce(() => this.http.post(apiUrl('system', 'uploadLogo'), form), {
+    const done = await this.actions.runOnce(() => this.api.postVoid(apiUrl('system', 'uploadLogo'), form), {
       busy: this.uploading,
       success: { key: 'system.settings.club.logoUploaded' },
     });

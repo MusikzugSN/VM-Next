@@ -1,4 +1,4 @@
-import { provideHttpClient } from '@angular/common/http';
+import { HttpEventType, provideHttpClient } from '@angular/common/http';
 import { HttpTestingController, provideHttpClientTesting } from '@angular/common/http/testing';
 import { TestBed } from '@angular/core/testing';
 import { firstValueFrom } from 'rxjs';
@@ -36,5 +36,34 @@ describe('ApiClient', () => {
     expect(await drift).toEqual({ title: 'Marschbuch' });
     expect(error).toHaveBeenCalledWith(expect.stringContaining('/internal/v1/x'), expect.any(Array));
     error.mockRestore();
+  });
+
+  it('uploads a form, reports progress and parses the result', async () => {
+    const api = TestBed.inject(ApiClient);
+    const controller = TestBed.inject(HttpTestingController);
+    const form = new FormData();
+    form.append('file', new Blob(['%PDF']), 'a.pdf');
+    const progress: number[] = [];
+
+    const result = firstValueFrom(api.uploadWithProgress('/internal/v1/upload', form, schema, (loaded) => progress.push(loaded)));
+    const request = controller.expectOne('/internal/v1/upload');
+    expect(request.request.method).toBe('POST');
+    expect(request.request.body).toBe(form);
+    request.event({ type: HttpEventType.UploadProgress, loaded: 10, total: 40 });
+    request.event({ type: HttpEventType.UploadProgress, loaded: 40, total: 40 });
+    request.flush({ name: 'Marschbuch' });
+
+    expect(await result).toEqual({ name: 'Marschbuch' });
+    expect(progress).toEqual([10, 40]);
+  });
+
+  it('rejects an upload result that does not match its schema', async () => {
+    const api = TestBed.inject(ApiClient);
+    const controller = TestBed.inject(HttpTestingController);
+
+    const result = firstValueFrom(api.uploadWithProgress('/internal/v1/upload', new FormData(), schema, () => undefined));
+    controller.expectOne('/internal/v1/upload').flush({ title: 'Marschbuch' });
+
+    await expect(result).rejects.toBeInstanceOf(z.ZodError);
   });
 });
