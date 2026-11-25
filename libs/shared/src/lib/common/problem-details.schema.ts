@@ -25,6 +25,7 @@ export const problemCodeSchema = z.enum([
   'invalid-hierarchy',
   'unsupported-media-type',
   'payload-too-large',
+  'print-too-large',
   'login-failed',
   'internal-error',
 ]);

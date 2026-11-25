@@ -1,7 +1,7 @@
-import type { PageTransform } from '@vm-web/shared';
+import { UPLOAD_MAX_PAGES, type PageTransform } from '@vm-web/shared';
 import { degrees, EncryptedPDFError, PDFDocument } from 'pdf-lib';
 
-export type PdfProblem = 'not_pdf' | 'encrypted' | 'damaged' | 'empty';
+export type PdfProblem = 'not_pdf' | 'encrypted' | 'damaged' | 'empty' | 'too_many_pages';
 
 export class InvalidPdfError extends Error {
   constructor(readonly problem: PdfProblem) {
@@ -19,10 +19,11 @@ export async function inspectPdf(bytes: Uint8Array): Promise<{ pageCount: number
     // pdf-lib parses broken files leniently and only fails when the page tree is accessed
     const doc = await PDFDocument.load(bytes, { updateMetadata: false });
     pageCount = doc.getPageCount();
-    doc.getPages();
+    if (pageCount <= UPLOAD_MAX_PAGES) doc.getPages();
   } catch (error) {
     throw new InvalidPdfError(error instanceof EncryptedPDFError ? 'encrypted' : 'damaged');
   }
+  if (pageCount > UPLOAD_MAX_PAGES) throw new InvalidPdfError('too_many_pages');
   if (pageCount < 1) throw new InvalidPdfError('empty');
   return { pageCount };
 }
