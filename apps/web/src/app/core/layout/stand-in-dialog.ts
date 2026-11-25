@@ -19,59 +19,7 @@ import { filterVoiceGroups } from '../voices/voice-groups';
   changeDetection: ChangeDetectionStrategy.OnPush,
   // The dialog renders in an overlay; its host must not take up space in the header.
   host: { style: 'display: contents' },
-  template: `
-    <vm-dialog [(zVisible)]="open" zWidth="560px">
-      <vm-dialog-header>
-        <h2 vm-dialog-title>{{ 'shell.voice.standInTitle' | transloco }}</h2>
-        <p vm-dialog-description>{{ 'shell.voice.standInText' | transloco }}</p>
-      </vm-dialog-header>
-
-      <div class="flex min-h-0 flex-1 flex-col gap-5 overflow-y-auto md:max-h-[60dvh] md:flex-none">
-        <label vm-field>
-          <span vm-field-label>{{ 'shell.voice.search' | transloco }}</span>
-          <span class="relative">
-            <ng-icon name="lucideSearch" class="absolute top-1/2 left-3 -translate-y-1/2 text-muted-foreground" aria-hidden="true" />
-            <input
-              vm-input
-              type="search"
-              class="ps-9"
-              [placeholder]="'shell.voice.searchPlaceholder' | transloco"
-              [value]="search()"
-              (input)="search.set($any($event.target).value)"
-            />
-          </span>
-        </label>
-
-        @for (group of groups(); track group.instrument.id) {
-          <div role="group" [attr.aria-labelledby]="'stand-in-' + group.instrument.id" class="flex flex-col gap-2">
-            <span [id]="'stand-in-' + group.instrument.id" class="text-label-medium text-muted-foreground">{{ group.instrument.name }}</span>
-            <div class="flex flex-wrap gap-2">
-              @for (voice of group.voices; track voice.id) {
-                <button
-                  type="button"
-                  [attr.aria-pressed]="voice.id === current()"
-                  (click)="choose(voice.id)"
-                  class="inline-flex h-control items-center gap-1.5 rounded-full border px-3 font-medium xl:h-control-compact"
-                  [class]="voice.id === current() ? 'border-primary bg-primary-soft text-primary' : 'border-input bg-background'"
-                >
-                  @if (voice.id === current()) {
-                    <ng-icon name="lucideCheck" aria-hidden="true" />
-                  }
-                  {{ voice.name }}
-                </button>
-              }
-            </div>
-          </div>
-        } @empty {
-          <p class="text-muted-foreground">{{ 'shell.voice.noMatch' | transloco }}</p>
-        }
-      </div>
-
-      <vm-dialog-footer>
-        <button vm-button variant="tonal" type="button" (click)="open.set(false)">{{ 'common.cancel' | transloco }}</button>
-      </vm-dialog-footer>
-    </vm-dialog>
-  `,
+  templateUrl: './stand-in-dialog.html',
 })
 export class StandInDialog {
   private readonly voices = inject(VoiceContextStore);

@@ -28,31 +28,7 @@ import type { CropMargins, Rotation } from './review-model';
   imports: [TranslocoPipe],
   changeDetection: ChangeDetectionStrategy.OnPush,
   host: { class: 'flex min-h-0 flex-1' },
-  template: `
-    <div #frame class="flex min-h-80 flex-1 items-start justify-center overflow-auto bg-muted p-4">
-      @switch (state()) {
-        @case ('loading') {
-          <p class="self-center text-muted-foreground">{{ 'common.loading' | transloco }}</p>
-        }
-        @case ('error') {
-          <p role="alert" class="self-center text-destructive-ink">{{ 'pdf.error' | transloco }}</p>
-        }
-      }
-      <div class="relative shrink-0" [class.hidden]="state() !== 'ready'">
-        <canvas #canvas class="block border bg-white shadow-level1" [class.opacity-40]="dimmed()" aria-hidden="true"></canvas>
-        @if (crop(); as c) {
-          <div
-            aria-hidden="true"
-            class="pointer-events-none absolute border-2 border-primary shadow-[0_0_0_9999px_color-mix(in_srgb,var(--mat-sys-scrim)_32%,transparent)]"
-            [style.left.%]="c.left"
-            [style.top.%]="c.top"
-            [style.right.%]="c.right"
-            [style.bottom.%]="c.bottom"
-          ></div>
-        }
-      </div>
-    </div>
-  `,
+  templateUrl: './review-preview.html',
 })
 export class ReviewPreview {
   readonly src = input.required<string>();

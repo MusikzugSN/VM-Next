@@ -14,7 +14,7 @@ export class TrustedMarkdown {
   constructor(readonly markdown: string) {}
 }
 
-export type TemplateValue = string | number | boolean | null | TrustedMarkdown | TemplateContext | readonly unknown[];
+type TemplateValue = string | number | boolean | null | TrustedMarkdown | TemplateContext | readonly unknown[];
 export interface TemplateContext {
   readonly [key: string]: TemplateValue | undefined;
 }
@@ -111,12 +111,12 @@ export function isSet(value: TemplateValue | undefined): boolean {
   return true;
 }
 
-export interface RenderOptions {
+interface RenderOptions {
   /** Text for a placeholder without value; default: empty. The preview shows „[fehlt: …]“. */
   missing?: (path: string) => string;
 }
 
-export interface RenderResult {
+interface RenderResult {
   markdown: string;
   /** Placeholders that were rendered without value. A published document must have none. */
   missing: string[];
@@ -146,9 +146,4 @@ export function renderTemplate(nodes: readonly Node[], context: TemplateContext,
     .replace(/\n{3,}/g, '\n\n')
     .trim();
   return { markdown: markdown + '\n', missing };
-}
-
-/** Every placeholder and condition path of a template, e.g. for checks in tests. */
-export function templatePaths(nodes: readonly Node[]): string[] {
-  return nodes.flatMap((n) => (n.kind === 'text' ? [] : n.kind === 'var' ? [n.path] : [n.path, ...templatePaths(n.then), ...templatePaths(n.otherwise)]));
 }

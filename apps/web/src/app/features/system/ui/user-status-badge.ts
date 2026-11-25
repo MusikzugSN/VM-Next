@@ -12,17 +12,7 @@ import { VmBadge } from '@vm-web/ui';
   viewProviders: [provideIcons({ lucideCircleCheck, lucideLock })],
   changeDetection: ChangeDetectionStrategy.OnPush,
   host: { class: 'inline-flex' },
-  template: `
-    @if (status() === 'active') {
-      <span vm-badge tone="success">
-        <ng-icon name="lucideCircleCheck" size="var(--mat-sys-icon-size-xs)" aria-hidden="true" />{{ 'system.users.active' | transloco }}
-      </span>
-    } @else {
-      <span vm-badge tone="error">
-        <ng-icon name="lucideLock" size="var(--mat-sys-icon-size-xs)" aria-hidden="true" />{{ 'system.users.blocked' | transloco }}
-      </span>
-    }
-  `,
+  templateUrl: './user-status-badge.html',
 })
 export class UserStatusBadge {
   readonly status = input.required<UserStatus>();

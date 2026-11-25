@@ -19,6 +19,18 @@ describe('detectImage (S-4)', () => {
   ])('rejects %s', (_, bytes) => {
     expect(detectImage(bytes)).toBeNull();
   });
+
+  it('stays fast on many comments (no ReDoS)', () => {
+    const start = performance.now();
+    expect(detectImage(Buffer.from('<!--' + '--><!--'.repeat(150)))).toBeNull();
+    expect(detectImage(Buffer.from('<!-- a -->'.repeat(50) + '<svg>'))?.mime).toBe('image/svg+xml');
+    expect(performance.now() - start).toBeLessThan(100);
+  });
+
+  it('rejects an unterminated comment and a non-svg doctype', () => {
+    expect(detectImage(Buffer.from('<!-- <svg>'))).toBeNull();
+    expect(detectImage(Buffer.from('<!DOCTYPE html><svg>'))).toBeNull();
+  });
 });
 
 describe('descendantsOf (F-3)', () => {

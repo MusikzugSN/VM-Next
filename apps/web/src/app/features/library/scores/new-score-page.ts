@@ -18,27 +18,7 @@ import { buildScoreBody, emptyScoreForm, type ScoreFormErrors, type ScoreFormInp
   selector: 'vm-library-new-score-page',
   imports: [RouterLink, TranslocoPipe, VmButton, ScoreForm],
   changeDetection: ChangeDetectionStrategy.OnPush,
-  template: `
-    <form class="flex flex-col gap-6" novalidate (submit)="$event.preventDefault(); save()">
-      <div>
-        <h1 class="text-headline-small">{{ 'pages.newScore' | transloco }}</h1>
-        <p class="mt-2 text-muted-foreground">{{ 'library.form.requiredHint' | transloco }}</p>
-      </div>
-
-      @if (hasErrors()) {
-        <p role="alert" class="rounded-small bg-destructive-soft p-4 text-destructive-ink">{{ 'errors.validation-failed' | transloco }}</p>
-      }
-
-      <vm-score-form [(value)]="form" [errors]="errors()" />
-
-      <div class="flex flex-col-reverse gap-2 md:flex-row md:justify-end">
-        <a vm-button variant="tonal" [routerLink]="scoresPath">{{ 'common.cancel' | transloco }}</a>
-        <button vm-button type="submit" [zLoading]="saving()" [zDisabled]="saving() || !options.fieldsLoaded()">
-          {{ 'library.form.saveScore' | transloco }}
-        </button>
-      </div>
-    </form>
-  `,
+  templateUrl: './new-score-page.html',
 })
 export class NewScorePage {
   private readonly api = inject(ApiClient);

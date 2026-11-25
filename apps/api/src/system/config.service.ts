@@ -13,6 +13,7 @@ import {
 import { eq } from 'drizzle-orm';
 import { readFile, rm } from 'node:fs/promises';
 import { activeEnsembleOptions } from '../common/ensemble-tree';
+import { uploadTempPath } from '../common/files/upload-temp';
 import { uuidv7 } from '../common/ids/uuid-v7';
 import { ProblemException } from '../common/problem-details/problem.exception';
 import { httpUrlOrNull } from '../common/url';
@@ -30,8 +31,26 @@ export function detectImage(bytes: Buffer): { mime: string; ext: string } | null
   if (bytes[0] === 0xff && bytes[1] === 0xd8 && bytes[2] === 0xff) return { mime: 'image/jpeg', ext: 'jpg' };
   if (bytes.subarray(0, 4).toString('latin1') === 'RIFF' && bytes.subarray(8, 12).toString('latin1') === 'WEBP') return { mime: 'image/webp', ext: 'webp' };
   const head = bytes.subarray(0, 1024).toString('utf8').replace(BOM, '').trimStart();
-  if (/^(<\?xml[^>]*>\s*)?(<!--[\s\S]*?-->\s*)*(<!DOCTYPE svg[^>]*>\s*)?<svg[\s>]/i.test(head)) return { mime: 'image/svg+xml', ext: 'svg' };
+  if (isSvgHead(head)) return { mime: 'image/svg+xml', ext: 'svg' };
   return null;
+}
+
+/**
+ * `<svg` after an optional XML declaration, comments and an SVG doctype.
+ * Scanned step by step instead of one regex, so the time stays linear in the input (no ReDoS).
+ */
+function isSvgHead(head: string): boolean {
+  let rest = head;
+  const xmlDecl = /^<\?xml[^>]*>/i.exec(rest);
+  if (xmlDecl) rest = rest.slice(xmlDecl[0].length).trimStart();
+  while (rest.startsWith('<!--')) {
+    const end = rest.indexOf('-->', 4);
+    if (end < 0) return false;
+    rest = rest.slice(end + 3).trimStart();
+  }
+  const doctype = /^<!DOCTYPE svg[^>]*>/i.exec(rest);
+  if (doctype) rest = rest.slice(doctype[0].length).trimStart();
+  return /^<svg[\s>]/i.test(rest);
 }
 
 /** Club configuration (S-4, A-2, A-3, D-2, D-4, B-1). OIDC settings stay in the environment. */
@@ -97,8 +116,9 @@ export class ConfigService {
   /** Replaces the logo; PNG, JPEG, WebP or SVG detected from the content, max. 2 MB (multer limit). */
   async uploadLogo(file: { path: string } | undefined): Promise<void> {
     if (!file) throw ProblemException.validation([{ path: '/file', code: 'required' }]);
+    const path = uploadTempPath(file.path);
     try {
-      const bytes = await readFile(file.path);
+      const bytes = await readFile(path);
       const image = detectImage(bytes);
       if (!image) throw new ProblemException(415, 'unsupported-media-type', 'PNG, JPEG, WebP or SVG only', [{ path: '/file', code: 'not_image' }]);
       const key = `branding/logo-${uuidv7()}.${image.ext}`;
@@ -107,7 +127,7 @@ export class ConfigService {
       await this.update({ logoFileKey: key, logoMime: image.mime });
       if (old) await this.storage.delete(old).catch((e: unknown) => this.logger.warn(`Could not delete old logo: ${String(e)}`));
     } finally {
-      await rm(file.path, { force: true });
+      await rm(path, { force: true });
     }
   }
 

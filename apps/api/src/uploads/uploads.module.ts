@@ -1,9 +1,7 @@
 import { Module } from '@nestjs/common';
 import { MulterModule } from '@nestjs/platform-express';
 import { UPLOAD_MAX_FILES } from '@vm-web/shared';
-import { mkdirSync } from 'node:fs';
-import { tmpdir } from 'node:os';
-import { join } from 'node:path';
+import { ensureUploadTempDir } from '../common/files/upload-temp';
 import { AppConfig } from '../config/app-config.service';
 import { MeModule } from '../me/me.module';
 import { ReviewController } from './review.controller';
@@ -18,10 +16,8 @@ import { UploadsService } from './uploads.service';
     MulterModule.registerAsync({
       inject: [AppConfig],
       useFactory: (config: AppConfig) => {
-        const dest = join(tmpdir(), 'vmweb-uploads');
-        mkdirSync(dest, { recursive: true });
         return {
-          dest,
+          dest: ensureUploadTempDir(),
           limits: {
             fileSize: config.get('UPLOAD_MAX_FILE_MB') * 1024 * 1024,
             files: UPLOAD_MAX_FILES,

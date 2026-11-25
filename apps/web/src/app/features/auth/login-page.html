@@ -1,0 +1,65 @@
+<ng-template #welcome>
+  <section
+    [attr.aria-label]="'auth.login.welcomeLabel' | transloco"
+    class="flex flex-col gap-3 rounded-medium bg-primary-soft px-4 py-5 text-primary md:flex-1 md:justify-between md:gap-0 md:rounded-none md:p-12 xl:p-16"
+  >
+    <div class="hidden items-center gap-3 md:flex">
+      <vm-club-logo [size]="32" />
+      <span class="font-semibold">{{ clubName() }}</span>
+    </div>
+    <div class="flex max-w-[520px] flex-col gap-3 md:gap-5">
+      <div aria-hidden="true" class="flex w-30 flex-col gap-1.5 md:w-60 md:gap-2">
+        @for (line of staffLines; track line) {
+          <div class="h-px bg-primary/25"></div>
+        }
+      </div>
+      <p class="text-title-large leading-6 md:text-headline-large md:leading-10">
+        {{ 'auth.login.welcome' | transloco: { club: clubName() } }}
+      </p>
+      <p class="text-body-large whitespace-pre-line md:text-body-large md:leading-6">
+        {{ branding.branding()?.loginBanner ?? ('auth.login.defaultBanner' | transloco) }}
+      </p>
+    </div>
+    <p class="hidden text-body-medium md:block">{{ 'auth.login.tagline' | transloco }}</p>
+  </section>
+</ng-template>
+
+<div class="flex min-h-dvh flex-col md:flex-row">
+  @if (!viewport.isMobile()) {
+    <ng-container [ngTemplateOutlet]="welcome" />
+  }
+
+  <section class="flex flex-1 flex-col md:w-[min(640px,50%)] md:flex-none md:p-8">
+    <main class="flex flex-1 flex-col px-4 pt-12 pb-4 md:items-center md:justify-center md:p-0">
+      <div class="flex w-full flex-1 flex-col gap-6 md:max-w-dialog-sm md:flex-none md:items-center md:text-center">
+        <div class="flex flex-col items-center gap-4 text-center md:gap-6">
+          <vm-club-logo [size]="logoSize()" [label]="'auth.login.logoLabel' | transloco: { club: clubName() }" />
+          <div class="flex flex-col gap-1">
+            <h1 class="text-title-large leading-7 md:text-headline-small md:leading-8">{{ clubName() }}</h1>
+            <p class="hidden text-muted-foreground md:block">{{ 'auth.login.intro' | transloco }}</p>
+          </div>
+        </div>
+
+        @if (viewport.isMobile()) {
+          <ng-container [ngTemplateOutlet]="welcome" />
+        }
+
+        @if (errorKey(); as key) {
+          <p role="alert" class="flex items-start gap-2 rounded-small bg-destructive-soft p-4 text-start text-destructive-ink">
+            <ng-icon name="lucideCircleAlert" class="mt-0.5 shrink-0" aria-hidden="true" />{{ key | transloco }}
+          </p>
+        }
+
+        <div class="mt-auto flex w-full flex-col gap-3 md:mt-0">
+          <a vm-button [href]="loginHref()" class="w-full">
+            <ng-icon name="lucideLogIn" aria-hidden="true" />{{ 'auth.login.submit' | transloco }}
+          </a>
+          <p class="flex items-start gap-2 text-start text-body-medium text-muted-foreground">
+            <ng-icon name="lucideInfo" class="mt-0.5 shrink-0" aria-hidden="true" />{{ 'auth.login.redirectHint' | transloco }}
+          </p>
+        </div>
+      </div>
+    </main>
+    <vm-legal-links class="border-t md:border-t-0" />
+  </section>
+</div>

@@ -1,3 +1,4 @@
+import { SHORT_NAME_MAX } from '@vm-web/shared';
 import { ChangeDetectionStrategy, Component, computed, effect, input, model, signal, untracked } from '@angular/core';
 import { TranslocoPipe } from '@jsverse/transloco';
 import { customFieldTypeSchema, type CustomFieldType, type FieldDefinition } from '@vm-web/shared';
@@ -5,7 +6,6 @@ import { VmField, VmFieldLabel, VmInput, VmSelect, VmTextarea } from '@vm-web/ui
 
 
 import { FormDialog, runDialogSave } from '../../../shared/ui/form-dialog';
-import { NAME_MAX } from '../../../shared/ui/name-dialog';
 import { draftFromField, emptyDraft, optionsFromText, type FieldDraft } from './field-draft';
 import { ToggleField } from '../../../shared/ui/toggle-field';
 
@@ -27,39 +27,7 @@ export interface FieldDialogValue {
   changeDetection: ChangeDetectionStrategy.OnPush,
   // The dialog renders in an overlay; its host must not take up space (or a gap) in the page.
   host: { style: 'display: contents' },
-  template: `
-    <vm-form-dialog
-      [(open)]="open"
-      [titleKey]="field() ? 'fields.edit' : 'fields.create'"
-      [titleParams]="{ name: field()?.name }"
-      [submitKey]="field() ? 'common.save' : 'common.create'"
-      [canSubmit]="valid()"
-      [busy]="busy()"
-      (submitted)="submit()"
-    >
-      <label vm-field>
-        <span vm-field-label>{{ 'fields.name' | transloco }} *</span>
-        <input vm-input cdkFocusInitial type="text" required [maxLength]="max" [value]="draft().name" (input)="patch({ name: $any($event.target).value })" />
-      </label>
-      <label vm-field>
-        <span vm-field-label>{{ 'fields.type' | transloco }}</span>
-        <select vm-select [disabled]="!!field()" [value]="draft().type" (change)="patch({ type: $any($event.target).value })" aria-describedby="field-type-hint">
-          @for (type of types; track type) {
-            <option [value]="type" [selected]="type === draft().type">{{ 'terms.fieldTypes.' + type | transloco }}</option>
-          }
-        </select>
-        <span id="field-type-hint" class="text-body-small text-muted-foreground">{{ 'fields.typeHint' | transloco }}</span>
-      </label>
-      @if (needsOptions()) {
-        <label vm-field>
-          <span vm-field-label>{{ 'fields.options' | transloco }} *</span>
-          <textarea vm-textarea rows="5" [value]="draft().options" (input)="patch({ options: $any($event.target).value })" aria-describedby="field-options-hint"></textarea>
-          <span id="field-options-hint" class="text-body-small text-muted-foreground">{{ 'fields.optionsHint' | transloco }}</span>
-        </label>
-      }
-      <vm-toggle-field [label]="'fields.required' | transloco" [hint]="'fields.requiredHint' | transloco" [checked]="draft().required" (toggled)="patch({ required: $event })" />
-    </vm-form-dialog>
-  `,
+  templateUrl: './field-dialog.html',
 })
 export class FieldDialog {
   readonly open = model(false);
@@ -67,7 +35,7 @@ export class FieldDialog {
   readonly field = input<FieldDefinition | null>(null);
   readonly save = input.required<(value: FieldDialogValue) => Promise<boolean>>();
 
-  protected readonly max = NAME_MAX;
+  protected readonly max = SHORT_NAME_MAX;
   protected readonly types = customFieldTypeSchema.options;
   protected readonly draft = signal<FieldDraft>(emptyDraft());
   protected readonly busy = signal(false);

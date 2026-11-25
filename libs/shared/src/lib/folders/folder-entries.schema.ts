@@ -4,7 +4,9 @@ import { cursorQuerySchema, pageSchema } from '../common/pagination.schema';
 import { scoreCandidateSchema } from '../common/ensemble-options.schema';
 
 /** Folder number (N-5): free text such as `12`, `12a`, `A3`; sorted naturally. Unique within a folder. */
-export const folderNumberSchema = z.string().trim().min(1).max(10);
+export const FOLDER_NUMBER_MAX = 10;
+export const FOLDER_NUMBER_SUFFIX_LENGTH = 1;
+export const folderNumberSchema = z.string().trim().min(1).max(FOLDER_NUMBER_MAX);
 
 /**
  * Optional suffix of a folder number (`1a`, `1b`): exactly one character or `null`.
@@ -12,7 +14,7 @@ export const folderNumberSchema = z.string().trim().min(1).max(10);
  */
 export const folderNumberSuffixSchema = z.preprocess(
   (v) => (typeof v === 'string' && v.trim() === '' ? null : v),
-  z.string().trim().length(1).nullable(),
+  z.string().trim().length(FOLDER_NUMBER_SUFFIX_LENGTH).nullable(),
 );
 
 /** Number and suffix as shown, e.g. `1a`. */

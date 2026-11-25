@@ -2,6 +2,8 @@
 // fremde Stimme in der Kopfzeile (M-2), „Aushilfe“ nur bei fremder Stimme, keine ResizeObserver-Fehler.
 //   node src/probe-voice-switch.mjs [mcp-url]
 const url = process.argv[2] ?? 'http://browser:8934/mcp';
+/** Value as a JS literal for code sent to `browser_evaluate`; also escapes `<`, `>`, `/` and U+2028/9 (CodeQL js/bad-code-sanitization). */
+const jsLiteral = (value) => JSON.stringify(value).replace(/[<>/\u2028\u2029]/g, (c) => `\\u${c.charCodeAt(0).toString(16).padStart(4, '0')}`);
 let session;
 let id = 0;
 async function rpc(method, params, notify = false) {
@@ -21,7 +23,7 @@ const wait = (ms) => new Promise((r) => setTimeout(r, ms));
 /** Klickt das erste sichtbare Element mit genau diesem Text (Button, Menüeintrag). */
 const clickText = (text) =>
   call('browser_evaluate', {
-    function: `() => { const el = [...document.querySelectorAll('button, a, [role=menuitem], [role=menuitemradio]')].find((e) => e.textContent.trim().startsWith(${JSON.stringify(text)}) && e.offsetParent !== null); if (!el) return 'nicht gefunden: ' + ${JSON.stringify(text)}; el.click(); return 'geklickt: ' + ${JSON.stringify(text)}; }`,
+    function: `() => { const el = [...document.querySelectorAll('button, a, [role=menuitem], [role=menuitemradio]')].find((e) => e.textContent.trim().startsWith(${jsLiteral(text)}) && e.offsetParent !== null); if (!el) return 'nicht gefunden: ' + ${jsLiteral(text)}; el.click(); return 'geklickt: ' + ${jsLiteral(text)}; }`,
   });
 const header = () =>
   call('browser_evaluate', {

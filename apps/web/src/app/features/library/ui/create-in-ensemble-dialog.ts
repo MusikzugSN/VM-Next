@@ -1,3 +1,4 @@
+import { SHORT_NAME_MAX } from '@vm-web/shared';
 import { ChangeDetectionStrategy, Component, computed, effect, input, model, signal, untracked } from '@angular/core';
 import { TranslocoPipe } from '@jsverse/transloco';
 import type { Ref } from '@vm-web/shared';
@@ -5,7 +6,6 @@ import { VmField, VmFieldLabel, VmInput, VmSelect } from '@vm-web/ui';
 
 
 import { FormDialog, runDialogSave } from '../../../shared/ui/form-dialog';
-import { NAME_MAX } from '../../../shared/ui/name-dialog';
 import { TreeLabelPipe } from '../../../shared/ui/tree-label.pipe';
 import { ToggleField } from '../../../shared/ui/toggle-field';
 
@@ -24,29 +24,7 @@ export interface CreateInEnsemble {
   changeDetection: ChangeDetectionStrategy.OnPush,
   // The dialog renders in an overlay; its host must not take up space (or a gap) in the page.
   host: { style: 'display: contents' },
-  template: `
-    <vm-form-dialog [(open)]="open" [titleKey]="titleKey()" submitKey="common.create" [canSubmit]="valid()" [busy]="busy()" (submitted)="submit()">
-      <label vm-field>
-        <span vm-field-label>{{ 'library.common.name' | transloco }} *</span>
-        <input vm-input cdkFocusInitial type="text" [maxLength]="max" [value]="name()" (input)="name.set($any($event.target).value)" />
-      </label>
-      @if (withDate()) {
-        <label vm-field>
-          <span vm-field-label>{{ 'library.events.date' | transloco }} *</span>
-          <input vm-input type="date" [value]="date()" (input)="date.set($any($event.target).value)" />
-        </label>
-      }
-      <label vm-field>
-          <span vm-field-label>{{ 'terms.ensemble' | transloco }} *</span>
-          <select vm-select [value]="ensembleId()" (change)="ensembleId.set($any($event.target).value)">
-            @for (ensemble of ensembles(); track ensemble.id) {
-              <option [value]="ensemble.id" [selected]="ensemble.id === ensembleId()">{{ ensemble | treeLabel }}</option>
-            }
-          </select>
-        </label>
-      <vm-toggle-field [label]="'library.common.showInMyArea' | transloco" [hint]="'library.common.showInMyAreaHint' | transloco" [checked]="show()" (toggled)="show.set($event)" />
-    </vm-form-dialog>
-  `,
+  templateUrl: './create-in-ensemble-dialog.html',
 })
 export class CreateInEnsembleDialog {
   readonly open = model(false);
@@ -55,7 +33,7 @@ export class CreateInEnsembleDialog {
   readonly withDate = input(false);
   readonly save = input.required<(value: CreateInEnsemble) => Promise<boolean>>();
 
-  protected readonly max = NAME_MAX;
+  protected readonly max = SHORT_NAME_MAX;
   protected readonly name = signal('');
   protected readonly date = signal('');
   protected readonly ensembleId = signal('');

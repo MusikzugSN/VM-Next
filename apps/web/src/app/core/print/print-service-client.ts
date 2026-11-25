@@ -9,6 +9,7 @@ import {
   printJobSchema,
   printServiceErrorSchema,
   printServiceStatusSchema,
+  printServiceUpdateResultSchema,
   type PrintJob,
   type PrintJobMeta,
   type PrintServiceStatus,
@@ -17,6 +18,10 @@ import type { z } from 'zod';
 
 /** How long VM-Web waits for the local service before it counts as „not running“ (D-3). */
 export const PRINT_SERVICE_TIMEOUT_MS = 1500;
+/** The update downloads the release archive (about 40 MB) before it answers. */
+export const PRINT_SERVICE_UPDATE_TIMEOUT_MS = 5 * 60_000;
+/** Set once the service answered in this browser; see `PrintServiceClient.seenBefore`. */
+const SEEN_KEY = 'vm-web.printService.seen';
 
 /** Reachability of the local print service, as the UI needs it. */
 export type PrintServiceState =
@@ -28,7 +33,10 @@ export type PrintServiceState =
 /** The non-ready states, for the install-guide UI that explains and helps fix them. */
 export type PrintServiceIssue = Exclude<PrintServiceState, { kind: 'ready' }>;
 
-/** Error of a job request, with the service's code if it sent one. */
+/**
+ * Error of a request, with the service's code if it sent one. `update-unavailable`: the service is
+ * older than POST /update and has to be updated by hand once.
+ */
 export class PrintServiceFailure extends Error {
   constructor(readonly code: string) {
     super(`print service: ${code}`);
@@ -46,6 +54,14 @@ export interface PrintServiceClient {
   submit(pdf: Blob, meta: PrintJobMeta): Promise<PrintJob>;
   cancel(jobId: string): Promise<PrintJob>;
   retry(jobId: string): Promise<PrintJob>;
+  /** Lets the service replace itself with release `version` and restart (POST /update). */
+  update(version: string): Promise<void>;
+  /**
+   * Whether the service was ever reachable in this browser. Checks that run without the person
+   * asking (e.g. on start) only talk to localhost then, so browsers don't ask everyone for
+   * local-network access.
+   */
+  seenBefore(): boolean;
 }
 
 export const PRINT_SERVICE = new InjectionToken<PrintServiceClient>('PRINT_SERVICE', {
@@ -67,8 +83,25 @@ export class HttpPrintServiceClient implements PrintServiceClient {
     if (!response.ok) return { kind: 'offline' };
     const parsed = printServiceStatusSchema.safeParse(await response.json().catch(() => null));
     if (!parsed.success) return { kind: 'offline' };
+    this.markSeen();
     if (!parsed.data.contracts.includes(PRINT_SERVICE_CONTRACT)) return { kind: 'incompatible', reason: 'contract' };
     return { kind: 'ready', status: parsed.data };
+  }
+
+  seenBefore(): boolean {
+    try {
+      return localStorage.getItem(SEEN_KEY) === '1';
+    } catch {
+      return false;
+    }
+  }
+
+  private markSeen(): void {
+    try {
+      localStorage.setItem(SEEN_KEY, '1');
+    } catch {
+      // storage blocked: the start check just stays off
+    }
   }
 
   async jobs(): Promise<PrintJob[]> {
@@ -88,6 +121,22 @@ export class HttpPrintServiceClient implements PrintServiceClient {
 
   retry(jobId: string): Promise<PrintJob> {
     return this.request(PRINT_SERVICE_ROUTES.retry(jobId), { method: 'POST' }, printJobSchema);
+  }
+
+  async update(version: string): Promise<void> {
+    const init: RequestInit = {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ version }),
+      signal: AbortSignal.timeout(PRINT_SERVICE_UPDATE_TIMEOUT_MS),
+    };
+    try {
+      await this.request(PRINT_SERVICE_ROUTES.update, init, printServiceUpdateResultSchema);
+    } catch (error) {
+      // Services before POST /update answer unknown paths with 404 job-not-found
+      if (error instanceof PrintServiceFailure && error.code === 'job-not-found') throw new PrintServiceFailure('update-unavailable');
+      throw error;
+    }
   }
 
   private async request<S extends z.ZodType>(path: string, init: RequestInit, schema: S): Promise<z.output<S>> {

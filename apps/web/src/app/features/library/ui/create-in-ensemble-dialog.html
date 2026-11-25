@@ -1,0 +1,21 @@
+<vm-form-dialog [(open)]="open" [titleKey]="titleKey()" submitKey="common.create" [canSubmit]="valid()" [busy]="busy()" (submitted)="submit()">
+  <label vm-field>
+    <span vm-field-label>{{ 'library.common.name' | transloco }} *</span>
+    <input vm-input cdkFocusInitial type="text" [maxLength]="max" [value]="name()" (input)="name.set($any($event.target).value)" />
+  </label>
+  @if (withDate()) {
+    <label vm-field>
+      <span vm-field-label>{{ 'library.events.date' | transloco }} *</span>
+      <input vm-input type="date" [value]="date()" (input)="date.set($any($event.target).value)" />
+    </label>
+  }
+  <label vm-field>
+      <span vm-field-label>{{ 'terms.ensemble' | transloco }} *</span>
+      <select vm-select [value]="ensembleId()" (change)="ensembleId.set($any($event.target).value)">
+        @for (ensemble of ensembles(); track ensemble.id) {
+          <option [value]="ensemble.id" [selected]="ensemble.id === ensembleId()">{{ ensemble | treeLabel }}</option>
+        }
+      </select>
+    </label>
+  <vm-toggle-field [label]="'library.common.showInMyArea' | transloco" [hint]="'library.common.showInMyAreaHint' | transloco" [checked]="show()" (toggled)="show.set($event)" />
+</vm-form-dialog>

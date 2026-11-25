@@ -10,6 +10,7 @@ import { loadConfig, normalizeOrigin } from './config';
 import { JobService } from './jobs';
 import type { BackendJobState, BackendPrintOptions, PrinterBackend } from './printer-backend';
 import { createPrintServer, isPdf } from './server';
+import { UpdateError, type Updater } from './updater';
 
 const ORIGIN = 'https://noten.example.org';
 const PDF = new TextEncoder().encode('%PDF-1.7\n%test\n');
@@ -46,12 +47,31 @@ describe('print service HTTP interface', () => {
   let server: Server;
   let base: string;
   let backend: FakeBackend;
+  let updates: string[];
+  let restarts: number;
+  let updateError: UpdateError | null;
 
   beforeEach(async () => {
+    updates = [];
+    restarts = 0;
+    updateError = null;
+    const updater: Updater = {
+      update: async (version) => {
+        if (updateError) throw updateError;
+        updates.push(version);
+      },
+    };
     dir = await mkdtemp(join(tmpdir(), 'vmweb-print-'));
     backend = new FakeBackend();
     const jobs = new JobService(backend, dir, 30);
-    server = createPrintServer({ config: { allowedOrigin: ORIGIN, maxPdfBytes: 1024 }, backend, jobs, version: '1.0.0' });
+    server = createPrintServer({
+      config: { allowedOrigin: ORIGIN, maxPdfBytes: 1024 },
+      backend,
+      jobs,
+      version: '1.0.0',
+      updater,
+      restart: () => restarts++,
+    });
     await new Promise<void>((resolve) => server.listen(0, '127.0.0.1', resolve));
     base = `http://127.0.0.1:${(server.address() as AddressInfo).port}/v1`;
   });
@@ -140,6 +160,53 @@ describe('print service HTTP interface', () => {
     await job();
     const reopened = new JobService(backend, dir, 30);
     expect(await reopened.list()).toHaveLength(1);
+  });
+
+  it('runs overlapping prints and polls one after another, so jobs.json stays intact (D-5)', async () => {
+    const order: string[] = [];
+    const slow = new (class extends FakeBackend {
+      override async listPrinters() {
+        order.push('enter');
+        await new Promise((resolve) => setTimeout(resolve, 10));
+        order.push('leave');
+        return this.printers;
+      }
+    })();
+    const jobs = new JobService(slow, dir, 30);
+    const meta = { contract: PRINT_SERVICE_CONTRACT, source: { kind: 'folder' as const, title: 'Marschbuch', voices: [] }, printerId: null, pages: 2, duplex: true, copies: 1 };
+    await Promise.all([jobs.submit(PDF, meta), jobs.list(), jobs.submit(PDF, meta), jobs.list(), jobs.submit(PDF, meta)]);
+    expect(order).toEqual(['enter', 'leave', 'enter', 'leave', 'enter', 'leave']);
+    const reopened = new JobService(backend, dir, 30);
+    expect(await reopened.list()).toHaveLength(3);
+  });
+
+  const update = (body: unknown) =>
+    call('/update', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body) });
+
+  it('updates itself and restarts after answering', async () => {
+    const response = await update({ version: '1.2.0' });
+    expect(response.status).toBe(200);
+    expect(await response.json()).toEqual({ version: '1.2.0' });
+    expect(updates).toEqual(['1.2.0']);
+    await new Promise((resolve) => setTimeout(resolve, 10));
+    expect(restarts).toBe(1);
+  });
+
+  it('refuses updates without a release version and does not restart on errors', async () => {
+    expect((await (await update({ version: '1.2.0-dev' })).json()).code).toBe('update-invalid-version');
+    expect((await (await update({})).json()).code).toBe('update-invalid-version');
+    updateError = new UpdateError(502, 'update-failed', 'weg');
+    const failed = await update({ version: '1.2.0' });
+    expect(failed.status).toBe(502);
+    expect((await failed.json()).code).toBe('update-failed');
+    expect(updates).toEqual([]);
+    expect(restarts).toBe(0);
+  });
+
+  it('accepts updates only from the configured origin', async () => {
+    const response = await call('/update', { method: 'POST', body: JSON.stringify({ version: '1.2.0' }) }, 'https://evil.example');
+    expect(response.status).toBe(403);
+    expect(updates).toEqual([]);
   });
 });
 

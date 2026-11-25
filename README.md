@@ -1,99 +1,65 @@
-# VmWeb
+# VM-Web
 
-<a alt="Nx logo" href="https://nx.dev" target="_blank" rel="noreferrer"><img src="https://raw.githubusercontent.com/nrwl/nx/master/images/nx-logo.png" width="45"></a>
+Notenverwaltung für einen Musikverein: eine Installation pro Verein, Anmeldung über einen eigenen
+Identity-Server, und Musiker:innen sehen ohne Zusatzrechte die Noten ihrer eigenen Stimmen – als
+Mappe, Event-Setlist oder Einzelstück, zum Herunterladen oder Drucken.
 
-✨ Your new, shiny [Nx workspace](https://nx.dev) is ready ✨.
+## Aufbau
 
-[Learn more about this workspace setup and its capabilities](https://nx.dev/getting-started/intro#learn-nx?utm_source=nx_project&amp;utm_medium=readme&amp;utm_campaign=nx_projects) or run `npx nx graph` to visually explore what was created. Now, let's get you up to speed!
+Nx-Monorepo mit drei Anwendungen und zwei Bibliotheken:
 
-## Run tasks
+| Projekt | Inhalt |
+| --- | --- |
+| `apps/api` | NestJS-Backend-for-Frontend: OIDC-Anmeldung, Rechte, Noten, Uploads, Druckdokumente. MySQL über Drizzle. |
+| `apps/web` | Angular-Frontend (Signals, Zard UI, Tailwind, Transloco). |
+| `apps/print-service` | Lokaler Druckdienst für Linux/CUPS, den sich jede:r auf dem eigenen Rechner installiert. |
+| `libs/shared` | Zod-Schemas, Routen und Konstanten, die API und Frontend gemeinsam nutzen. |
+| `libs/ui` | Zard-UI-Komponenten als Quellcode. |
 
-To run tasks with Nx use:
+## Entwicklung
 
-```sh
-npx nx <target> <project-name>
-```
-
-For example:
-
-```sh
-npx nx build myproject
-```
-
-These targets are either [inferred automatically](https://nx.dev/concepts/inferred-tasks?utm_source=nx_project&utm_medium=readme&utm_campaign=nx_projects) or defined in the `project.json` or `package.json` files.
-
-[More about running tasks in the docs &raquo;](https://nx.dev/features/run-tasks?utm_source=nx_project&utm_medium=readme&utm_campaign=nx_projects)
-
-## Add new projects
-
-While you could add new projects to your workspace manually, you might want to leverage [Nx plugins](https://nx.dev/concepts/nx-plugins?utm_source=nx_project&utm_medium=readme&utm_campaign=nx_projects) and their [code generation](https://nx.dev/features/generate-code?utm_source=nx_project&utm_medium=readme&utm_campaign=nx_projects) feature.
-
-To install a new plugin you can use the `nx add` command. Here's an example of adding the React plugin:
-```sh
-npx nx add @nx/react
-```
-
-Use the plugin's generator to create new projects. For example, to create a new React app or library:
+Voraussetzungen: Node (siehe `.nvmrc`), pnpm, Docker (für MySQL und den Identity-Server).
 
 ```sh
-# Generate an app
-npx nx g @nx/react:app demo
-
-# Generate a library
-npx nx g @nx/react:lib some-lib
+pnpm install
+pnpm dev:up                 # MySQL (Port 3307) und Pocket ID (Port 1411)
+pnpm db:migrate             # Migrationen einspielen
+npx nx serve api
+npx nx serve web
 ```
 
-You can use `npx nx list` to get a list of installed plugins. Then, run `npx nx list <plugin-name>` to learn about more specific capabilities of a particular plugin. Alternatively, [install Nx Console](https://nx.dev/getting-started/editor-setup?utm_source=nx_project&utm_medium=readme&utm_campaign=nx_projects) to browse plugins and generators in your IDE.
+`pnpm dev:down` stoppt die Dienste wieder, `pnpm dev:logs` zeigt ihre Logs. Die Einrichtung des
+Identity-Servers und die nötigen Umgebungsvariablen stehen in [apps/api/README.md](apps/api/README.md),
+die des Druckdienstes in [apps/print-service/README.md](apps/print-service/README.md).
 
-[Learn more about Nx plugins &raquo;](https://nx.dev/concepts/nx-plugins?utm_source=nx_project&utm_medium=readme&utm_campaign=nx_projects) | [Browse the plugin registry &raquo;](https://nx.dev/plugin-registry?utm_source=nx_project&utm_medium=readme&utm_campaign=nx_projects)
+## Prüfen
 
-## Set up CI!
-
-### Step 1
-
-To connect to Nx Cloud, run the following command:
+Dieselben Schritte wie in der CI:
 
 ```sh
-npx nx connect
+npx nx run-many -t lint typecheck
+npx nx run-many -t test
+npx nx run-many -t build --configuration=production
 ```
 
-Connecting to Nx Cloud ensures a [fast and scalable CI](https://nx.dev/ci/intro/why-nx-cloud?utm_source=nx_project&utm_medium=readme&utm_campaign=nx_projects) pipeline. It includes features such as:
-
-- [Remote caching](https://nx.dev/ci/features/remote-cache?utm_source=nx_project&utm_medium=readme&utm_campaign=nx_projects)
-- [Task distribution across multiple machines](https://nx.dev/ci/features/distribute-task-execution?utm_source=nx_project&utm_medium=readme&utm_campaign=nx_projects)
-- [Automated e2e test splitting](https://nx.dev/ci/features/split-e2e-tasks?utm_source=nx_project&utm_medium=readme&utm_campaign=nx_projects)
-- [Task flakiness detection and rerunning](https://nx.dev/ci/features/flaky-tasks?utm_source=nx_project&utm_medium=readme&utm_campaign=nx_projects)
-
-### Step 2
-
-Use the following command to configure a CI workflow for your workspace:
+Die Integrationstests der API legen eigene Datenbanken an und laufen nur mit gesetzter
+`TEST_DATABASE_URL`; ohne sie überspringen sie sich und melden das im Testlauf:
 
 ```sh
-npx nx g ci-workflow
+TEST_DATABASE_URL='mysql://root:vmweb@127.0.0.1:3307/vmweb' npx nx run-many -t test
 ```
 
-[Learn more about Nx on CI](https://nx.dev/ci/intro/ci-with-nx#ready-get-started-with-your-provider?utm_source=nx_project&utm_medium=readme&utm_campaign=nx_projects)
+## Dokumentation
 
-## Install Nx Console
-
-Nx Console is an editor extension that enriches your developer experience. It lets you run tasks, generate code, and improves code autocompletion in your IDE. It is available for VSCode and IntelliJ.
-
-[Install Nx Console &raquo;](https://nx.dev/getting-started/editor-setup?utm_source=nx_project&utm_medium=readme&utm_campaign=nx_projects)
-
-## Useful links
-
-Learn more:
-
-- [Learn more about this workspace setup](https://nx.dev/getting-started/intro#learn-nx?utm_source=nx_project&amp;utm_medium=readme&amp;utm_campaign=nx_projects)
-- [Learn about Nx on CI](https://nx.dev/ci/intro/ci-with-nx?utm_source=nx_project&utm_medium=readme&utm_campaign=nx_projects)
-- [Releasing Packages with Nx release](https://nx.dev/features/manage-releases?utm_source=nx_project&utm_medium=readme&utm_campaign=nx_projects)
-- [What are Nx plugins?](https://nx.dev/concepts/nx-plugins?utm_source=nx_project&utm_medium=readme&utm_campaign=nx_projects)
-
-And join the Nx community:
-- [Discord](https://go.nx.dev/community)
-- [Follow us on X](https://twitter.com/nxdevtools) or [LinkedIn](https://www.linkedin.com/company/nrwl)
-- [Our Youtube channel](https://www.youtube.com/@nxdevtools)
-- [Our blog](https://nx.dev/blog?utm_source=nx_project&utm_medium=readme&utm_campaign=nx_projects)
+| Datei | Inhalt |
+| --- | --- |
+| [docs/requirements.md](docs/requirements.md) | Anforderungen mit IDs (R-2, N-15, …), die in Code, Issues und Pull Requests referenziert werden |
+| [docs/api.md](docs/api.md) | Endpunkte, Rechte und Fehlercodes |
+| [docs/db-schema.md](docs/db-schema.md) | Tabellen, Schlüssel und Entscheidungen zum Schema |
+| [docs/frontend-plan.md](docs/frontend-plan.md) | Aufbau des Frontends, Routen, Stufenplan |
+| [docs/design-system.md](docs/design-system.md) | Tokens, Komponenten und Gestaltungsregeln |
+| [docs/print-service.md](docs/print-service.md) | Schnittstelle und Sicherheitsmodell des Druckdienstes |
+| [docs/release.md](docs/release.md) | Versionen, Release-Zweige und Backports |
 
 ## Lizenz
 

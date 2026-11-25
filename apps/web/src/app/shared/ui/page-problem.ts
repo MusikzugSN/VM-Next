@@ -13,13 +13,7 @@ import { isApiProblem } from '../../core/api/api-problem';
   selector: 'vm-page-problem',
   imports: [RouterLink, TranslocoPipe],
   changeDetection: ChangeDetectionStrategy.OnPush,
-  template: `
-    <div role="alert" class="flex flex-col gap-3 rounded-medium border p-6">
-      <h1 class="text-headline-small">{{ titleKey() | transloco }}</h1>
-      <p class="text-muted-foreground">{{ messageKey() | transloco }}</p>
-      <a [routerLink]="homePath" class="self-start font-medium">{{ 'pages.toHome' | transloco }}</a>
-    </div>
-  `,
+  templateUrl: './page-problem.html',
 })
 export class PageProblem {
   readonly error = input<unknown>();

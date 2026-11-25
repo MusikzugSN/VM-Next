@@ -16,32 +16,7 @@ let nextId = 0;
   changeDetection: ChangeDetectionStrategy.OnPush,
   // The dialog renders in an overlay; its host must not take up space (or a gap) in the page.
   host: { style: 'display: contents' },
-  template: `
-    <vm-dialog [(zVisible)]="open" [zWidth]="width()" [zMaskClosable]="!busy()">
-      <vm-dialog-header>
-        <h2 vm-dialog-title>{{ titleKey() | transloco: titleParams() }}</h2>
-        @if (descriptionKey(); as description) {
-          <p vm-dialog-description>{{ description | transloco: titleParams() }}</p>
-        }
-      </vm-dialog-header>
-
-      <form
-        [id]="formId"
-        class="flex min-h-0 flex-1 flex-col gap-5 overflow-y-auto md:max-h-[65dvh] md:flex-none"
-        novalidate
-        (submit)="$event.preventDefault(); submitted.emit()"
-      >
-        <ng-content />
-      </form>
-
-      <vm-dialog-footer>
-        <button vm-button variant="tonal" type="button" (click)="open.set(false)">{{ (submitKey() ? 'common.cancel' : 'common.close') | transloco }}</button>
-        @if (submitKey(); as submit) {
-          <button vm-button type="submit" [attr.form]="formId" [zLoading]="busy()" [zDisabled]="busy() || !canSubmit()">{{ submit | transloco }}</button>
-        }
-      </vm-dialog-footer>
-    </vm-dialog>
-  `,
+  templateUrl: './form-dialog.html',
 })
 export class FormDialog {
   readonly open = model(false);

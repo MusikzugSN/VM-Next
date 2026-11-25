@@ -11,6 +11,7 @@ import { VmSheetImports, VmToaster } from '@vm-web/ui';
 
 
 import { PrintDialog } from '../../features/print/print-dialog';
+import { PrintServiceUpdateDialog } from '../../features/print/print-service-update-dialog';
 import { UploadDialog } from '../../features/uploads/upload-dialog';
 import { BrandingStore } from '../branding/branding.store';
 import { ClubLogo } from '../branding/club-logo';
@@ -43,6 +44,7 @@ import { VoiceSwitcher } from './voice-switcher';
     VoiceSwitcher,
     UploadDialog,
     PrintDialog,
+    PrintServiceUpdateDialog,
     VmToaster,
   ],
   viewProviders: [provideIcons({ lucideMenu, lucideHouse, lucideFolderOpen, lucideCalendar, lucideUser })],

@@ -34,127 +34,7 @@ export function ruleEnd(rules: readonly PrintRule[], index: number): number | nu
   viewProviders: [provideIcons({ lucidePlus, lucideX, lucideRotateCcw })],
   changeDetection: ChangeDetectionStrategy.OnPush,
   host: { class: 'flex flex-col gap-4' },
-  template: `
-    @if (data.error()) {
-      <vm-page-problem [error]="data.error()" />
-    } @else if (data.hasValue()) {
-      @let info = data.value();
-      <section aria-labelledby="h-print-rules" vm-card class="flex flex-col gap-4 p-4 md:p-6">
-        <div class="flex flex-col gap-2 md:flex-row md:items-start md:justify-between">
-          <div>
-            <h2 id="h-print-rules" class="text-title-large">{{ 'system.printRules.title' | transloco }}</h2>
-            <p class="text-muted-foreground">{{ 'system.printRules.hint' | transloco: { name: ensembleName() } }}</p>
-          </div>
-          @if (canEdit()) {
-            <div class="flex flex-col gap-2 md:flex-row">
-              @if (info.own) {
-                <button vm-button variant="outlined" type="button" (click)="reset()">
-                  <ng-icon name="lucideRotateCcw" aria-hidden="true" />{{ 'system.printRules.reset' | transloco }}
-                </button>
-              }
-              <button vm-button type="button" [zDisabled]="!dirty() || !valid()" (click)="save()">{{ 'common.save' | transloco }}</button>
-            </div>
-          }
-        </div>
-
-        <p class="rounded-small bg-muted px-4 py-3 text-body-medium">
-          @if (info.own) {
-            {{ 'system.printRules.own' | transloco }}
-          } @else if (info.inheritedFrom; as parent) {
-            {{ 'system.printRules.inherited' | transloco: { name: parent.name } }}
-          } @else {
-            {{ 'system.printRules.default' | transloco }}
-          }
-        </p>
-
-        <div class="overflow-x-auto rounded-small border">
-          <table vm-table>
-            <thead>
-              <tr>
-                <th scope="col" class="px-4 py-3 text-start">{{ 'system.printRules.pages' | transloco }}</th>
-                <th scope="col" class="px-4 py-3 text-start">{{ 'system.printRules.mode' | transloco }}</th>
-                <th scope="col" class="px-4 py-3 text-start">{{ 'system.printRules.example' | transloco }}</th>
-                @if (canEdit()) {
-                  <th scope="col" class="w-12 px-4 py-3"><span class="sr-only">{{ 'system.printRules.actions' | transloco }}</span></th>
-                }
-              </tr>
-            </thead>
-            <tbody>
-              @for (rule of draft(); track $index; let i = $index, first = $first) {
-                @let end = ruleEnd(draft(), i);
-                <tr class="align-middle">
-                  <td class="px-4 py-3">
-                    @if (first || !canEdit()) {
-                      <span class="font-medium">{{ rangeLabel(rule.fromPages, end) }}</span>
-                    } @else {
-                      <label class="flex items-center gap-2">
-                        <span>{{ 'system.printRules.from' | transloco }}</span>
-                        <input
-                          vm-input
-                          type="number"
-                          min="2"
-                          max="500"
-                          inputmode="numeric"
-                          class="w-20"
-                          [value]="rule.fromPages"
-                          (change)="setFrom(i, $any($event.target).valueAsNumber)"
-                          [attr.aria-label]="'system.printRules.fromLabel' | transloco: { index: i + 1 }"
-                          [attr.aria-invalid]="!validAt(i)"
-                        />
-                        <span>{{ 'system.printRules.pagesUnit' | transloco }}</span>
-                        @if (end !== null) {
-                          <span class="text-muted-foreground">({{ 'system.printRules.until' | transloco: { end: end } }})</span>
-                        }
-                      </label>
-                    }
-                  </td>
-                  <td class="px-4 py-3">
-                    @if (canEdit()) {
-                      <select
-                        vm-select
-                        class="md:w-60"
-                        [value]="rule.mode"
-                        (change)="setMode(i, $any($event.target).value)"
-                        [attr.aria-label]="'system.printRules.modeLabel' | transloco: { range: rangeLabel(rule.fromPages, end) }"
-                      >
-                        @for (mode of modes; track mode) {
-                          <option [value]="mode" [selected]="mode === rule.mode">{{ 'print.modes.' + mode | transloco }}</option>
-                        }
-                      </select>
-                    } @else {
-                      {{ 'print.modes.' + rule.mode | transloco }}
-                    }
-                  </td>
-                  <td class="px-4 py-3 text-muted-foreground">
-                    @let sample = end ?? rule.fromPages;
-                    {{ sampleText(sample, rule.mode) }}
-                  </td>
-                  @if (canEdit()) {
-                    <td class="px-4 py-2">
-                      @if (!first) {
-                        <button vm-icon-button type="button" (click)="remove(i)" [attr.aria-label]="'system.printRules.remove' | transloco: { range: rangeLabel(rule.fromPages, end) }">
-                          <ng-icon name="lucideX" aria-hidden="true" />
-                        </button>
-                      }
-                    </td>
-                  }
-                </tr>
-              }
-            </tbody>
-          </table>
-        </div>
-        @if (canEdit()) {
-          <button vm-button variant="outlined" type="button" class="self-start" [zDisabled]="draft().length >= 20" (click)="add()">
-            <ng-icon name="lucidePlus" aria-hidden="true" />{{ 'system.printRules.add' | transloco }}
-          </button>
-          @if (!valid()) {
-            <p role="alert" class="text-body-medium text-destructive-ink">{{ 'system.printRules.invalid' | transloco }}</p>
-          }
-        }
-        <p class="text-body-medium text-muted-foreground">{{ 'system.printRules.footnote' | transloco }}</p>
-      </section>
-    }
-  `,
+  templateUrl: './print-rules-tab.html',
 })
 export class PrintRulesTab {
   private readonly api = inject(ApiClient);
@@ -194,7 +74,7 @@ export class PrintRulesTab {
     return this.transloco.translate('system.printRules.sample', {
       pages: this.transloco.translate(pluralKey('print.pages', pages), { count: pages }),
       sheets: this.transloco.translate(pluralKey('system.printRules.sheets', sheets), { count: sheets }),
-      mode: this.transloco.translate(`print.modes.${mode}`),
+      mode: this.transloco.translate(`system.printRules.modes.${mode}`),
     });
   }
 

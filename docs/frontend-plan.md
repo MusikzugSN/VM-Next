@@ -25,13 +25,13 @@ Stufenplan für das Angular-Frontend von VM-Web.
 | Zustand | Signals. Pro Seite ein kleiner Store (`signal` plus `resource`/`httpResource`), kein NgRx. |
 | API-Zugriff | URLs nur über `apiUrl(API_ROUTES…)` aus `@vm-web/shared`. Typen per `z.infer` aus den Shared-Schemas. Responses werden im Dev-Build mit Zod geprüft, im Prod-Build nicht (Bundle-Größe und Laufzeit). |
 | Routen | Englisch. Alle Pfade stehen als `APP_ROUTES` mit `appUrl()` in `@vm-web/shared` (`libs/shared/src/lib/app-routes.ts`), analog zu `API_ROUTES`. Das Angular-Routing, die Links und später die API (Weiterleitungen nach dem Login, Links in E-Mails o. Ä.) nutzen dieselben Konstanten. Tabelle siehe „Routen“. |
-| i18n | Transloco, vorerst nur `de-DE`. Dateien unter `apps/web/public/translate/de-DE/`, ausgeliefert als `/translate/de-DE/…`. **Global** (`global.json`, beim Start geladen): Navigation, allgemeine Aktionen (Speichern, Abbrechen, Löschen …), Glossarbegriffe, Statuswörter (StatusBadge), Fehler-Codes der API (`errors.<code>`), Validierung, Seitenhülle. **Scopes** (`<scope>.scope.json`, mit dem Bereich per Lazy Loading geladen): `auth`, `me`, `library`, `print`, `system`. Ein eigener `TranslocoLoader` bildet `de-DE` auf `global.json` und `me/de-DE` auf `me.scope.json` ab. Ein Test prüft, dass alle verwendeten Schlüssel vorhanden sind. |
+| i18n | Transloco, vorerst nur `de-DE`. Dateien unter `apps/web/public/translate/de-DE/`, ausgeliefert als `/translate/de-DE/…`. **Global** (`global.json`, beim Start geladen): Navigation, allgemeine Aktionen (Speichern, Abbrechen, Löschen …), Glossarbegriffe, Statuswörter (StatusBadge), Fehler-Codes der API (`errors.<code>`), Validierung, Seitenhülle. **Scopes** (`<scope>.scope.json`, mit dem Bereich per Lazy Loading geladen): `auth`, `me`, `library`, `print`, `system`, `legal`. Ein eigener `TranslocoLoader` bildet `de-DE` auf `global.json` und `me/de-DE` auf `me.scope.json` ab. Ein Test prüft, dass alle verwendeten Schlüssel vorhanden sind. |
 | Fehler | Ein Interceptor wandelt Problem Details in `ApiProblem` um. Formulare mappen `errors[].pointer` auf Felder. Die Texte kommen aus i18n unter `errors.<code>`. Der Interceptor erledigt nur, was überall gleich ist: Bei 401 geht es zu `/login?returnTo=…`, bei `account-blocked` zu `/blocked`. 403 und 404 entscheidet die aufrufende Stelle: Beim Laden einer Seite folgt „Kein Zugriff“ bzw. „Nicht gefunden“, bei einer Aktion ein Toast. |
 | Rechte | `SessionStore.can(code, ensembleId?)` bildet die Logik aus `AccessContext` nach (`club` / `anyEnsemble` / Ensemble mit Vererbung, Admin). Routen-Guard: `canMatch: [permission('score.view')]`. Menüpunkte ohne Recht werden ausgeblendet. |
 | Listen | Eine Hilfsfunktion `cursorList()` (Signal mit `items`, `loadMore`, `loading`). Desktop und Tablet zeigen Tabellen, Mobil zeigt Karten. „Mehr laden“ als Button, kein Endlos-Scrollen (Tastatur, Barrierefreiheit). |
 | Suche & Filter | Suchfeld mit Filter-Button (`sliders-horizontal`), Zähler-Badge und Chips. Der Filter öffnet sich als Dialog (480 px), mobil als Bottom-Sheet. Der Filterzustand steht in den Query-Parametern der URL. |
 | Responsiv | `BreakpointObserver` liefert ein Signal `viewport()` mit `mobile` / `tablet` / `desktop` (768 / 1280 px). Wo die Mockups abweichen, gibt es eigene Templates, sonst nur Tailwind-Klassen. |
-| Barrierefreiheit | Fokusring über Token `ring`. Fokus wird bei jedem Routenwechsel auf das `h1` gesetzt. Toasts mit `aria-live`. Jede Seite hat einen Test mit `axe-core` (Vitest, jsdom). |
+| Barrierefreiheit | Fokusring über Token `ring`. Fokus wird bei jedem Routenwechsel auf das `h1` gesetzt. Toasts mit `aria-live`. `axe-core` steht zur Verfügung; Tests damit gibt es bisher nur für einzelne Seiten, flächendeckende a11y-Tests stehen aus. |
 | Downloads | PDF, ZIP und CSV über `<a href download>` auf die API-URL (Cookie-Sitzung, kein Blob). Druck-PDFs gehen per POST, daher als Blob. |
 | Tests | Vitest (`@angular/build:unit-test`): Stores, Guards, Interceptor und Rechte-Logik als Unit-Tests, Seiten als Komponententests mit gemocktem `HttpTestingController`. E2E kommt später (laut Anforderungen). |
 
@@ -243,7 +243,7 @@ Diese Stufe ist die größte. Bei Bedarf teile ich sie in **3a** (Stücke, Stimm
 | --- | --- |
 | `tailwindcss` v4, `@tailwindcss/postcss` | Pflicht laut Anforderungen (Zard) |
 | Zard UI 1.12 (`zard-cli`, Komponenten als Quellcode in `libs/ui/src/lib/zard`) samt `class-variance-authority`, `clsx`, `tailwind-merge`, `@angular/cdk`, `ngx-sonner`, `@ng-icons/core` und `@ng-icons/lucide` | UI-Bibliothek. Das ältere npm-Paket `@ngzard/ui` nutzt `lucide-angular`, das Angular 22 nicht unterstützt. |
-| `pdfjs-dist` | PDF-Vorschau (Anforderung); wird erst in Stufe 2 installiert |
+| `pdfjs-dist` | PDF-Vorschau (Anforderung) |
 | `@jsverse/transloco` | i18n zur Laufzeit mit JSON-Dateien (siehe Frage 1) |
 | `@fontsource-variable/inter` | Schrift lokal statt über das Google-CDN (Datenschutz) |
 | `axe-core` (dev) | Barrierefreiheits-Tests |
@@ -304,6 +304,6 @@ Diese Stufe ist die größte. Bei Bedarf teile ich sie in **3a** (Stücke, Stimm
   - Druckverlauf `/print`: Status des Druckservice, Aufträge mit Wartend/Druckt/Fertig/Fehler/Abgebrochen, Abbrechen und „Erneut senden“, Abfrage alle 2 s bei sichtbarer Seite, Statuswechsel als Toast; ohne Druckservice die Installationsanleitung mit der VM-Web-Adresse zum Kopieren.
 - **Nach Stufe 6:**
   - Mehrfachauswahl in den Listen von Mein Bereich (Mappe, Event, Tag) mit „Als ZIP“ und „Drucken“ (M-6, M-7) und in der Stückliste der Notenverwaltung mit „Drucken“; die Aktionen stehen in einer schwebenden Leiste (`vm-selection-bar`), damit sich die Liste nicht verschiebt.
-  - Sitzungen liegen in Postgres (`cache_entries`), API-Neustarts melden nicht mehr ab.
+  - Sitzungen liegen in MySQL (`cache_entries`), API-Neustarts melden nicht mehr ab.
   - Druckservice für Linux/CUPS in `apps/print-service` (README mit Einrichtung).
   - **Druckregeln (S-2, D-6):** Tab „Druck“ im Ensemble-Detail mit Regeln „ab X Seiten → einseitig/beidseitig“, Vererbung von übergeordneten Ensembles, sonst Standard (1 Seite einseitig, ab 2 beidseitig). Der Druckdialog fragt „beidseitig“ nicht mehr ab, sondern zeigt die angewandten Regeln und je Stück Druckart und Blätter; Mappen und Events drucken nach den Regeln ihres Ensembles, einzelne Stücke nach denen des Hauptensembles.

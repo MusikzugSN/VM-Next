@@ -59,58 +59,7 @@ export function clampPage(page: number, count: number): number {
   viewProviders: [provideIcons({ lucideChevronLeft, lucideChevronRight })],
   changeDetection: ChangeDetectionStrategy.OnPush,
   host: { class: 'flex flex-col gap-3' },
-  template: `
-    <div
-      #frame
-      tabindex="0"
-      role="group"
-      [attr.aria-label]="'pdf.label' | transloco: { page: page(), count: pageCount() }"
-      (keydown.arrowleft)="go(page() - 1)"
-      (keydown.arrowright)="go(page() + 1)"
-      class="flex min-h-64 items-start justify-center overflow-auto rounded-small bg-muted p-2 md:p-4"
-    >
-      @switch (state()) {
-        @case ('loading') {
-          <p class="self-center text-muted-foreground">{{ 'common.loading' | transloco }}</p>
-        }
-        @case ('error') {
-          <p role="alert" class="self-center text-destructive-ink">{{ 'pdf.error' | transloco }}</p>
-        }
-      }
-      <canvas #canvas [class.hidden]="state() !== 'ready'" class="max-w-full border bg-white shadow-level1" aria-hidden="true"></canvas>
-    </div>
-
-    @if (pageCount() > 1) {
-      <nav [attr.aria-label]="'pdf.pages' | transloco" class="flex flex-wrap items-center justify-center gap-1">
-        <button vm-icon-button type="button" [zDisabled]="page() <= 1" (click)="go(page() - 1)" [attr.aria-label]="'pdf.previous' | transloco">
-          <ng-icon name="lucideChevronLeft" aria-hidden="true" />
-        </button>
-        @if (pageCount() <= maxPageButtons) {
-          @for (n of pages(); track n) {
-            <button
-              vm-icon-button
-              [variant]="n === page() ? 'tonal' : 'text'"
-              type="button"
-              class="tabular-nums"
-              [attr.aria-current]="n === page() ? 'page' : null"
-              [attr.aria-label]="'pdf.page' | transloco: { page: n }"
-              (click)="go(n)"
-            >
-              {{ n }}
-            </button>
-          }
-        }
-        <button vm-icon-button type="button" [zDisabled]="page() >= pageCount()" (click)="go(page() + 1)" [attr.aria-label]="'pdf.next' | transloco">
-          <ng-icon name="lucideChevronRight" aria-hidden="true" />
-        </button>
-      </nav>
-    }
-    <p class="text-center text-body-small text-muted-foreground tabular-nums" aria-live="polite">
-      @if (state() === 'ready') {
-        {{ 'pdf.status' | transloco: { page: page(), count: pageCount() } }}
-      }
-    </p>
-  `,
+  templateUrl: './pdf-viewer.html',
 })
 export class PdfViewer {
   /** URL of the PDF (same origin, cookie session). */

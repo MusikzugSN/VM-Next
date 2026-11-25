@@ -14,7 +14,7 @@ import { httpUrlOrNull } from '../common/url';
 import { DATABASE, type Database } from '../db/database';
 import { legalData, legalDocuments, type AcceptedLegalTemplate } from '../db/schema';
 
-export interface LegalDocumentRow extends LegalDocumentSettings {
+interface LegalDocumentRow extends LegalDocumentSettings {
   acceptedTemplate: AcceptedLegalTemplate | null;
   acceptedAt: Date | null;
   publishedHash: string | null;
@@ -28,7 +28,7 @@ export interface LegalState {
   updatedAt: Date | null;
 }
 
-export interface LegalSettingsWrite {
+interface LegalSettingsWrite {
   documents: Record<LegalDocument, LegalDocumentSettings>;
   imprintData: ImprintData;
   privacyData: PrivacyData;
@@ -46,7 +46,7 @@ export const LEGAL_STORE = Symbol('LEGAL_STORE');
 
 export const LEGAL_DOCUMENTS: readonly LegalDocument[] = ['imprint', 'privacy'];
 
-export const emptyDocumentRow = (): LegalDocumentRow => ({
+const emptyDocumentRow = (): LegalDocumentRow => ({
   mode: null,
   url: null,
   acceptedTemplate: null,

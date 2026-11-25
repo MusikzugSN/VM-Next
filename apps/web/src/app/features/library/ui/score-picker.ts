@@ -1,3 +1,4 @@
+import { FOLDER_NUMBER_MAX } from '@vm-web/shared';
 import { ChangeDetectionStrategy, Component, effect, input, output, signal, untracked } from '@angular/core';
 import { rxResource } from '@angular/core/rxjs-interop';
 import { TranslocoPipe } from '@jsverse/transloco';
@@ -34,52 +35,7 @@ export interface PickedScore {
   viewProviders: [provideIcons({ lucidePlus })],
   changeDetection: ChangeDetectionStrategy.OnPush,
   host: { class: 'flex flex-col gap-3' },
-  template: `
-    <div class="flex flex-col gap-3 md:flex-row md:items-end">
-      <vm-search-field [(value)]="search" labelKey="library.picker.search" [hideLabel]="false" [focusInDialog]="true" />
-      @if (numbered()) {
-        <label vm-field class="md:w-32">
-          <span vm-field-label>{{ 'library.picker.number' | transloco }}</span>
-          <input vm-input type="text" maxlength="10" [value]="number()" (input)="number.set($any($event.target).value)" />
-        </label>
-      }
-    </div>
-
-    @if (query().trim()) {
-      @if (results.hasValue()) {
-        <ul class="flex flex-col" [attr.aria-label]="'library.picker.results' | transloco">
-          @for (score of results.value().items; track score.id; let first = $first) {
-            <li class="flex min-h-target items-center gap-3 py-1" [class.border-t]="!first">
-              <span class="flex min-w-0 flex-1 flex-col">
-                <span class="font-medium">{{ score.title }}</span>
-                @if (score.composer) {
-                  <span class="text-muted-foreground">{{ score.composer }}</span>
-                }
-              </span>
-              @if (score.alreadyContained) {
-                <span class="text-body-small text-muted-foreground">{{ 'library.picker.contained' | transloco }}</span>
-              } @else {
-                <button
-                  vm-button
-                  variant="outlined"
-                  type="button"
-                  [zDisabled]="numbered() && !number().trim()"
-                  (click)="pick(score)"
-                  [attr.aria-label]="'library.picker.addLabel' | transloco: { title: score.title }"
-                >
-                  <ng-icon name="lucidePlus" aria-hidden="true" />{{ 'library.picker.add' | transloco }}
-                </button>
-              }
-            </li>
-          } @empty {
-            <li class="text-muted-foreground">{{ 'library.picker.none' | transloco }}</li>
-          }
-        </ul>
-      } @else if (results.isLoading()) {
-        <p class="text-muted-foreground">{{ 'common.loading' | transloco }}</p>
-      }
-    }
-  `,
+  templateUrl: './score-picker.html',
 })
 export class ScorePicker {
   /** Loads candidates for a search text. */
@@ -88,6 +44,7 @@ export class ScorePicker {
   readonly picked = output<PickedScore>();
 
   protected readonly search = signal('');
+  protected readonly numberMax = FOLDER_NUMBER_MAX;
   protected readonly query = debounced(this.search);
   protected readonly number = signal('');
 

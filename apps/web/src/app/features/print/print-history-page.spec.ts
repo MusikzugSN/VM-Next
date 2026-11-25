@@ -4,6 +4,7 @@ import type { PrintJob, PrintJobStatus } from '@vm-web/shared';
 import axe from 'axe-core';
 
 import global from '../../../../public/translate/de-DE/global.json';
+import print from '../../../../public/translate/de-DE/print.scope.json';
 import { setViewportWidth } from '../../../test-setup';
 import { PRINT_SERVICE, type PrintServiceClient, type PrintServiceState } from '../../core/print/print-service-client';
 import { PrintHistoryPage } from './print-history-page';
@@ -36,6 +37,8 @@ function fakeService(state: PrintServiceState, jobs: PrintJob[] = []): PrintServ
       return jobs[0];
     },
     retry: async () => jobs[0],
+    update: async () => undefined,
+    seenBefore: () => true,
   };
 }
 
@@ -45,7 +48,7 @@ async function render(service: PrintServiceClient) {
     imports: [
       PrintHistoryPage,
       TranslocoTestingModule.forRoot({
-        langs: { 'de-DE': global },
+        langs: { 'de-DE': global, 'print/de-DE': print },
         translocoConfig: { availableLangs: ['de-DE'], defaultLang: 'de-DE' },
         preloadLangs: true,
       }),

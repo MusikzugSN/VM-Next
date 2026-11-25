@@ -1,3 +1,4 @@
+import { SHORT_NAME_MAX } from '@vm-web/shared';
 import { ChangeDetectionStrategy, Component, computed, inject, signal } from '@angular/core';
 import { rxResource } from '@angular/core/rxjs-interop';
 import { RouterLink } from '@angular/router';
@@ -59,6 +60,7 @@ export class ScoreImportPage {
 
   protected readonly scoresPath = APP_ROUTES.library.scores;
   protected readonly fixedTargets = FIXED_TARGETS;
+  protected readonly nameMax = SHORT_NAME_MAX;
   protected readonly newFieldTypes = NEW_FIELD_TYPES;
   protected readonly canEdit = computed(() => this.session.can('score.edit'));
 

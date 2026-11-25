@@ -1,3 +1,4 @@
+import { SHORT_NAME_MAX } from '@vm-web/shared';
 import { ChangeDetectionStrategy, Component, effect, input, model, signal, untracked } from '@angular/core';
 import { TranslocoPipe } from '@jsverse/transloco';
 import { VmField, VmFieldLabel, VmInput } from '@vm-web/ui';
@@ -6,7 +7,6 @@ import { VmField, VmFieldLabel, VmInput } from '@vm-web/ui';
 import { FormDialog, runDialogSave } from './form-dialog';
 
 /** Max. length of a short name (`shortNameSchema`). */
-export const NAME_MAX = 100;
 
 /**
  * Dialog with one name field: create or rename tags, instruments, ensembles, roles.
@@ -18,22 +18,7 @@ export const NAME_MAX = 100;
   changeDetection: ChangeDetectionStrategy.OnPush,
   // The dialog renders in an overlay; its host must not take up space (or a gap) in the page.
   host: { style: 'display: contents' },
-  template: `
-    <vm-form-dialog
-      [(open)]="open"
-      [titleKey]="titleKey()"
-      [titleParams]="titleParams()"
-      [submitKey]="submitKey()"
-      [canSubmit]="!!name().trim() && name().trim() !== initial()"
-      [busy]="busy()"
-      (submitted)="submit()"
-    >
-      <label vm-field>
-        <span vm-field-label>{{ labelKey() | transloco }}</span>
-        <input vm-input cdkFocusInitial type="text" required [maxLength]="max" [value]="name()" (input)="name.set($any($event.target).value)" />
-      </label>
-    </vm-form-dialog>
-  `,
+  templateUrl: './name-dialog.html',
 })
 export class NameDialog {
   readonly open = model(false);
@@ -45,7 +30,7 @@ export class NameDialog {
   readonly initial = input('');
   readonly save = input.required<(name: string) => Promise<boolean>>();
 
-  protected readonly max = NAME_MAX;
+  protected readonly max = SHORT_NAME_MAX;
   protected readonly name = signal('');
   protected readonly busy = signal(false);
 

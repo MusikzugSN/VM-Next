@@ -8,36 +8,7 @@ import type { CustomFieldValue, FieldDefinition } from '@vm-web/shared';
   selector: 'vm-field-value',
   imports: [DatePipe, DecimalPipe, TranslocoPipe],
   changeDetection: ChangeDetectionStrategy.OnPush,
-  template: `
-    @let v = value();
-    @if (v === null || v === undefined || v === '' || (isArray(v) && !v.length)) {
-      <span class="text-muted-foreground">–</span>
-    } @else {
-      @switch (field().type) {
-        @case ('number') {
-          {{ $any(v) | number }}
-        }
-        @case ('date') {
-          {{ $any(v) | date: 'dd.MM.yyyy' }}
-        }
-        @case ('boolean') {
-          {{ (v ? 'library.filter.yes' : 'library.filter.no') | transloco }}
-        }
-        @case ('link') {
-          <a [href]="v" target="_blank" rel="noopener noreferrer">{{ 'library.fields.openLink' | transloco }}</a>
-        }
-        @case ('select') {
-          {{ labels() }}
-        }
-        @case ('multiselect') {
-          {{ labels() }}
-        }
-        @default {
-          {{ v }}
-        }
-      }
-    }
-  `,
+  templateUrl: './field-value.html',
 })
 export class FieldValue {
   readonly field = input.required<FieldDefinition>();

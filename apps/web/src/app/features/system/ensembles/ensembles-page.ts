@@ -1,3 +1,4 @@
+import { SHORT_NAME_MAX } from '@vm-web/shared';
 import { ChangeDetectionStrategy, Component, computed, inject, signal } from '@angular/core';
 import { rxResource } from '@angular/core/rxjs-interop';
 import { RouterLink } from '@angular/router';
@@ -23,7 +24,6 @@ import { SessionStore } from '../../../core/auth/session.store';
 import { PluralPipe } from '../../../core/i18n/plural.pipe';
 import { ListState } from '../../../shared/ui/list-state';
 import { FormDialog, runDialogSave } from '../../../shared/ui/form-dialog';
-import { NAME_MAX } from '../../../shared/ui/name-dialog';
 import { TreeLabelPipe } from '../../../shared/ui/tree-label.pipe';
 import { ToggleField } from '../../../shared/ui/toggle-field';
 import { selectOr } from '../../../core/util/resource-value';
@@ -34,88 +34,14 @@ import { selectOr } from '../../../core/util/resource-value';
   imports: [VmSwitch, VmCard, VmField, VmFieldLabel, ToggleField, TreeLabelPipe, RouterLink, NgIcon, TranslocoPipe, PluralPipe, VmButton, VmInput, VmSelect, ListState, FormDialog],
   viewProviders: [provideIcons({ lucidePlus, lucideArchive, lucideArchiveRestore })],
   changeDetection: ChangeDetectionStrategy.OnPush,
-  template: `
-    <div class="flex flex-col gap-3 md:flex-row md:items-start md:justify-between">
-      <div>
-        <h1 class="text-headline-small">{{ 'nav.system.ensembles' | transloco }}</h1>
-        <p class="mt-2 text-muted-foreground">{{ 'system.ensembles.intro' | transloco }}</p>
-      </div>
-      @if (canCreate()) {
-        <button vm-button type="button" class="w-full md:w-auto" (click)="startCreate()">
-          <ng-icon name="lucidePlus" aria-hidden="true" />{{ 'system.ensembles.create' | transloco }}
-        </button>
-      }
-    </div>
-
-    <vm-form-dialog
-      [(open)]="creating"
-      titleKey="system.ensembles.create"
-      submitKey="common.create"
-      [canSubmit]="!!newName().trim() && !!newParentId()"
-      [busy]="busy()"
-      (submitted)="create()"
-    >
-      <label vm-field>
-        <span vm-field-label>{{ 'system.common.name' | transloco }} *</span>
-        <input vm-input cdkFocusInitial type="text" [maxLength]="nameMax" [value]="newName()" (input)="newName.set($any($event.target).value)" required />
-      </label>
-      <label vm-field>
-        <span vm-field-label>{{ 'system.ensembles.parent' | transloco }} *</span>
-        <select vm-select [value]="newParentId()" (change)="newParentId.set($any($event.target).value)">
-          @for (e of parents(); track e.id) {
-            <option [value]="e.id" [selected]="e.id === newParentId()">{{ e | treeLabel }}</option>
-          }
-        </select>
-      </label>
-      <vm-toggle-field [label]="'system.ensembles.applyTemplate' | transloco" [hint]="'system.ensembles.applyTemplateHint' | transloco" [checked]="applyTemplate()" (toggled)="applyTemplate.set($event)" />
-    </vm-form-dialog>
-
-    <div class="flex items-center gap-1">
-      <vm-switch [checked]="includeArchived()" [label]="'system.ensembles.showArchived' | transloco" (toggled)="includeArchived.set($event)" />
-      <span aria-hidden="true">{{ 'system.ensembles.showArchived' | transloco }}</span>
-    </div>
-
-    <ul vm-card class="overflow-hidden" [class.hidden]="list.items().length === 0">
-      @for (e of list.items(); track e.id; let first = $first) {
-        <li class="flex items-start gap-2 px-4 py-3 md:items-center" [class.border-t]="!first" [class.bg-surface-container-low]="e.archived">
-          <span class="flex min-w-0 flex-1 flex-col md:flex-row md:items-center md:gap-3" [style.padding-inline-start.rem]="e.depth * 1.25">
-            <a [routerLink]="link(e)" class="font-medium">{{ e.name }}</a>
-            <span class="flex flex-wrap gap-1.5 text-body-medium text-muted-foreground">
-              @if (e.isRoot) {
-                <span class="rounded-small bg-muted px-1.5 py-0.5 text-body-small">{{ 'system.ensembles.root' | transloco }}</span>
-              }
-              @if (e.isDefault) {
-                <span class="rounded-small bg-primary-soft px-1.5 py-0.5 text-body-small text-primary">{{ 'system.ensembles.default' | transloco }}</span>
-              }
-              @if (e.archived) {
-                <span class="rounded-small bg-muted px-1.5 py-0.5 text-body-small">{{ 'system.ensembles.archived' | transloco }}</span>
-              }
-              <span>{{ 'system.ensembles.memberCount' | tPlural: e.memberCount }} · {{ 'system.ensembles.lineupSize' | tPlural: e.lineupSize }}</span>
-            </span>
-          </span>
-          @if (canEdit() && !e.isRoot) {
-            @if (e.archived) {
-              <button vm-button variant="text" type="button" (click)="setArchived(e, false)" [attr.aria-label]="'system.ensembles.unarchiveLabel' | transloco: { name: e.name }">
-                <ng-icon name="lucideArchiveRestore" aria-hidden="true" /><span class="hidden md:inline">{{ 'system.ensembles.unarchive' | transloco }}</span>
-              </button>
-            } @else {
-              <button vm-button variant="text" type="button" (click)="setArchived(e, true)" [attr.aria-label]="'system.ensembles.archiveLabel' | transloco: { name: e.name }">
-                <ng-icon name="lucideArchive" aria-hidden="true" /><span class="hidden md:inline">{{ 'system.ensembles.archive' | transloco }}</span>
-              </button>
-            }
-          }
-        </li>
-      }
-    </ul>
-    <vm-list-state [list]="list" emptyKey="system.ensembles.empty" />
-  `,
+  templateUrl: './ensembles-page.html',
 })
 export class EnsemblesPage {
   private readonly api = inject(ApiClient);
   private readonly actions = inject(ActionRunner);
   private readonly session = inject(SessionStore);
 
-  protected readonly nameMax = NAME_MAX;
+  protected readonly nameMax = SHORT_NAME_MAX;
   protected readonly canCreate = computed(() => this.session.can('ensemble.create'));
   protected readonly canEdit = computed(() => this.session.can('ensemble.edit'));
   protected readonly includeArchived = signal(false);

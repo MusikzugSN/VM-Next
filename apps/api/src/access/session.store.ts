@@ -14,7 +14,7 @@ export interface SessionData {
 }
 
 /** Pre-login state between `auth/login` and `auth/callback`. */
-export interface LoginState {
+interface LoginState {
   codeVerifier: string;
   nonce: string;
   returnTo: string;
