@@ -27,7 +27,6 @@ import { VoicesService } from './voices.service';
 
 const R = API_ROUTES.voices;
 
-/** Voices have no ensemble → `voice.*` in at least one ensemble (R-4). */
 @Controller(R.base)
 export class VoicesController {
   constructor(@Inject(VoicesService) private readonly voices: VoicesService) {}
