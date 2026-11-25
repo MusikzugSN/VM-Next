@@ -111,10 +111,6 @@ Conventional Commits mit deutschem Betreff: `feat(api): …`, `fix(print-service
 Die Regeln oben gelten ab sofort für neuen Code. Diese Stellen erfüllen sie noch nicht und werden in eigenen Folge-PRs nachgezogen; wer eine davon ohnehin anfasst, zieht sie gleich mit. Erledigte Zeile hier löschen.
 
 - **Kommentare:** 405 von 551 Dateien enthalten Doc- oder Zeilenkommentare (~3200 Zeilen). Entfernen, Inhalt wo nötig nach `docs/`.
-- **Repository-Schicht fehlt** in: `voices`, `folders`, `events`, `print-rules`, `uploads` (`uploads.service`, `review.service`), `downloads` (`downloads.service`, `output.service`) und `system` (`ensembles`, `roles`, `users`, `config`). Vorhanden und als Vorbild geeignet: `scores`, `me`, `access`, `auth`, `settings`.
-- **`tags/tags.module.ts`** enthält Service, Controller und Modul in einer Datei; auf `tags.service.ts`, `tags.controller.ts`, `tags.module.ts` aufteilen (Repository siehe oben).
-- **Ohne Integrationstest:** `folders`, `events`, `voices`, `tags`, `print-rules`, `settings`.
-- **`libs/ui`** hat einen einzigen Test für 8.300 Zeilen. Mindestens Dialog (Fokusfalle, Escape), Dropdown (Tastatur) und ein `axe-core`-Durchlauf je Primitive.
 
 ## Prüfen vor dem Abschluss
 
