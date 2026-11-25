@@ -1,6 +1,6 @@
 {
   "name": "@vm-web/source",
-  "version": "1.1.0",
+  "version": "1.1.1",
   "license": "MIT",
   "scripts": {
     "dev:up": "wsl docker compose -f docker-compose.dev.yml up -d",
