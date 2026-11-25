@@ -44,7 +44,7 @@
         </div>
         @if (item.missing) {
           @if (canUpload()) {
-            <button vm-button variant="text" type="button" (click)="upload(item.row)">
+            <button vm-button variant="text" type="button" (click)="upload(item.row)" [attr.aria-label]="'me.list.upload' | transloco: { title: item.row.title }">
               <ng-icon name="lucideUpload" aria-hidden="true" />{{ 'common.upload' | transloco }}
             </button>
           }
@@ -111,11 +111,6 @@
                 @if (item.missing) {
                   <span class="font-medium">{{ item.row.title }}</span>
                   <vm-status-badge kind="missing" />
-                  @if (canUpload()) {
-                    <button type="button" class="font-medium text-primary underline-offset-4 hover:underline" (click)="upload(item.row)">
-                      {{ 'common.upload' | transloco }}
-                    </button>
-                  }
                 } @else {
                   <a [routerLink]="item.link" [queryParams]="item.query" class="font-medium text-foreground no-underline hover:underline">{{
                     item.row.title
@@ -129,7 +124,13 @@
             <td class="px-4 py-3 text-muted-foreground">{{ item.row.composer ?? '' }}</td>
             <td class="px-4 py-3 text-end text-muted-foreground tabular-nums">{{ item.missing ? '–' : item.pages }}</td>
             <td class="px-4 py-3 text-end">
-              @if (item.download) {
+              @if (item.missing) {
+                @if (canUpload()) {
+                  <button vm-button variant="text" type="button" (click)="upload(item.row)" [attr.aria-label]="'me.list.upload' | transloco: { title: item.row.title }">
+                    <ng-icon name="lucideUpload" aria-hidden="true" />{{ 'common.upload' | transloco }}
+                  </button>
+                }
+              } @else if (item.download) {
                 <a
                   vm-icon-button
                  
