@@ -1,0 +1,43 @@
+<ng-template #label><span vm-field-label>{{ labelKey() | transloco }}{{ required() ? ' *' : '' }}</span></ng-template>
+<ng-template #note>
+  @if (error(); as e) {
+    <span vm-field-error [id]="id + '-error'">{{ 'validation.' + e | transloco }}</span>
+  } @else if (hintKey(); as hint) {
+    <span [id]="id + '-hint'" class="text-body-medium text-muted-foreground">{{ hint | transloco }}</span>
+  }
+</ng-template>
+@if (multiline()) {
+  <label vm-field>
+    <ng-container [ngTemplateOutlet]="label" />
+    <textarea
+      vm-textarea
+      rows="5"
+      [attr.maxlength]="maxlength()"
+      [readOnly]="readonly()"
+      [value]="text()"
+      (input)="valueChange.emit($any($event.target).value)"
+      [attr.aria-invalid]="error() ? 'true' : null"
+      [attr.aria-describedby]="describedBy()"
+    ></textarea>
+    <ng-container [ngTemplateOutlet]="note" />
+  </label>
+} @else {
+  <label vm-field>
+    <ng-container [ngTemplateOutlet]="label" />
+    <input
+      vm-input
+      [type]="type()"
+      [attr.inputmode]="type() === 'number' ? 'numeric' : null"
+      [attr.min]="type() === 'number' ? 0 : null"
+      [attr.maxlength]="type() === 'number' ? null : maxlength()"
+      [attr.autocomplete]="autocomplete()"
+      [attr.placeholder]="placeholder()"
+      [readOnly]="readonly()"
+      [value]="text()"
+      (input)="valueChange.emit($any($event.target).value)"
+      [attr.aria-invalid]="error() ? 'true' : null"
+      [attr.aria-describedby]="describedBy()"
+    />
+    <ng-container [ngTemplateOutlet]="note" />
+  </label>
+}

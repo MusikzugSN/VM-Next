@@ -1,0 +1,43 @@
+<div>
+  <h1 class="text-headline-small">{{ 'nav.system.settings' | transloco }}</h1>
+  <p class="mt-2 text-muted-foreground">{{ 'system.settings.intro' | transloco }}</p>
+</div>
+
+@if (canView()) {
+  <vm-legal-status-banner [showLink]="current() !== 'legal'" />
+}
+
+@if (tabs().length > 1) {
+  <nav [attr.aria-label]="'system.settings.sections' | transloco" class="flex gap-1 overflow-x-auto overflow-y-hidden border-b">
+    @for (t of tabs(); track t) {
+      <a
+        [routerLink]="path"
+        [queryParams]="{ tab: t === tabs()[0] ? null : t }"
+        [attr.aria-current]="current() === t ? 'page' : null"
+        class="-mb-px inline-flex min-h-target items-center border-b-2 px-3 font-medium whitespace-nowrap no-underline"
+        [class]="current() === t ? 'border-primary text-primary' : 'border-transparent text-muted-foreground hover:text-foreground'"
+        >{{ 'system.settings.tabs.' + t | transloco }}</a
+      >
+    }
+  </nav>
+}
+
+@if (current() === 'fields') {
+  <vm-fields-settings />
+} @else if (current() === 'legal') {
+  <vm-legal-settings [readonly]="!canEdit()" />
+} @else if (config.error()) {
+  <vm-page-problem [error]="config.error()" />
+} @else if (config.hasValue() && config.value(); as c) {
+  @switch (current()) {
+    @case ('club') {
+      <vm-club-settings [config]="c" [readonly]="!canEdit()" (changed)="config.reload()" />
+    }
+    @case ('defaults') {
+      <vm-defaults-settings [config]="c" [readonly]="!canEdit()" (changed)="config.reload()" />
+    }
+    @case ('print') {
+      <vm-print-settings [config]="c" [readonly]="!canEdit()" (changed)="config.reload()" />
+    }
+  }
+}

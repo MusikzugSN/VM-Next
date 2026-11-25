@@ -32,38 +32,7 @@ export function decodeTagFilter(value: string | undefined): TagFilterValue {
   viewProviders: [provideIcons({ lucideSlidersHorizontal, lucideX })],
   changeDetection: ChangeDetectionStrategy.OnPush,
   host: { class: 'contents' },
-  template: `
-    <button
-      type="button"
-      vm-menu-trigger
-      [zDropdownMenu]="menu"
-      [attr.aria-label]="'common.filter' | transloco"
-      class="relative flex size-control shrink-0 items-center justify-center rounded-full border border-input bg-background hover:bg-accent xl:size-control-compact"
-    >
-      <ng-icon name="lucideSlidersHorizontal" aria-hidden="true" />
-      @if (value()) {
-        <span vm-badge-count>1</span>
-        <span class="sr-only">{{ 'me.filter.active' | transloco }}</span>
-      }
-    </button>
-    <vm-menu-content #menu="zDropdownMenuContent" zAlign="end" class="max-h-80 w-64 overflow-y-auto">
-      <vm-menu-radio-group [zValue]="encoded()" (zValueChange)="select($event)">
-        <vm-menu-radio-item zValue="">{{ 'me.filter.none' | transloco }}</vm-menu-radio-item>
-        @if (tags.hasValue() && tags.value().clubTags.length) {
-          <vm-menu-label>{{ 'me.tags.club' | transloco }}</vm-menu-label>
-          @for (tag of tags.value().clubTags; track tag.id) {
-            <vm-menu-radio-item [zValue]="'club:' + tag.id">{{ tag.name }}</vm-menu-radio-item>
-          }
-        }
-        @if (tags.hasValue() && tags.value().personalTags.length) {
-          <vm-menu-label>{{ 'me.tags.personal' | transloco }}</vm-menu-label>
-          @for (tag of tags.value().personalTags; track tag.id) {
-            <vm-menu-radio-item [zValue]="'personal:' + tag.id">{{ tag.name }}</vm-menu-radio-item>
-          }
-        }
-      </vm-menu-radio-group>
-    </vm-menu-content>
-  `,
+  templateUrl: './tag-filter.html',
 })
 export class TagFilter {
   private readonly api = inject(ApiClient);

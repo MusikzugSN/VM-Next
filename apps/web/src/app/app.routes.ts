@@ -25,11 +25,13 @@ export const appRoutes: Route[] = [
     path: childSegment(APP_ROUTES[document], '/'),
     ...page(`legal.${document}`),
     data: { ...page(`legal.${document}`).data, document },
+    providers: [provideTranslocoScope('legal')],
     loadComponent: () => import('./features/legal/legal-page').then((m) => m.LegalPage),
   })),
   {
     path: childSegment(APP_ROUTES.dependencies, '/'),
     ...page('legal.dependencies'),
+    providers: [provideTranslocoScope('legal')],
     loadComponent: () => import('./features/legal/dependencies-page').then((m) => m.DependenciesPage),
   },
   {

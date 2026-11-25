@@ -277,58 +277,6 @@
       "failed": "Die PDF ließ sich nicht aufteilen."
     }
   },
-  "review": {
-    "waiting": {
-      "one": "1 Notenblatt wartet auf Freigabe",
-      "other": "{{ count }} Notenblätter warten auf Freigabe"
-    },
-    "shortcuts": "Tastenkürzel:",
-    "keyApprove": "annehmen",
-    "keyReject": "ablehnen",
-    "keyBrowse": "vorheriger/nächster Upload",
-    "empty": "Keine Uploads warten auf die Prüfung.",
-    "queue": "Warteschlange",
-    "queueCount": "Warteschlange · {{ count }}",
-    "collapseQueue": "Warteschlange einklappen",
-    "expandQueue": "Warteschlange öffnen",
-    "position": "{{ position }} von {{ total }}",
-    "inQueue": "in der Warteschlange",
-    "previousUpload": "Vorheriger Upload",
-    "nextUpload": "Nächster Upload",
-    "noVoice": "Stimme offen",
-    "preview": "Vorschau",
-    "tools": "Vorschau-Werkzeuge",
-    "rotate": "Drehen",
-    "rotated": "Seite {{ page }} um {{ degrees }} Grad gedreht.",
-    "crop": "Zuschneiden",
-    "cropLegend": "Zuschnitt von Seite {{ page }}",
-    "margin": {
-      "left": "Links %",
-      "top": "Oben %",
-      "right": "Rechts %",
-      "bottom": "Unten %"
-    },
-    "resetCrop": "Zuschnitt entfernen",
-    "cropHint": "Ränder in Prozent der angezeigten Seite; der dunkle Bereich wird abgeschnitten.",
-    "zoomIn": "Vergrößern",
-    "zoomOut": "Verkleinern",
-    "keepPage": "Seite {{ page }} übernehmen",
-    "keptCount": "{{ kept }} von {{ total }} Seiten",
-    "assignment": "Zuordnung",
-    "uploadedBy": "Hochgeladen von",
-    "file": "Datei",
-    "exists": "Für dieses Stück und diese Stimme gibt es schon ein Notenblatt.",
-    "replace": "Vorhandenes Notenblatt ersetzen",
-    "replaceNotAllowed": "Zum Ersetzen fehlt dir das Recht „Stücke löschen“. Ordne eine andere Stimme zu oder lehne ab.",
-    "reason": "Grund bei Ablehnung",
-    "reasonPlaceholder": "z. B. Falsches Stück zugeordnet",
-    "reasonRequired": "Bitte gib einen Grund an – er wird der hochladenden Person angezeigt.",
-    "reject": "Ablehnen",
-    "approve": "Annehmen & weiter",
-    "approved": "„{{ name }}“ freigegeben.",
-    "rejected": "„{{ name }}“ abgelehnt.",
-    "pages": "Seiten"
-  },
   "fields": {
     "create": "Eigenes Feld anlegen",
     "edit": "Feld „{{ name }}“ bearbeiten",
@@ -402,15 +350,9 @@
       "job-not-found": "Diesen Auftrag gibt es im Druckservice nicht mehr.",
       "internal-error": "Der Druckservice meldet einen Fehler."
     },
-    "history": {
-      "intro": "Deine Druckaufträge über den Druckservice auf diesem Computer. Bis {{ limit }} Seiten druckst du direkt über den Browser.",
-      "introNoLimit": "Deine Druckaufträge über den Druckservice auf diesem Computer. Kleine Aufträge druckst du direkt über den Browser.",
-      "connected": "Druckservice auf diesem Computer verbunden",
-      "printers": {
-        "one": "1 Drucker",
-        "other": "{{ count }} Drucker"
-      },
-      "checking": "Druckservice wird gesucht …",
+    "rulesOf": "Gedruckt nach den Druckregeln von {{ name }}.",
+    "rulesDefault": "Gedruckt nach den Standard-Druckregeln.",
+    "serviceGuide": {
       "offline": "Kein Druckservice auf diesem Computer",
       "offlineText": "Große Aufträge wie ganze Mappen oder Events druckt der Druckservice. Er läuft auf deinem Computer und nimmt nur Aufträge von dieser VM-Web-Adresse an.",
       "incompatible": {
@@ -425,42 +367,7 @@
       },
       "copy": "Adresse kopieren",
       "copied": "Adresse kopiert.",
-      "recheck": "Erneut prüfen",
-      "empty": "Noch keine Druckaufträge über den Druckservice.",
-      "job": "Auftrag",
-      "voice": "Stimme",
-      "pages": "Seiten",
-      "printer": "Drucker",
-      "sentAt": "Gesendet",
-      "status": "Status",
-      "actions": "Aktionen",
-      "allVoices": "Alle Stimmen",
-      "progress": "Druckt {{ printed }}/{{ pages }}",
-      "cancel": "Abbrechen",
-      "retry": "Erneut senden",
-      "retried": "Auftrag erneut gesendet.",
-      "cancelled": "Auftrag abgebrochen.",
-      "kinds": {
-        "score": "Stück",
-        "folder": "Mappe",
-        "event": "Event",
-        "selection": "Auswahl"
-      },
-      "keepHint": "Der Verlauf liegt nur auf diesem Computer und zeigt die Aufträge der letzten 30 Tage.",
-      "changed": "„{{ title }}“: {{ status }}"
-    },
-    "jobStatus": {
-      "waiting": "Wartend",
-      "printing": "Druckt",
-      "done": "Fertig",
-      "failed": "Fehler",
-      "cancelled": "Abgebrochen"
-    },
-    "rulesOf": "Gedruckt nach den Druckregeln von {{ name }}.",
-    "rulesDefault": "Gedruckt nach den Standard-Druckregeln.",
-    "modes": {
-      "simplex": "Einseitig",
-      "duplex": "Beidseitig, lange Kante"
+      "recheck": "Erneut prüfen"
     }
   },
   "legal": {
@@ -468,10 +375,6 @@
     "privacy": "Datenschutz",
     "imprintLong": "Impressum",
     "privacyLong": "Datenschutzerklärung",
-    "page": {
-      "redirecting": "Du wirst zur Seite des Vereins weitergeleitet …",
-      "unavailable": "Diese Seite wird vom {{ club }} gerade eingerichtet. Bitte wende dich bei Fragen direkt an den Verein."
-    },
     "warning": {
       "title": "Impressum und Datenschutzerklärung fehlen noch",
       "titleImprint": "Impressum fehlt noch",
@@ -483,23 +386,6 @@
       "template": "Für Impressum oder Datenschutzerklärung gibt es eine neue Vorlage. Bis du sie übernimmst, bleibt der bisherige Text veröffentlicht.",
       "action": "Zu „Rechtliches“"
     },
-    "dependencies": "Abhängigkeiten",
-    "dependenciesPage": {
-      "ownBefore": "VM-Web ist freie Software unter der",
-      "ownLicense": "GNU General Public License v3.0",
-      "ownAfter": ".",
-      "sourceBefore": "Den Quellcode findest du",
-      "source": "auf GitHub",
-      "intro": "VM-Web baut auf diesen Open-Source-Paketen auf. Die Liste umfasst alle Pakete, die Web-App und Server zur Laufzeit nutzen – auch indirekt eingebundene.",
-      "search": "Pakete durchsuchen",
-      "searchPlaceholder": "Name oder Lizenz",
-      "count": "{{ shown }} von {{ total }} Paketen",
-      "name": "Paket",
-      "version": "Version",
-      "license": "Lizenz",
-      "linkLabel": "{{ name }} – Projektseite (öffnet in neuem Tab)",
-      "error": "Die Liste konnte nicht geladen werden. Versuche es später erneut.",
-      "empty": "Kein Paket passt zur Suche."
-    }
+    "dependencies": "Abhängigkeiten"
   }
 }

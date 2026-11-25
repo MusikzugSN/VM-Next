@@ -1,0 +1,28 @@
+@let v = value();
+@if (v === null || v === undefined || v === '' || (isArray(v) && !v.length)) {
+  <span class="text-muted-foreground">–</span>
+} @else {
+  @switch (field().type) {
+    @case ('number') {
+      {{ $any(v) | number }}
+    }
+    @case ('date') {
+      {{ $any(v) | date: 'dd.MM.yyyy' }}
+    }
+    @case ('boolean') {
+      {{ (v ? 'library.filter.yes' : 'library.filter.no') | transloco }}
+    }
+    @case ('link') {
+      <a [href]="v" target="_blank" rel="noopener noreferrer">{{ 'library.fields.openLink' | transloco }}</a>
+    }
+    @case ('select') {
+      {{ labels() }}
+    }
+    @case ('multiselect') {
+      {{ labels() }}
+    }
+    @default {
+      {{ v }}
+    }
+  }
+}

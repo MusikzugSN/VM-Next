@@ -38,70 +38,7 @@ import { selectOr } from '../../core/util/resource-value';
   ],
   viewProviders: [provideIcons({ lucideChevronLeft, lucideFileArchive, lucidePrinter, lucideSearch, lucideX })],
   changeDetection: ChangeDetectionStrategy.OnPush,
-  template: `
-    <a [routerLink]="foldersPath" class="inline-flex min-h-target items-center gap-1 self-start font-medium no-underline md:hidden">
-      <ng-icon name="lucideChevronLeft" aria-hidden="true" />{{ 'nav.me.folders' | transloco }}
-    </a>
-
-    @if (overview.error()) {
-      <vm-page-problem [error]="overview.error()" />
-    } @else if (overview.hasValue()) {
-      @let folder = overview.value();
-      <div class="flex flex-col gap-3 md:flex-row md:items-start md:justify-between md:gap-4">
-        <div>
-          <h1 class="text-title-large leading-7 md:text-headline-small md:leading-8">{{ folder.name }}</h1>
-          <p class="mt-2 text-muted-foreground">
-            {{ folder.ensemble.name }} · {{ 'me.common.scoreCount' | tPlural: folder.scoreCount }} ·
-            {{ 'me.list.pages' | tPlural: folder.totalPages }}
-          </p>
-        </div>
-        <div class="flex flex-col gap-2 md:flex-row-reverse">
-          <a vm-button [href]="zip()" download class="w-full md:w-auto">
-            <ng-icon name="lucideFileArchive" aria-hidden="true" />{{ 'me.common.zip' | transloco }}
-          </a>
-          <button vm-button variant="outlined" type="button" class="w-full md:w-auto" (click)="print()">
-            <ng-icon name="lucidePrinter" aria-hidden="true" />{{ 'common.print' | transloco }}
-          </button>
-        </div>
-      </div>
-      @if (folder.missingCount > 0) {
-        <p class="text-destructive-ink">{{ 'me.common.missingHint' | tPlural: folder.missingCount }}</p>
-      }
-    }
-
-    <div class="flex flex-col gap-2">
-      <div class="flex items-end gap-2">
-        <label class="flex flex-1 flex-col gap-1.5">
-          <span class="font-medium">{{ 'me.folder.search' | transloco }}</span>
-          <span class="relative">
-            <ng-icon name="lucideSearch" class="absolute top-1/2 left-3 -translate-y-1/2 text-muted-foreground" aria-hidden="true" />
-            <input
-              vm-input
-              type="search"
-              class="ps-9"
-              [placeholder]="'me.folder.searchPlaceholder' | transloco"
-              [value]="search()"
-              (input)="search.set($any($event.target).value)"
-            />
-          </span>
-        </label>
-        <vm-tag-filter #filter [(value)]="tagFilter" />
-      </div>
-      @if (filter.activeName(); as name) {
-        <div class="flex flex-wrap items-center gap-2">
-          <span class="inline-flex items-center gap-1 rounded-small bg-primary-soft py-0.5 ps-2 text-primary">
-            {{ name }}
-            <button type="button" class="relative flex size-8 items-center justify-center rounded-full after:absolute after:-inset-1.5 hover:bg-on-primary-container/8 xl:after:inset-0" [attr.aria-label]="'me.filter.remove' | transloco: { name }" (click)="tagFilter.set(null)">
-              <ng-icon name="lucideX" aria-hidden="true" />
-            </button>
-          </span>
-        </div>
-      }
-    </div>
-
-    <vm-member-score-list [rows]="list.items()" numbering="number" [folderId]="folderId()" [listTitle]="overview.hasValue() ? overview.value().name : ''" />
-    <vm-list-state [list]="list" emptyKey="me.folder.empty" />
-  `,
+  templateUrl: './folder-page.html',
 })
 export class FolderPage {
   /** Breadcrumb and document title show the loaded element's name. */

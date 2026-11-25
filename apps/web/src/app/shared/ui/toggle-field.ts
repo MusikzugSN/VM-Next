@@ -11,19 +11,7 @@ import { VmSwitch } from '@vm-web/ui';
   imports: [VmSwitch],
   changeDetection: ChangeDetectionStrategy.OnPush,
   host: { class: 'block' },
-  template: `
-    <!-- The switch is a <button role="switch"> inside vm-switch: a labelable element, so a click on the text toggles it. -->
-    <!-- eslint-disable-next-line @angular-eslint/template/label-has-associated-control -->
-    <label class="flex cursor-pointer items-center justify-between gap-4 rounded-small border px-4 py-3" [class.opacity-60]="disabled()">
-      <span class="flex min-w-0 flex-col">
-        <span class="font-medium">{{ label() }}</span>
-        @if (hint(); as text) {
-          <span class="text-body-medium text-muted-foreground">{{ text }}</span>
-        }
-      </span>
-      <vm-switch [checked]="checked()" [label]="label()" [disabled]="disabled()" (toggled)="toggled.emit($event)" />
-    </label>
-  `,
+  templateUrl: './toggle-field.html',
 })
 export class ToggleField {
   readonly label = input.required<string>();
