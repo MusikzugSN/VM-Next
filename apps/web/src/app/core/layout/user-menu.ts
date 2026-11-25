@@ -3,19 +3,19 @@ import { ChangeDetectionStrategy, Component, computed, inject, input } from '@an
 import { RouterLink } from '@angular/router';
 import { TranslocoPipe } from '@jsverse/transloco';
 import { NgIcon, provideIcons } from '@ng-icons/core';
-import { lucideLogOut, lucideUser } from '@ng-icons/lucide';
+import { lucideLogOut, lucideScale, lucideShieldCheck, lucideUser } from '@ng-icons/lucide';
 import { APP_ROUTES } from '@vm-web/shared';
 import { VmMenuImports } from '@vm-web/ui';
 
 
 import { SessionStore } from '../auth/session.store';
-import { initials } from '../branding/branding.store';
+import { BrandingStore, initials } from '../branding/branding.store';
 
-/** Person, own roles and „Abmelden“; in the sidebar (desktop) or as avatar in the header. */
+/** Person, own roles, imprint and privacy policy (S-7) and „Abmelden“; in the sidebar (desktop) or as avatar in the header. */
 @Component({
   selector: 'vm-user-menu',
   imports: [NgIcon, NgTemplateOutlet, RouterLink, TranslocoPipe, VmMenuImports],
-  viewProviders: [provideIcons({ lucideUser, lucideLogOut })],
+  viewProviders: [provideIcons({ lucideUser, lucideLogOut, lucideScale, lucideShieldCheck })],
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
     @if (user(); as user) {
@@ -68,6 +68,18 @@ import { initials } from '../branding/branding.store';
         </vm-menu-label>
         <vm-menu-separator />
         <a vm-menu-item [routerLink]="profilePath"><ng-icon name="lucideUser" aria-hidden="true" />{{ 'nav.me.profile' | transloco }}</a>
+        @if (branding.branding(); as b) {
+          <vm-menu-separator />
+          @for (doc of legalDocs; track doc.key) {
+            @let link = b[doc.key];
+            @if (link.kind === 'external') {
+              <a vm-menu-item [href]="link.href"><ng-icon [name]="doc.icon" aria-hidden="true" />{{ 'legal.' + doc.key | transloco }}</a>
+            } @else {
+              <a vm-menu-item [routerLink]="link.href"><ng-icon [name]="doc.icon" aria-hidden="true" />{{ 'legal.' + doc.key | transloco }}</a>
+            }
+          }
+          <vm-menu-separator />
+        }
         <button type="button" vm-menu-item (click)="logout()">
           <ng-icon name="lucideLogOut" aria-hidden="true" />{{ 'common.logout' | transloco }}
         </button>
@@ -77,10 +89,16 @@ import { initials } from '../branding/branding.store';
 })
 export class UserMenu {
   private readonly session = inject(SessionStore);
+  protected readonly branding = inject(BrandingStore);
 
   readonly variant = input<'sidebar' | 'header'>('header');
 
   protected readonly profilePath = APP_ROUTES.me.profile;
+  /** Imprint and privacy policy (S-7). */
+  protected readonly legalDocs = [
+    { key: 'imprint', icon: 'lucideScale' },
+    { key: 'privacy', icon: 'lucideShieldCheck' },
+  ] as const;
   protected readonly user = this.session.user;
   protected readonly userInitials = computed(() => initials(this.user()?.name ?? '?'));
   /** „Notenwart:in · Hauptorchester“ for a single membership, otherwise the role names. */

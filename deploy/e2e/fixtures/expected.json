@@ -182,5 +182,57 @@
       }
     ]
   },
+  "legal": {
+    "$comment": "S-7: Eingaben des Admins in E2E-1.6/1.7 und erwarteter Endstand. Fiktiver Verein, Bundesland BW (Anschrift der Aufsichtsbehörde geprüft).",
+    "imprint": {
+      "legalName": "Musikverein Harmonie Talheim e.V.",
+      "address": {
+        "street": "Hauptstraße 12",
+        "postalCode": "74388",
+        "city": "Talheim"
+      },
+      "representatives": [
+        {
+          "name": "Sandra Kessler",
+          "role": "1. Vorsitzende",
+          "address": null,
+          "email": null,
+          "phone": null
+        }
+      ],
+      "email": "vorstand@mv-talheim.example",
+      "phone": "+49 7133 123456",
+      "isRegistered": true,
+      "registerCourt": "Amtsgericht Stuttgart",
+      "registerNumber": "VR 123456",
+      "vatId": null,
+      "contentResponsible": null,
+      "department": null
+    },
+    "privacy": {
+      "dataProtectionOfficer": null,
+      "hosting": {
+        "operator": "provider",
+        "provider": {
+          "name": "Beispiel Hosting GmbH",
+          "address": "Serverweg 1, 90402 Nürnberg"
+        },
+        "serverCountry": "DE",
+        "dpaConcluded": false
+      },
+      "identityServer": {
+        "operator": "self",
+        "provider": null,
+        "serverCountry": "DE"
+      },
+      "serverLogRetentionDays": 14,
+      "backupRetentionDays": 30,
+      "state": "BW",
+      "additionalText": null
+    },
+    "warnings": [
+      "hosting-without-dpa"
+    ]
+  },
   "warnings": []
 }

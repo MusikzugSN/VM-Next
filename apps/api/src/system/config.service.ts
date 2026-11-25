@@ -56,8 +56,6 @@ export class ConfigService {
     return {
       club: {
         clubName: s.clubName,
-        imprintUrl: httpUrlOrNull(s.imprintUrl),
-        privacyUrl: httpUrlOrNull(s.privacyUrl),
         loginAutoRedirect: s.loginAutoRedirect,
         logoUrl: s.logoFileKey ? `${API_PREFIX}/auth/branding/logo` : null,
         loginBanner: s.loginBanner,
@@ -80,8 +78,6 @@ export class ConfigService {
   async updateClub(body: UpdateClubBody): Promise<void> {
     await this.update({
       clubName: body.clubName,
-      imprintUrl: body.imprintUrl,
-      privacyUrl: body.privacyUrl,
       loginBanner: body.loginBanner || null,
       loginAutoRedirect: body.loginAutoRedirect,
     });

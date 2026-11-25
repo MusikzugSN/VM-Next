@@ -11,7 +11,7 @@ import { safeReturnTo } from '../../core/auth/guards';
 import { BrandingStore } from '../../core/branding/branding.store';
 import { ClubLogo } from '../../core/branding/club-logo';
 import { ViewportService } from '../../core/layout/viewport';
-import { LegalLinks } from './legal-links';
+import { LegalLinks } from '../../core/legal/legal-links';
 
 /** i18n key for `?error=` on the login page: login errors from the callback or API problem codes. */
 export function loginErrorKey(code: string | undefined): string | null {

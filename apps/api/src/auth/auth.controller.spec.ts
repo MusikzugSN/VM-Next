@@ -1,6 +1,7 @@
 import { CSRF_COOKIE, CSRF_HEADER, sessionResponseSchema, SESSION_COOKIE } from '@vm-web/shared';
 import { Readable } from 'node:stream';
 import { LOGIN_COOKIE } from '../access/cookies';
+import { LegalService } from '../legal/legal.service';
 import { ClubSettingsRepository } from '../settings/club-settings.repository';
 import { FILE_STORAGE } from '../storage/file-storage';
 import { ENS, PEOPLE, roleIdOf, type PersonKey } from '../testing/access-fixtures';
@@ -46,12 +47,15 @@ class FakeUsers implements IUsersRepository {
 
 const settings = {
   clubName: 'Musikzug Test',
-  imprintUrl: 'https://example.org/impressum',
-  privacyUrl: 'javascript:alert(1)',
   loginBanner: 'Willkommen',
   loginAutoRedirect: false,
   logoFileKey: 'branding/logo.png',
   logoMime: 'image/png',
+};
+
+const legalLinks = {
+  imprint: { kind: 'external', href: 'https://example.org/impressum' },
+  privacy: { kind: 'internal', href: '/datenschutz' },
 };
 
 describe('AuthController (BFF login)', () => {
@@ -67,6 +71,7 @@ describe('AuthController (BFF login)', () => {
           { provide: OIDC_CLIENT, useValue: oidc },
           { provide: USERS_REPOSITORY, useValue: users },
           { provide: ClubSettingsRepository, useValue: { get: async () => settings } },
+          { provide: LegalService, useValue: { links: async () => legalLinks } },
           {
             provide: FILE_STORAGE,
             useValue: { read: async (key: string) => Readable.from([Buffer.from(`png:${key}`)]) },
@@ -200,13 +205,13 @@ describe('AuthController (BFF login)', () => {
     expect(headers[CSRF_HEADER]).toBeTruthy();
   });
 
-  it('login page returns branding and drops unsafe links', async () => {
+  it('login page returns branding and the legal links (S-7)', async () => {
     expect(await (await get('login-page')).json()).toEqual({
       clubName: 'Musikzug Test',
       logoUrl: '/internal/v1/auth/branding/logo',
       loginBanner: 'Willkommen',
-      imprintUrl: 'https://example.org/impressum',
-      privacyUrl: null,
+      imprint: { kind: 'external', href: 'https://example.org/impressum' },
+      privacy: { kind: 'internal', href: '/datenschutz' },
       autoRedirect: false,
     });
   });
