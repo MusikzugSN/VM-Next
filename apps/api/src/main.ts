@@ -35,7 +35,8 @@ async function bootstrap() {
       // @nx/js isn't installed
     }
   }
-  Logger.log(`API listening on http://${host}:${port}${API_PREFIX}`, 'Bootstrap');
+  const build = `${config.get('APP_VERSION')} (${config.get('APP_REVISION')})`;
+  Logger.log(`VM-Next ${build} listening on http://${host}:${port}${API_PREFIX}`, 'Bootstrap');
 }
 
 bootstrap().catch((error: unknown) => {

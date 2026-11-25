@@ -21,7 +21,15 @@ Der Reverse Proxy muss `X-Forwarded-Proto` setzen und Uploads bis `CLIENT_MAX_BO
 
 ## Aktualisieren
 
-`VM_NEXT_VERSION` in `.env` setzen, dann `docker compose pull && docker compose up -d`. Migrationen laufen beim Start der API.
+`VM_NEXT_VERSION` in `.env` setzen, dann `docker compose pull && docker compose up -d --wait`. Migrationen laufen beim Start der API; bei vielen Daten dauert dieser erste Start entsprechend lange.
+
+Danach prüfen, welche Version wirklich läuft:
+
+```bash
+curl -s http://127.0.0.1:8080/health   # {"status":"ok","version":"1.2.0","revision":"…"}
+```
+
+Steht dort noch die alte Version oder antwortet der Aufruf nicht, nennt `docker compose logs api` den Grund.
 
 ## Sichern
 

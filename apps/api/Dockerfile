@@ -38,14 +38,16 @@ LABEL org.opencontainers.image.title="vm-next-api" \
 ENV NODE_ENV=production \
     HOST=0.0.0.0 \
     PORT=3000 \
-    FILE_STORAGE_PATH=/data
+    FILE_STORAGE_PATH=/data \
+    APP_VERSION=${VERSION} \
+    APP_REVISION=${REVISION}
 WORKDIR /app
 COPY --from=deps --chown=root:root /app ./
 RUN mkdir -p /data && chown node:node /data
 VOLUME ["/data"]
 USER node
 EXPOSE 3000
-HEALTHCHECK --interval=15s --timeout=5s --start-period=30s --retries=3 \
+HEALTHCHECK --interval=15s --timeout=5s --start-period=180s --retries=3 \
   CMD ["node", "-e", "fetch('http://127.0.0.1:'+(process.env.PORT||3000)+'/health').then(r=>process.exit(r.ok?0:1),()=>process.exit(1))"]
 # main.js handles SIGTERM itself (app.enableShutdownHooks)
 CMD ["node", "main.js"]
