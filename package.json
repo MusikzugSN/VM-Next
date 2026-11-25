@@ -1,7 +1,11 @@
 {
   "name": "@vm-web/source",
   "version": "0.0.0",
-  "license": "MIT",
+  "license": "GPL-3.0-only",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/MusikzugSN/VM-Next.git"
+  },
   "scripts": {
     "dev:up": "wsl docker compose -f docker-compose.dev.yml up -d",
     "dev:down": "wsl docker compose -f docker-compose.dev.yml down",

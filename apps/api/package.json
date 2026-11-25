@@ -2,6 +2,7 @@
   "name": "@vm-web/api",
   "version": "0.0.1",
   "private": true,
+  "license": "GPL-3.0-only",
   "dependencies": {
     "@nestjs/common": "^11.0.0",
     "@nestjs/config": "^12.1.1",
