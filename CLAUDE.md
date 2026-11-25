@@ -67,6 +67,7 @@ Der Vertrag zwischen Frontend und API steht genau einmal, maschinenlesbar, in `l
 ### Datenzugriff: Abfragen gehören in ein Repository
 
 - Drizzle-Abfragen stehen in `*.repository.ts`. **Ein Service injiziert nicht `DATABASE`**, sondern das Repository seines Features; er enthält die Fachlogik, das Repository die Abfragen.
+- **Liest eine Operation und schreibt abhängig vom Gelesenen, bleibt sie als *eine* Methode im Repository** – zusammen mit der Sperre oder dem Constraint, der sie absichert. Nicht in „Service prüft, Repository schreibt" aufteilen: dazwischen passt ein zweiter Request (siehe Transaktionen unten). Betrifft `voices`, `uploads/review` und `system/ensembles`.
 - Ausgenommen ist Infrastruktur, die selbst die Datenbank ist oder sie einmalig füllt: `cache/sql-cache.service.ts`, `seed/seed.service.ts`, `legal/legal.store.ts`, `health.controller.ts`.
 - Eine Datei enthält eine Art Klasse: `*.controller.ts`, `*.service.ts`, `*.repository.ts`, `*.module.ts`. Kein Controller und kein Service in einer `*.module.ts`.
 
@@ -75,6 +76,8 @@ Der Vertrag zwischen Frontend und API steht genau einmal, maschinenlesbar, in `l
 - Schema in `apps/api/src/db/schema/*.ts`, Drizzle, MySQL. Ids sind UUIDv7 aus `uuidv7()` (`apps/api/src/common/ids/`), nie `AUTO_INCREMENT` und nie `randomUUID`.
 - Nach einer Schemaänderung `pnpm db:generate`. **Erzeugte SQL-Dateien unter `apps/api/src/db/migrations/` nicht von Hand ändern** und nie eine bereits veröffentlichte Migration umschreiben – `.github/scripts/check-migrations.mjs` vergleicht Release-Branches gegen `master`.
 - Mehrere Schreibvorgänge, die zusammengehören, laufen in einer Transaktion (`Tx`); Hilfen dafür: `replaceRows`, `nextPosition`, `assertPermutation`, `withNameTaken`, `isUniqueViolation` in `apps/api/src/db/`.
+- **Eine Transaktion gibt Atomarität, keine Isolation.** Unter `REPEATABLE READ` – dem Standard von InnoDB – liest ein `SELECT` aus einem Snapshot und sperrt nichts: zwischen Prüfung und Schreiben darf ein zweiter Request einfügen und committen. Wer sich auf das Gelesene verlässt, braucht `SELECT … FOR UPDATE` (Vorbild: `db/schema/seed-lock.ts`) oder einen Fremdschlüssel, der die Datenbank entscheiden lässt – `onDelete: 'restrict'` schützt, `'set null'` nicht.
+- Transaktionen enden an der Datenbank. Dateien, Mails und der Druckservice gehören nicht hinein: erst die Datei schreiben, dann die Transaktion, und im Fehlerfall die Datei wieder entfernen (Vorbild: `uploads/review.service.ts`).
 
 ## Für beide Seiten
 
