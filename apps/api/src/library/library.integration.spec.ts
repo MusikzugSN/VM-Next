@@ -18,7 +18,9 @@ import { SeedService } from '../seed/seed.service';
 import { ClubSettingsRepository } from '../settings/club-settings.repository';
 import { FILE_STORAGE } from '../storage/file-storage';
 import { FsFileStorage } from '../storage/fs-file-storage';
-import { TagsController, TagsService } from '../tags/tags.module';
+import { TagsController } from '../tags/tags.controller';
+import { TagsRepository } from '../tags/tags.repository';
+import { TagsService } from '../tags/tags.service';
 import { addDays, LibraryBuilder } from '../testing/library-builder';
 import { createTestApp, type TestApp } from '../testing/test-app';
 import { createTestDatabase, TEST_DATABASE_URL, type TestDatabase } from '../testing/test-database';
@@ -86,7 +88,7 @@ describe.skipIf(!TEST_DATABASE_URL)('Notenverwaltung (TEST_DATABASE_URL)', () =>
     t = await createTestApp(
       {
         controllers: [ScoresController, VoicesController, FoldersController, EventsController, TagsController],
-        providers: [ScoresRepository, ScoresService, FieldsService, ScoreImportService, MeRepository, VoicesService, FoldersService, EventsService, TagsService, ClubSettingsRepository],
+        providers: [ScoresRepository, ScoresService, FieldsService, ScoreImportService, MeRepository, VoicesService, FoldersService, EventsService, TagsRepository, TagsService, ClubSettingsRepository],
       },
       { database: testDb.db, providers: [{ provide: FILE_STORAGE, useValue: storage }], config: { APP_TIMEZONE: 'Europe/Berlin' } },
     );

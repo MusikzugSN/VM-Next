@@ -1,4 +1,3 @@
-import { HttpClient, HttpEventType } from '@angular/common/http';
 import { ChangeDetectionStrategy, Component, computed, effect, inject, signal, untracked } from '@angular/core';
 import { TranslocoPipe, TranslocoService } from '@jsverse/transloco';
 import { NgIcon, provideIcons } from '@ng-icons/core';
@@ -12,7 +11,7 @@ import {
   type UploadSheetsResponse,
   voiceSuggestionsResponseSchema,
 } from '@vm-web/shared';
-import { filter, firstValueFrom, last, map, tap } from 'rxjs';
+import { firstValueFrom } from 'rxjs';
 
 import { VmButton, VmDialogImports, VmIconButton, VmToastService } from '@vm-web/ui';
 
@@ -41,7 +40,6 @@ import { addFiles, batches, formatSize, replaceWithParts, sendable, uploadMeta, 
   templateUrl: './upload-dialog.html',
 })
 export class UploadDialog {
-  private readonly http = inject(HttpClient);
   private readonly api = inject(ApiClient);
   private readonly launcher = inject(UploadLauncher);
   private readonly session = inject(SessionStore);
@@ -167,16 +165,7 @@ export class UploadDialog {
     const form = new FormData();
     for (const item of items) form.append(UPLOAD_FILE_FIELD, item.file, item.file.name);
     form.append(UPLOAD_META_FIELD, JSON.stringify(uploadMeta(items)));
-    return firstValueFrom(
-      this.http.post(apiUrl('uploads', 'uploadSheets'), form, { reportProgress: true, observe: 'events' }).pipe(
-        tap((event) => {
-          if (event.type === HttpEventType.UploadProgress) progress(event.loaded);
-        }),
-        filter((event) => event.type === HttpEventType.Response),
-        last(),
-        map((event) => uploadSheetsResponseSchema.parse(event.body)),
-      ),
-    );
+    return firstValueFrom(this.api.uploadWithProgress(apiUrl('uploads', 'uploadSheets'), form, uploadSheetsResponseSchema, progress));
   }
 
   /** Adds files and asks the API for a voice per file name (N-11). */
