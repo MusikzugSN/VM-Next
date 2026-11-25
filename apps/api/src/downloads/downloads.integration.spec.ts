@@ -6,6 +6,7 @@ import { join } from 'node:path';
 import { PDFDocument } from 'pdf-lib';
 import { clubSettings, ensemblePrintRules, sheets } from '../db/schema';
 import { PrintRulesService } from '../print-rules/print-rules.service';
+import { PrintRulesRepository } from '../print-rules/print-rules.repository';
 import { MeRepository } from '../me/me.repository';
 import { MeService } from '../me/me.service';
 import { ClubSettingsRepository } from '../settings/club-settings.repository';
@@ -121,7 +122,7 @@ describe.skipIf(!TEST_DATABASE_URL)('Druck und Download (TEST_DATABASE_URL)', ()
     await b.setlist(ids.concert, [ids.polka, ids.march]);
 
     t = await createTestApp(
-      { controllers: [DownloadsController, PrintController], providers: [DownloadsService, OutputService, MeRepository, MeService, ClubSettingsRepository, PrintRulesService] },
+      { controllers: [DownloadsController, PrintController], providers: [DownloadsService, OutputService, MeRepository, MeService, ClubSettingsRepository, PrintRulesService, PrintRulesRepository] },
       { database: testDb.db, providers: [{ provide: FILE_STORAGE, useValue: storage }], config: { APP_TIMEZONE: 'Europe/Berlin' } },
     );
   });
