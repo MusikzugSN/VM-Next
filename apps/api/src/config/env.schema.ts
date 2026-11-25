@@ -48,6 +48,9 @@ const envSchema = z.object({
 
   SESSION_IDLE_TTL_DAYS: positiveInt.default(14),
   SESSION_ABSOLUTE_TTL_DAYS: positiveInt.default(90),
+
+  APP_VERSION: z.string().default('dev'),
+  APP_REVISION: z.string().default('unknown'),
 });
 
 export type Env = z.infer<typeof envSchema>;
