@@ -16,7 +16,7 @@ import { displayFolderNumber } from '../folders/folder-number';
  * - `print`: Mein Bereich plus scores with `score.view`, folders with `folder.view` and events with
  *   `event.view` in their ensemble, released or not (F-9)
  */
-export type OutputMode = 'download' | 'print';
+type OutputMode = 'download' | 'print';
 
 export type OutputScope =
   | { kind: 'score'; scoreId: string }
@@ -24,14 +24,14 @@ export type OutputScope =
   | { kind: 'event'; eventId: string }
   | { kind: 'selection'; scoreIds: readonly string[]; folderId?: string; eventId?: string };
 
-export interface OutputEntry {
+interface OutputEntry {
   scoreId: string;
   title: string;
   /** Folder number or setlist position (two digits); `null` without context. */
   number: string | null;
 }
 
-export interface OutputDocument extends OutputEntry {
+interface OutputDocument extends OutputEntry {
   sheet: MemberSheet;
   fileKey: string;
 }

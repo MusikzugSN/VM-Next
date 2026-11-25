@@ -8,6 +8,10 @@ import * as schema from '../db/schema';
 /** Base URL of the test server; integration tests are skipped without it. */
 export const TEST_DATABASE_URL = process.env['TEST_DATABASE_URL'];
 
+if (!TEST_DATABASE_URL) {
+  console.warn('TEST_DATABASE_URL is not set: every integration test in this file is skipped (see apps/api/README.md).');
+}
+
 export interface TestDatabase {
   db: Database;
   pool: Pool;

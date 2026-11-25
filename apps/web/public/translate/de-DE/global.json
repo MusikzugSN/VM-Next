@@ -45,7 +45,6 @@
     "edit": "Bearbeiten",
     "create": "Anlegen",
     "rename": "Umbenennen",
-    "undo": "Rückgängig",
     "retry": "Erneut versuchen",
     "search": "Suchen",
     "filter": "Filter",
@@ -84,7 +83,6 @@
     "sheet": "Notenblatt",
     "folder": "Mappe",
     "event": "Event",
-    "substituteVoice": "Ersatzstimme",
     "review": "Prüfung",
     "tag": "Tag",
     "fieldTypes": {
@@ -179,7 +177,6 @@
   "pages": {
     "login": "Anmeldung",
     "toHome": "Zu Mein Bereich",
-    "comingSoon": "Diese Seite wird in Stufe {{ stage }} gebaut.",
     "newScore": "Stück anlegen",
     "editFolder": "Mappe bearbeiten",
     "editEvent": "Event bearbeiten",

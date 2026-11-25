@@ -3,7 +3,7 @@ import { escapeMarkdownBlock, escapeMarkdownInline, TrustedMarkdown, type Templa
 import type { SupervisoryAuthority } from './supervisory-authorities';
 import { LEGAL_MODULES } from './legal-modules';
 
-export interface LegalContextInput {
+interface LegalContextInput {
   imprint: ImprintData;
   privacy: PrivacyData;
   authority: SupervisoryAuthority | undefined;
@@ -27,7 +27,7 @@ export function countryName(code: string | null): string | null {
 }
 
 /** `2026-11-24` → `24.11.2026`. */
-export function germanDate(iso: string): string {
+function germanDate(iso: string): string {
   const [y, m, d] = iso.split('-');
   return `${d}.${m}.${y}`;
 }

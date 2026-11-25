@@ -12,7 +12,6 @@ export interface ScoreQueryState {
   filters: ScoreFilter[];
 }
 
-export const DEFAULT_SCORE_QUERY: ScoreQueryState = { q: '', sort: 'title', dir: 'asc', tagId: null, ensembleId: null, filters: [] };
 
 const filtersSchema = z.array(scoreFilterSchema).max(20);
 

@@ -21,7 +21,7 @@ import { OIDC_CLIENT, type IOidcClient } from './oidc.client';
 import { USERS_REPOSITORY, type IUsersRepository } from './users.repository';
 
 
-export type CallbackResult =
+type CallbackResult =
   | { kind: 'success'; redirect: string; sessionId: string; csrfToken: string }
   | { kind: 'failure'; redirect: string };
 

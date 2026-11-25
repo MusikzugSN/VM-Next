@@ -382,6 +382,7 @@ Eigene Felder als Wertetabelle `score_field_values` (eine Zeile je Stück und ge
 | `folder_entries` | Stück in Mappe mit eigener Nummer | PK `(folder_id, score_id)`; UK `(folder_id, number)`; `number_sort_key` = natürliche Sortierung (Zahlen links mit Nullen aufgefüllt), vom Service gesetzt | N-5, M-4 |
 | `events` | Events eines Ensembles | `ensemble_id` `RESTRICT`; Index `(ensemble_id, date)` | N-15, N-16, M-5 |
 | `setlist_entries` | Setlist | PK `(event_id, score_id)` (jedes Stück einmal); UK `(event_id, position)` `DEFERRABLE INITIALLY DEFERRED` für Umsortieren in einer Transaktion | N-16, M-5 |
+| `ensemble_print_rules` | Druckregeln eines Ensembles: „ab `from_pages` Seiten → `mode`“ | PK `(ensemble_id, from_pages)`; `ensemble_id` `CASCADE`; Checks `from_pages >= 1` und `mode in (simplex, duplex)`; Ensembles ohne Zeilen erben vom übergeordneten, sonst gilt `DEFAULT_PRINT_RULES` | S-2, D-6 |
 
 ## Erster Start (Seed, S-5, R-5, N-8, F-3)
 

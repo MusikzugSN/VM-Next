@@ -10,7 +10,7 @@ const BOM = new RegExp('^' + String.fromCharCode(0xfeff));
 /** Slot in `privacy.de.md` for the sections of the active modules. */
 export const MODULES_SLOT = '{{> modules}}';
 
-export interface TemplateFile {
+interface TemplateFile {
   document: LegalDocument;
   module: LegalModuleKey | null;
   version: number;
