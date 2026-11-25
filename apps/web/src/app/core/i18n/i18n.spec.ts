@@ -91,8 +91,9 @@ describe.each(AVAILABLE_LANGS)('translations %s', (lang) => {
   it('has every key used in templates and code', () => {
     const missing = usedKeys([...Object.keys(global), ...scopes.keys()]).filter(({ key }) => {
       const [first, ...rest] = key.split('.');
+      // A scope may share its name with a global namespace (`print`, `legal`): Transloco merges them.
       const scope = scopes.get(first);
-      return scope ? !has(scope, rest.join('.')) : !has(global, key);
+      return !(scope && has(scope, rest.join('.'))) && !has(global, key);
     });
     expect(missing).toEqual([]);
   });

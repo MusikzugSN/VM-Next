@@ -1,0 +1,41 @@
+{
+  "history": {
+    "intro": "Deine Druckaufträge über den Druckservice auf diesem Computer. Bis {{ limit }} Seiten druckst du direkt über den Browser.",
+    "introNoLimit": "Deine Druckaufträge über den Druckservice auf diesem Computer. Kleine Aufträge druckst du direkt über den Browser.",
+    "connected": "Druckservice auf diesem Computer verbunden",
+    "printers": {
+      "one": "1 Drucker",
+      "other": "{{ count }} Drucker"
+    },
+    "checking": "Druckservice wird gesucht …",
+    "empty": "Noch keine Druckaufträge über den Druckservice.",
+    "job": "Auftrag",
+    "voice": "Stimme",
+    "pages": "Seiten",
+    "printer": "Drucker",
+    "sentAt": "Gesendet",
+    "status": "Status",
+    "actions": "Aktionen",
+    "allVoices": "Alle Stimmen",
+    "progress": "Druckt {{ printed }}/{{ pages }}",
+    "cancel": "Abbrechen",
+    "retry": "Erneut senden",
+    "retried": "Auftrag erneut gesendet.",
+    "cancelled": "Auftrag abgebrochen.",
+    "kinds": {
+      "score": "Stück",
+      "folder": "Mappe",
+      "event": "Event",
+      "selection": "Auswahl"
+    },
+    "keepHint": "Der Verlauf liegt nur auf diesem Computer und zeigt die Aufträge der letzten 30 Tage.",
+    "changed": "„{{ title }}“: {{ status }}"
+  },
+  "jobStatus": {
+    "waiting": "Wartend",
+    "printing": "Druckt",
+    "done": "Fertig",
+    "failed": "Fehler",
+    "cancelled": "Abgebrochen"
+  }
+}

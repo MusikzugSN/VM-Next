@@ -1,0 +1,43 @@
+<div class="flex flex-col gap-3 md:flex-row md:items-start md:justify-between">
+  <div>
+    <h1 class="text-headline-small">{{ 'nav.system.roles' | transloco }}</h1>
+    <p class="mt-2 text-muted-foreground">{{ 'system.roles.intro' | transloco }}</p>
+  </div>
+  <div class="flex flex-col gap-2 md:flex-row">
+    @if (canEdit()) {
+      <button vm-button variant="outlined" type="button" (click)="resetAll()">
+        <ng-icon name="lucideRotateCcw" aria-hidden="true" />{{ 'system.roles.resetAll' | transloco }}
+      </button>
+    }
+    @if (canCreate()) {
+      <button vm-button type="button" (click)="creating.set(true)">
+        <ng-icon name="lucidePlus" aria-hidden="true" />{{ 'system.roles.create' | transloco }}
+      </button>
+    }
+  </div>
+</div>
+
+<vm-name-dialog [(open)]="creating" titleKey="system.roles.create" labelKey="system.roles.newRole" [save]="create" />
+
+<ul vm-card class="overflow-hidden" [class.hidden]="list.items().length === 0">
+  @for (role of list.items(); track role.id; let first = $first) {
+    <li class="flex flex-col gap-1 px-4 py-3 md:flex-row md:items-center md:gap-3" [class.border-t]="!first">
+      <a [routerLink]="link(role)" class="font-medium">{{ role.name }}</a>
+      <span class="flex flex-1 flex-wrap items-center gap-1.5 text-body-medium text-muted-foreground">
+        @if (role.defaultKey) {
+          <span class="rounded-small bg-muted px-1.5 py-0.5 text-body-small">{{ 'system.roles.default' | transloco }}</span>
+        }
+        @if (role.modifiedFromDefault) {
+          <span class="rounded-small bg-warning-soft px-1.5 py-0.5 text-body-small text-warning-ink">{{ 'system.roles.modified' | transloco }}</span>
+        }
+        @if (role.hasClubPermissions) {
+          <span vm-badge tone="error">
+            <ng-icon name="lucideTriangleAlert" size="12" aria-hidden="true" />{{ 'system.roles.clubPermissions' | transloco }}
+          </span>
+        }
+        <span>{{ 'system.roles.assignmentCount' | tPlural: role.assignmentCount }}</span>
+      </span>
+    </li>
+  }
+</ul>
+<vm-list-state [list]="list" emptyKey="system.roles.empty" />

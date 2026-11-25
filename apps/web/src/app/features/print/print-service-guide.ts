@@ -30,7 +30,7 @@ export class PrintServiceGuide {
   protected async copyOrigin(): Promise<void> {
     try {
       await navigator.clipboard.writeText(this.origin);
-      this.sonner.success(this.transloco.translate('print.history.copied'));
+      this.sonner.success(this.transloco.translate('print.serviceGuide.copied'));
     } catch {
       // Clipboard blocked: the address is visible on the page anyway.
     }

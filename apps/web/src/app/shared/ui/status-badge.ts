@@ -37,12 +37,7 @@ const STYLES: Record<StatusKind, { tone: VmBadgeTone; icon: string }> = {
   viewProviders: [provideIcons({ lucideReplace, lucideCircleAlert, lucideClock, lucideCircleCheck, lucideCircleX, lucidePrinter })],
   changeDetection: ChangeDetectionStrategy.OnPush,
   host: { class: 'inline-flex' },
-  template: `
-    <span vm-badge [tone]="style().tone">
-      <ng-icon [name]="style().icon" size="var(--mat-sys-icon-size-xs)" aria-hidden="true" />
-      {{ 'status.' + kind() | transloco: params() }}
-    </span>
-  `,
+  templateUrl: './status-badge.html',
 })
 export class StatusBadge {
   readonly kind = input.required<StatusKind>();

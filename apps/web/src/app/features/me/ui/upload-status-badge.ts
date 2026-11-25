@@ -9,7 +9,7 @@ import { StatusBadge } from '../../../shared/ui/status-badge';
   imports: [StatusBadge],
   changeDetection: ChangeDetectionStrategy.OnPush,
   host: { class: 'inline-flex' },
-  template: `<vm-status-badge [kind]="status()" />`,
+  templateUrl: './upload-status-badge.html',
 })
 export class UploadStatusBadge {
   readonly status = input.required<UploadStatus>();

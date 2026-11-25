@@ -17,27 +17,7 @@ import { LegalStatusStore } from './legal-status.store';
   viewProviders: [provideIcons({ lucideTriangleAlert })],
   changeDetection: ChangeDetectionStrategy.OnPush,
   host: { class: 'contents' },
-  template: `
-    @if (missing().length || legal.templateUpdateAvailable()) {
-      <div class="flex flex-col gap-2 rounded-medium border border-warning-ink/30 bg-warning-soft p-4 text-warning-ink md:flex-row md:items-center md:justify-between" role="alert">
-        <p class="flex items-start gap-2">
-          <ng-icon name="lucideTriangleAlert" class="mt-0.5 shrink-0" size="var(--mat-sys-icon-size-md)" aria-hidden="true" />
-          <span>
-            @if (missing().length) {
-              <strong class="block">{{ titleKey() | transloco }}</strong>
-              {{ (missing().length === 2 ? 'legal.warning.both' : 'legal.warning.' + missing()[0]) | transloco }}
-            } @else {
-              <strong class="block">{{ 'legal.warning.templateTitle' | transloco }}</strong>
-              {{ 'legal.warning.template' | transloco }}
-            }
-          </span>
-        </p>
-        @if (showLink()) {
-          <a [routerLink]="settingsPath" [queryParams]="{ tab: 'legal' }" class="shrink-0 font-medium text-warning-ink">{{ 'legal.warning.action' | transloco }}</a>
-        }
-      </div>
-    }
-  `,
+  templateUrl: './legal-status-banner.html',
 })
 export class LegalStatusBanner {
   protected readonly legal = inject(LegalStatusStore);

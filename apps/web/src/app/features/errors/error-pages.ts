@@ -14,22 +14,7 @@ import { VmButton } from '@vm-web/ui';
   imports: [RouterLink, TranslocoPipe, NgIcon, VmButton],
   viewProviders: [provideIcons({ lucideShieldX, lucideHouse })],
   changeDetection: ChangeDetectionStrategy.OnPush,
-  template: `
-    <section class="mx-auto flex w-full max-w-dialog-lg flex-col gap-6 py-6 md:py-12">
-      <span class="flex size-12 items-center justify-center rounded-full bg-muted text-foreground">
-        <ng-icon name="lucideShieldX" size="var(--mat-sys-icon-size-md)" aria-hidden="true" />
-      </span>
-      <div class="flex flex-col gap-2">
-        <h1 class="text-headline-small">{{ 'pages.forbidden.title' | transloco }}</h1>
-        <p class="text-muted-foreground">{{ 'pages.forbidden.text' | transloco }}</p>
-      </div>
-      <div>
-        <a vm-button [routerLink]="homePath" class="w-full md:w-auto">
-          <ng-icon name="lucideHouse" aria-hidden="true" />{{ 'pages.toHome' | transloco }}
-        </a>
-      </div>
-    </section>
-  `,
+  templateUrl: './forbidden-page.html',
 })
 export class ForbiddenPage {
   protected readonly homePath = APP_ROUTES.me.root;
@@ -41,26 +26,7 @@ export class ForbiddenPage {
   imports: [RouterLink, TranslocoPipe, NgIcon, VmButton],
   viewProviders: [provideIcons({ lucideSearchX, lucideHouse, lucideArrowLeft })],
   changeDetection: ChangeDetectionStrategy.OnPush,
-  template: `
-    <section class="mx-auto flex w-full max-w-dialog-lg flex-col gap-6 py-6 md:py-12">
-      <span class="flex size-12 items-center justify-center rounded-full bg-muted text-foreground">
-        <ng-icon name="lucideSearchX" size="var(--mat-sys-icon-size-md)" aria-hidden="true" />
-      </span>
-      <div class="flex flex-col gap-2">
-        <h1 class="text-headline-small">{{ 'pages.notFound.title' | transloco }}</h1>
-        <p class="text-muted-foreground">{{ 'pages.notFound.text' | transloco }}</p>
-        <p class="text-muted-foreground">
-          {{ 'pages.notFound.requested' | transloco }} <code class="font-mono text-body-medium text-foreground">{{ requested }}</code>
-        </p>
-      </div>
-      <div class="flex flex-col gap-2 md:flex-row">
-        <a vm-button [routerLink]="homePath"> <ng-icon name="lucideHouse" aria-hidden="true" />{{ 'pages.toHome' | transloco }} </a>
-        <button vm-button variant="outlined" type="button" (click)="back()">
-          <ng-icon name="lucideArrowLeft" aria-hidden="true" />{{ 'common.back' | transloco }}
-        </button>
-      </div>
-    </section>
-  `,
+  templateUrl: './not-found-page.html',
 })
 export class NotFoundPage {
   private readonly location = inject(Location);

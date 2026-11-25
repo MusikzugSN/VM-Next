@@ -10,25 +10,7 @@ import { VoiceContextStore } from '../../core/voices/voice-context.store';
   selector: 'vm-voice-select',
   imports: [TranslocoPipe, VmSelect],
   changeDetection: ChangeDetectionStrategy.OnPush,
-  template: `
-    <select
-      vm-select
-      [id]="controlId()"
-      [value]="value() ?? ''"
-      (change)="changed.emit($any($event.target).value || null)"
-      [attr.aria-invalid]="invalid() ? 'true' : null"
-      [attr.aria-describedby]="describedBy()"
-    >
-      <option value="">{{ 'upload.chooseVoice' | transloco }}</option>
-      @for (group of voices.options(); track group.instrument.id) {
-        <optgroup [label]="group.instrument.name">
-          @for (voice of group.voices; track voice.id) {
-            <option [value]="voice.id" [selected]="voice.id === value()">{{ voice.name }}</option>
-          }
-        </optgroup>
-      }
-    </select>
-  `,
+  templateUrl: './voice-select.html',
 })
 export class VoiceSelect {
   protected readonly voices = inject(VoiceContextStore);

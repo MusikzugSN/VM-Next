@@ -21,47 +21,7 @@ export type EventsTab = 'upcoming' | 'archive';
   imports: [VmCard, PluralPipe, DatePipe, RouterLink, NgIcon, TranslocoPipe, EventDate, ListState],
   viewProviders: [provideIcons({ lucideChevronRight })],
   changeDetection: ChangeDetectionStrategy.OnPush,
-  template: `
-    <div>
-      <h1 class="text-headline-small">{{ 'nav.me.events' | transloco }}</h1>
-      <p class="mt-2 text-muted-foreground">{{ 'me.events.intro' | transloco }}</p>
-    </div>
-
-    <nav [attr.aria-label]="'me.events.view' | transloco" class="inline-flex self-start rounded-medium bg-muted p-1">
-      @for (t of tabs; track t.value) {
-        <a
-          [routerLink]="eventsPath"
-          [queryParams]="{ tab: t.value === 'archive' ? 'archive' : null }"
-          [attr.aria-current]="current() === t.value ? 'page' : null"
-          class="inline-flex min-h-target items-center rounded-small px-4 font-medium text-foreground no-underline xl:min-h-target-compact"
-          [class.bg-background]="current() === t.value"
-          [class.shadow-sm]="current() === t.value"
-          >{{ t.labelKey | transloco }}</a
-        >
-      }
-    </nav>
-
-    <ul class="flex flex-col gap-2">
-      @for (event of list.items(); track event.id) {
-        <li>
-          <a
-            [routerLink]="link(event.id)" vm-card class="flex items-center gap-3 p-4 text-foreground no-underline hover:bg-accent md:p-4"
-          >
-            <vm-event-date [date]="event.date" />
-            <span class="flex min-w-0 flex-1 flex-col">
-              <span class="text-title-medium font-medium">{{ event.name }}</span>
-              <span class="text-muted-foreground">{{ event.date | date: 'EEEE, d.M.yyyy' }} · {{ event.ensemble.name }}</span>
-            </span>
-            <span class="hidden text-muted-foreground tabular-nums md:inline">{{
-              'me.common.scoreCount' | tPlural: event.scoreCount
-            }}</span>
-            <ng-icon name="lucideChevronRight" class="shrink-0 text-muted-foreground" aria-hidden="true" />
-          </a>
-        </li>
-      }
-    </ul>
-    <vm-list-state [list]="list" [emptyKey]="current() === 'archive' ? 'me.events.emptyArchive' : 'me.events.empty'" />
-  `,
+  templateUrl: './events-page.html',
 })
 export class EventsPage {
   private readonly api = inject(ApiClient);

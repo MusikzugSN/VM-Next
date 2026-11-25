@@ -1,13 +1,13 @@
 <div class="flex flex-col gap-1">
   <h1 class="text-headline-small">{{ 'nav.library.review' | transloco }}</h1>
-  <p class="text-muted-foreground">{{ 'review.waiting' | tPlural: total() }}</p>
+  <p class="text-muted-foreground">{{ 'library.review.waiting' | tPlural: total() }}</p>
   @if (!viewport.isMobile()) {
     <p class="text-body-medium text-muted-foreground">
-      {{ 'review.shortcuts' | transloco }}
-      <kbd class="rounded-extra-small border border-input px-1 font-sans text-foreground">A</kbd> {{ 'review.keyApprove' | transloco }} ·
-      <kbd class="rounded-extra-small border border-input px-1 font-sans text-foreground">R</kbd> {{ 'review.keyReject' | transloco }} ·
+      {{ 'library.review.shortcuts' | transloco }}
+      <kbd class="rounded-extra-small border border-input px-1 font-sans text-foreground">A</kbd> {{ 'library.review.keyApprove' | transloco }} ·
+      <kbd class="rounded-extra-small border border-input px-1 font-sans text-foreground">R</kbd> {{ 'library.review.keyReject' | transloco }} ·
       <kbd class="rounded-extra-small border border-input px-1 font-sans text-foreground">←</kbd>
-      <kbd class="rounded-extra-small border border-input px-1 font-sans text-foreground">→</kbd> {{ 'review.keyBrowse' | transloco }}
+      <kbd class="rounded-extra-small border border-input px-1 font-sans text-foreground">→</kbd> {{ 'library.review.keyBrowse' | transloco }}
     </p>
   }
 </div>
@@ -21,14 +21,14 @@
 } @else {
   @if (viewport.isMobile()) {
     <div class="flex items-center gap-2">
-      <button vm-icon-button variant="outlined" type="button" [zDisabled]="!upload()?.previousUploadId" (click)="openUpload(upload()?.previousUploadId)" [attr.aria-label]="'review.previousUpload' | transloco">
+      <button vm-icon-button variant="outlined" type="button" [zDisabled]="!upload()?.previousUploadId" (click)="openUpload(upload()?.previousUploadId)" [attr.aria-label]="'library.review.previousUpload' | transloco">
         <ng-icon name="lucideChevronLeft" aria-hidden="true" />
       </button>
       <div class="flex-1 text-center">
-        <p class="font-semibold tabular-nums">{{ position() ? ('review.position' | transloco: { position: position(), total: total() }) : '' }}</p>
-        <p class="text-body-small text-muted-foreground">{{ 'review.inQueue' | transloco }}</p>
+        <p class="font-semibold tabular-nums">{{ position() ? ('library.review.position' | transloco: { position: position(), total: total() }) : '' }}</p>
+        <p class="text-body-small text-muted-foreground">{{ 'library.review.inQueue' | transloco }}</p>
       </div>
-      <button vm-icon-button variant="outlined" type="button" [zDisabled]="!upload()?.nextUploadId" (click)="openUpload(upload()?.nextUploadId)" [attr.aria-label]="'review.nextUpload' | transloco">
+      <button vm-icon-button variant="outlined" type="button" [zDisabled]="!upload()?.nextUploadId" (click)="openUpload(upload()?.nextUploadId)" [attr.aria-label]="'library.review.nextUpload' | transloco">
         <ng-icon name="lucideChevronRight" aria-hidden="true" />
       </button>
     </div>
@@ -36,22 +36,22 @@
 
   <div class="flex min-h-[70dvh] flex-col overflow-hidden rounded-medium border md:flex-row">
     @if (!viewport.isMobile()) {
-      <section [attr.aria-label]="'review.queue' | transloco" class="flex shrink-0 flex-col border-e bg-sidebar" [class]="queueOpen() ? 'w-64' : 'w-14 items-center'">
+      <section [attr.aria-label]="'library.review.queue' | transloco" class="flex shrink-0 flex-col border-e bg-sidebar" [class]="queueOpen() ? 'w-64' : 'w-14 items-center'">
         <div class="flex items-center gap-2 border-b p-2">
           <button
             vm-icon-button
            
             type="button"
             [attr.aria-expanded]="queueOpen()"
-            [attr.aria-label]="(queueOpen() ? 'review.collapseQueue' : 'review.expandQueue') | transloco"
+            [attr.aria-label]="(queueOpen() ? 'library.review.collapseQueue' : 'library.review.expandQueue') | transloco"
             (click)="queueOpen.set(!queueOpen())"
           >
             <ng-icon [name]="queueOpen() ? 'lucidePanelLeftClose' : 'lucidePanelLeftOpen'" aria-hidden="true" />
           </button>
           @if (queueOpen()) {
-            <h2 class="font-semibold">{{ 'review.queueCount' | transloco: { count: total() } }}</h2>
+            <h2 class="font-semibold">{{ 'library.review.queueCount' | transloco: { count: total() } }}</h2>
           } @else if (position()) {
-            <span class="sr-only">{{ 'review.position' | transloco: { position: position(), total: total() } }}</span>
+            <span class="sr-only">{{ 'library.review.position' | transloco: { position: position(), total: total() } }}</span>
           }
         </div>
         @if (queueOpen()) {
@@ -65,7 +65,7 @@
                   [class.bg-primary-soft]="item.uploadId === uploadId()"
                 >
                   <span class="truncate font-medium">{{ item.score?.name ?? item.fileName }}</span>
-                  <span class="truncate text-body-small text-muted-foreground">{{ item.voice?.name ?? ('review.noVoice' | transloco) }}</span>
+                  <span class="truncate text-body-small text-muted-foreground">{{ item.voice?.name ?? ('library.review.noVoice' | transloco) }}</span>
                   <span class="truncate text-body-small text-muted-foreground">{{ item.uploadedBy?.name ?? '–' }} · {{ item.uploadedAt | date: 'dd.MM.' }}</span>
                 </a>
               </li>
@@ -80,8 +80,8 @@
       </section>
     }
 
-    <section [attr.aria-label]="'review.preview' | transloco" class="flex min-w-0 flex-1 flex-col">
-      <div role="toolbar" [attr.aria-label]="'review.tools' | transloco" class="flex flex-wrap items-center gap-1 border-b px-1 py-1">
+    <section [attr.aria-label]="'library.review.preview' | transloco" class="flex min-w-0 flex-1 flex-col">
+      <div role="toolbar" [attr.aria-label]="'library.review.tools' | transloco" class="flex flex-wrap items-center gap-1 border-b px-1 py-1">
         <button vm-icon-button type="button" [zDisabled]="page() <= 1" (click)="goPage(-1)" [attr.aria-label]="'pdf.previous' | transloco">
           <ng-icon name="lucideChevronLeft" aria-hidden="true" />
         </button>
@@ -90,16 +90,16 @@
           <ng-icon name="lucideChevronRight" aria-hidden="true" />
         </button>
         <span class="flex-1"></span>
-        <button vm-button variant="text" type="button" (click)="rotateCurrent()"><ng-icon name="lucideRotateCw" aria-hidden="true" />{{ 'review.rotate' | transloco }}</button>
+        <button vm-button variant="text" type="button" (click)="rotateCurrent()"><ng-icon name="lucideRotateCw" aria-hidden="true" />{{ 'library.review.rotate' | transloco }}</button>
         <button vm-button variant="text" type="button" [attr.aria-pressed]="cropping()" (click)="cropping.set(!cropping())">
-          <ng-icon name="lucideCrop" aria-hidden="true" />{{ 'review.crop' | transloco }}
+          <ng-icon name="lucideCrop" aria-hidden="true" />{{ 'library.review.crop' | transloco }}
         </button>
         @if (!viewport.isMobile()) {
-          <button vm-icon-button type="button" [zDisabled]="zoomIndex() === 0" (click)="zoomBy(-1)" [attr.aria-label]="'review.zoomOut' | transloco">
+          <button vm-icon-button type="button" [zDisabled]="zoomIndex() === 0" (click)="zoomBy(-1)" [attr.aria-label]="'library.review.zoomOut' | transloco">
             <ng-icon name="lucideZoomOut" aria-hidden="true" />
           </button>
           <span class="w-12 text-center text-body-medium tabular-nums">{{ zoom() * 100 }} %</span>
-          <button vm-icon-button type="button" [zDisabled]="zoomIndex() === 5" (click)="zoomBy(1)" [attr.aria-label]="'review.zoomIn' | transloco">
+          <button vm-icon-button type="button" [zDisabled]="zoomIndex() === 5" (click)="zoomBy(1)" [attr.aria-label]="'library.review.zoomIn' | transloco">
             <ng-icon name="lucideZoomIn" aria-hidden="true" />
           </button>
         }
@@ -107,10 +107,10 @@
 
       @if (cropping() && current(); as p) {
         <fieldset class="flex flex-wrap items-end gap-3 border-b bg-background px-4 py-3">
-          <legend class="sr-only">{{ 'review.cropLegend' | transloco: { page: page() } }}</legend>
+          <legend class="sr-only">{{ 'library.review.cropLegend' | transloco: { page: page() } }}</legend>
           @for (side of ['left', 'top', 'right', 'bottom']; track side) {
             <label class="flex flex-col gap-1 text-body-small">
-              <span class="font-medium">{{ 'review.margin.' + side | transloco }}</span>
+              <span class="font-medium">{{ 'library.review.margin.' + side | transloco }}</span>
               <input
                 type="number"
                 min="0"
@@ -122,8 +122,8 @@
               />
             </label>
           }
-          <button vm-button variant="text" type="button" (click)="resetCrop()">{{ 'review.resetCrop' | transloco }}</button>
-          <p class="w-full text-body-small text-muted-foreground">{{ 'review.cropHint' | transloco }}</p>
+          <button vm-button variant="text" type="button" (click)="resetCrop()">{{ 'library.review.resetCrop' | transloco }}</button>
+          <p class="w-full text-body-small text-muted-foreground">{{ 'library.review.cropHint' | transloco }}</p>
         </fieldset>
       }
 
@@ -142,16 +142,16 @@
       @if (current(); as p) {
         <label class="flex min-h-target items-center gap-2 border-t px-3 xl:min-h-9">
           <input vm-checkbox type="checkbox" [checked]="p.keep" (change)="toggleKeep()" />
-          {{ 'review.keepPage' | transloco: { page: page() } }}
-          <span class="text-body-small text-muted-foreground">({{ 'review.keptCount' | transloco: { kept: keptPages(), total: pages().length } }})</span>
+          {{ 'library.review.keepPage' | transloco: { page: page() } }}
+          <span class="text-body-small text-muted-foreground">({{ 'library.review.keptCount' | transloco: { kept: keptPages(), total: pages().length } }})</span>
         </label>
       }
     </section>
 
-    <section [attr.aria-label]="'review.assignment' | transloco" class="flex w-full shrink-0 flex-col gap-4 border-t p-4 md:w-80 md:border-s md:border-t-0">
+    <section [attr.aria-label]="'library.review.assignment' | transloco" class="flex w-full shrink-0 flex-col gap-4 border-t p-4 md:w-80 md:border-s md:border-t-0">
       @if (upload(); as u) {
         <div class="flex items-center justify-between">
-          <h2 class="text-title-medium">{{ 'review.assignment' | transloco }}</h2>
+          <h2 class="text-title-medium">{{ 'library.review.assignment' | transloco }}</h2>
           <vm-status-badge [kind]="u.status" />
         </div>
         <div class="flex flex-col gap-1.5">
@@ -163,52 +163,52 @@
           <vm-voice-select controlId="rv-voice" [value]="voiceId()" (changed)="voiceId.set($event)" />
         </div>
         <dl class="grid grid-cols-[auto_1fr] gap-x-3 gap-y-1 text-body-medium">
-          <dt class="text-muted-foreground">{{ 'review.uploadedBy' | transloco }}</dt>
+          <dt class="text-muted-foreground">{{ 'library.review.uploadedBy' | transloco }}</dt>
           <dd>{{ u.uploadedBy?.name ?? '–' }}, {{ u.uploadedAt | date: 'dd.MM.yyyy, HH:mm' }}</dd>
-          <dt class="text-muted-foreground">{{ 'review.file' | transloco }}</dt>
+          <dt class="text-muted-foreground">{{ 'library.review.file' | transloco }}</dt>
           <dd class="font-mono break-all">{{ u.fileName }}</dd>
-          <dt class="text-muted-foreground">{{ 'review.pages' | transloco }}</dt>
+          <dt class="text-muted-foreground">{{ 'library.review.pages' | transloco }}</dt>
           <dd class="tabular-nums">{{ u.pageCount }}</dd>
         </dl>
 
         @if (needsReplace()) {
           <div class="flex flex-col gap-2 rounded-small bg-warning-soft p-4 text-warning-ink">
-            <p>{{ 'review.exists' | transloco }}</p>
+            <p>{{ 'library.review.exists' | transloco }}</p>
             @if (canReplace()) {
               <label class="inline-flex min-h-target items-center gap-2 xl:min-h-target-compact">
                 <input vm-checkbox type="checkbox" [checked]="replaceExisting()" (change)="replaceExisting.set($any($event.target).checked)" />
-                {{ 'review.replace' | transloco }}
+                {{ 'library.review.replace' | transloco }}
               </label>
             } @else {
-              <p class="text-body-medium">{{ 'review.replaceNotAllowed' | transloco }}</p>
+              <p class="text-body-medium">{{ 'library.review.replaceNotAllowed' | transloco }}</p>
             }
           </div>
         }
 
         <label vm-field>
-          <span vm-field-label>{{ 'review.reason' | transloco }}</span>
+          <span vm-field-label>{{ 'library.review.reason' | transloco }}</span>
           <textarea
             #reasonField
             vm-textarea
             rows="3"
             maxlength="1000"
-            [placeholder]="'review.reasonPlaceholder' | transloco"
+            [placeholder]="'library.review.reasonPlaceholder' | transloco"
             [value]="reason()"
             (input)="reason.set($any($event.target).value); reasonMissing.set(false)"
             [attr.aria-invalid]="reasonMissing() ? 'true' : null"
             [attr.aria-describedby]="reasonMissing() ? 'rv-reason-err' : null"
           ></textarea>
           @if (reasonMissing()) {
-            <span vm-field-error id="rv-reason-err">{{ 'review.reasonRequired' | transloco }}</span>
+            <span vm-field-error id="rv-reason-err">{{ 'library.review.reasonRequired' | transloco }}</span>
           }
         </label>
 
         <div class="mt-auto flex gap-2 md:flex-col-reverse" [class.sticky]="viewport.isMobile()" [class.bottom-16]="viewport.isMobile()">
           <button vm-button variant="outlined" type="button" class="flex-1 border-destructive text-destructive-ink" [zDisabled]="busy()" (click)="reject()">
-            {{ 'review.reject' | transloco }}
+            {{ 'library.review.reject' | transloco }}
           </button>
           <button vm-button type="button" class="flex-[1.6]" [zLoading]="busy()" [zDisabled]="!canApprove()" (click)="approve()">
-            {{ 'review.approve' | transloco }}
+            {{ 'library.review.approve' | transloco }}
           </button>
         </div>
       } @else if (details.isLoading()) {

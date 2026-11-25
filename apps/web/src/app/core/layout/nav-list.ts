@@ -55,39 +55,7 @@ import { canSee, isActive, NAV_SECTIONS } from './nav';
     }),
   ],
   changeDetection: ChangeDetectionStrategy.OnPush,
-  template: `
-    <nav [attr.aria-label]="'nav.label' | transloco" class="flex flex-col gap-0.5">
-      @for (section of sections(); track section.labelKey; let first = $first) {
-        <h2 class="px-spacing-md pb-1 text-label-medium text-on-surface-variant" [class.pt-3]="!first">
-          {{ section.labelKey | transloco }}
-        </h2>
-        <ul class="flex flex-col gap-0.5">
-          @for (item of section.items; track item.path) {
-            <li>
-              <a
-                [routerLink]="item.path"
-                [attr.aria-current]="isActive(item, url()) ? 'page' : null"
-                [class.bg-primary-container]="isActive(item, url())"
-                (click)="navigate.emit()"
-                class="flex h-control items-center gap-spacing-md rounded-full px-spacing-md text-label-large text-on-surface no-underline transition-colors hover:not-aria-[current=page]:bg-on-surface/8 aria-[current=page]:text-on-primary-container xl:h-control-compact"
-              >
-                <ng-icon [name]="item.icon" size="var(--mat-sys-icon-size-md)" aria-hidden="true" />
-                <span class="flex-1">{{ item.labelKey | transloco }}</span>
-                @if (item.badge === 'review' && reviewCount() > 0) {
-                  <span
-                    class="min-w-5 rounded-full bg-primary px-1.5 text-center text-label-small leading-5 text-on-primary tabular-nums"
-                  >
-                    {{ reviewCount() }}
-                    <span class="sr-only">{{ 'shell.pendingUploads' | transloco }}</span>
-                  </span>
-                }
-              </a>
-            </li>
-          }
-        </ul>
-      }
-    </nav>
-  `,
+  templateUrl: './nav-list.html',
 })
 export class NavList {
   private readonly session = inject(SessionStore);

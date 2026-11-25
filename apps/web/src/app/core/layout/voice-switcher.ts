@@ -19,45 +19,7 @@ import { StandInDialog } from './stand-in-dialog';
   imports: [NgIcon, RouterLink, TranslocoPipe, VmMenuImports, StandInDialog],
   viewProviders: [provideIcons({ lucideMusic2, lucideChevronDown })],
   changeDetection: ChangeDetectionStrategy.OnPush,
-  template: `
-    @if (store.needsVoiceSelection()) {
-      <a
-        [routerLink]="profilePath"
-        class="inline-flex h-control items-center gap-2 rounded-full bg-secondary-container px-spacing-lg text-label-large text-on-secondary-container no-underline transition-opacity hover:opacity-90 xl:h-target-compact"
-      >
-        <ng-icon name="lucideMusic2" aria-hidden="true" />{{ 'shell.voice.choose' | transloco }}
-      </a>
-    } @else if (store.activeVoices().length > 0) {
-      <button
-        type="button"
-        vm-menu-trigger
-        [zDropdownMenu]="menu"
-        [attr.aria-label]="'shell.voice.label' | transloco: { voices: label() }"
-        class="inline-flex h-control max-w-72 items-center gap-2 rounded-full bg-secondary-container px-spacing-lg text-label-large text-on-secondary-container transition-opacity hover:opacity-90 xl:h-target-compact"
-      >
-        <ng-icon name="lucideMusic2" aria-hidden="true" class="shrink-0" />
-        <span class="truncate">{{ label() }}</span>
-        @if (store.isStandIn()) {
-          <span class="rounded-small bg-surface px-1 text-label-small">{{ 'shell.voice.override' | transloco }}</span>
-        }
-        <ng-icon name="lucideChevronDown" aria-hidden="true" class="shrink-0" />
-      </button>
-
-      <vm-menu-content #menu="zDropdownMenuContent" zAlign="end" class="w-64">
-        <vm-menu-label>{{ 'shell.voice.menuTitle' | transloco }}</vm-menu-label>
-        <vm-menu-radio-group [zValue]="selected()" (zValueChange)="select($event)">
-          <vm-menu-radio-item zValue="">{{ 'shell.voice.allOwn' | transloco }}</vm-menu-radio-item>
-          @for (voice of menuVoices(); track voice.id) {
-            <vm-menu-radio-item [zValue]="voice.id">{{ voice.name }}</vm-menu-radio-item>
-          }
-        </vm-menu-radio-group>
-        <vm-menu-separator />
-        <button type="button" vm-menu-item (click)="standInOpen.set(true)">{{ 'shell.voice.other' | transloco }}</button>
-        <a vm-menu-item [routerLink]="profilePath">{{ 'shell.voice.editProfile' | transloco }}</a>
-      </vm-menu-content>
-      <vm-stand-in-dialog [(open)]="standInOpen" />
-    }
-  `,
+  templateUrl: './voice-switcher.html',
 })
 export class VoiceSwitcher {
   protected readonly store = inject(VoiceContextStore);

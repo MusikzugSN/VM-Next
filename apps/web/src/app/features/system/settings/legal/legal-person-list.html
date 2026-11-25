@@ -1,0 +1,98 @@
+<fieldset class="flex flex-col gap-3">
+  <legend class="mb-1 font-medium">{{ legendKey() | transloco }}{{ required() ? ' *' : '' }}</legend>
+  @if (hintKey(); as hint) {
+    <p class="text-body-medium text-muted-foreground">{{ hint | transloco }}</p>
+  }
+  @for (p of persons(); track $index; let i = $index) {
+    <div class="flex flex-col gap-3 rounded-small border p-3">
+      <div class="grid items-end gap-2 sm:grid-cols-[1fr_1fr_auto]">
+        <vm-legal-field
+          path="imprint.representativeName"
+          [required]="true"
+          [maxlength]="100"
+          [value]="p.name"
+          [error]="err(i, 'name')"
+          [readonly]="readonly()"
+          (valueChange)="set(i, 'name', $event)"
+        />
+        <vm-legal-field
+          path="imprint.representativeRole"
+          [required]="true"
+          [maxlength]="100"
+          [placeholder]="rolePlaceholderKey() | transloco"
+          [value]="p.role"
+          [error]="err(i, 'role')"
+          [readonly]="readonly()"
+          (valueChange)="set(i, 'role', $event)"
+        />
+        @if (!readonly()) {
+          <button vm-icon-button type="button" [attr.aria-label]="'system.settings.legal.removePerson' | transloco: { index: i + 1 }" (click)="remove(i)">
+            <ng-icon name="lucideTrash2" aria-hidden="true" />
+          </button>
+        }
+      </div>
+      <details class="group" [open]="hasAnyContact(p)">
+        <summary class="flex min-h-target cursor-pointer items-center gap-2 text-body-medium font-medium">
+          {{ 'system.settings.legal.personContact' | transloco }}
+          @if (complete(p)) {
+            <span class="inline-flex items-center gap-1 text-success-ink">
+              <ng-icon name="lucideCircleCheck" aria-hidden="true" />{{ 'system.settings.legal.contactComplete' | transloco }}
+            </span>
+          }
+        </summary>
+        <div class="mt-2 flex flex-col gap-3">
+          <vm-legal-field
+            path="imprint.address.street"
+            autocomplete="off"
+            [value]="p.address?.street ?? null"
+            [error]="err(i, 'address/street')"
+            [readonly]="readonly()"
+            (valueChange)="setAddress(i, 'street', $event)"
+          />
+          <div class="grid gap-3 sm:grid-cols-[10rem_1fr]">
+            <vm-legal-field
+              path="imprint.address.postalCode"
+              [maxlength]="5"
+              [value]="p.address?.postalCode ?? null"
+              [error]="err(i, 'address/postalCode')"
+              [readonly]="readonly()"
+              (valueChange)="setAddress(i, 'postalCode', $event)"
+            />
+            <vm-legal-field
+              path="imprint.address.city"
+              [maxlength]="100"
+              [value]="p.address?.city ?? null"
+              [error]="err(i, 'address/city')"
+              [readonly]="readonly()"
+              (valueChange)="setAddress(i, 'city', $event)"
+            />
+          </div>
+          <div class="grid gap-3 sm:grid-cols-2">
+            <vm-legal-field
+              path="imprint.phone"
+              type="tel"
+              [maxlength]="40"
+              [value]="p.phone"
+              [error]="err(i, 'phone')"
+              [readonly]="readonly()"
+              (valueChange)="set(i, 'phone', $event)"
+            />
+            <vm-legal-field
+              path="imprint.email"
+              type="email"
+              [value]="p.email"
+              [error]="err(i, 'email')"
+              [readonly]="readonly()"
+              (valueChange)="set(i, 'email', $event)"
+            />
+          </div>
+        </div>
+      </details>
+    </div>
+  }
+  @if (!readonly() && persons().length < 10) {
+    <button vm-button variant="outlined" type="button" class="self-start" (click)="add()">
+      <ng-icon name="lucidePlus" aria-hidden="true" />{{ 'system.settings.legal.addPerson' | transloco }}
+    </button>
+  }
+</fieldset>

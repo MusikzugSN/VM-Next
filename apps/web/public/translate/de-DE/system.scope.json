@@ -433,6 +433,10 @@
     "sheets": {
       "one": "1 Blatt",
       "other": "{{ count }} Blätter"
+    },
+    "modes": {
+      "simplex": "Einseitig",
+      "duplex": "Beidseitig, lange Kante"
     }
   }
 }

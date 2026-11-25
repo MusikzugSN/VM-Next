@@ -183,7 +183,7 @@ export class ReviewPage {
 
   protected rotateCurrent(): void {
     this.updateCurrent((p) => ({ ...p, rotation: rotate(p.rotation), crop: null }));
-    this.announcement.set(this.transloco.translate('review.rotated', { page: this.page(), degrees: this.current()?.rotation ?? 0 }));
+    this.announcement.set(this.transloco.translate('library.review.rotated', { page: this.page(), degrees: this.current()?.rotation ?? 0 }));
   }
 
   protected toggleKeep(): void {
@@ -220,7 +220,7 @@ export class ReviewPage {
             approveUploadResponseSchema,
           ),
       {
-        success: { key: 'review.approved', params: { name: upload.fileName } },
+        success: { key: 'library.review.approved', params: { name: upload.fileName } },
         onProblem: (problem) => {
           if (isApiProblem(problem) && problem.code === 'upload-not-pending') {
             this.afterDecision(upload.nextUploadId);
@@ -245,7 +245,7 @@ export class ReviewPage {
     const done = await this.actions.runOnce(
       () =>
         this.api.post(apiUrl('review', 'reject', { uploadId: upload.uploadId }), { reason: this.reason().trim() }, rejectUploadResponseSchema),
-      { success: { key: 'review.rejected', params: { name: upload.fileName } } },
+      { success: { key: 'library.review.rejected', params: { name: upload.fileName } } },
     );
     this.busy.set(false);
     if (done) this.afterDecision(done.value.nextUploadId);

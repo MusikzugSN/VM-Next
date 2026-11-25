@@ -22,56 +22,7 @@ import { selectOr } from '../../../core/util/resource-value';
   viewProviders: [provideIcons({ lucideArrowUp, lucideArrowDown, lucidePencil, lucidePlus, lucideTrash2 })],
   changeDetection: ChangeDetectionStrategy.OnPush,
   host: { class: 'flex flex-col gap-4' },
-  template: `
-    <div class="flex flex-col gap-3 md:flex-row md:items-start md:justify-between">
-      <p class="text-muted-foreground">{{ 'system.settings.fields.hint' | transloco }}</p>
-      @if (canEdit()) {
-        <button vm-button type="button" class="w-full shrink-0 md:w-auto" (click)="openDialog(null)">
-          <ng-icon name="lucidePlus" aria-hidden="true" />{{ 'fields.create' | transloco }}
-        </button>
-      }
-    </div>
-
-    @if (fields.error()) {
-      <vm-page-problem [error]="fields.error()" />
-    } @else if (items().length === 0 && fields.hasValue()) {
-      <p class="rounded-medium border border-dashed p-8 text-center text-muted-foreground">{{ 'system.settings.fields.empty' | transloco }}</p>
-    } @else {
-      <ul vm-card class="overflow-hidden">
-        @for (field of items(); track field.id; let first = $first, last = $last, i = $index) {
-          <li class="flex flex-col gap-2 px-4 py-3 md:flex-row md:items-center" [class.border-t]="!first">
-            <span class="flex min-w-0 flex-1 flex-col">
-              <span class="font-medium">{{ field.name }}{{ field.required ? ' *' : '' }}</span>
-              <span class="text-body-medium text-muted-foreground">
-                {{ 'terms.fieldTypes.' + field.type | transloco }}
-                @if (field.options.length) {
-                  · {{ optionLabels(field) }}
-                }
-              </span>
-            </span>
-            @if (canEdit()) {
-              <span class="flex gap-1">
-                <button vm-icon-button type="button" [zDisabled]="first" (click)="move(i, -1)" [attr.aria-label]="'common.moveUp' | transloco: { name: field.name }">
-                  <ng-icon name="lucideArrowUp" aria-hidden="true" />
-                </button>
-                <button vm-icon-button type="button" [zDisabled]="last" (click)="move(i, 1)" [attr.aria-label]="'common.moveDown' | transloco: { name: field.name }">
-                  <ng-icon name="lucideArrowDown" aria-hidden="true" />
-                </button>
-                <button vm-button variant="text" type="button" (click)="openDialog(field)" [attr.aria-label]="'system.settings.fields.editLabel' | transloco: { name: field.name }">
-                  <ng-icon name="lucidePencil" aria-hidden="true" /><span class="hidden md:inline">{{ 'common.edit' | transloco }}</span>
-                </button>
-                <button vm-button variant="text" type="button" class="text-destructive-ink" (click)="remove(field)" [attr.aria-label]="'system.settings.fields.deleteLabel' | transloco: { name: field.name }">
-                  <ng-icon name="lucideTrash2" aria-hidden="true" /><span class="hidden md:inline">{{ 'common.delete' | transloco }}</span>
-                </button>
-              </span>
-            }
-          </li>
-        }
-      </ul>
-    }
-
-    <vm-field-dialog [(open)]="dialogOpen" [field]="editing()" [save]="save" />
-  `,
+  templateUrl: './fields-settings.html',
 })
 export class FieldsSettings {
   private readonly api = inject(ApiClient);

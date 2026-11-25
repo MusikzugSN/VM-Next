@@ -1,0 +1,32 @@
+<div class="flex min-h-dvh flex-col bg-background">
+  <header class="flex h-header shrink-0 items-center gap-3 border-b px-4 md:px-8 print:border-b-0 print:px-0">
+    <a [routerLink]="homePath" class="flex min-w-0 items-center gap-3 text-foreground no-underline">
+      <vm-club-logo [size]="32" />
+      <span class="truncate font-semibold">{{ clubName() }}</span>
+    </a>
+  </header>
+  <main class="flex flex-1 justify-center px-4 py-8 md:px-8 md:py-12 print:p-0">
+    <article class="w-full max-w-[72ch]">
+      @if (doc.error()) {
+        <vm-page-problem [error]="doc.error()" />
+      } @else if (doc.hasValue() && doc.value(); as d) {
+        @switch (d.mode) {
+          @case ('generated') {
+            <vm-legal-html [html]="d.html" />
+          }
+          @case ('link') {
+            <p class="text-muted-foreground" role="status">{{ 'legal.page.redirecting' | transloco }}</p>
+            <a [href]="d.url">{{ d.url }}</a>
+          }
+          @default {
+            <h1 class="text-headline-small">{{ 'legal.' + document() | transloco }}</h1>
+            <p class="mt-4 text-muted-foreground">{{ 'legal.page.unavailable' | transloco: { club: clubName() } }}</p>
+          }
+        }
+      } @else {
+        <p class="text-muted-foreground" role="status">{{ 'common.loading' | transloco }}</p>
+      }
+    </article>
+  </main>
+  <vm-legal-links class="border-t" />
+</div>
