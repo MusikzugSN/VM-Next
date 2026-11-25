@@ -1,3 +1,4 @@
+import { SHORT_NAME_MAX } from '@vm-web/shared';
 import { ChangeDetectionStrategy, Component, computed, effect, input, model, signal, untracked } from '@angular/core';
 import { TranslocoPipe } from '@jsverse/transloco';
 import type { Ref } from '@vm-web/shared';
@@ -5,7 +6,6 @@ import { VmField, VmFieldLabel, VmInput, VmSelect } from '@vm-web/ui';
 
 
 import { FormDialog, runDialogSave } from '../../../shared/ui/form-dialog';
-import { NAME_MAX } from '../../../shared/ui/name-dialog';
 import { TreeLabelPipe } from '../../../shared/ui/tree-label.pipe';
 import { ToggleField } from '../../../shared/ui/toggle-field';
 
@@ -55,7 +55,7 @@ export class CreateInEnsembleDialog {
   readonly withDate = input(false);
   readonly save = input.required<(value: CreateInEnsemble) => Promise<boolean>>();
 
-  protected readonly max = NAME_MAX;
+  protected readonly max = SHORT_NAME_MAX;
   protected readonly name = signal('');
   protected readonly date = signal('');
   protected readonly ensembleId = signal('');

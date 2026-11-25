@@ -1,3 +1,4 @@
+import { SCORE_TITLE_MAX } from '@vm-web/shared';
 import { ChangeDetectionStrategy, Component, inject, input, model, signal } from '@angular/core';
 import { TranslocoPipe } from '@jsverse/transloco';
 import { NgIcon, provideIcons } from '@ng-icons/core';
@@ -27,6 +28,7 @@ export class ScoreForm {
   private readonly api = inject(ApiClient);
   private readonly actions = inject(ActionRunner);
   protected readonly options = inject(LibraryOptions);
+  protected readonly titleMax = SCORE_TITLE_MAX;
 
   readonly value = model.required<ScoreFormInput>();
   readonly errors = input<ScoreFormErrors>({});
