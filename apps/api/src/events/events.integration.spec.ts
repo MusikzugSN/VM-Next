@@ -194,7 +194,7 @@ describe.skipIf(!TEST_DATABASE_URL)('Termine (TEST_DATABASE_URL)', () => {
   describe('changing (N-15, N-16)', () => {
     it('creates events in active ensembles only', async () => {
       const created = await api('board', 'events/create', { ensembleId: ids.windClass, name: 'Probenwochenende', date: addDays(today, 20) });
-      expect(created.status).toBe(200);
+      expect(created.status).toBe(201);
       expect((await api('board', `events/${created.body.id}/details`)).body).toMatchObject({
         name: 'Probenwochenende',
         ensemble: { id: ids.windClass },
