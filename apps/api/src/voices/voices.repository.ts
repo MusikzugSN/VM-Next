@@ -7,7 +7,7 @@ import { escapeLike, likePattern } from '../common/sql';
 import { assertKnownIds } from '../common/validation/id-list';
 import { DATABASE, type Database, type Tx } from '../db/database';
 import { withNameTaken } from '../db/db-errors';
-import { ensembleLineupVoices, instruments, sheets, uploads, userVoices, voices, voiceSubstitutes } from '../db/schema';
+import { ensembleLineupVoices, instruments, seedLock, sheets, uploads, userVoices, voices, voiceSubstitutes } from '../db/schema';
 import { assertPermutation, nextPosition, replaceRows } from '../db/table-helpers';
 
 @Injectable()
@@ -140,7 +140,8 @@ export class VoicesRepository {
 }
 
 async function lockCatalog(tx: Tx): Promise<string[]> {
-  const rows = await tx.select({ id: instruments.id }).from(instruments).for('update');
+  await tx.select({ id: seedLock.id }).from(seedLock).where(eq(seedLock.id, 1)).for('update');
+  const rows = await tx.select({ id: instruments.id }).from(instruments);
   return rows.map((r) => r.id);
 }
 
