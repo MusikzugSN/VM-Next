@@ -1,4 +1,4 @@
-import { CupsBackend, isPrinting, listsJob, parseDefault, parseInfo, parseRequestId, type Run } from './cups-backend';
+import { CupsBackend, isPrinting, listsJob, parseDefault, parseInfo, parseRequestId, statusMessage, type Run } from './cups-backend';
 
 describe('CUPS output parsing', () => {
   it('reads the default printer', () => {
@@ -23,6 +23,15 @@ describe('CUPS output parsing', () => {
     expect(listsJob(list, 'HP-4')).toBe(false);
     expect(isPrinting('printer HP now printing HP-42.  enabled since Sat', 'HP-42')).toBe(true);
     expect(isPrinting('printer HP now printing HP-420.  enabled since Sat', 'HP-42')).toBe(false);
+  });
+
+  it('reads the status message of a completed job', () => {
+    const aborted = 'PDF-1   root   10240   Thu Nov 26 17:15:58 2026\n' + '\tStatus: Backend failed\n\tAlerts: processing-to-stop-point\n\tqueued for PDF\n';
+    const printed = 'PDF-4   root   10240   Thu Nov 26 17:32:05 2026\n' + '\tStatus: \n\tAlerts: processing-to-stop-point\n\tqueued for PDF\n';
+    expect(statusMessage(aborted, 'PDF-1')).toBe('Backend failed');
+    expect(statusMessage(printed, 'PDF-4')).toBe('');
+    expect(statusMessage(aborted + printed, 'PDF-4')).toBe('');
+    expect(statusMessage(printed, 'PDF-9')).toBe('');
   });
 });
 
@@ -69,6 +78,12 @@ describe('CupsBackend', () => {
     expect((await backend(line, 'printer HP now printing HP-7.', '').state('HP-7', 'HP')).status).toBe('printing');
     expect((await backend('', '', line).state('HP-7', 'HP')).status).toBe('done');
     expect((await backend('', '', '').state('HP-7', 'HP')).status).toBe('failed');
+  });
+
+  it('does not call an aborted job done', async () => {
+    const aborted = 'HP-7 anna 1024 Sat\n\tStatus: Backend failed\n\tqueued for HP\n';
+    const run = fake({ 'lpstat -W not-completed': '', 'lpstat -W completed': aborted }).run;
+    expect(await new CupsBackend(run).state('HP-7', 'HP')).toEqual({ status: 'failed', printedPages: null, error: 'Backend failed' });
   });
 
   it('reports a failing lpstat instead of declaring the job gone', async () => {

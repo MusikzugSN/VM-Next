@@ -45,7 +45,23 @@ export function parseRequestId(output: string): string | null {
 
 /** Whether a job id is listed in `lpstat -o` style output (first column). */
 export function listsJob(output: string, backendId: string): boolean {
-  return output.split('\n').some((line) => line.trim().split(/\s+/)[0] === backendId);
+  return output.split('\n').some((line) => !/^\s/.test(line) && line.trim().split(/\s+/)[0] === backendId);
+}
+
+/**
+ * The `Status:` line a job carries in `lpstat -l` output. CUPS lists an aborted job as completed
+ * and tells it apart only by this message; a job that printed carries it empty.
+ */
+export function statusMessage(output: string, backendId: string): string {
+  const lines = output.split('\n');
+  const start = lines.findIndex((line) => !/^\s/.test(line) && line.trim().split(/\s+/)[0] === backendId);
+  if (start < 0) return '';
+  for (const line of lines.slice(start + 1)) {
+    if (!/^\s/.test(line)) break;
+    const match = /^\s+Status:\s*(.*)$/.exec(line);
+    if (match) return match[1].trim();
+  }
+  return '';
 }
 
 /** `lpstat -p X` → `printer X now printing X-42.  enabled since …`. */
@@ -99,8 +115,11 @@ export class CupsBackend implements PrinterBackend {
       const printer = await this.run('lpstat', ['-p', printerId]).catch(() => '');
       return { status: isPrinting(printer, backendId) ? 'printing' : 'waiting', printedPages: null, error: null };
     }
-    const done = await this.run('lpstat', ['-W', 'completed', '-o', printerId]);
-    if (listsJob(done, backendId)) return { status: 'done', printedPages: null, error: null };
+    const done = await this.run('lpstat', ['-W', 'completed', '-l', '-o', printerId]);
+    if (listsJob(done, backendId)) {
+      const message = statusMessage(done, backendId);
+      return message ? { status: 'failed', printedPages: null, error: message } : { status: 'done', printedPages: null, error: null };
+    }
     return { status: 'failed', printedPages: null, error: 'Der Auftrag ist im Drucksystem nicht mehr vorhanden.' };
   }
 
