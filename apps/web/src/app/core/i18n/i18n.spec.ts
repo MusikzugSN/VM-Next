@@ -97,4 +97,16 @@ describe.each(AVAILABLE_LANGS)('translations %s', (lang) => {
     });
     expect(missing).toEqual([]);
   });
+
+  it('resolves every emptyKey of a list state', () => {
+    const unresolved: { key: string; file: string }[] = [];
+    for (const file of sourceFiles(APP_ROOT)) {
+      for (const match of readFileSync(file, 'utf8').matchAll(/emptyKey="([\w.-]+)"/g)) {
+        const [first, ...rest] = match[1].split('.');
+        const scope = scopes.get(first);
+        if (!(scope && has(scope, rest.join('.'))) && !has(global, match[1])) unresolved.push({ key: match[1], file: relative(WEB_ROOT, file) });
+      }
+    }
+    expect(unresolved).toEqual([]);
+  });
 });

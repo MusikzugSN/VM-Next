@@ -15,7 +15,7 @@
 <p class="sr-only" aria-live="polite">{{ announcement() }}</p>
 
 @if (!uploadId()) {
-  <vm-list-state [list]="queue" emptyKey="review.empty" />
+  <vm-list-state [list]="queue" emptyKey="library.review.empty" />
 } @else if (details.error()) {
   <vm-page-problem [error]="details.error()" />
 } @else {
